@@ -830,3 +830,983 @@ Total : 101.00 EUR`,
         }
       ]
     },
+    {
+      titre: 'C avancé', niveau: 'Avancé', description: 'Fichiers, préprocesseur et projets multi-fichiers, structures de données, débogage et comportements indéfinis.',
+      lecons: [
+        {
+          titre: 'Fichiers et entrées/sorties',
+          theorie: `<p>En C, un fichier est un flux (<code>FILE *</code>) manipulé par les fonctions de <code>&lt;stdio.h&gt;</code>. <code>stdin</code>, <code>stdout</code> et <code>stderr</code> sont trois flux déjà ouverts : la console suit exactement les mêmes règles qu'un fichier.</p>
+${code('c', `#include <stdio.h>
+
+int main(void)
+{
+    FILE *f = fopen("notes.txt", "w");          /* "r" lecture, "w" écriture (écrase), "a" ajout, "rb"/"wb" binaire */
+    if (f == NULL) {
+        perror("fopen");                        /* affiche la cause système : No such file or directory... */
+        return 1;
+    }
+    fprintf(f, "%s;%d\\n", "Ana", 15);           /* comme printf, vers un flux */
+    fputs("Bob;12\\n", f);
+    fclose(f);                                  /* vide le tampon et libère : obligatoire */
+    return 0;
+}`)}
+<h2>Lire ligne par ligne</h2>
+${code('c', `FILE *f = fopen("notes.txt", "r");
+if (!f) { perror("fopen"); return 1; }
+
+char ligne[256];
+while (fgets(ligne, sizeof ligne, f) != NULL) {     /* lit jusqu'au \\n inclus, ou 255 caractères */
+    char nom[64]; int note;
+    if (sscanf(ligne, "%63[^;];%d", nom, &note) == 2) {   /* %63[^;] : jusqu'à 63 caractères sauf ';' */
+        printf("%s a %d\\n", nom, note);
+    } else {
+        fprintf(stderr, "Ligne invalide : %s", ligne);
+    }
+}
+if (ferror(f)) perror("lecture");
+fclose(f);`)}
+<p><code>fgets</code> + <code>sscanf</code> est le duo robuste : on lit une ligne bornée, puis on l'analyse. <code>fscanf</code> directement sur le fichier désynchronise facilement sur une ligne mal formée.</p>
+<h2>Lecture caractère par caractère et binaire</h2>
+${code('c', `int c;
+while ((c = fgetc(f)) != EOF) { /* c est un int pour pouvoir contenir EOF (-1) */ }
+
+/* Binaire : écrire/lire des structures telles quelles (non portable entre machines différentes) */
+Produit p = {"Stylo", 3, 1.5};
+fwrite(&p, sizeof p, 1, f);
+fread(&p, sizeof p, 1, f);
+fseek(f, 0, SEEK_END); long taille = ftell(f); rewind(f);   /* taille d'un fichier */`)}
+<h2>Tampons et erreurs</h2>
+<ul><li>Les écritures passent par un tampon : sans <code>fclose</code> ou <code>fflush</code>, elles peuvent être perdues si le programme plante.</li><li><code>stderr</code> n'est pas tamponné : les messages d'erreur y apparaissent immédiatement et ne polluent pas la sortie utile (<code>./prog &gt; resultat.txt</code> garde les erreurs à l'écran).</li><li>Teste toujours <code>fopen</code>, <code>fgets</code>, <code>fread</code>, <code>fclose</code> : le disque peut être plein, le fichier absent, les droits insuffisants.</li></ul>
+<h2>Arguments de la ligne de commande</h2>
+${code('c', `int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage : %s fichier\\n", argv[0]);   /* argv[0] : nom du programme */
+        return 2;
+    }
+    const char *chemin = argv[1];
+    /* ... */
+}`)}
+<h2>Variables d'environnement et sortie</h2>
+<p><code>getenv("HOME")</code> lit l'environnement ; <code>exit(code)</code> termine immédiatement (en vidant les tampons) ; <code>EXIT_SUCCESS</code>/<code>EXIT_FAILURE</code> de <code>&lt;stdlib.h&gt;</code> sont les codes portables.</p>
+<div class="callout info"><b>Chemins</b>Un chemin relatif dépend du dossier d'où le programme est lancé, pas de l'emplacement de l'exécutable. Pour les fichiers de configuration, construis le chemin à partir de <code>argv[0]</code> ou de <code>HOME</code>.</div>`,
+          exercice: {
+            type: 'sortie', langage: 'c', titre: 'Compteur de lignes et de mots',
+            enonce: `<p>Écris un programme <code>wc_lite</code> qui reçoit un chemin en argument, lit le fichier ligne par ligne avec <code>fgets</code>, compte les lignes, les mots (séquences de caractères non blancs, utilise <code>isspace</code> de <code>&lt;ctype.h&gt;</code>) et les caractères, puis affiche les trois nombres. En cas d'erreur d'ouverture, affiche un message via <code>perror</code> sur <code>stderr</code> et renvoie 1. Teste avec un fichier contenant <code>le chat dort</code> et <code>sur le canape</code> sur deux lignes.</p>`,
+            depart: `#include <stdio.h>
+#include <ctype.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage : %s fichier\\n", argv[0]);
+        return 2;
+    }
+    /* ... */
+    return 0;
+}`,
+            solution: `#include <stdio.h>
+#include <ctype.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage : %s fichier\\n", argv[0]);
+        return 2;
+    }
+    FILE *f = fopen(argv[1], "r");
+    if (f == NULL) {
+        perror(argv[1]);
+        return 1;
+    }
+    long lignes = 0, mots = 0, caracteres = 0;
+    char ligne[1024];
+    while (fgets(ligne, sizeof ligne, f) != NULL) {
+        int dans_mot = 0;
+        for (int i = 0; ligne[i] != '\\0'; i++) {
+            caracteres++;
+            if (ligne[i] == '\\n') lignes++;
+            if (isspace((unsigned char)ligne[i])) {
+                dans_mot = 0;
+            } else if (!dans_mot) {
+                dans_mot = 1;
+                mots++;
+            }
+        }
+    }
+    fclose(f);
+    printf("Lignes : %ld\\nMots : %ld\\nCaracteres : %ld\\n", lignes, mots, caracteres);
+    return 0;
+}`,
+            sortieAttendue: `Lignes : 2
+Mots : 6
+Caracteres : 27`,
+            explication: `<p>Le drapeau <code>dans_mot</code> détecte le début de chaque mot (passage d'un blanc à un non-blanc). Le cast <code>(unsigned char)</code> avant <code>isspace</code> évite un comportement indéfini avec les caractères accentués (valeurs négatives d'un <code>char</code> signé).</p>`,
+            verification: { question: 'Pourquoi passer <code>(unsigned char)ligne[i]</code> à <code>isspace</code> ?', options: ['Pour accélérer', 'Parce que les fonctions de ctype attendent une valeur entre 0 et 255 ou EOF : un char signé négatif (accent) serait un comportement indéfini', 'Parce que isspace renvoie un unsigned'], bonne: 1, explication: 'Avec un char signé, « é » (0xE9) vaut -23 : hors du domaine des fonctions ctype.' }
+          },
+          quiz: [
+            { q: 'Que renvoie <code>fopen</code> en cas d\'échec ?', options: ['-1', 'NULL', 'Un fichier vide'], bonne: 1, explication: 'perror affiche alors la raison fournie par le système.' },
+            { q: 'Pourquoi <code>fgetc</code> renvoie-t-il un <code>int</code> et non un <code>char</code> ?', options: ['Pour la vitesse', 'Pour pouvoir représenter EOF en plus des 256 valeurs d\'un octet', 'Par tradition'], bonne: 1, explication: 'EOF vaut -1 : il doit se distinguer de tous les caractères possibles.' },
+            { q: 'Que risque-t-on sans <code>fclose</code> après des écritures ?', options: ['Rien', 'Perdre les données encore dans le tampon', 'Une erreur de compilation'], bonne: 1, explication: 'fclose vide le tampon vers le disque et libère le descripteur.' }
+          ]
+        },
+        {
+          titre: 'Préprocesseur, en-têtes et projets multi-fichiers',
+          theorie: `<p>Un vrai programme C est découpé en plusieurs fichiers : des <code>.c</code> (implémentations) et des <code>.h</code> (interfaces). Le <strong>préprocesseur</strong> assemble tout cela par substitution de texte avant la compilation.</p>
+<h2>Directives essentielles</h2>
+${code('c', `#include <stdio.h>        /* en-tête système : cherché dans les dossiers standard */
+#include "produit.h"      /* en-tête du projet : cherché d'abord dans le dossier courant */
+
+#define TAILLE_MAX 100                  /* constante symbolique (substitution textuelle) */
+#define CARRE(x) ((x) * (x))            /* macro : parenthèses OBLIGATOIRES, sinon CARRE(a+1) = a+1*a+1 */
+#define MIN(a, b) ((a) < (b) ? (a) : (b))   /* attention : MIN(i++, j) incrémente deux fois */
+
+#ifdef DEBUG
+#define LOG(fmt, ...) fprintf(stderr, "[%s:%d] " fmt "\\n", __FILE__, __LINE__, __VA_ARGS__)
+#else
+#define LOG(fmt, ...) ((void)0)
+#endif
+/* gcc -DDEBUG prog.c active les logs ; sans, ils disparaissent du binaire */`)}
+<p>Préfère <code>const int TAILLE_MAX = 100;</code> ou une <code>enum</code> aux <code>#define</code> pour les constantes (typées, visibles au débogueur), et les fonctions <code>static inline</code> aux macros pour les petits calculs.</p>
+<h2>Un module : .h + .c</h2>
+${code('c', `/* produit.h : interface, ce que les autres fichiers ont le droit de connaître */
+#ifndef PRODUIT_H              /* garde d'inclusion : évite la double inclusion */
+#define PRODUIT_H
+
+#include <stddef.h>
+
+typedef struct {
+    char nom[32];
+    int quantite;
+    double prix;
+} Produit;
+
+double produit_valeur(const Produit *p);
+int produit_depuis_ligne(const char *ligne, Produit *p);   /* 0 si succès */
+
+#endif`)}
+${code('c', `/* produit.c : implémentation */
+#include "produit.h"
+#include <stdio.h>
+
+static int valider(const Produit *p)     /* static : privé à ce fichier */
+{
+    return p->quantite >= 0 && p->prix >= 0;
+}
+
+double produit_valeur(const Produit *p) { return p->quantite * p->prix; }
+
+int produit_depuis_ligne(const char *ligne, Produit *p)
+{
+    if (sscanf(ligne, "%31[^;];%d;%lf", p->nom, &p->quantite, &p->prix) != 3) return -1;
+    return valider(p) ? 0 : -1;
+}`)}
+<p>Règles : un <code>.h</code> ne contient que des déclarations (prototypes, types, <code>extern</code>), jamais de définitions de variables ou de fonctions (sinon erreur « multiple definition » à l'édition de liens). Chaque <code>.c</code> inclut son propre <code>.h</code> en premier pour vérifier la cohérence.</p>
+<h2>Compiler plusieurs fichiers</h2>
+${code('bash', `gcc -std=c11 -Wall -Wextra -c produit.c      # → produit.o
+gcc -std=c11 -Wall -Wextra -c main.c         # → main.o
+gcc -o inventaire main.o produit.o           # édition de liens
+# ou en une fois : gcc -std=c11 -Wall -Wextra -o inventaire main.c produit.c
+# bibliothèque mathématique : ajouter -lm`)}
+<h2>Makefile minimal</h2>
+${code('bash', `CC = gcc
+CFLAGS = -std=c11 -Wall -Wextra -g
+OBJ = main.o produit.o
+
+inventaire: $(OBJ)
+	$(CC) -o $@ $(OBJ)
+
+%.o: %.c produit.h
+	$(CC) $(CFLAGS) -c $<
+
+clean:
+	rm -f $(OBJ) inventaire`)}
+<p><code>make</code> ne recompile que les fichiers modifiés (il compare les dates). Attention : les lignes de commande commencent par une <strong>tabulation</strong>, pas des espaces. Pour les projets plus grands : CMake.</p>
+<h2>Macros prédéfinies et portabilité</h2>
+<p><code>__FILE__</code>, <code>__LINE__</code>, <code>__func__</code> pour les messages de débogage ; <code>#if defined(_WIN32)</code> / <code>#elif defined(__linux__)</code> pour le code spécifique à une plateforme ; <code>#pragma once</code> en alternative aux gardes (supporté partout en pratique).</p>
+<div class="callout info"><b>Voir le résultat du préprocesseur</b><code>gcc -E main.c</code> affiche le code après substitution : utile pour comprendre une macro récalcitrante.</div>`,
+          exercice: {
+            type: 'trous', langage: 'c', titre: 'Un en-tête correct',
+            enonce: `<p>Complète l'en-tête <code>pile.h</code> d'un module de pile d'entiers et le début de son implémentation. Les trous portent sur la garde d'inclusion, le mot-clé rendant une fonction privée, la macro de taille avec parenthèses et la compilation.</p>`,
+            code: `/* pile.h */
+#ifndef PILE_H
+#___ PILE_H
+
+#define CAPACITE_MAX 64
+#define EST_VIDE(p) ((p)->taille ___ 0)
+
+typedef struct {
+    int donnees[CAPACITE_MAX];
+    int taille;
+} Pile;
+
+void pile_init(Pile *p);
+int  pile_push(Pile *p, int valeur);   /* 0 si succès, -1 si pleine */
+int  pile_pop(Pile *p, int *valeur);   /* 0 si succès, -1 si vide */
+
+#___ /* PILE_H */
+
+/* pile.c */
+#include "___"
+
+___ int est_pleine(const Pile *p)   /* privée au fichier */
+{
+    return p->taille == CAPACITE_MAX;
+}
+
+void pile_init(Pile *p) { p->taille = 0; }
+
+/* Compilation : gcc -std=c11 -Wall -Wextra -o demo main.c ___ */`,
+            reponses: [['define'], ['=='], ['endif'], ['pile.h'], ['static'], ['pile.c']],
+            aides: ['La directive qui définit le symbole de garde.', 'L\'opérateur de comparaison d\'égalité.', 'La directive qui ferme le #ifndef.', 'Le fichier d\'en-tête du module, entre guillemets.', 'Le mot-clé qui limite la visibilité d\'une fonction à son fichier.', 'Le fichier source du module à compiler avec main.c.']
+          },
+          quiz: [
+            { q: 'À quoi sert <code>#ifndef X / #define X / #endif</code> dans un .h ?', options: ['À définir une constante', 'À empêcher l\'inclusion multiple du même en-tête', 'À activer le débogage'], bonne: 1, explication: 'Sans garde, inclure deux fois le .h redéfinirait les types : erreur.' },
+            { q: 'Pourquoi <code>#define CARRE(x) x * x</code> est-il faux ?', options: ['Il manque un point-virgule', 'CARRE(a + 1) devient a + 1 * a + 1', 'Les macros ne prennent pas d\'arguments'], bonne: 1, explication: 'Substitution textuelle : il faut parenthéser ((x) * (x)).' },
+            { q: 'Que fait <code>gcc -c fichier.c</code> ?', options: ['Compile et lie', 'Produit un fichier objet .o sans édition de liens', 'Vérifie la syntaxe seulement'], bonne: 1, explication: 'Les .o sont ensuite liés ensemble en un exécutable.' }
+          ]
+        },
+        {
+          titre: 'Structures de données : liste chaînée et table de hachage',
+          theorie: `<p>Avec les structures, les pointeurs et <code>malloc</code>, tu peux construire toutes les structures de données classiques. La <strong>liste chaînée</strong> est la première : chaque élément (nœud) contient une valeur et l'adresse du suivant.</p>
+${code('c', `typedef struct Noeud {          /* le nom « struct Noeud » est nécessaire pour l'auto-référence */
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+Noeud *inserer_tete(Noeud *tete, int valeur)
+{
+    Noeud *n = malloc(sizeof *n);
+    if (n == NULL) return tete;           /* à améliorer : signaler l'erreur */
+    n->valeur = valeur;
+    n->suivant = tete;
+    return n;                             /* la nouvelle tête */
+}
+
+void afficher(const Noeud *n)
+{
+    for (; n != NULL; n = n->suivant) printf("%d -> ", n->valeur);
+    printf("NULL\\n");
+}
+
+void liberer(Noeud *n)
+{
+    while (n != NULL) {
+        Noeud *suivant = n->suivant;      /* sauvegarder AVANT de libérer */
+        free(n);
+        n = suivant;
+    }
+}`)}
+<h2>Supprimer un élément</h2>
+${code('c', `Noeud *supprimer(Noeud *tete, int valeur)
+{
+    Noeud **pp = &tete;                    /* pointeur sur le pointeur courant : élégant, sans cas spécial pour la tête */
+    while (*pp != NULL && (*pp)->valeur != valeur) {
+        pp = &(*pp)->suivant;
+    }
+    if (*pp != NULL) {
+        Noeud *a_supprimer = *pp;
+        *pp = a_supprimer->suivant;
+        free(a_supprimer);
+    }
+    return tete;
+}`)}
+<p>Le double pointeur <code>Noeud **</code> désigne « l'endroit où est stockée l'adresse du nœud courant » : la variable <code>tete</code> ou le champ <code>suivant</code> du précédent. C'est l'idiome qui évite de traiter la tête à part.</p>
+<h2>Liste vs tableau</h2>
+<table><tr><th></th><th>Tableau dynamique</th><th>Liste chaînée</th></tr>
+<tr><td>Accès au i-ème</td><td>O(1)</td><td>O(n)</td></tr>
+<tr><td>Insertion en tête</td><td>O(n) (décalage)</td><td>O(1)</td></tr>
+<tr><td>Mémoire</td><td>contiguë, cache-friendly</td><td>un bloc par nœud + pointeur</td></tr>
+<tr><td>Usage</td><td>presque toujours</td><td>files, insertions fréquentes au milieu, allocateurs</td></tr></table>
+<p>En pratique, le tableau dynamique gagne dans la majorité des cas grâce au cache du processeur. Apprends la liste pour comprendre les pointeurs et les structures récursives (arbres).</p>
+<h2>Table de hachage</h2>
+<p>Pour associer des clés à des valeurs (dictionnaire), on calcule un indice à partir de la clé :</p>
+${code('c', `#define NB_SEAUX 256
+
+typedef struct Entree { char *cle; int valeur; struct Entree *suivant; } Entree;
+Entree *table[NB_SEAUX];                 /* tableau de listes chaînées (chaînage séparé) */
+
+unsigned hacher(const char *s)           /* djb2 : simple et correct pour des chaînes */
+{
+    unsigned h = 5381;
+    for (; *s; s++) h = h * 33 + (unsigned char)*s;
+    return h % NB_SEAUX;
+}
+
+Entree *chercher(const char *cle)
+{
+    for (Entree *e = table[hacher(cle)]; e; e = e->suivant)
+        if (strcmp(e->cle, cle) == 0) return e;
+    return NULL;
+}`)}
+<p>Avec une bonne fonction de hachage et un nombre de seaux adapté, recherche et insertion sont en O(1) en moyenne. C'est la structure derrière les dictionnaires Python et les objets JavaScript.</p>
+<h2>Arbres binaires de recherche</h2>
+<p>Un nœud avec deux enfants (<code>gauche</code>, <code>droite</code>) : plus petit à gauche, plus grand à droite. Recherche et insertion en O(log n) si l'arbre est équilibré ; les parcours sont naturellement récursifs. Les bibliothèques réelles utilisent des variantes équilibrées (AVL, rouge-noir).</p>
+<div class="callout info"><b>Testez avec les outils</b>Chaque structure qui alloue doit être validée avec <code>valgrind</code> ou AddressSanitizer : insérer, supprimer, libérer, zéro fuite, zéro accès invalide.</div>`,
+          exercice: {
+            type: 'sortie', langage: 'c', titre: 'Liste chaînée triée',
+            enonce: `<p>Implémente une liste chaînée d'entiers avec <code>inserer_trie(Noeud **tete, int v)</code> qui insère en gardant la liste croissante (utilise un double pointeur), <code>afficher</code>, <code>longueur</code> et <code>liberer</code>. Dans <code>main</code>, insère 5, 2, 9, 2, 7 puis affiche la liste et sa longueur. Vérifie l'absence de fuite avec valgrind ou <code>-fsanitize=address</code>.</p>`,
+            depart: `#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+int inserer_trie(Noeud **tete, int v)
+{
+    /* ... */
+}
+
+int main(void)
+{
+    Noeud *liste = NULL;
+    int valeurs[] = {5, 2, 9, 2, 7};
+    /* ... */
+    return 0;
+}`,
+            solution: `#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+int inserer_trie(Noeud **tete, int v)
+{
+    Noeud *n = malloc(sizeof *n);
+    if (n == NULL) return -1;
+    n->valeur = v;
+    Noeud **pp = tete;
+    while (*pp != NULL && (*pp)->valeur < v) {
+        pp = &(*pp)->suivant;
+    }
+    n->suivant = *pp;
+    *pp = n;
+    return 0;
+}
+
+void afficher(const Noeud *n)
+{
+    for (; n != NULL; n = n->suivant) printf("%d -> ", n->valeur);
+    printf("NULL\\n");
+}
+
+int longueur(const Noeud *n)
+{
+    int l = 0;
+    for (; n != NULL; n = n->suivant) l++;
+    return l;
+}
+
+void liberer(Noeud *n)
+{
+    while (n != NULL) {
+        Noeud *suivant = n->suivant;
+        free(n);
+        n = suivant;
+    }
+}
+
+int main(void)
+{
+    Noeud *liste = NULL;
+    int valeurs[] = {5, 2, 9, 2, 7};
+    for (int i = 0; i < 5; i++) {
+        if (inserer_trie(&liste, valeurs[i]) != 0) {
+            fprintf(stderr, "Memoire insuffisante\\n");
+            liberer(liste);
+            return 1;
+        }
+    }
+    afficher(liste);
+    printf("Longueur : %d\\n", longueur(liste));
+    liberer(liste);
+    return 0;
+}`,
+            sortieAttendue: `2 -> 2 -> 5 -> 7 -> 9 -> NULL
+Longueur : 5`,
+            explication: `<p><code>pp</code> avance tant que la valeur courante est strictement inférieure à <code>v</code> ; à l'arrêt, <code>*pp</code> est l'emplacement où insérer (la tête, un champ <code>suivant</code>, ou le <code>NULL</code> final). Les doublons (2) sont conservés, insérés après l'existant.</p>`,
+            verification: { question: 'Pourquoi <code>inserer_trie</code> prend-elle un <code>Noeud **</code> plutôt qu\'un <code>Noeud *</code> ?', options: ['Pour aller plus vite', 'Pour pouvoir modifier la variable tete de l\'appelant quand l\'insertion se fait en tête', 'Parce que malloc renvoie un double pointeur'], bonne: 1, explication: 'Avec un simple pointeur (copie), une insertion en tête ne serait pas visible par main. Le double pointeur permet aussi de traiter tous les cas uniformément.' }
+          },
+          quiz: [
+            { q: 'Pourquoi sauvegarder <code>n-&gt;suivant</code> avant <code>free(n)</code> ?', options: ['Pour la lisibilité', 'Parce que lire n->suivant après free est un use after free', 'Parce que free efface suivant'], bonne: 1, explication: 'Après free, le contenu du bloc est indéterminé.' },
+            { q: 'Complexité de l\'accès au i-ème élément d\'une liste chaînée ?', options: ['O(1)', 'O(log n)', 'O(n)'], bonne: 2, explication: 'Il faut suivre i pointeurs depuis la tête.' },
+            { q: 'Que fait une fonction de hachage ?', options: ['Chiffre la clé', 'Transforme une clé en indice de tableau', 'Trie les clés'], bonne: 1, explication: 'Un bon hachage répartit uniformément les clés dans les seaux.' }
+          ]
+        },
+        {
+          titre: 'Débogage, comportements indéfinis et bonnes pratiques',
+          theorie: `<p>Le C offre une liberté totale, y compris celle de se tromper silencieusement. Un programme C peut « marcher » par hasard puis planter en production. Cette leçon donne les outils et les réflexes pour écrire du C fiable.</p>
+<h2>Le comportement indéfini (UB)</h2>
+<p>Quand le standard ne définit pas ce qui se passe, <em>tout</em> est permis : résultat aléatoire, plantage, ou code supprimé par l'optimiseur. Les plus fréquents :</p>
+<ul><li>Dépassement de tableau (lecture ou écriture).</li><li>Dépassement d'un entier signé (<code>INT_MAX + 1</code>).</li><li>Déréférencer <code>NULL</code>, un pointeur non initialisé ou libéré.</li><li>Variable non initialisée.</li><li>Modifier deux fois une variable sans point de séquence : <code>i = i++ + 1;</code>.</li><li>Décalage de bits négatif ou trop grand ; division par zéro.</li><li>Renvoyer l'adresse d'une variable locale.</li></ul>
+<p>Le compilateur suppose que l'UB n'arrive jamais : il peut supprimer un test <code>if (p == NULL)</code> placé <em>après</em> un déréférencement de <code>p</code>. D'où des bugs « impossibles ».</p>
+<h2>Les outils</h2>
+${code('bash', `gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wconversion -g -O0 -o prog prog.c   # avertissements maximum
+gcc -fsanitize=address,undefined -g -o prog prog.c && ./prog     # ASan + UBSan : détection à l'exécution
+valgrind --leak-check=full ./prog                                   # fuites, accès invalides
+gdb ./prog                                                          # débogueur : break main, run, next, print x, bt
+clang-tidy prog.c -- -std=c11                                       # analyse statique`)}
+<p>Avec gdb : <code>break fichier.c:42</code> (point d'arrêt), <code>run</code>, <code>next</code> (ligne suivante), <code>step</code> (entrer dans la fonction), <code>print variable</code>, <code>bt</code> (pile d'appels après un plantage). Compile avec <code>-g</code> pour avoir les numéros de ligne.</p>
+<h2>Lire un plantage</h2>
+<table><tr><th>Message</th><th>Cause probable</th></tr>
+<tr><td>Segmentation fault</td><td>pointeur NULL/invalide, dépassement de tableau, récursion infinie</td></tr>
+<tr><td>double free or corruption</td><td>free deux fois, écriture hors d'un bloc malloc</td></tr>
+<tr><td>Bus error</td><td>accès mal aligné (rare sur x86)</td></tr>
+<tr><td>Floating point exception</td><td>division entière par zéro</td></tr></table>
+<h2>Bonnes pratiques</h2>
+<ul><li>Initialise toute variable à la déclaration ; mets les pointeurs à <code>NULL</code> après <code>free</code>.</li><li>Vérifie chaque valeur de retour (<code>malloc</code>, <code>fopen</code>, <code>scanf</code>, <code>fgets</code>…).</li><li>Utilise <code>size_t</code> pour les tailles et indices, <code>const</code> partout où c'est possible.</li><li>Préfère <code>snprintf</code>, <code>fgets</code>, <code>strncpy</code> bornés ; jamais <code>gets</code>, <code>strcpy</code> sans contrôle.</li><li>Une fonction = une responsabilité ; pas de variable globale modifiable.</li><li>Compile avec tous les avertissements et corrige-les tous : zéro warning.</li><li>Écris des tests : un fichier <code>test_module.c</code> avec des <code>assert</code> (<code>&lt;assert.h&gt;</code>), exécuté par <code>make test</code>.</li></ul>
+${code('c', `#include <assert.h>
+#include "pile.h"
+int main(void)
+{
+    Pile p; pile_init(&p);
+    assert(EST_VIDE(&p));
+    assert(pile_push(&p, 3) == 0);
+    int v; assert(pile_pop(&p, &v) == 0 && v == 3);
+    assert(pile_pop(&p, &v) == -1);
+    return 0;      /* si on arrive ici, tous les tests passent */
+}`)}
+<h2>Style</h2>
+<p>Adopte un style et tiens-t'y : indentation 4 espaces, accolades cohérentes, 80-100 colonnes, noms explicites. <code>clang-format</code> formate automatiquement selon un fichier de configuration.</p>
+<div class="callout warn"><b>« Ça marche chez moi »</b>Un programme avec un UB peut fonctionner sur ta machine et planter ailleurs. Seule l'absence de warnings, les sanitizers et les tests donnent une confiance raisonnable.</div>`,
+          exercice: {
+            type: 'qcm', titre: 'Chasse aux comportements indéfinis',
+            enonce: `<p>Parmi ces extraits, lesquels contiennent un comportement indéfini ? (plusieurs réponses)</p>
+${code('c', `/* A */ int t[5]; for (int i = 0; i <= 5; i++) t[i] = i;
+/* B */ char *s = "abc"; s[0] = 'A';
+/* C */ int n; printf("%d", n);
+/* D */ unsigned u = 0; u--; printf("%u", u);
+/* E */ int *p = malloc(sizeof *p); free(p); free(p);
+/* F */ double d = 7 / 2.0;`)}`,
+            options: ['A — écriture en t[5] hors du tableau', 'B — modification d\'un littéral de chaîne', 'C — lecture d\'une variable non initialisée', 'D — décrémentation d\'un unsigned à 0', 'E — double free', 'F — division réelle'],
+            bonne: [0, 1, 2, 4], multiple: true,
+            explication: 'A, B, C et E sont des UB. D est défini : les non signés « bouclent » (u vaut UINT_MAX). F est une division réelle correcte (3.5).'
+          },
+          quiz: [
+            { q: 'Que peut faire un compilateur face à un comportement indéfini ?', options: ['Refuser de compiler', 'N\'importe quoi, y compris supprimer du code', 'Afficher un message à l\'exécution'], bonne: 1, explication: 'Le compilateur suppose que l\'UB n\'arrive jamais et optimise en conséquence.' },
+            { q: 'Quelle option gcc détecte les dépassements de tableau à l\'exécution ?', options: ['-O2', '-fsanitize=address', '-Wall'], bonne: 1, explication: 'AddressSanitizer instrumente les accès mémoire et signale la ligne fautive.' },
+            { q: 'Quelle commande gdb affiche la pile d\'appels après un plantage ?', options: ['print', 'bt', 'next'], bonne: 1, explication: 'bt (backtrace) remonte la chaîne des appels jusqu\'à main.' }
+          ]
+        }
+      ]
+    },
+    {
+      titre: 'Projet final : gestionnaire d\'inventaire', niveau: 'Avancé', description: 'Un outil en ligne de commande complet : modèle, tableau dynamique, persistance CSV, interface et Makefile.',
+      lecons: [
+        {
+          titre: 'Projet (1/4) : conception et modèle',
+          theorie: `<p>Projet final : un <strong>gestionnaire d'inventaire</strong> en ligne de commande. Il charge un fichier CSV de produits, permet d'ajouter, lister, chercher, retirer du stock, et sauvegarde. Trois fichiers : <code>produit.h/.c</code> (modèle), <code>inventaire.h/.c</code> (collection dynamique), <code>main.c</code> (interface).</p>
+<h2>Cahier des charges</h2>
+<ul><li>Un produit : code (chaîne courte unique), nom, quantité, prix unitaire.</li><li>Commandes : <code>lister</code>, <code>ajouter CODE NOM QTE PRIX</code>, <code>retirer CODE QTE</code>, <code>chercher TEXTE</code>, <code>valeur</code> (valeur totale du stock).</li><li>Fichier <code>stock.csv</code> : une ligne par produit, <code>code;nom;quantite;prix</code>, chargé au démarrage, écrit à la fin.</li><li>Gestion d'erreurs : code inconnu, stock insuffisant, fichier illisible, ligne malformée (ignorée avec avertissement).</li><li>Zéro warning, zéro fuite (valgrind).</li></ul>
+<h2>Le module produit</h2>
+${code('c', `/* produit.h */
+#ifndef PRODUIT_H
+#define PRODUIT_H
+#include <stdio.h>
+
+#define CODE_MAX 16
+#define NOM_MAX 64
+
+typedef struct {
+    char code[CODE_MAX];
+    char nom[NOM_MAX];
+    int quantite;
+    double prix;
+} Produit;
+
+/* Analyse une ligne CSV "code;nom;qte;prix". Renvoie 0 si succès, -1 sinon. */
+int produit_parser(const char *ligne, Produit *p);
+/* Écrit le produit au format CSV sur le flux. */
+void produit_ecrire(const Produit *p, FILE *f);
+/* Affiche une ligne lisible. */
+void produit_afficher(const Produit *p);
+double produit_valeur(const Produit *p);
+
+#endif`)}
+${code('c', `/* produit.c */
+#include "produit.h"
+#include <string.h>
+
+int produit_parser(const char *ligne, Produit *p)
+{
+    char fin;                                     /* détecte les caractères en trop */
+    int n = sscanf(ligne, "%15[^;];%63[^;];%d;%lf%c", p->code, p->nom, &p->quantite, &p->prix, &fin);
+    if (n < 4) return -1;
+    if (n == 5 && fin != '\\n') return -1;
+    if (p->quantite < 0 || p->prix < 0 || p->code[0] == '\\0') return -1;
+    return 0;
+}
+
+void produit_ecrire(const Produit *p, FILE *f)
+{
+    fprintf(f, "%s;%s;%d;%.2f\\n", p->code, p->nom, p->quantite, p->prix);
+}
+
+void produit_afficher(const Produit *p)
+{
+    printf("%-8s %-24s %5d x %8.2f = %9.2f\\n", p->code, p->nom, p->quantite, p->prix, produit_valeur(p));
+}
+
+double produit_valeur(const Produit *p) { return p->quantite * p->prix; }`)}
+<p>Les largeurs dans <code>sscanf</code> (<code>%15[^;]</code>) sont <em>une de moins</em> que la taille des tableaux : la place du <code>'\\0'</code>. C'est le genre de détail qui sépare un programme C sûr d'une faille.</p>
+<h2>Pourquoi ce découpage</h2>
+<p><code>produit.c</code> ne sait rien des fichiers ni de l'interface : il se teste isolément (<code>test_produit.c</code> avec des <code>assert</code> sur <code>produit_parser</code>). <code>main.c</code> ne connaît pas le format CSV. Chaque module a une seule raison de changer.</p>
+<div class="callout info"><b>Tester le parseur</b>Cas à couvrir : ligne valide, champ manquant, quantité négative, nom trop long (tronqué à 63, le reste fait échouer le parse : c'est voulu), ligne vide.</div>`,
+          exercice: {
+            type: 'trous', langage: 'c', titre: 'Le parseur CSV',
+            enonce: `<p>Complète <code>produit_parser</code> et un test unitaire. Les largeurs de champ doivent laisser la place du terminateur.</p>`,
+            code: `#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+
+#define CODE_MAX 16
+#define NOM_MAX 64
+
+typedef struct { char code[CODE_MAX]; char nom[NOM_MAX]; int quantite; double prix; } Produit;
+
+int produit_parser(const char *ligne, Produit *p)
+{
+    int n = sscanf(ligne, "%___[^;];%___[^;];%d;%___", p->code, p->nom, &p->quantite, &p->prix);
+    if (n ___ 4) return -1;
+    if (p->quantite < 0 || p->prix < 0) return ___;
+    return 0;
+}
+
+int main(void)
+{
+    Produit p;
+    assert(produit_parser("CAF01;Cafe moulu;10;6.50\\n", &p) == 0);
+    assert(strcmp(p.code, "CAF01") == 0 && p.quantite == 10);
+    assert(produit_parser("CAF01;Cafe moulu;10", &p) == ___);
+    assert(produit_parser("X;Y;-3;1.0", &p) == -1);
+    printf("Tests OK\\n");
+    return 0;
+}`,
+            reponses: [['15'], ['63'], ['lf'], ['!=', '<'], ['-1'], ['-1']],
+            aides: ['CODE_MAX - 1 : 15 caractères + le terminateur.', 'NOM_MAX - 1 : 63.', 'Le spécificateur scanf pour un double.', 'Succès seulement si les quatre champs ont été lus.', 'Le code d\'erreur documenté.', 'Il manque le prix : la fonction doit échouer.']
+          },
+          quiz: [
+            { q: 'Pourquoi <code>%15[^;]</code> pour un tableau de 16 ?', options: ['Erreur, il faudrait 16', 'Pour laisser la place du caractère nul', 'Parce que scanf compte à partir de 1'], bonne: 1, explication: 'scanf écrit jusqu\'à 15 caractères puis le \'\\0\' : 16 octets au total.' },
+            { q: 'Quel avantage à ce que produit.c ignore les fichiers ?', options: ['Compilation plus rapide', 'Il se teste isolément et n\'a qu\'une raison de changer', 'Aucun, c\'est une convention'], bonne: 1, explication: 'Séparation des responsabilités : modèle, stockage, interface.' },
+            { q: 'Que renvoie <code>sscanf</code> ?', options: ['Le nombre de caractères lus', 'Le nombre de conversions réussies', '0 ou 1'], bonne: 1, explication: 'On compare ce nombre au nombre de champs attendus.' }
+          ]
+        },
+        {
+          titre: 'Projet (2/4) : la collection dynamique',
+          theorie: `<p>L'inventaire est un tableau dynamique de <code>Produit</code> qui grandit à la demande, avec des opérations de recherche, d'ajout et de suppression. C'est le module <code>inventaire</code>.</p>
+${code('c', `/* inventaire.h */
+#ifndef INVENTAIRE_H
+#define INVENTAIRE_H
+#include "produit.h"
+#include <stddef.h>
+
+typedef struct {
+    Produit *items;
+    size_t taille;
+    size_t capacite;
+} Inventaire;
+
+void inventaire_init(Inventaire *inv);
+void inventaire_liberer(Inventaire *inv);
+int  inventaire_ajouter(Inventaire *inv, const Produit *p);     /* 0 ok, -1 mémoire, -2 code déjà présent */
+Produit *inventaire_chercher_code(Inventaire *inv, const char *code);   /* NULL si absent */
+int  inventaire_retirer_stock(Inventaire *inv, const char *code, int qte);   /* 0 ok, -1 inconnu, -2 insuffisant */
+int  inventaire_supprimer(Inventaire *inv, const char *code);
+double inventaire_valeur(const Inventaire *inv);
+
+#endif`)}
+<h2>Implémentation</h2>
+${code('c', `#include "inventaire.h"
+#include <stdlib.h>
+#include <string.h>
+
+void inventaire_init(Inventaire *inv) { inv->items = NULL; inv->taille = inv->capacite = 0; }
+
+void inventaire_liberer(Inventaire *inv) { free(inv->items); inventaire_init(inv); }
+
+static int reserver(Inventaire *inv)
+{
+    if (inv->taille < inv->capacite) return 0;
+    size_t nouvelle = inv->capacite ? inv->capacite * 2 : 16;
+    Produit *tmp = realloc(inv->items, nouvelle * sizeof *tmp);
+    if (tmp == NULL) return -1;
+    inv->items = tmp;
+    inv->capacite = nouvelle;
+    return 0;
+}
+
+Produit *inventaire_chercher_code(Inventaire *inv, const char *code)
+{
+    for (size_t i = 0; i < inv->taille; i++)
+        if (strcmp(inv->items[i].code, code) == 0) return &inv->items[i];
+    return NULL;
+}
+
+int inventaire_ajouter(Inventaire *inv, const Produit *p)
+{
+    if (inventaire_chercher_code(inv, p->code) != NULL) return -2;
+    if (reserver(inv) != 0) return -1;
+    inv->items[inv->taille++] = *p;          /* copie de la structure */
+    return 0;
+}
+
+int inventaire_retirer_stock(Inventaire *inv, const char *code, int qte)
+{
+    Produit *p = inventaire_chercher_code(inv, code);
+    if (p == NULL) return -1;
+    if (qte < 0 || p->quantite < qte) return -2;
+    p->quantite -= qte;
+    return 0;
+}
+
+int inventaire_supprimer(Inventaire *inv, const char *code)
+{
+    Produit *p = inventaire_chercher_code(inv, code);
+    if (p == NULL) return -1;
+    size_t i = p - inv->items;                                  /* indice par arithmétique de pointeurs */
+    memmove(&inv->items[i], &inv->items[i + 1], (inv->taille - i - 1) * sizeof *inv->items);
+    inv->taille--;
+    return 0;
+}`)}
+<p><code>memmove</code> (et non <code>memcpy</code>) car les zones source et destination se chevauchent. Les pointeurs renvoyés par <code>chercher_code</code> deviennent invalides après un <code>realloc</code> : ne les conserve pas entre deux ajouts.</p>
+<h2>Recherche textuelle et tri</h2>
+${code('c', `static int comparer_nom(const void *a, const void *b)
+{
+    return strcmp(((const Produit *)a)->nom, ((const Produit *)b)->nom);
+}
+void inventaire_trier(Inventaire *inv) { qsort(inv->items, inv->taille, sizeof *inv->items, comparer_nom); }
+
+/* Recherche insensible à la casse : strcasecmp n'est pas standard ; on compare en minuscules */
+int contient_insensible(const char *texte, const char *motif);   /* à écrire avec tolower */`)}
+<h2>Tests du module</h2>
+<p><code>test_inventaire.c</code> : ajouter deux produits, refuser un doublon, retirer du stock (succès puis insuffisant), supprimer le premier et vérifier que le second est désormais à l'indice 0, libérer. Lancer sous valgrind.</p>
+<div class="callout info"><b>Codes de retour</b>Des constantes nommées (<code>enum { INV_OK = 0, INV_MEMOIRE = -1, INV_DOUBLON = -2 }</code>) rendent les appels lisibles. Documente-les dans le .h.</div>`,
+          exercice: {
+            type: 'sortie', langage: 'c', titre: 'Tests de l\'inventaire',
+            enonce: `<p>En reprenant <code>inventaire.c</code> de la leçon (recopie-le), écris <code>test_inventaire.c</code> qui, avec des <code>assert</code> : ajoute « CAF01 » et « THE02 », vérifie que l'ajout d'un doublon renvoie −2, que <code>retirer_stock("CAF01", 3)</code> renvoie 0 puis que retirer 100 renvoie −2, qu'un code inconnu renvoie −1, que la suppression de « CAF01 » place « THE02 » à l'indice 0, puis libère et affiche <code>Tests OK</code>. Compile avec <code>-fsanitize=address</code>.</p>`,
+            depart: `#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "inventaire.h"
+
+int main(void)
+{
+    Inventaire inv;
+    inventaire_init(&inv);
+    Produit cafe = {"CAF01", "Cafe moulu", 10, 6.5};
+    Produit the = {"THE02", "The vert", 5, 4.0};
+    /* ... */
+    inventaire_liberer(&inv);
+    printf("Tests OK\\n");
+    return 0;
+}`,
+            solution: `#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "inventaire.h"
+
+int main(void)
+{
+    Inventaire inv;
+    inventaire_init(&inv);
+    Produit cafe = {"CAF01", "Cafe moulu", 10, 6.5};
+    Produit the = {"THE02", "The vert", 5, 4.0};
+
+    assert(inventaire_ajouter(&inv, &cafe) == 0);
+    assert(inventaire_ajouter(&inv, &the) == 0);
+    assert(inv.taille == 2);
+    assert(inventaire_ajouter(&inv, &cafe) == -2);
+
+    assert(inventaire_retirer_stock(&inv, "CAF01", 3) == 0);
+    assert(inventaire_chercher_code(&inv, "CAF01")->quantite == 7);
+    assert(inventaire_retirer_stock(&inv, "CAF01", 100) == -2);
+    assert(inventaire_retirer_stock(&inv, "XXX", 1) == -1);
+
+    assert(inventaire_supprimer(&inv, "CAF01") == 0);
+    assert(inv.taille == 1);
+    assert(strcmp(inv.items[0].code, "THE02") == 0);
+    assert(inventaire_supprimer(&inv, "CAF01") == -1);
+
+    assert(inventaire_valeur(&inv) == 20.0);
+
+    inventaire_liberer(&inv);
+    assert(inv.items == NULL && inv.taille == 0);
+    printf("Tests OK\\n");
+    return 0;
+}`,
+            sortieAttendue: `Tests OK`,
+            explication: `<p>Chaque <code>assert</code> documente un contrat du module. Si l'un échoue, le programme s'arrête avec le fichier et la ligne : <code>test_inventaire.c:14: main: Assertion … failed</code>. Les tests doivent passer sous AddressSanitizer sans aucun rapport.</p>`,
+            verification: { question: 'Pourquoi ne faut-il pas conserver le pointeur renvoyé par <code>inventaire_chercher_code</code> après un appel à <code>inventaire_ajouter</code> ?', options: ['Parce que la fonction renvoie une copie', 'Parce qu\'un realloc peut déplacer le tableau : le pointeur devient invalide', 'Parce que le produit est supprimé'], bonne: 1, explication: 'realloc peut rendre un nouveau bloc ailleurs en mémoire ; l\'ancienne adresse pointe alors sur de la mémoire libérée.' }
+          },
+          quiz: [
+            { q: 'Pourquoi <code>memmove</code> plutôt que <code>memcpy</code> pour décaler les éléments ?', options: ['memmove est plus rapide', 'Les zones se chevauchent : seul memmove le garantit', 'memcpy ne gère pas les structures'], bonne: 1, explication: 'memcpy sur des zones qui se chevauchent est un comportement indéfini.' },
+            { q: 'Comment obtenir l\'indice d\'un élément à partir d\'un pointeur dans le tableau ?', options: ['p / sizeof(Produit)', 'p - inv->items', 'strlen(p)'], bonne: 1, explication: 'La différence de deux pointeurs du même tableau donne le nombre d\'éléments entre eux.' },
+            { q: 'Que se passe-t-il si un assert échoue ?', options: ['Un avertissement', 'Le programme s\'arrête en indiquant fichier et ligne', 'Rien en mode normal'], bonne: 1, explication: 'assert appelle abort() ; on le désactive en production avec -DNDEBUG.' }
+          ]
+        },
+        {
+          titre: 'Projet (3/4) : persistance CSV',
+          theorie: `<p>Le module <code>stockage</code> fait le lien entre le fichier et l'inventaire : charger au démarrage, sauvegarder à la fin, sans jamais perdre les données en cas d'erreur.</p>
+${code('c', `/* stockage.h */
+#ifndef STOCKAGE_H
+#define STOCKAGE_H
+#include "inventaire.h"
+/* Charge le fichier dans inv. Renvoie le nombre de produits chargés, -1 si le fichier est illisible.
+   Les lignes invalides sont ignorées avec un avertissement sur stderr. */
+int stockage_charger(const char *chemin, Inventaire *inv);
+/* Sauvegarde atomiquement : écrit un fichier temporaire puis le renomme. 0 si succès. */
+int stockage_sauvegarder(const char *chemin, const Inventaire *inv);
+#endif`)}
+${code('c', `/* stockage.c */
+#include "stockage.h"
+#include <stdio.h>
+#include <string.h>
+
+int stockage_charger(const char *chemin, Inventaire *inv)
+{
+    FILE *f = fopen(chemin, "r");
+    if (f == NULL) return -1;
+    char ligne[256];
+    int charges = 0, numero = 0;
+    while (fgets(ligne, sizeof ligne, f) != NULL) {
+        numero++;
+        if (ligne[0] == '\\n' || ligne[0] == '#') continue;        /* lignes vides et commentaires */
+        Produit p;
+        if (produit_parser(ligne, &p) != 0) {
+            fprintf(stderr, "Ligne %d ignoree : %s", numero, ligne);
+            continue;
+        }
+        int r = inventaire_ajouter(inv, &p);
+        if (r == -1) { fclose(f); return -1; }
+        if (r == -2) { fprintf(stderr, "Ligne %d : code %s en double, ignoree\\n", numero, p.code); continue; }
+        charges++;
+    }
+    fclose(f);
+    return charges;
+}
+
+int stockage_sauvegarder(const char *chemin, const Inventaire *inv)
+{
+    char tmp[512];
+    snprintf(tmp, sizeof tmp, "%s.tmp", chemin);
+    FILE *f = fopen(tmp, "w");
+    if (f == NULL) return -1;
+    fprintf(f, "# code;nom;quantite;prix\\n");
+    for (size_t i = 0; i < inv->taille; i++) produit_ecrire(&inv->items[i], f);
+    if (fclose(f) != 0) { remove(tmp); return -1; }     /* erreur d'écriture (disque plein) */
+    if (rename(tmp, chemin) != 0) { remove(tmp); return -1; }
+    return 0;
+}`)}
+<h2>Pourquoi écrire dans un fichier temporaire ?</h2>
+<p>Si le programme plante ou si le disque est plein pendant l'écriture directe de <code>stock.csv</code>, le fichier est tronqué : toutes les données sont perdues. En écrivant <code>stock.csv.tmp</code> puis en renommant, le remplacement est <em>atomique</em> sur la plupart des systèmes : on a soit l'ancienne version, soit la nouvelle, jamais un mélange. C'est le motif standard de tout logiciel qui sauvegarde.</p>
+<h2>Un fichier absent n'est pas une erreur</h2>
+<p>Au premier lancement, <code>stock.csv</code> n'existe pas. <code>main</code> distingue ce cas (<code>errno == ENOENT</code> après <code>fopen</code>) d'un vrai problème de droits :</p>
+${code('c', `#include <errno.h>
+int n = stockage_charger(chemin, &inv);
+if (n < 0 && errno != ENOENT) { perror(chemin); return 1; }
+if (n < 0) printf("Nouvel inventaire (fichier absent)\\n");`)}
+<h2>Format CSV : les pièges</h2>
+<ul><li>Un nom contenant <code>;</code> casserait le format. Soit on l'interdit à la saisie, soit on gère les guillemets (RFC 4180). Pour ce projet, on l'interdit et on le vérifie dans <code>produit_parser</code>.</li><li>Le séparateur décimal : <code>printf("%.2f")</code> écrit un point ; sous une locale française, <code>setlocale</code> pourrait écrire une virgule. On ne touche pas à la locale dans ce projet.</li><li>Encodage : UTF-8 partout ; les largeurs de <code>%-24s</code> comptent des octets, pas des caractères accentués. Acceptable ici.</li></ul>
+<h2>Tester la persistance</h2>
+<p>Écrire un inventaire dans un fichier temporaire, le recharger dans un second inventaire, vérifier l'égalité champ à champ, et tester une ligne corrompue au milieu du fichier (elle doit être ignorée, les autres chargées).</p>
+<div class="callout info"><b>SQLite comme suite</b>Pour un vrai outil, la bibliothèque SQLite (un seul fichier C, domaine public) remplace avantageusement le CSV : transactions, requêtes, robustesse. Le module stockage est le seul à changer.</div>`,
+          exercice: {
+            type: 'sortie', langage: 'c', titre: 'Aller-retour fichier',
+            enonce: `<p>Écris <code>test_stockage.c</code> qui crée un inventaire de deux produits, le sauvegarde dans <code>test_stock.csv</code>, le recharge dans un second inventaire, vérifie par <code>assert</code> le nombre chargé (2) et l'égalité des codes, quantités et prix, puis ajoute manuellement une ligne corrompue (<code>"ligne;cassee\\n"</code>) à la fin du fichier avec <code>fopen(…, "a")</code>, recharge dans un troisième inventaire et vérifie qu'on obtient toujours 2 produits. Supprime le fichier avec <code>remove</code> et affiche <code>Tests OK</code>.</p>`,
+            depart: `#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "stockage.h"
+
+int main(void)
+{
+    const char *chemin = "test_stock.csv";
+    Inventaire a, b, c;
+    inventaire_init(&a); inventaire_init(&b); inventaire_init(&c);
+    /* ... */
+    printf("Tests OK\\n");
+    return 0;
+}`,
+            solution: `#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "stockage.h"
+
+int main(void)
+{
+    const char *chemin = "test_stock.csv";
+    Inventaire a, b, c;
+    inventaire_init(&a); inventaire_init(&b); inventaire_init(&c);
+
+    Produit p1 = {"CAF01", "Cafe moulu", 10, 6.5};
+    Produit p2 = {"THE02", "The vert", 5, 4.0};
+    assert(inventaire_ajouter(&a, &p1) == 0);
+    assert(inventaire_ajouter(&a, &p2) == 0);
+    assert(stockage_sauvegarder(chemin, &a) == 0);
+
+    assert(stockage_charger(chemin, &b) == 2);
+    for (size_t i = 0; i < 2; i++) {
+        assert(strcmp(a.items[i].code, b.items[i].code) == 0);
+        assert(a.items[i].quantite == b.items[i].quantite);
+        assert(a.items[i].prix == b.items[i].prix);
+    }
+
+    FILE *f = fopen(chemin, "a");
+    assert(f != NULL);
+    fputs("ligne;cassee\\n", f);
+    fclose(f);
+    assert(stockage_charger(chemin, &c) == 2);
+
+    inventaire_liberer(&a); inventaire_liberer(&b); inventaire_liberer(&c);
+    remove(chemin);
+    printf("Tests OK\\n");
+    return 0;
+}`,
+            sortieAttendue: `Ligne 4 ignoree : ligne;cassee
+Tests OK`,
+            explication: `<p>La ligne 4 (après l'en-tête commenté et les deux produits) est rejetée par <code>produit_parser</code> et signalée sur <code>stderr</code> ; les deux produits valides sont chargés. Le fichier temporaire est supprimé pour laisser le dossier propre.</p>`,
+            verification: { question: 'Pourquoi sauvegarder dans <code>stock.csv.tmp</code> puis renommer, plutôt qu\'écrire directement dans <code>stock.csv</code> ?', options: ['Pour aller plus vite', 'Pour ne jamais laisser un fichier tronqué en cas de plantage ou de disque plein', 'Parce que fopen en "w" est interdit sur un fichier existant'], bonne: 1, explication: 'rename est atomique : le fichier final est soit l\'ancien, soit le nouveau, jamais un mélange.' }
+          },
+          quiz: [
+            { q: 'Que vaut <code>errno</code> après un <code>fopen</code> échoué sur un fichier absent ?', options: ['0', 'ENOENT', 'EOF'], bonne: 1, explication: 'ENOENT = « No such file or directory ». On le distingue d\'un refus de permission (EACCES).' },
+            { q: 'Pourquoi vérifier le retour de <code>fclose</code> en écriture ?', options: ['Ce n\'est pas nécessaire', 'Le vidage du tampon peut échouer (disque plein)', 'Pour fermer deux fois'], bonne: 1, explication: 'L\'erreur d\'écriture peut n\'apparaître qu\'au moment du vidage final.' },
+            { q: 'Que fait le programme face à une ligne CSV invalide ?', options: ['Il s\'arrête', 'Il l\'ignore avec un avertissement et continue', 'Il la corrige'], bonne: 1, explication: 'Robustesse : une ligne corrompue ne doit pas rendre tout le fichier inutilisable.' }
+          ]
+        },
+        {
+          titre: 'Projet (4/4) : interface, Makefile et livraison',
+          theorie: `<p>Dernière pièce : <code>main.c</code>, qui interprète la ligne de commande, appelle les modules et affiche les résultats. Puis le <code>Makefile</code> pour tout assembler et tester.</p>
+${code('c', `/* main.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include "stockage.h"
+
+static const char *FICHIER = "stock.csv";
+
+static void usage(const char *prog)
+{
+    fprintf(stderr,
+        "Usage : %s commande [arguments]\\n"
+        "  lister\\n  ajouter CODE NOM QTE PRIX\\n  retirer CODE QTE\\n  supprimer CODE\\n  chercher TEXTE\\n  valeur\\n", prog);
+}
+
+static int cmd_ajouter(Inventaire *inv, int argc, char *argv[])
+{
+    if (argc != 6) return 2;
+    Produit p;
+    snprintf(p.code, sizeof p.code, "%s", argv[2]);
+    snprintf(p.nom, sizeof p.nom, "%s", argv[3]);
+    char *fin;
+    p.quantite = (int)strtol(argv[4], &fin, 10);          /* strtol : conversion avec contrôle */
+    if (*fin != '\\0' || p.quantite < 0) { fprintf(stderr, "Quantite invalide\\n"); return 1; }
+    p.prix = strtod(argv[5], &fin);
+    if (*fin != '\\0' || p.prix < 0) { fprintf(stderr, "Prix invalide\\n"); return 1; }
+    if (strchr(p.nom, ';')) { fprintf(stderr, "Le nom ne doit pas contenir ';'\\n"); return 1; }
+    int r = inventaire_ajouter(inv, &p);
+    if (r == -2) { fprintf(stderr, "Code %s deja present\\n", p.code); return 1; }
+    if (r == -1) { fprintf(stderr, "Memoire insuffisante\\n"); return 1; }
+    printf("Ajoute : "); produit_afficher(&p);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) { usage(argv[0]); return 2; }
+    Inventaire inv;
+    inventaire_init(&inv);
+    int n = stockage_charger(FICHIER, &inv);
+    if (n < 0 && errno != ENOENT) { perror(FICHIER); return 1; }
+
+    int code = 0, modifie = 0;
+    const char *cmd = argv[1];
+    if (strcmp(cmd, "lister") == 0) {
+        for (size_t i = 0; i < inv.taille; i++) produit_afficher(&inv.items[i]);
+    } else if (strcmp(cmd, "ajouter") == 0) {
+        code = cmd_ajouter(&inv, argc, argv); modifie = (code == 0);
+    } else if (strcmp(cmd, "valeur") == 0) {
+        printf("Valeur du stock : %.2f\\n", inventaire_valeur(&inv));
+    } /* retirer, supprimer, chercher : même schéma */
+    else { usage(argv[0]); code = 2; }
+
+    if (modifie && stockage_sauvegarder(FICHIER, &inv) != 0) { perror("sauvegarde"); code = 1; }
+    inventaire_liberer(&inv);
+    return code;
+}`)}
+<p><code>strtol</code>/<code>strtod</code> remplacent <code>atoi</code> : ils indiquent où la conversion s'est arrêtée, ce qui permet de rejeter « 12abc ». La sauvegarde n'a lieu que si une commande a modifié l'inventaire et a réussi.</p>
+<h2>Makefile complet</h2>
+${code('bash', `CC      = gcc
+CFLAGS  = -std=c11 -Wall -Wextra -Wpedantic -g
+SRC     = produit.c inventaire.c stockage.c
+OBJ     = $(SRC:.c=.o)
+TESTS   = test_produit test_inventaire test_stockage
+
+all: inventaire
+
+inventaire: main.o $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
+
+test_%: test_%.c $(OBJ)
+	$(CC) $(CFLAGS) -fsanitize=address -o $@ $^
+
+test: $(TESTS)
+	@for t in $(TESTS); do ./$$t || exit 1; done
+	@echo "Tous les tests passent"
+
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $<
+
+clean:
+	rm -f *.o inventaire $(TESTS) test_stock.csv
+
+.PHONY: all test clean`)}
+<p><code>make</code> construit l'outil, <code>make test</code> compile et lance les trois suites sous AddressSanitizer, <code>make clean</code> nettoie. <code>$@</code> = la cible, <code>$^</code> = toutes les dépendances, <code>$&lt;</code> = la première.</p>
+<h2>Utilisation</h2>
+${code('bash', `./inventaire ajouter CAF01 "Cafe moulu" 10 6.50
+./inventaire ajouter THE02 "The vert" 5 4
+./inventaire retirer CAF01 3
+./inventaire lister
+./inventaire valeur
+cat stock.csv`)}
+<h2>Pour aller plus loin</h2>
+<ul><li>Mode interactif (boucle de commandes avec <code>fgets</code>).</li><li>Tri et filtres (<code>qsort</code>, options <code>--tri=nom</code>).</li><li>Historique des mouvements dans un second fichier.</li><li>Remplacer le CSV par SQLite.</li><li>Un <code>getopt</code> pour les options longues ; des pages de manuel.</li></ul>
+<div class="callout ok"><b>Parcours terminé</b>Tu as écrit un programme C complet, modulaire, testé, sans fuite : modèle, collection dynamique, persistance atomique, interface. C'est la base de tout logiciel système. Le parcours C++ reprend ces idées avec les outils du langage moderne.</div>`,
+          exercice: {
+            type: 'trous', langage: 'c', titre: 'La commande retirer',
+            enonce: `<p>Complète la commande <code>retirer CODE QTE</code> de <code>main.c</code> : conversion contrôlée, appel du module, messages d'erreur, et signalement de la modification pour déclencher la sauvegarde.</p>`,
+            code: `static int cmd_retirer(Inventaire *inv, int argc, char *argv[])
+{
+    if (argc != ___) return 2;                 /* prog retirer CODE QTE */
+    char *fin;
+    long qte = strtol(argv[3], &fin, ___);
+    if (*fin != '\\0' || qte < 0) { fprintf(stderr, "Quantite invalide\\n"); return 1; }
+    int r = inventaire_retirer_stock(inv, argv[___], (int)qte);
+    if (r == -1) { fprintf(stderr, "Code inconnu : %s\\n", argv[2]); return 1; }
+    if (r == ___) { fprintf(stderr, "Stock insuffisant\\n"); return 1; }
+    printf("Retire %ld unite(s) de %s\\n", qte, argv[2]);
+    return 0;
+}
+
+/* dans main : */
+else if (strcmp(cmd, "retirer") == 0) {
+    code = cmd_retirer(&inv, argc, argv);
+    modifie = (code ___ 0);
+}`,
+            reponses: [['4'], ['10'], ['2'], ['-2'], ['==']],
+            aides: ['prog, retirer, CODE, QTE : quatre arguments.', 'La base décimale.', 'L\'indice de CODE dans argv.', 'Le code renvoyé par le module pour un stock insuffisant.', 'On ne sauvegarde que si la commande a réussi.']
+          },
+          quiz: [
+            { q: 'Pourquoi <code>strtol</code> plutôt que <code>atoi</code> ?', options: ['Il est plus rapide', 'Il permet de détecter une conversion incomplète ou invalide', 'atoi n\'existe plus'], bonne: 1, explication: 'atoi("12abc") renvoie 12 sans se plaindre ; strtol indique où il s\'est arrêté.' },
+            { q: 'Que signifie <code>$^</code> dans une règle Makefile ?', options: ['La cible', 'Toutes les dépendances', 'La première dépendance'], bonne: 1, explication: '$@ est la cible, $< la première dépendance, $^ toutes.' },
+            { q: 'Quand le programme sauvegarde-t-il le fichier ?', options: ['À chaque lancement', 'Seulement si une commande a modifié l\'inventaire avec succès', 'Jamais automatiquement'], bonne: 1, explication: 'Éviter d\'écrire inutilement réduit les risques et préserve le fichier en cas d\'erreur.' }
+          ]
+        }
+      ]
+    }
+  ]
+};
