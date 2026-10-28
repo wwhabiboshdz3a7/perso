@@ -1090,8 +1090,110 @@ print(construire_prompt("Comment me faire rembourser ?", morceaux))`,
       ]
     },
     {
-      titre: 'Projet final : classifieur complet', niveau: 'Avancé', description: 'Un pipeline de classification de bout en bout en Python pur : données, modèle, évaluation, et réflexion sur le déploiement.',
+      titre: 'Projet final : classifieur complet', niveau: 'Avancé', description: 'Les outils du métier, puis un pipeline de classification de bout en bout : données, modèle, évaluation et déploiement.',
       lecons: [
+        {
+          titre: 'Les outils du métier : numpy, pandas, scikit-learn',
+          theorie: `<p>Jusqu'ici, tout en Python pur pour <em>comprendre</em>. En pratique, on s'appuie sur un écosystème qui fait le même travail en quelques lignes, bien plus vite. Cette leçon fait le pont avant le projet.</p>
+<h2>numpy : le calcul vectoriel</h2>
+<p>numpy remplace les listes de listes par des <strong>tableaux</strong> (ndarray) sur lesquels les opérations s'appliquent d'un coup, en C sous le capot : des centaines de fois plus rapide qu'une boucle Python.</p>
+${code('python', `# import numpy as np  (sur ta machine)
+# X = np.array([[30, 1], [50, 2], [75, 3]])
+# X.mean(axis=0)            # moyenne par colonne, sans boucle
+# X_norm = (X - X.mean(axis=0)) / X.std(axis=0)   # normalisation en une ligne
+# z = X @ poids + biais     # produit matriciel : toutes les prédictions d'un coup`)}
+<p>L'opération <code>X @ poids</code> (produit matriciel) calcule d'un seul appel ce que nos boucles faisaient exemple par exemple. C'est la base de tout le ML performant, y compris sur GPU (CuPy, PyTorch).</p>
+<h2>pandas : les données tabulaires</h2>
+<p>pandas manipule des <strong>DataFrames</strong> (tableaux étiquetés), l'outil n° 1 du nettoyage de données — l'étape qui occupe le plus de temps dans un vrai projet.</p>
+${code('python', `# import pandas as pd
+# df = pd.read_csv("clients.csv")
+# df.head(); df.describe(); df.info()        # explorer
+# df["age"].fillna(df["age"].median())       # valeurs manquantes
+# df = df.dropna(); df = df.drop_duplicates()
+# df.groupby("ville")["achat"].mean()        # agréger
+# pd.get_dummies(df["categorie"])            # encodage one-hot des variables catégorielles
+# X = df[["age", "revenu"]].values; y = df["achat"].values`)}
+<h2>scikit-learn : le ML en quelques lignes</h2>
+<p>Tous les algorithmes de ce parcours (régression, k-NN, k-means, arbres, régression logistique) et bien d'autres, avec une interface uniforme <code>fit</code> / <code>predict</code>.</p>
+${code('python', `# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.metrics import classification_report
+
+# X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=0)
+# scaler = StandardScaler().fit(X_tr)        # apprend moyennes/écarts sur l'entraînement
+# X_tr = scaler.transform(X_tr); X_te = scaler.transform(X_te)
+# modele = LogisticRegression().fit(X_tr, y_tr)
+# print(classification_report(y_te, modele.predict(X_te)))`)}
+<p>Remarque : <code>StandardScaler</code> est exactement notre <code>normaliser_fit</code>/<code>transform</code> ; <code>LogisticRegression</code> fait notre descente de gradient ; <code>classification_report</code> calcule précision, rappel et F1. Tu as codé à la main ce que ces objets encapsulent : tu sais ce qu'ils font et comment les déboguer.</p>
+<h2>Les pipelines</h2>
+<p>scikit-learn chaîne préprocesseur et modèle en un <code>Pipeline</code>, ce qui empêche la fuite de données (le scaler est appris dans la validation croisée, pas sur tout le jeu) :</p>
+${code('python', `# from sklearn.pipeline import make_pipeline
+# from sklearn.model_selection import cross_val_score
+# pipe = make_pipeline(StandardScaler(), LogisticRegression())
+# scores = cross_val_score(pipe, X, y, cv=5)    # validation croisée en 5 blocs
+# print(scores.mean(), scores.std())`)}
+<h2>Installer et travailler</h2>
+${code('bash', `python3 -m venv .venv && source .venv/bin/activate
+pip install numpy pandas scikit-learn matplotlib jupyter
+jupyter notebook        # notebooks interactifs : code + graphiques + notes`)}
+<p><strong>matplotlib</strong>/<strong>seaborn</strong> pour visualiser (toujours tracer ses données !), <strong>Jupyter</strong> pour explorer de façon interactive. Pour le deep learning : <strong>PyTorch</strong> ou <strong>TensorFlow</strong> ; pour les LLM : <strong>Hugging Face Transformers</strong>.</p>
+<div class="callout info"><b>Comprendre d'abord, automatiser ensuite</b>Savoir ce qu'il y a sous <code>fit()</code> change tout : tu sais pourquoi normaliser, pourquoi séparer, ce qu'une métrique signifie, et comment réagir quand « ça ne marche pas ». Les outils te font gagner du temps ; les fondations te font prendre les bonnes décisions.</div>`,
+          exercice: {
+            type: 'code', langage: 'python', titre: 'Refaire le pipeline, version compacte',
+            enonce: `<p>Sans numpy (indisponible ici), mais dans l'esprit scikit-learn : écris une classe <code>StandardScaler</code> avec <code>fit(X)</code> (mémorise moyennes et écarts par colonne, écart nul → 1.0) et <code>transform(X)</code>, puis une fonction <code>train_test_split(X, y, test_size)</code> qui renvoie <code>(X_tr, X_te, y_tr, y_te)</code> en coupant à la fin (les <code>test_size</code> dernières proportions en test). Teste l'enchaînement fit/transform et la séparation.</p>`,
+            depart: `import math
+
+class StandardScaler:
+    def fit(self, X):
+        ...
+        return self
+    def transform(self, X):
+        ...
+
+def train_test_split(X, y, test_size=0.2):
+    ...
+
+X = [[0, 100], [10, 200], [20, 300], [30, 400], [40, 500]]
+y = [0, 0, 1, 1, 1]
+Xtr, Xte, ytr, yte = train_test_split(X, y, 0.4)
+print(len(Xtr), len(Xte))
+sc = StandardScaler().fit(Xtr)
+print(sc.transform([[20, 300]]))
+`,
+            solution: `import math
+
+class StandardScaler:
+    def fit(self, X):
+        n, d = len(X), len(X[0])
+        self.moyennes = [sum(X[i][j] for i in range(n)) / n for j in range(d)]
+        self.ecarts = []
+        for j in range(d):
+            var = sum((X[i][j] - self.moyennes[j]) ** 2 for i in range(n)) / n
+            self.ecarts.append(math.sqrt(var) or 1.0)
+        return self
+    def transform(self, X):
+        return [[(x[j] - self.moyennes[j]) / self.ecarts[j] for j in range(len(x))] for x in X]
+
+def train_test_split(X, y, test_size=0.2):
+    n_test = round(len(X) * test_size)
+    n_train = len(X) - n_test
+    return X[:n_train], X[n_train:], y[:n_train], y[n_train:]
+
+X = [[0, 100], [10, 200], [20, 300], [30, 400], [40, 500]]
+y = [0, 0, 1, 1, 1]
+Xtr, Xte, ytr, yte = train_test_split(X, y, 0.4)
+print(len(Xtr), len(Xte))
+sc = StandardScaler().fit(Xtr)
+print(sc.transform([[20, 300]]))`,
+            tests: [sansErreur(), exprVerif('train_test_split([[1],[2],[3],[4],[5]], [0,0,1,1,1], 0.4)', 'Séparation 60/40', r => r[0].length === 3 && r[1].length === 2 && r[2].length === 3 && r[3].length === 2), exprVerif('StandardScaler().fit([[0],[10],[20]]).transform([[10]])', 'Transforme le point central en 0', v => Math.abs(v[0][0]) < 1e-9, 'La moyenne de [0,10,20] est 10 : (10-10)/ecart = 0.'), exprVerif('StandardScaler().fit([[5],[5]]).transform([[5]])', 'Écart-type nul géré', v => v[0][0] === 0.0, 'Un écart-type nul doit devenir 1.0 pour éviter la division par zéro.'), exprVerif('(lambda sc: sc.transform([[0, 100], [40, 500]]))(StandardScaler().fit([[0, 100], [10, 200], [20, 300], [30, 400], [40, 500]]))', 'Normalisation cohérente sur deux colonnes', v => Math.abs(v[0][0] - v[1][0] * -1) < 0.01, 'Les extrêmes symétriques doivent se normaliser en valeurs opposées.'), codeContient('math.sqrt', 'Calcule l\'écart-type avec math.sqrt de la variance.')]
+          },
+          quiz: [
+            { q: 'Que remplace numpy par rapport aux listes Python ?', options: ['Rien', 'Des tableaux calculés en C, bien plus rapides, avec des opérations vectorisées', 'Un éditeur de code'], bonne: 1, explication: 'X @ poids calcule toutes les prédictions d\'un coup, sans boucle Python.' },
+            { q: 'À quoi sert un Pipeline scikit-learn ?', options: ['À dessiner', 'À chaîner préprocesseur et modèle en évitant la fuite de données', 'À installer les paquets'], bonne: 1, explication: 'Le scaler est appris dans chaque pli de la validation croisée, pas sur tout le jeu.' },
+            { q: 'À quoi correspond <code>StandardScaler</code> de scikit-learn ?', options: ['À un modèle', 'À la normalisation (centrage-réduction) qu\'on a codée à la main', 'À une métrique'], bonne: 1, explication: 'fit apprend moyennes/écarts, transform les applique : exactement notre normaliser_fit/transform.' }
+          ]
+        },
         {
           titre: 'Projet (1/3) : données et régression logistique',
           theorie: `<p>Projet final : construire un <strong>classifieur binaire complet</strong> en Python pur, de la préparation des données à l'évaluation. On utilise la <strong>régression logistique</strong>, le modèle de classification le plus fondamental, qui relie tout ce qu'on a vu : combinaison linéaire, fonction d'activation, descente de gradient.</p>
