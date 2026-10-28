@@ -26,14 +26,17 @@ const workerSource = `
     let erreur = null, valeurs = [];
     // Les expressions de test sont évaluées dans la même portée que le code de l'élève
     // (sinon les const/let/class déclarés dans le code ne seraient pas visibles).
-    const suffixe = '\\n;self.__valeurs__ = [' + exprs.map(ex => '(() => { try { return { ok: true, valeur: (' + ex + ') }; } catch (err) { return { ok: false, erreur: String(err && err.message || err) }; } })()').join(',') + '];';
+    // La fonction d'évaluation est définie dans la portée du code (fermeture) mais appelée APRÈS la fin
+    // des traitements asynchrones, pour que les variables remplies par une fonction async soient visibles.
+    const suffixe = '\\n;self.__evaluer__ = () => [' + exprs.map(ex => '(() => { try { return { ok: true, valeur: (' + ex + ') }; } catch (err) { return { ok: false, erreur: String(err && err.message || err) }; } })()').join(',') + '];';
     try {
+      self.__evaluer__ = null;
       const r = (0, eval)(code + suffixe);
       if (r && typeof r.then === 'function') await r;
       for (let i = 0; i < 5; i++) await null;                       // laisse passer les microtâches
       while (__attente > 0) await new Promise(res => __setTimeout(res, 5));   // puis les timers (setTimeout)
       for (let i = 0; i < 5; i++) await null;
-      valeurs = (self.__valeurs__ || []).map(v => { try { return v.ok ? { ok: true, valeur: JSON.parse(JSON.stringify(v.valeur ?? null)) } : v; } catch { return { ok: true, valeur: String(v.valeur) }; } });
+      valeurs = (self.__evaluer__ ? self.__evaluer__() : []).map(v => { try { return v.ok ? { ok: true, valeur: JSON.parse(JSON.stringify(v.valeur ?? null)) } : v; } catch { return { ok: true, valeur: String(v.valeur) }; } });
     } catch (err) {
       erreur = (err && err.name ? err.name + ': ' : '') + (err && err.message ? err.message : String(err));
       __logs.push('⚠ ' + erreur);
