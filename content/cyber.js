@@ -454,7 +454,7 @@ console.log(assainir('<p onclick="x()">Bonjour <b>monde</b> <script>alert(1)</sc
           },
           quiz: [
             { q: 'Quelle est la parade principale au XSS ?', options: ['Bloquer le mot script', 'Échapper les données à la sortie selon le contexte', 'Désactiver JavaScript'], bonne: 1, explication: 'Les données deviennent du texte inerte ; les filtres par mots-clés se contournent.' },
-            { q: 'Que bloque une CSP avec <code>script-src \'self\'</code> ?', options: ['Toutes les images', 'Les scripts inline et ceux d\'autres origines', 'Les cookies'], bonne: 1, explication: 'Un <script> injecté ou un onerror= inline ne s\'exécute pas.' },
+            { q: 'Que bloque une CSP avec <code>script-src \'self\'</code> ?', options: ['Toutes les images', 'Les scripts inline et ceux d\'autres origines', 'Les cookies'], bonne: 1, explication: 'Un &lt;script&gt; injecté ou un onerror= inline ne s\'exécute pas.' },
             { q: 'Pourquoi <code>HttpOnly</code> limite-t-il l\'impact d\'un XSS ?', options: ['Il bloque le script', 'Le script ne peut pas lire le cookie de session', 'Il force HTTPS'], bonne: 1, explication: 'Le vol de session direct devient impossible, même si d\'autres actions restent possibles.' }
           ]
         },
