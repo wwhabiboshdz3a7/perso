@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Démos de sites pour commerces toulousains — 23 sites de démonstration</title>
+<meta name="description" content="Collection de sites de démonstration pour commerces et artisans de Toulouse : restaurant, coiffeur, garage, immobilier, fleuriste… Chaque démo embarque une fonctionnalité métier fonctionnelle (réservation, devis, commande en ligne).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Anton&family=Playfair+Display&family=Bebas+Neue&family=Marcellus&family=Chakra+Petch:wght@700&family=Archivo+Black&family=Fraunces:wght@700&family=Manrope:wght@800&family=Syne:wght@800&family=DM+Serif+Display&family=Lora:wght@600&family=Outfit:wght@900&family=Libre+Caslon+Display&family=EB+Garamond:wght@500&family=Urbanist:wght@800&family=Tenor+Sans&family=Cinzel&family=Special+Elite&family=Quicksand:wght@700&family=Prata&family=Lexend:wght@700&family=Abril+Fatface&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23e8537a'/%3E%3Crect x='8' y='8' width='16' height='16' rx='3' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{--rose:#e8537a;--rose-d:#b93a5d;--brick:#c9705a;--ink:#17141f;--muted:#6b6676;--bg:#fbf9f7;--card:#fff;--accent:var(--rose);--focus:var(--rose-d);--border:#e9e3e0;--radius:18px}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:Sora,sans-serif;font-weight:800;line-height:1.05;letter-spacing:-.03em}
+.banner{background:var(--ink);color:#fff;font-size:13px;text-align:center;padding:9px 16px}
+.banner b{color:#ffb4c6}
+.header{position:sticky;top:0;z-index:40;background:rgba(251,249,247,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.brand{font-family:Sora;font-weight:800;font-size:19px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--rose),var(--brick))}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:6px 6px 6px 14px;max-width:360px;flex:1;min-width:0}
+@media (max-width:600px){.search span{display:none}}
+.search input{border:0;flex:1;min-width:0;background:transparent;font-size:14px}
+.search input:focus{outline:none}
+.search span{font-size:12px;color:var(--muted);white-space:nowrap;background:var(--bg);padding:6px 10px;border-radius:999px}
+.hero{padding:72px 0 40px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-10%;top:-40%;width:50%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(232,83,122,.18),transparent 65%);pointer-events:none}
+.hero .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose-d);font-weight:600}
+.hero h1{font-size:clamp(38px,6vw,76px);max-width:16ch;margin-top:12px}
+.hero h1 span{background:linear-gradient(90deg,var(--rose),var(--brick));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:18px;color:var(--muted);max-width:60ch;margin:20px 0 28px}
+.hero .stats{display:flex;gap:32px;flex-wrap:wrap;margin-top:24px}
+.hero .stats b{display:block;font-family:Sora;font-size:30px}
+.hero .stats span{font-size:13px;color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0 28px;position:sticky;top:68px;background:var(--bg);z-index:30}
+.filters button{padding:8px 14px;border-radius:999px;border:1.5px solid var(--border);font-size:13px;font-weight:600;background:#fff;transition:all .15s}
+.filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters button:hover{border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;padding-bottom:80px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s;text-decoration:none;color:inherit}
+.card:hover{transform:translateY(-6px);box-shadow:0 30px 60px rgba(23,20,31,.12)}
+.card.hidden{display:none}
+.thumb{aspect-ratio:16/10;position:relative;overflow:hidden;background:var(--t-bg,#eee);padding:14px 16px 0;display:flex;flex-direction:column;gap:8px}
+.thumb .bar{height:8px;border-radius:4px;background:var(--t-fg,#333);opacity:.9}
+.thumb .bar.sm{width:40%;height:6px;opacity:.5}
+.thumb .bar.xs{width:25%;height:5px;opacity:.35}
+.thumb .title{font-family:var(--t-font,Sora),serif;font-size:clamp(18px,2.4vw,24px);color:var(--t-fg,#333);line-height:1.05;margin:4px 0 2px;font-weight:700;max-width:80%}
+.thumb .btns{display:flex;gap:6px;margin-top:auto;margin-bottom:12px}
+.thumb .btns i{height:18px;width:60px;border-radius:9px;background:var(--t-accent,#000)}
+.thumb .btns i+i{background:transparent;border:1.5px solid var(--t-fg,#333);opacity:.6}
+.thumb .blob{position:absolute;right:-8%;bottom:-20%;width:46%;aspect-ratio:1;border-radius:var(--t-shape,50%);background:var(--t-accent,#000);opacity:.85;transform:rotate(-6deg)}
+.thumb .tag{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.9);color:var(--ink);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;border-radius:999px}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body .sector{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d);font-weight:700}
+.body h3{font-size:20px;letter-spacing:-.02em}
+.body .quartier{font-size:13px;color:var(--muted)}
+.body .feat{font-size:14px;color:var(--ink);background:var(--bg);border-radius:10px;padding:10px 12px;margin-top:4px;border-left:3px solid var(--rose)}
+.body .feat b{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;font-weight:600}
+.body .cta{margin-top:auto;padding-top:12px;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:14px}
+.body .cta span{color:var(--rose-d)}
+.body .cta i{font-style:normal;transition:transform .2s}
+.card:hover .cta i{transform:translateX(4px)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
+.how{background:#fff;border-top:1px solid var(--border);padding:72px 0}
+.how h2{font-size:clamp(28px,4vw,40px);margin-bottom:28px}
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.how-grid div{background:var(--bg);border-radius:14px;padding:22px}
+.how-grid b{display:block;font-family:Sora;font-size:17px;margin-bottom:6px}
+.how-grid p{font-size:14px;color:var(--muted)}
+footer.site{padding:36px 0;font-size:13px;color:var(--muted);border-top:1px solid var(--border)}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+<div class="banner"><b>Démo</b> — toutes les entreprises présentées sont fictives ; aucune réservation, commande ou paiement n'est réel.</div>
+<header class="header"><div class="container">
+  <a href="#" class="brand"><i></i>Démos Toulouse</a>
+  <label class="search"><input id="q" type="search" placeholder="Rechercher un métier, un quartier, une fonctionnalité…" aria-label="Rechercher"><span id="count"></span></label>
+</div></header>
+
+<section class="hero"><div class="container">
+  <p class="eyebrow">Sites de démonstration · commerces & artisans · Toulouse</p>
+  <h1>Voilà ce qu'on peut faire <span>pour votre commerce</span></h1>
+  <p>Chaque site ci-dessous est une démonstration complète : design sur mesure, version mobile, référencement local, et surtout une <strong>fonctionnalité métier qui marche vraiment</strong> — réservation, devis instantané, commande en ligne, suivi de dossier. Ouvrez une démo, testez, imaginez la vôtre.</p>
+  <div class="stats"><div><b id="nb">23</b><span>démos de secteurs différents</span></div><div><b>100 %</b><span>fonctionnalités testables dans le navigateur</span></div><div><b>0</b><span>ligne de code à écrire pour vous</span></div></div>
+</div></section>
+
+<main class="container">
+  <div class="filters" id="filters" role="group" aria-label="Filtrer par secteur"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<section class="how"><div class="container">
+  <h2>Ce que chaque démo contient</h2>
+  <div class="how-grid">
+    <div><b>Une direction artistique unique</b><p>Palette, typographies et mise en page pensées pour le métier : un barbier ne ressemble pas à un cabinet dentaire.</p></div>
+    <div><b>La fonctionnalité qui fait vendre</b><p>Réservation, devis, panier, suivi de commande… tout fonctionne côté client, avec sauvegarde locale et envoi de formulaire.</p></div>
+    <div><b>Mobile d'abord</b><p>Menu burger, boutons d'appel et d'itinéraire fixés en bas d'écran, contrastes vérifiés.</p></div>
+    <div><b>Référencement local</b><p>Titre et description optimisés, données structurées LocalBusiness avec adresse toulousaine, horaires et téléphone.</p></div>
+    <div><b>Les pages qui rassurent</b><p>Avis clients, questions fréquentes, horaires du jour, plan d'accès, mentions légales.</p></div>
+    <div><b>Prêt à publier</b><p>Site statique hébergeable gratuitement, formulaires reçus par e-mail, aucun serveur à maintenir.</p></div>
+  </div>
+</div></section>
+
+<footer class="site"><div class="container"><span>Collection de démos — entreprises fictives, quartiers réels de Toulouse.</span><span>© <span data-year></span></span></div></footer>
+
+<script src="assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$ } = Demo;
+  const DEMOS = [
+    { slug: 'restaurant', sector: 'Restauration', name: 'Le Comptoir des Carmes', type: 'Restaurant bistronomique', q: 'Carmes', feat: 'Réservation de table avec calendrier, créneaux calculés et filtres allergènes', t: { bg: '#f6f1e7', fg: '#1f3d2b', accent: '#b8923f', font: '"Cormorant Garamond", serif' } },
+    { slug: 'pizzeria', sector: 'Restauration', name: 'Forno Rosso', type: 'Pizzeria · fast-food', q: 'Jean-Jaurès', feat: 'Commande click & collect : panier, options, heure de retrait, codes promo', t: { bg: '#d62828', fg: '#fff', accent: '#ffd166', font: 'Anton, Impact, sans-serif' } },
+    { slug: 'coiffeur', sector: 'Beauté & bien-être', name: 'Atelier Mèche', type: 'Salon de coiffure', q: 'Saint-Cyprien', feat: 'Prise de RDV : prestation, coiffeur, agenda hebdomadaire, rappel SMS', t: { bg: '#faf6f1', fg: '#3b3a36', accent: '#e9c4b8', font: '"Playfair Display", serif' } },
+    { slug: 'barbier', sector: 'Beauté & bien-être', name: 'Maison Brasseur', type: 'Barbier', q: 'Saint-Michel', feat: 'Réservation de créneau et carte de fidélité numérique (10e coupe offerte)', t: { bg: '#141414', fg: '#f1ece2', accent: '#c9a254', font: '"Bebas Neue", Impact, sans-serif', shape: '4px' } },
+    { slug: 'institut', sector: 'Beauté & bien-être', name: 'Maison Lys', type: 'Institut de beauté · onglerie', q: 'Capitole', feat: 'RDV multi-prestations avec durée cumulée et carte cadeau personnalisée', t: { bg: '#fbf7f4', fg: '#2b2622', accent: '#b89a7a', font: 'Marcellus, serif', shape: '300px 300px 0 0' } },
+    { slug: 'garage', sector: 'Auto & mobilité', name: 'Garage Minimes Auto', type: 'Garage · carrosserie', q: 'Minimes', feat: 'Devis instantané par modèle, RDV atelier et suivi de réparation par n° de dossier', t: { bg: '#0f1f33', fg: '#fff', accent: '#ff6b1a', font: '"Chakra Petch", sans-serif', shape: '8px' } },
+    { slug: 'plombier', sector: 'Artisans & maison', name: 'Dépann\'Eau Toulouse', type: 'Plombier · chauffagiste · électricien', q: 'Lardenne', feat: 'Demande d\'intervention avec délai par quartier et comparateur avant/après', t: { bg: '#f7fbfb', fg: '#102a2d', accent: '#e63946', font: '"Archivo Black", sans-serif' } },
+    { slug: 'boulangerie', sector: 'Commerce de bouche', name: 'Maison Fournil', type: 'Boulangerie-pâtisserie', q: 'Côte Pavée', feat: 'Précommande avec configurateur de gâteau et horaires de fournée en direct', t: { bg: '#f3e3c3', fg: '#3d2a1e', accent: '#b5672a', font: 'Fraunces, serif' } },
+    { slug: 'dentiste', sector: 'Santé', name: 'Cabinet Dentaire Rangueil', type: 'Cabinet dentaire · médical', q: 'Rangueil', feat: 'RDV par praticien et motif, téléconsultation, espace « préparer sa visite »', t: { bg: '#e0f2fe', fg: '#0f172a', accent: '#0ea5e9', font: 'Manrope, sans-serif', shape: '24px' } },
+    { slug: 'salle-de-sport', sector: 'Sport & loisirs', name: 'Studio Pulse', type: 'Salle de sport · studio yoga', q: 'Purpan', feat: 'Planning hebdomadaire interactif, réservation avec jauge, essai gratuit, abonnements', t: { bg: '#111', fg: '#f4f4f4', accent: '#c6ff3d', font: 'Syne, sans-serif' } },
+    { slug: 'immobilier', sector: 'Immobilier & conseil', name: 'Garonne Immobilier', type: 'Agence immobilière', q: 'Compans-Caffarelli', feat: 'Recherche filtrée, fiches, simulateur de mensualité, estimation en 4 étapes', t: { bg: '#1b2a41', fg: '#fff', accent: '#d4b483', font: '"DM Serif Display", serif', shape: '10px' } },
+    { slug: 'fleuriste', sector: 'Commerce', name: 'Pétale & Co', type: 'Fleuriste', q: 'Saint-Aubin', feat: 'Catalogue, livraison à Toulouse sur créneau avec carte-message, abonnement hebdo', t: { bg: '#f7e1e8', fg: '#243027', accent: '#2f5d46', font: 'Lora, serif', shape: '200px 200px 24px 24px' } },
+    { slug: 'auto-ecole', sector: 'Auto & mobilité', name: 'Auto-école Envol', type: 'Auto-école', q: 'Blagnac', feat: 'Calcul de tarif, réservation de leçons, suivi des heures et quiz code (10 questions)', t: { bg: '#0b1033', fg: '#fff', accent: '#ffd60a', font: 'Outfit, sans-serif', shape: '24px' } },
+    { slug: 'photographe', sector: 'Créatifs & événements', name: 'Lucie Marty', type: 'Photographe · vidéaste', q: 'Colomiers', feat: 'Portfolio plein écran et masonry, devis mariage/corporate, calendrier de disponibilités', t: { bg: '#111', fg: '#fafafa', accent: '#444', font: '"Libre Caslon Display", serif', shape: '0' } },
+    { slug: 'avocat', sector: 'Immobilier & conseil', name: 'Dalmas & Associés', type: 'Cabinet d\'avocats', q: 'Place Wilson', feat: 'Simulateur d\'honoraires, RDV découverte, articles juridiques', t: { bg: '#f6f1e6', fg: '#1f1a1b', accent: '#5c1a2a', font: '"EB Garamond", serif', shape: '4px' } },
+    { slug: 'opticien', sector: 'Santé', name: 'Optique Saint-Georges', type: 'Opticien', q: 'Saint-Georges', feat: 'Montures filtrables par visage, simulateur de reste à charge, RDV examen de vue', t: { bg: '#eef3ff', fg: '#0f172a', accent: '#1d4ed8', font: 'Urbanist, sans-serif' } },
+    { slug: 'boutique', sector: 'Commerce', name: 'Maison Ortie', type: 'Boutique de vêtements', q: 'Carmes', feat: 'E-shop vitrine : variantes taille/couleur, panier, code promo, retrait ou livraison', t: { bg: '#ece7df', fg: '#2d2a26', accent: '#b56b48', font: '"Tenor Sans", serif', shape: '0' } },
+    { slug: 'hotel', sector: 'Hébergement', name: 'Maison Garonne', type: 'Chambres d\'hôtes · hôtel', q: 'Saint-Cyprien', feat: 'Recherche de disponibilités, tarif par séjour, réservation de chambre, calendrier', t: { bg: '#123b3f', fg: '#f8f4ea', accent: '#c3a86b', font: 'Cinzel, serif', shape: '6px' } },
+    { slug: 'tatoueur', sector: 'Créatifs & événements', name: 'Encre Noire', type: 'Salon de tatouage', q: 'Arnaud-Bernard', feat: 'Flashs uniques réservables, estimation de projet, demande de rendez-vous', t: { bg: '#f2eee6', fg: '#111', accent: '#b3261e', font: '"Special Elite", monospace', shape: '0' } },
+    { slug: 'veterinaire', sector: 'Santé', name: 'Clinique des Argoulets', type: 'Vétérinaire', q: 'Croix-Daurade', feat: 'Carnet de santé avec rappels de vaccins, prise de rendez-vous et urgences', t: { bg: '#fff7ed', fg: '#1f2937', accent: '#f97316', font: 'Quicksand, sans-serif' } },
+    { slug: 'traiteur', sector: 'Créatifs & événements', name: 'Les Tables de Garance', type: 'Traiteur événementiel', q: 'Saint-Simon', feat: 'Devis événementiel instantané (convives, formule, options) et menus de saison', t: { bg: '#7a1f2b', fg: '#fff', accent: '#f5e9d6', font: 'Prata, serif', shape: '8px' } },
+    { slug: 'pressing', sector: 'Artisans & maison', name: 'Pressing Patte d\'Oie', type: 'Pressing · blanchisserie', q: 'Patte d\'Oie', feat: 'Devis par article, collecte à domicile sur créneau, suivi de commande', t: { bg: '#ecfeff', fg: '#0f172a', accent: '#0891b2', font: 'Lexend, sans-serif', shape: '14px' } },
+    { slug: 'ecole-de-musique', sector: 'Sport & loisirs', name: 'Académie Busca', type: 'École de musique', q: 'Busca', feat: 'Simulateur de tarif, créneau hebdomadaire par professeur, cours d\'essai gratuit', t: { bg: '#2b1d3a', fg: '#fff', accent: '#f2b134', font: '"Abril Fatface", serif' } }
+  ];
+  const sectors = [...new Set(DEMOS.map((d) => d.sector))];
+  let sector = 'all', q = '';
+  $('#filters').innerHTML = `<button aria-pressed="true" data-s="all">Tous (${DEMOS.length})</button>` + sectors.map((s) => `<button aria-pressed="false" data-s="${s}">${s} (${DEMOS.filter((d) => d.sector === s).length})</button>`).join('');
+  $('#grid').innerHTML = DEMOS.map((d) => `<a class="card" href="demos/${d.slug}/" data-sector="${d.sector}" data-text="${(d.name + ' ' + d.type + ' ' + d.q + ' ' + d.feat + ' ' + d.sector).toLowerCase()}"><div class="thumb" style="--t-bg:${d.t.bg};--t-fg:${d.t.fg};--t-accent:${d.t.accent};--t-font:${d.t.font};--t-shape:${d.t.shape || '50%'}"><span class="tag">${d.sector}</span><div class="bar xs"></div><div class="title">${d.name}</div><div class="bar sm"></div><div class="btns"><i></i><i></i></div><div class="blob"></div></div><div class="body"><span class="sector">${d.type}</span><h3>${d.name}</h3><span class="quartier">📍 ${d.q} · Toulouse</span><div class="feat"><b>Fonctionnalité clé</b>${d.feat}</div><div class="cta"><span>Voir la démo</span><i>→</i></div></div></a>`).join('');
+  function apply() { let n = 0; $$('.card').forEach((c) => { const ok = (sector === 'all' || c.dataset.sector === sector) && (!q || c.dataset.text.includes(q)); c.classList.toggle('hidden', !ok); if (ok) n++; }); $('#count').textContent = `${n} / ${DEMOS.length}`; let e = $('.empty'); if (!n && !e) { e = document.createElement('p'); e.className = 'empty'; e.textContent = 'Aucune démo ne correspond.'; $('#grid').appendChild(e); } else if (n && e) e.remove(); }
+  $$('#filters button').forEach((b) => b.addEventListener('click', () => { sector = b.dataset.s; $$('#filters button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); apply(); }));
+  $('#q').addEventListener('input', (e) => { q = e.target.value.trim().toLowerCase(); apply(); });
+  $('#nb').textContent = DEMOS.length; apply();
+})();
+</script>
+</body>
+</html>
