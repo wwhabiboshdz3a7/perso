@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.nexora-agence.fr/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://www.nexora-agence.fr/services/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/services/web.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/services/films.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/services/ads.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/services/admin.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/tarifs.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/realisations.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/a-propos.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/contact.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.nexora-agence.fr/mentions-legales.html</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://www.nexora-agence.fr/politique-confidentialite.html</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.nexora-agence.fr/mentions-legales.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.nexora-agence.fr/politique-confidentialite.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

@@ -9,27 +9,42 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://images.unsplash.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; frame-src https://www.openstreetmap.org; form-action 'self'; base-uri 'self'; object-src 'none'"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'"
 
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=604800"
 
-# Anciennes adresses du site précédent (ancres de la page unique)
+[[headers]]
+  for = "/assets/hero.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# Anciennes pages de la refonte multi-pages : renvoyées vers les sections de la page unique
 [[redirects]]
-  from = "/index.html"
-  to = "/"
+  from = "/services/*"
+  to = "/#services"
   status = 301
 
 [[redirects]]
-  from = "/services"
-  to = "/services/"
+  from = "/tarifs.html"
+  to = "/#tarifs"
   status = 301
 
 [[redirects]]
-  from = "/services/index.html"
-  to = "/services/"
+  from = "/realisations.html"
+  to = "/#avis"
+  status = 301
+
+[[redirects]]
+  from = "/a-propos.html"
+  to = "/#agence"
+  status = 301
+
+[[redirects]]
+  from = "/contact.html"
+  to = "/#contact"
   status = 301
 
 [[redirects]]
