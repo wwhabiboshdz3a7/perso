@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garage Minimes Auto — Garage & carrosserie à Toulouse Minimes</title>
+<meta name="description" content="Garage toutes marques et carrosserie aux Minimes, Toulouse. Devis instantané en ligne (vidange, pneus, freins, contrôle technique), prise de rendez-vous atelier et suivi de réparation par numéro de dossier.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230f1f33'/%3E%3Cpath d='M6 20h20l-3-8H9z' fill='%23ff6b1a'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"AutoRepair","name":"Garage Minimes Auto","telephone":"+33561478320","priceRange":"€€","address":{"@type":"PostalAddress","streetAddress":"112 avenue des Minimes","addressLocality":"Toulouse","postalCode":"31200","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6210,"longitude":1.4330},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"18:30"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"08:30","closes":"12:30"}],"url":"https://example.com/demos/garage/"}
+</script>
+<style>
+:root{--navy:#0f1f33;--navy-2:#16294a;--orange:#ff6b1a;--orange-d:#d4540f;--grey:#f2f4f7;--ink:#152033;--muted:#5f6b7d;--accent:var(--orange);--focus:var(--orange);--border:#d9dee7;--radius:6px;--ph:linear-gradient(135deg,#16294a,#0f1f33);--mb-bg:#ff6b1a;--mb-bg2:#0f1f33}
+body{font-family:"IBM Plex Sans",system-ui,sans-serif;background:#fff;color:var(--ink)}
+h1,h2,h3{font-family:"Chakra Petch",sans-serif;font-weight:700;line-height:1.05;text-transform:uppercase;letter-spacing:.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:var(--radius);font-weight:600;text-decoration:none;transition:all .2s;font-size:15px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.btn-orange{background:var(--orange);color:#fff}.btn-orange:hover{background:var(--orange-d)}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:var(--navy-2)}
+.btn-ghost{box-shadow:inset 0 0 0 2px var(--navy);clip-path:none}.btn-ghost:hover{background:var(--grey)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.topbar{background:var(--navy);color:#fff;font-size:13px;padding:8px 0}
+.topbar .container{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.topbar b{color:var(--orange)}
+.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(15,31,51,.06)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{font-family:"Chakra Petch";font-weight:700;font-size:22px;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand i{width:34px;height:34px;background:var(--navy);clip-path:polygon(20% 0,100% 0,80% 100%,0 100%);position:relative}
+.brand i::after{content:"";position:absolute;inset:40% 25%;background:var(--orange)}
+.nav{display:flex;gap:26px;align-items:center;font-weight:500;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--orange)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:70px 0 0;background:#fff;flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+.hero .ph{position:absolute;inset:0;--ph:linear-gradient(120deg,#16294a,#0f1f33)}
+.hero .ph img{opacity:.35}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,31,51,.95) 30%,rgba(15,31,51,.4))}
+.hero .container{position:relative;z-index:2;padding:88px 0;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+@media (max-width:900px){.hero .container{grid-template-columns:1fr;padding:56px 0}}
+.hero h1{font-size:clamp(40px,6vw,76px)}
+.hero h1 span{color:var(--orange)}
+.hero p{font-size:18px;opacity:.9;max-width:50ch;margin:20px 0 28px}
+.kpis{display:flex;gap:28px;flex-wrap:wrap;margin-top:36px}
+.kpis div b{display:block;font-family:"Chakra Petch";font-size:34px;color:var(--orange)}
+.kpis div span{font-size:13px;opacity:.8}
+.hero-panel{background:#fff;color:var(--ink);border-radius:10px;padding:24px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.hero-panel h3{font-size:18px;margin-bottom:6px}
+.hero-panel p{font-size:14px;color:var(--muted);margin-bottom:14px}
+.hero-panel .track{display:flex;gap:8px}
+.hero-panel input{flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);text-transform:uppercase;font-family:ui-monospace,monospace}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);font-weight:600}
+.section-head{margin-bottom:40px;max-width:680px}
+.section-head h2{font-size:clamp(30px,4.5vw,48px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.svc{border:1.5px solid var(--border);border-radius:10px;padding:24px;transition:all .25s;position:relative;overflow:hidden}
+.svc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--orange);transform:scaleY(0);transition:transform .3s;transform-origin:bottom}
+.svc:hover{border-color:var(--navy);transform:translateY(-3px)}.svc:hover::before{transform:none}
+.svc .ic{font-size:30px;margin-bottom:12px}
+.svc h3{font-size:18px;margin-bottom:6px}
+.svc p{font-size:14px;color:var(--muted)}
+.svc .pr{margin-top:12px;font-weight:600;color:var(--navy)}
+/* Devis */
+.devis{background:var(--grey)}
+.devis-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.devis-grid{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:10px;padding:28px;border:1px solid var(--border)}
+.panel h3{font-size:20px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.panel h3 span{width:30px;height:30px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-size:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.prest{display:grid;gap:8px;margin-top:14px}
+.prest label{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.prest label:hover{border-color:var(--navy)}
+.prest label:has(input:checked){border-color:var(--orange);background:#fff5ee}
+.prest input{accent-color:var(--orange)}
+.prest .nm{flex:1}.prest .nm small{display:block;color:var(--muted);font-size:12px}
+.prest .pr{font-weight:600;white-space:nowrap}
+.estimate{background:var(--navy);color:#fff;border-radius:10px;padding:28px;position:sticky;top:90px}
+.estimate h3{font-size:20px;margin-bottom:14px}
+.estimate .lines{display:grid;gap:8px;font-size:14px;margin-bottom:14px}
+.estimate .lines div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed rgba(255,255,255,.15);padding-bottom:6px}
+.estimate .total{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--orange);padding-top:12px}
+.estimate .total b{font-family:"Chakra Petch";font-size:38px;color:var(--orange)}
+.estimate .total small{display:block;opacity:.7;font-size:12px}
+.estimate .note{font-size:12px;opacity:.7;margin-top:12px}
+.estimate .empty{opacity:.7;font-size:14px}
+.estimate .delay{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:14px;background:rgba(255,255,255,.08);padding:10px 12px;border-radius:6px}
+.estimate .btn{width:100%;margin-top:14px}
+/* RDV */
+.rdv-form{display:grid;gap:14px;margin-top:8px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.slots button{padding:10px 4px;border:1.5px solid var(--border);border-radius:var(--radius);font-weight:500;font-size:14px}
+.slots button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.slots button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.confirm{background:#eefbf1;border:1.5px solid #86d39a;border-radius:10px;padding:22px;text-align:center}
+.confirm h3{font-size:22px;color:#166534}
+.confirm .num{font-family:ui-monospace,monospace;font-size:26px;letter-spacing:.1em;background:#fff;display:inline-block;padding:8px 16px;border-radius:6px;margin:10px 0;border:1px solid #86d39a}
+/* Suivi */
+.suivi{background:var(--navy);color:#fff}
+.suivi .eyebrow{color:var(--orange)}
+.suivi .section-head p{color:rgba(255,255,255,.75)}
+.track-box{background:#fff;color:var(--ink);border-radius:10px;padding:28px;max-width:760px}
+.track-box .search{display:flex;gap:8px;flex-wrap:wrap}
+.track-box input{flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);text-transform:uppercase;font-family:ui-monospace,monospace;letter-spacing:.05em}
+.track-box .hint{font-size:13px;color:var(--muted);margin-top:8px}
+.track-box .hint button{text-decoration:underline;color:var(--orange-d);font-weight:500}
+.timeline{margin-top:24px;display:grid;gap:0}
+.tl{display:grid;grid-template-columns:28px 1fr;gap:14px;padding-bottom:22px;position:relative}
+.tl::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--border)}
+.tl:last-child::before{display:none}
+.tl i{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:#fff;display:grid;place-items:center;font-size:13px;font-style:normal}
+.tl.done i{background:#16a34a;border-color:#16a34a;color:#fff}
+.tl.now i{background:var(--orange);border-color:var(--orange);color:#fff;box-shadow:0 0 0 6px rgba(255,107,26,.2)}
+.tl.todo{opacity:.45}
+.tl strong{display:block}.tl span{font-size:13px;color:var(--muted)}
+.file-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:20px;padding:14px;background:var(--grey);border-radius:var(--radius);font-size:14px}
+.file-head b{font-family:ui-monospace,monospace}
+.badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#fff5ee;color:var(--orange-d)}
+.badge.ok{background:#eefbf1;color:#166534}
+.err{color:#991b1b;font-size:14px;margin-top:10px}
+/* Avis, FAQ, accès */
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{border:1.5px solid var(--border);border-radius:10px;padding:22px}
+.review .stars{color:var(--orange);letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:500}
+.faq details{border:1.5px solid var(--border);border-radius:var(--radius);padding:0 16px;margin-bottom:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:600;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--orange);font-size:20px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:14px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours div.today{font-weight:600;color:var(--orange-d)}
+.map{border-radius:10px;overflow:hidden;min-height:320px;background:var(--grey);border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:18px 0}
+footer.site{background:var(--navy);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span>🔧 Dépannage & remorquage 7j/7 : <b>05 61 47 83 20</b></span><span>Lun–Ven 8h–18h30 · Sam 8h30–12h30</span></div></div>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i></i>Minimes Auto</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#prestations">Prestations</a><a href="#devis">Devis & RDV</a><a href="#suivi">Suivi réparation</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#devis" class="btn btn-orange">Devis instantané</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top">
+  <div class="ph"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1800&q=70" alt="Atelier mécanique, voiture sur pont élévateur" fetchpriority="high"></div>
+  <div class="container">
+    <div>
+      <p class="eyebrow" data-reveal>Garage toutes marques · Minimes</p>
+      <h1 data-reveal>Votre voiture entre <span>de bonnes mains</span></h1>
+      <p data-reveal>Entretien, mécanique, carrosserie et contrôle technique, avec un devis chiffré en 30 secondes et un suivi de réparation en temps réel. Prêt de véhicule offert dès 2 h d'immobilisation.</p>
+      <div data-reveal><a href="#devis" class="btn btn-orange">Obtenir mon devis</a> <a href="tel:+33561478320" class="btn btn-ghost" style="box-shadow:inset 0 0 0 2px #fff;color:#fff">05 61 47 83 20</a></div>
+      <div class="kpis" data-reveal><div><b>4,8/5</b><span>620 avis vérifiés</span></div><div><b>24 h</b><span>délai moyen</span></div><div><b>2 ans</b><span>garantie pièces & MO</span></div></div>
+    </div>
+    <div class="hero-panel" data-reveal="right">
+      <h3>Suivre ma réparation</h3>
+      <p>Saisissez votre numéro de dossier (reçu par SMS à la dépose).</p>
+      <div class="track"><input id="quickTrack" placeholder="GMA-2026-118" aria-label="Numéro de dossier"><button class="btn btn-navy" id="quickTrackBtn">Suivre</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="prestations"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Prestations</p><h2>Tout sous le même toit</h2><p>Mécanique, carrosserie et contrôle technique partenaire, pour toutes marques, thermiques, hybrides et électriques.</p></div>
+  <div class="services">
+    <article class="svc" data-reveal><div class="ic">🛢️</div><h3>Vidange & révision</h3><p>Huile constructeur, filtres, 30 points de contrôle, remise à zéro.</p><p class="pr">dès 89 €</p></article>
+    <article class="svc" data-reveal><div class="ic">🛞</div><h3>Pneumatiques</h3><p>Montage, équilibrage, géométrie. Toutes marques, stock sur place.</p><p class="pr">dès 25 € / pneu posé</p></article>
+    <article class="svc" data-reveal><div class="ic">🛑</div><h3>Freinage</h3><p>Plaquettes, disques, purge liquide, frein de parking.</p><p class="pr">dès 119 €</p></article>
+    <article class="svc" data-reveal><div class="ic">📋</div><h3>Contrôle technique</h3><p>Pré-contrôle gratuit, passage chez notre centre partenaire, contre-visite gérée.</p><p class="pr">79 €</p></article>
+    <article class="svc" data-reveal><div class="ic">🚗</div><h3>Carrosserie</h3><p>Débosselage sans peinture, peinture cabine, pare-brise.</p><p class="pr">sur devis photo</p></article>
+    <article class="svc" data-reveal><div class="ic">🔋</div><h3>Hybride & électrique</h3><p>Techniciens habilités, diagnostic batterie, mise à jour logicielle.</p><p class="pr">dès 69 €</p></article>
+  </div>
+</div></section>
+
+<section class="devis" id="devis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Devis instantané</p><h2>Un prix clair avant de venir</h2><p>Sélectionnez votre véhicule et vos prestations : l'estimation s'affiche en direct, puis réservez votre créneau atelier.</p></div>
+  <div class="devis-grid">
+    <div style="display:grid;gap:20px">
+      <div class="panel" data-reveal>
+        <h3><span>1</span>Votre véhicule</h3>
+        <div class="row2">
+          <div class="field"><label for="marque">Marque</label><select id="marque"></select></div>
+          <div class="field"><label for="modele">Modèle</label><select id="modele"></select></div>
+          <div class="field"><label for="energie">Énergie</label><select id="energie"><option value="essence">Essence</option><option value="diesel">Diesel</option><option value="hybride">Hybride</option><option value="electrique">Électrique</option></select></div>
+          <div class="field"><label for="annee">Année</label><select id="annee"></select></div>
+        </div>
+      </div>
+      <div class="panel" data-reveal>
+        <h3><span>2</span>Prestations souhaitées</h3>
+        <div class="prest" id="prest"></div>
+      </div>
+      <div class="panel" data-reveal id="rdvPanel">
+        <h3><span>3</span>Rendez-vous atelier</h3>
+        <form name="rdv-garage" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="rdvForm" class="rdv-form" novalidate>
+          <input type="hidden" name="form-name" value="rdv-garage"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+          <input type="hidden" name="vehicule" id="fVeh"><input type="hidden" name="prestations" id="fPrest"><input type="hidden" name="estimation" id="fEst"><input type="hidden" name="creneau" id="fSlot">
+          <div class="row2"><div class="field"><label for="date">Date de dépose</label><input type="date" id="date" name="date" required></div><div class="field"><label for="immat">Immatriculation</label><input id="immat" name="immatriculation" placeholder="AB-123-CD" style="text-transform:uppercase"></div></div>
+          <div><label style="font-size:14px;font-weight:600;display:block;margin-bottom:8px">Heure de dépose</label><div class="slots" id="slots"><p style="grid-column:1/-1;font-size:13px;color:var(--muted)">Choisissez une date.</p></div></div>
+          <div class="row2"><div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required placeholder="Dupont"></div><div class="field"><label for="tel">Téléphone</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div>
+          <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required placeholder="vous@exemple.fr"></div>
+          <label style="display:flex;gap:10px;font-size:14px;color:var(--muted)"><input type="checkbox" name="pret_vehicule"> Je souhaite un véhicule de prêt (offert dès 2 h d'immobilisation)</label>
+          <button type="submit" class="btn btn-orange" id="rdvSubmit" disabled>Réserver le créneau</button>
+        </form>
+        <div class="confirm hidden" id="rdvDone"><h3>Rendez-vous confirmé</h3><p>Votre numéro de dossier :</p><div class="num" id="doneNum"></div><p id="doneText" style="font-size:14px;color:var(--muted)"></p><p style="margin-top:12px"><a href="#suivi" class="btn btn-navy" id="doneTrack">Suivre ce dossier</a></p></div>
+      </div>
+    </div>
+    <aside class="estimate" data-reveal="right">
+      <h3>Votre estimation</h3>
+      <div id="estBody"><p class="empty">Cochez au moins une prestation.</p></div>
+    </aside>
+  </div>
+</div></section>
+
+<section class="suivi" id="suivi"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Suivi de réparation</p><h2>Où en est ma voiture ?</h2><p>Chaque étape est mise à jour par l'atelier. Vous recevez un SMS quand le véhicule est prêt.</p></div>
+  <div class="track-box" data-reveal>
+    <div class="search"><input id="trackInput" placeholder="N° de dossier, ex. GMA-2026-118" aria-label="Numéro de dossier"><button class="btn btn-orange" id="trackBtn">Afficher le suivi</button></div>
+    <p class="hint">Pour la démo, essayez <button type="button" data-demo="GMA-2026-118">GMA-2026-118</button>, <button type="button" data-demo="GMA-2026-121">GMA-2026-121</button> ou votre propre dossier créé ci-dessus.</p>
+    <div id="trackResult"></div>
+  </div>
+</div></section>
+
+<section id="avis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis clients</p><h2>Ils nous confient leurs clés</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Devis en ligne respecté au centime. Le suivi par SMS m'a évité trois coups de fil. Enfin un garage transparent.</p><footer>Patrick L. · Minimes</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Plaquettes + disques changés dans la matinée, voiture de prêt propre. Je recommande.</p><footer>Nadia K. · Barrière de Paris</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★☆</div><p>Bon accueil, tarifs corrects, un peu d'attente le samedi matin mais c'est le succès.</p><footer>Olivier M. · Sept Deniers</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Le devis en ligne est-il définitif ?</summary><p>C'est une estimation basée sur votre modèle et les prestations cochées. Elle est confirmée à la dépose après contrôle du véhicule ; aucun travail supplémentaire n'est engagé sans votre accord.</p></details>
+    <details><summary>Faites-vous le contrôle technique sur place ?</summary><p>Nous réalisons le pré-contrôle et accompagnons votre véhicule chez notre centre partenaire à 400 m. Vous repartez avec le PV.</p></details>
+    <details><summary>Ma garantie constructeur est-elle maintenue ?</summary><p>Oui : nous suivons le carnet d'entretien constructeur avec des pièces de qualité équivalente, ce qui préserve votre garantie.</p></details>
+    <details><summary>Proposez-vous des facilités de paiement ?</summary><p>Paiement en 3 fois sans frais dès 300 €.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,42px);margin:8px 0 18px">Avenue des Minimes</h2><div class="hours" id="hours"></div><address><strong>Garage Minimes Auto</strong><br>112 avenue des Minimes, 31200 Toulouse<br>Métro B · Minimes – Claude Nougaro · Parking client<br><a href="tel:+33561478320">05 61 47 83 20</a> · <a href="mailto:atelier@minimes-auto.fr">atelier@minimes-auto.fr</a></address><a class="btn btn-ghost" href="https://www.google.com/maps/dir/?api=1&destination=112+avenue+des+Minimes+31200+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4250%2C43.6170%2C1.4410%2C43.6250&layer=mapnik&marker=43.6210%2C1.4330"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Garage Minimes Auto — SARL GMA</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SARL GMA, 112 avenue des Minimes, 31200 Toulouse. SIRET 856 789 012 00015. Directeur de publication : Karim Benali. Hébergement : Netlify, Inc. Les données saisies (véhicule, coordonnées) servent à établir le devis et gérer le rendez-vous ; elles sont conservées 3 ans. Site de démonstration : entreprise fictive, les estimations sont indicatives.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561478320">📞 Dépannage</a><a href="#devis">Devis</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, pad, isoDate, fmtDate, cap, store, toast, validate, sendNetlify } = Demo;
+  const CARS = { Renault: ['Clio', 'Captur', 'Mégane', 'Scénic', 'Kadjar', 'Zoé'], Peugeot: ['208', '2008', '308', '3008', '508', 'Partner'], Citroën: ['C3', 'C4', 'C5 Aircross', 'Berlingo'], Dacia: ['Sandero', 'Duster', 'Jogger'], Volkswagen: ['Polo', 'Golf', 'Tiguan', 'Passat', 'ID.3'], Toyota: ['Yaris', 'Corolla', 'C-HR', 'RAV4'], BMW: ['Série 1', 'Série 3', 'X1', 'X3'], Mercedes: ['Classe A', 'Classe C', 'GLA'], Audi: ['A1', 'A3', 'Q3'], Tesla: ['Model 3', 'Model Y'], Ford: ['Fiesta', 'Focus', 'Puma', 'Kuga'], Fiat: ['500', 'Panda', 'Tipo'] };
+  const SEG = { Clio: 1, Captur: 2, Mégane: 2, Scénic: 2, Kadjar: 2, Zoé: 1, 208: 1, 2008: 2, 308: 2, 3008: 3, 508: 3, Partner: 2, C3: 1, C4: 2, 'C5 Aircross': 3, Berlingo: 2, Sandero: 1, Duster: 2, Jogger: 2, Polo: 1, Golf: 2, Tiguan: 3, Passat: 3, 'ID.3': 2, Yaris: 1, Corolla: 2, 'C-HR': 2, RAV4: 3, 'Série 1': 2, 'Série 3': 3, X1: 3, X3: 4, 'Classe A': 2, 'Classe C': 3, GLA: 3, A1: 2, A3: 2, Q3: 3, 'Model 3': 3, 'Model Y': 3, Fiesta: 1, Focus: 2, Puma: 2, Kuga: 3, 500: 1, Panda: 1, Tipo: 2 };
+  const PREST = [
+    { id: 'vidange', name: 'Vidange + filtre à huile', sub: 'Huile constructeur, 30 points de contrôle', base: 89, k: 18, hours: 1, elec: false },
+    { id: 'revision', name: 'Révision complète', sub: 'Vidange + filtres + liquides + RAZ', base: 169, k: 35, hours: 2.5, elec: false },
+    { id: 'pneus2', name: '2 pneus montés-équilibrés', sub: 'Pneus toutes saisons, valves incluses', base: 170, k: 45, hours: 1 },
+    { id: 'pneus4', name: '4 pneus + géométrie', sub: 'Parallélisme offert', base: 340, k: 90, hours: 2 },
+    { id: 'plaquettes', name: 'Plaquettes de frein avant', sub: 'Pièces équipementier, pose', base: 119, k: 25, hours: 1 },
+    { id: 'disques', name: 'Disques + plaquettes avant', sub: 'Kit complet', base: 249, k: 55, hours: 2 },
+    { id: 'ct', name: 'Contrôle technique accompagné', sub: 'Pré-contrôle + passage centre partenaire', base: 79, k: 0, hours: 2 },
+    { id: 'clim', name: 'Recharge climatisation', sub: 'Gaz + test fuite', base: 69, k: 10, hours: 1 },
+    { id: 'batterie', name: 'Batterie 12 V', sub: 'Fourniture + pose + recyclage', base: 129, k: 30, hours: 0.5 },
+    { id: 'diag', name: 'Diagnostic électronique', sub: 'Lecture défauts, rapport', base: 59, k: 0, hours: 1 }
+  ];
+  const LABOR = 72; // € HT / heure
+  const KEY = 'minimes-auto:dossiers';
+  const marque = $('#marque'), modele = $('#modele'), energie = $('#energie'), annee = $('#annee');
+  marque.innerHTML = Object.keys(CARS).map((m) => `<option>${m}</option>`).join('');
+  const y = new Date().getFullYear(); annee.innerHTML = Array.from({ length: 20 }, (_, i) => `<option>${y - i}</option>`).join(''); annee.value = y - 5;
+  function fillModels() { modele.innerHTML = CARS[marque.value].map((m) => `<option>${m}</option>`).join(''); }
+  marque.addEventListener('change', () => { fillModels(); renderEstimate(); }); fillModels();
+  $('#prest').innerHTML = PREST.map((p) => `<label><input type="checkbox" value="${p.id}"><span class="nm">${p.name}<small>${p.sub}</small></span><span class="pr" data-pr="${p.id}"></span></label>`).join('');
+
+  function price(p) {
+    const seg = SEG[modele.value] || 2; const age = y - Number(annee.value);
+    let v = p.base + p.k * (seg - 1); if (energie.value === 'diesel') v *= 1.06; if (energie.value === 'hybride') v *= 1.08; if (age > 10) v *= 1.05;
+    return Math.round(v);
+  }
+  function selected() { return $$('#prest input:checked').map((i) => PREST.find((p) => p.id === i.value)); }
+  function renderEstimate() {
+    const elec = energie.value === 'electrique';
+    $$('#prest label').forEach((l) => { const p = PREST.find((x) => x.id === $('input', l).value); const na = elec && p.elec === false; l.style.opacity = na ? .4 : 1; $('input', l).disabled = na; if (na) $('input', l).checked = false; $('[data-pr]', l).textContent = na ? 'n/a électrique' : euro(price(p)); });
+    const items = selected(); const total = items.reduce((s, p) => s + price(p), 0); const hours = items.reduce((s, p) => s + p.hours, 0);
+    const veh = `${marque.value} ${modele.value} ${annee.value} (${energie.options[energie.selectedIndex].text})`;
+    $('#fVeh').value = veh; $('#fPrest').value = items.map((p) => p.name).join(', '); $('#fEst').value = euro(total);
+    $('#estBody').innerHTML = items.length ? `<p style="font-size:13px;opacity:.8;margin-bottom:10px">${veh}</p><div class="lines">${items.map((p) => `<div><span>${p.name}</span><span>${euro(price(p))}</span></div>`).join('')}</div><div class="total"><div>Total estimé<small>TTC, pièces et main-d'œuvre</small></div><b>${euro(total)}</b></div><div class="delay">⏱ Immobilisation estimée : <strong>${hours >= 4 ? 'journée' : hours >= 2 ? 'demi-journée' : Math.max(1, Math.round(hours)) + ' h'}</strong>${hours >= 2 ? ' · véhicule de prêt offert' : ''}</div><p class="note">Estimation indicative calculée sur la main-d'œuvre à ${LABOR} € HT/h et les pièces équipementier. Confirmée à la dépose.</p><a href="#rdvPanel" class="btn btn-orange">Réserver ce créneau atelier</a>` : '<p class="empty">Cochez au moins une prestation pour voir le prix.</p>';
+    $('#rdvSubmit').disabled = !(items.length && slot);
+  }
+  [modele, energie, annee].forEach((s) => s.addEventListener('change', renderEstimate));
+  $('#prest').addEventListener('change', renderEstimate);
+
+  /* Créneaux de dépose */
+  let slot = null; const date = $('#date'); const today = new Date(); date.min = isoDate(today);
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  date.addEventListener('change', () => {
+    slot = null; const box = $('#slots'); box.innerHTML = ''; if (!date.value) return;
+    const d = new Date(date.value + 'T12:00:00'); const dow = d.getDay();
+    if (dow === 0) { box.innerHTML = '<p style="grid-column:1/-1;color:#991b1b;font-size:14px">Fermé le dimanche.</p>'; renderEstimate(); return; }
+    const times = dow === 6 ? ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00'] : ['08:00', '08:30', '09:00', '09:30', '10:00', '11:00', '13:30', '14:00', '15:00', '16:00', '17:00'];
+    const taken = store.get(KEY, []).filter((f) => f.date === date.value).map((f) => f.slot);
+    times.forEach((t) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.disabled = seeded(date.value + t) < 0.3 || taken.includes(t) || (date.value === isoDate(today) && t <= pad(today.getHours()) + ':' + pad(today.getMinutes())); b.addEventListener('click', () => { slot = t; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#fSlot').value = date.value + ' ' + t; renderEstimate(); }); box.appendChild(b); });
+    renderEstimate();
+  });
+
+  /* Dossiers de démonstration + dossiers créés */
+  const STEPS = ['Véhicule déposé', 'Diagnostic réalisé', 'Devis validé', 'Réparation en cours', 'Contrôle qualité', 'Véhicule prêt'];
+  const DEMO = { 'GMA-2026-118': { veh: 'Peugeot 308 2019', prest: 'Disques + plaquettes avant', step: 3, date: '2026-10-27', slot: '08:30', est: '331,00 €', ready: 'aujourd\'hui à 17h' }, 'GMA-2026-121': { veh: 'Tesla Model Y 2023', prest: 'Diagnostic électronique, 4 pneus + géométrie', step: 5, date: '2026-10-28', slot: '09:00', est: '589,00 €', ready: 'dès maintenant' } };
+  function findFile(num) { num = num.trim().toUpperCase(); return DEMO[num] ? { num, ...DEMO[num] } : store.get(KEY, []).find((f) => f.num === num); }
+  function showFile(num) {
+    const box = $('#trackResult'); const f = findFile(num);
+    if (!num.trim()) { box.innerHTML = '<p class="err">Saisissez un numéro de dossier.</p>'; return; }
+    if (!f) { box.innerHTML = `<p class="err">Aucun dossier « ${num.trim().toUpperCase()} ». Vérifiez le numéro reçu par SMS ou appelez le 05 61 47 83 20.</p>`; return; }
+    const step = f.step ?? 0; const done = step >= STEPS.length - 1;
+    box.innerHTML = `<div class="file-head"><span><b>${f.num}</b> · ${f.veh}</span><span class="badge${done ? ' ok' : ''}">${done ? 'Prêt à récupérer' : 'En cours'}</span></div><p style="font-size:14px;color:var(--muted);margin-top:10px">${f.prest} · estimation ${f.est} · dépose le ${fmtDate(new Date(f.date + 'T12:00:00'), { day: 'numeric', month: 'long' })} à ${f.slot}${f.ready ? ' · retrait prévu ' + f.ready : ''}</p><div class="timeline">${STEPS.map((s, i) => `<div class="tl ${i < step ? 'done' : i === step ? 'now' : 'todo'}"><i>${i < step ? '✓' : i + 1}</i><div><strong>${s}</strong><span>${i < step ? 'Terminé' : i === step ? 'En cours — mis à jour il y a 12 min' : 'À venir'}</span></div></div>`).join('')}</div>`;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  $('#trackBtn').addEventListener('click', () => showFile($('#trackInput').value));
+  $('#trackInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') showFile(e.target.value); });
+  $$('[data-demo]').forEach((b) => b.addEventListener('click', () => { $('#trackInput').value = b.dataset.demo; showFile(b.dataset.demo); }));
+  $('#quickTrackBtn').addEventListener('click', () => { $('#trackInput').value = $('#quickTrack').value; location.hash = 'suivi'; showFile($('#quickTrack').value); });
+
+  $('#rdvForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    if (!selected().length) { toast('Cochez au moins une prestation.', 'err'); return; }
+    if (!slot) { toast('Choisissez une heure de dépose.', 'err'); return; }
+    if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const btn = $('#rdvSubmit'); btn.disabled = true; btn.textContent = 'Envoi…';
+    const all = store.get(KEY, []); const num = `GMA-${y}-${String(200 + all.length + Math.floor(Math.random() * 50)).padStart(3, '0')}`;
+    const file = { num, veh: $('#fVeh').value, prest: $('#fPrest').value, est: $('#fEst').value, date: date.value, slot, step: 0, nom: f.nom.value };
+    await sendNetlify(f, { dossier: num });
+    all.push(file); store.set(KEY, all);
+    $('#doneNum').textContent = num; $('#doneText').textContent = `${file.veh} · ${file.prest}. Dépose le ${fmtDate(new Date(file.date + 'T12:00:00'))} à ${slot}. Confirmation envoyée par SMS et e-mail.`;
+    $('#doneTrack').addEventListener('click', () => { $('#trackInput').value = num; showFile(num); });
+    f.classList.add('hidden'); $('#rdvDone').classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Réserver le créneau'; toast('Rendez-vous atelier confirmé', 'ok');
+  });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="${i === dow ? 'today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Fermé' : i === 6 ? '8:30 – 12:30' : '8:00 – 12:30 · 13:30 – 18:30'}</span></div>`).join('');
+  renderEstimate();
+})();
+</script>
+</body>
+</html>
