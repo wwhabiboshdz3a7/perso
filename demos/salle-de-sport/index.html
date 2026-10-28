@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio Pulse — Salle de sport & yoga à Toulouse Purpan</title>
+<meta name="description" content="Studio de fitness et yoga à Purpan, Toulouse : cours collectifs (HIIT, yoga, pilates, boxe), planning hebdomadaire en ligne, réservation de place et séance d'essai gratuite.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23c6ff3d'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ExerciseGym","name":"Studio Pulse","telephone":"+33561770145","priceRange":"€€","address":{"@type":"PostalAddress","streetAddress":"3 allée de Purpan","addressLocality":"Toulouse","postalCode":"31300","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6100,"longitude":1.4010},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"06:30","closes":"22:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"08:00","closes":"18:00"}],"url":"https://example.com/demos/salle-de-sport/"}
+</script>
+<style>
+:root{--lime:#c6ff3d;--lime-d:#8fc400;--black:#111111;--grey:#1c1c1c;--grey-2:#2a2a2a;--txt:#f4f4f4;--muted:#9a9a9a;--accent:var(--lime);--focus:var(--lime);--border:#333;--radius:16px;--input-bg:#1c1c1c;--modal-bg:#1c1c1c;--modal-fg:#f4f4f4;--ph:linear-gradient(135deg,#2a2a2a,#111);--mb-bg:#c6ff3d;--mb-bg2:#2a2a2a}
+body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--black);color:var(--txt)}
+h1,h2,h3{font-family:Syne,sans-serif;font-weight:800;line-height:1;letter-spacing:-.03em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-lime{background:var(--lime);color:#111}.btn-lime:hover{background:#d9ff6e;transform:translateY(-2px)}
+.btn-line{border:2px solid var(--txt)}.btn-line:hover{background:var(--txt);color:#111}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.mobile-bar a:first-child{color:#111}
+.header{position:sticky;top:0;z-index:40;background:rgba(17,17,17,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{font-family:Syne;font-weight:800;font-size:24px;text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:-.02em}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--lime);box-shadow:0 0 20px var(--lime)}
+.nav{display:flex;gap:26px;align-items:center;font-weight:500;font-size:15px}
+.nav a{text-decoration:none;color:var(--muted)}.nav a:not(.btn):hover{color:var(--lime)}
+.nav .btn{padding:10px 20px;color:#111}
+@media (max-width:899px){.nav{position:fixed;inset:70px 0 0;background:var(--black);flex-direction:column;padding:32px;gap:26px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:22px}.nav.open{transform:none;visibility:visible}}
+.hero{position:relative;min-height:90vh;display:grid;align-items:end;overflow:hidden}
+.hero .ph{position:absolute;inset:0;--ph:radial-gradient(ellipse at 30% 40%,#2a2a2a,#111 70%)}
+.hero .ph img{opacity:.5}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#111 10%,transparent 60%)}
+.hero .container{position:relative;z-index:2;padding:80px 0 72px}
+.hero h1{font-size:clamp(56px,11vw,160px);line-height:.88}
+.hero h1 span{color:var(--lime)}
+.hero p{font-size:18px;color:var(--muted);max-width:50ch;margin:24px 0 32px}
+.hero .stats{display:flex;gap:36px;flex-wrap:wrap;margin-top:44px}
+.hero .stats b{display:block;font-family:Syne;font-size:40px;color:var(--lime)}
+.hero .stats span{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.ticker{background:var(--lime);color:#111;overflow:hidden;font-family:Syne;font-weight:800;text-transform:uppercase;padding:12px 0;white-space:nowrap;font-size:18px}
+.ticker div{display:inline-block;animation:tk 30s linear infinite}
+.ticker span{margin:0 24px}
+@keyframes tk{to{transform:translateX(-50%)}}
+section{padding:96px 0}
+@media (max-width:700px){section{padding:64px 0}}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);font-weight:700}
+.section-head{margin-bottom:40px;max-width:680px}
+.section-head h2{font-size:clamp(36px,6vw,72px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+/* Planning */
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.days button{flex:none;padding:12px 18px;border-radius:999px;border:1.5px solid var(--border);font-weight:700;font-size:14px;color:var(--muted);background:var(--grey)}
+.days button b{display:block;font-family:Syne;font-size:18px;color:var(--txt)}
+.days button[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:#111}
+.days button[aria-pressed="true"] b{color:#111}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.filters button{padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);font-size:13px;font-weight:500;color:var(--muted)}
+.filters button[aria-pressed="true"]{border-color:var(--txt);color:var(--txt)}
+.classes{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.cls{background:var(--grey);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:grid;gap:10px;position:relative;overflow:hidden;transition:border-color .2s}
+.cls:hover{border-color:var(--lime)}
+.cls .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cls .time{font-family:Syne;font-size:26px;font-weight:800}
+.cls .time small{display:block;font:500 12px "Space Grotesk";color:var(--muted)}
+.cls .type{font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--grey-2);font-weight:700}
+.cls .type.yoga{color:#b7a8ff}.cls .type.hiit{color:#ff8a65}.cls .type.pilates{color:#6ee7b7}.cls .type.boxe{color:#f87171}.cls .type.cycling{color:#67e8f9}
+.cls h3{font-size:22px;letter-spacing:-.01em;text-transform:none}
+.cls .coach{font-size:14px;color:var(--muted)}
+.gauge{height:6px;background:var(--grey-2);border-radius:999px;overflow:hidden}
+.gauge i{display:block;height:100%;background:var(--lime);transition:width .4s}
+.gauge i.warn{background:#ff8a65}.gauge i.full{background:#f87171}
+.cls .places{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.cls .book{margin-top:4px;padding:11px;border-radius:999px;background:var(--lime);color:#111;font-weight:700;transition:all .2s}
+.cls .book:hover{background:#d9ff6e}
+.cls .book.booked{background:var(--grey-2);color:var(--txt);border:1.5px solid var(--lime)}
+.cls .book.full{background:var(--grey-2);color:var(--muted);cursor:not-allowed}
+.cls .book.wait{background:transparent;border:1.5px solid var(--border);color:var(--txt)}
+.cls.hidden{display:none}
+.empty{color:var(--muted);padding:30px;text-align:center;grid-column:1/-1}
+.mine{margin-top:28px;background:var(--grey);border-radius:var(--radius);padding:20px;border:1px solid var(--border)}
+.mine h3{font-size:18px;margin-bottom:10px;text-transform:none}
+.mine ul{display:grid;gap:8px;font-size:14px}
+.mine li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border)}
+.mine li button{color:#f87171;text-decoration:underline;font-size:12px}
+/* Abonnements */
+.toggle{display:inline-flex;background:var(--grey);border-radius:999px;padding:4px;border:1px solid var(--border);margin-bottom:28px}
+.toggle button{padding:10px 20px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted)}
+.toggle button[aria-pressed="true"]{background:var(--lime);color:#111}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch}
+.plan{background:var(--grey);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column;position:relative}
+.plan.best{border-color:var(--lime);box-shadow:0 0 0 1px var(--lime),0 30px 60px rgba(198,255,61,.08)}
+.plan .badge{position:absolute;top:-12px;left:24px;background:var(--lime);color:#111;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.plan h3{font-size:24px;text-transform:none}
+.plan .price{font-family:Syne;font-size:48px;font-weight:800;margin:14px 0 4px;line-height:1}
+.plan .price small{font:500 14px "Space Grotesk";color:var(--muted)}
+.plan .save{font-size:12px;color:var(--lime);min-height:16px}
+.plan ul{display:grid;gap:8px;margin:18px 0 22px;font-size:14px;color:var(--muted);flex:1}
+.plan li::before{content:"✓ ";color:var(--lime)}
+.plan li.no{opacity:.4}.plan li.no::before{content:"✕ ";color:var(--muted)}
+/* Essai */
+.trial{background:var(--lime);color:#111}
+.trial .eyebrow{color:#111;opacity:.7}
+.trial-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.trial-grid{grid-template-columns:1fr}}
+.trial h2{font-size:clamp(36px,6vw,80px)}
+.trial p{font-size:17px;margin-top:14px;max-width:44ch}
+.trial form{background:#111;color:var(--txt);border-radius:20px;padding:28px;display:grid;gap:12px}
+.trial .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.trial .row{grid-template-columns:1fr}}
+.trial .field label{color:var(--muted)}
+.trial .done{background:#111;color:var(--txt);border-radius:20px;padding:28px;text-align:center}
+.trial .done h3{font-size:26px;color:var(--lime);text-transform:none}
+.coaches{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.coach{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:3/4}
+.coach .ph{position:absolute;inset:0}
+.coach:nth-child(2) .ph{--ph:linear-gradient(135deg,#3a3a3a,#8fc400)}.coach:nth-child(3) .ph{--ph:linear-gradient(135deg,#1c1c1c,#b7a8ff)}.coach:nth-child(4) .ph{--ph:linear-gradient(135deg,#2a2a2a,#ff8a65)}
+.coach .ph img{filter:grayscale(1) contrast(1.1);transition:filter .5s}
+.coach:hover .ph img{filter:none}
+.coach .cap{position:absolute;left:0;right:0;bottom:0;padding:16px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent)}
+.coach .cap b{display:block;font-family:Syne;font-size:18px}
+.coach .cap span{font-size:12px;color:var(--lime);text-transform:uppercase;letter-spacing:.1em}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.review{background:var(--grey);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.review .stars{color:var(--lime);letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-weight:700;display:flex;justify-content:space-between;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--lime);font-size:22px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:18px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px;color:var(--muted)}
+.hours .row.today{color:var(--lime);font-weight:700}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--grey);border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0;filter:grayscale(1) invert(.92)}
+address{font-style:normal;line-height:1.8;margin:14px 0;color:var(--muted)}
+address a{color:var(--lime)}
+footer.site{border-top:1px solid var(--border);padding:40px 0;font-size:13px;color:var(--muted)}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px;text-transform:none}
+.modal-close:hover{background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i></i>Pulse</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#planning">Planning</a><a href="#abonnements">Abonnements</a><a href="#coachs">Coachs</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#essai" class="btn btn-lime">Essai gratuit</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top">
+  <div class="ph"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=70" alt="Cours collectif au Studio Pulse" fetchpriority="high"></div>
+  <div class="container">
+    <p class="eyebrow" data-reveal>Studio fitness & yoga · Purpan · Toulouse</p>
+    <h1 data-reveal>Bouge.<br><span>Respire.</span><br>Recommence.</h1>
+    <p data-reveal>Cours collectifs en petit groupe (16 max), coachs diplômés, salle de muscu en accès libre. Réservez votre place en deux clics, annulez jusqu'à 2 h avant.</p>
+    <div data-reveal><a href="#essai" class="btn btn-lime">Séance d'essai offerte</a> <a href="#planning" class="btn btn-line">Voir le planning</a></div>
+    <div class="stats" data-reveal><div><b>42</b><span>cours / semaine</span></div><div><b>16</b><span>places max</span></div><div><b>6h30</b><span>premier cours</span></div></div>
+  </div>
+</section>
+<div class="ticker" aria-hidden="true"><div><span>HIIT</span>·<span>Yoga vinyasa</span>·<span>Pilates</span>·<span>Boxe</span>·<span>Cycling</span>·<span>Mobilité</span>·<span>HIIT</span>·<span>Yoga vinyasa</span>·<span>Pilates</span>·<span>Boxe</span>·<span>Cycling</span>·<span>Mobilité</span>·</div></div>
+
+<section id="planning"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Planning de la semaine</p><h2>Réserve ta place</h2><p>La jauge se met à jour en direct. Liste d'attente automatique quand un cours est complet.</p></div>
+  <div class="days" id="days" data-reveal></div>
+  <div class="filters" id="filters" data-reveal><button aria-pressed="true" data-f="all">Tous</button><button aria-pressed="false" data-f="hiit">HIIT</button><button aria-pressed="false" data-f="yoga">Yoga</button><button aria-pressed="false" data-f="pilates">Pilates</button><button aria-pressed="false" data-f="boxe">Boxe</button><button aria-pressed="false" data-f="cycling">Cycling</button></div>
+  <div class="classes" id="classes"></div>
+  <div class="mine" id="mine"></div>
+</div></section>
+
+<section id="abonnements" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Abonnements</p><h2>Sans engagement, sans surprise</h2></div>
+  <div class="toggle" data-reveal role="group"><button aria-pressed="true" data-period="m">Mensuel</button><button aria-pressed="false" data-period="y">Annuel · −20 %</button></div>
+  <div class="plans" id="plans"></div>
+</div></section>
+
+<section class="trial" id="essai"><div class="container trial-grid">
+  <div data-reveal><p class="eyebrow">Séance d'essai</p><h2>Ta première séance est offerte</h2><p>Choisis un cours dans le planning ou laisse-nous te conseiller. Pas de carte bancaire, pas d'engagement : juste une serviette.</p></div>
+  <div data-reveal="right">
+    <form name="essai-salle-de-sport" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="trialForm" novalidate>
+      <input type="hidden" name="form-name" value="essai-salle-de-sport"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+      <div class="row"><div class="field"><label for="tPrenom">Prénom</label><input id="tPrenom" name="prenom" required></div><div class="field"><label for="tTel">Mobile</label><input id="tTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div>
+      <div class="field"><label for="tEmail">E-mail</label><input id="tEmail" name="email" type="email" required></div>
+      <div class="field"><label for="tCours">Cours qui t'intéresse</label><select id="tCours" name="cours"><option>Je ne sais pas encore</option><option>HIIT</option><option>Yoga vinyasa</option><option>Pilates</option><option>Boxe</option><option>Cycling</option><option>Musculation en accès libre</option></select></div>
+      <div class="field"><label for="tNiveau">Niveau</label><select id="tNiveau" name="niveau"><option>Débutant·e</option><option>Je pratique un peu</option><option>Sportif·ve régulier·e</option></select></div>
+      <button type="submit" class="btn btn-lime" id="trialSubmit">Réserver ma séance offerte</button>
+    </form>
+    <div class="done hidden" id="trialDone"><h3>C'est parti !</h3><p id="trialText" style="color:var(--muted);margin-top:8px"></p></div>
+  </div>
+</div></section>
+
+<section id="coachs"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les coachs</p><h2>Ils te poussent, avec le sourire</h2></div>
+  <div class="coaches">
+    <div class="coach" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=500&q=70" alt="Coach Maya" loading="lazy"></div><div class="cap"><b>Maya</b><span>HIIT · Boxe</span></div></div>
+    <div class="coach" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=500&q=70" alt="Coach Élodie" loading="lazy"></div><div class="cap"><b>Élodie</b><span>Yoga · Mobilité</span></div></div>
+    <div class="coach" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=500&q=70" alt="Coach Jules" loading="lazy"></div><div class="cap"><b>Jules</b><span>Cycling · Muscu</span></div></div>
+    <div class="coach" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=70" alt="Coach Sarah" loading="lazy"></div><div class="cap"><b>Sarah</b><span>Pilates</span></div></div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Ils transpirent avec nous</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Petits groupes, vrais corrections, et le planning en ligne qui me laisse réserver depuis le tram. Addictif.</p><footer>Chloé · Purpan</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le HIIT de Maya à 7h, c'est le meilleur réveil de Toulouse. Vestiaires nickel.</p><footer>Rémi · Saint-Cyprien</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>J'ai commencé par la séance d'essai en yoga, je suis abonnée annuelle depuis. Ambiance bienveillante.</p><footer>Nathalie · Ancely</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:760px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Comment annuler une réservation ?</summary><p>Depuis le planning (bouton « Annuler ») jusqu'à 2 h avant le cours. Au-delà, la séance est décomptée pour les formules à la carte.</p></details>
+    <details><summary>Que se passe-t-il quand un cours est complet ?</summary><p>Vous rejoignez la liste d'attente ; une place libérée vous est attribuée automatiquement et vous êtes prévenu par SMS.</p></details>
+    <details><summary>Y a-t-il des douches et des casiers ?</summary><p>Oui, vestiaires avec douches, casiers à code et sèche-cheveux. Serviettes en location (2 €).</p></details>
+    <details><summary>Puis-je suspendre mon abonnement ?</summary><p>Oui, jusqu'à 2 mois par an, gratuitement, depuis votre espace membre.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(32px,5vw,56px);margin:8px 0 18px">Allée de Purpan</h2><div class="hours" id="hours"></div><address>Studio Pulse<br>3 allée de Purpan, 31300 Toulouse<br>Tram T1 · Arènes Romaines · Parking gratuit<br><a href="tel:+33561770145">05 61 77 01 45</a> · <a href="mailto:hello@studiopulse.fr">hello@studiopulse.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=3+allée+de+Purpan+31300+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.3930%2C43.6060%2C1.4090%2C43.6140&layer=mapnik&marker=43.6100%2C1.4010"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Studio Pulse — SAS Pulse Toulouse</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SAS Pulse Toulouse, 3 allée de Purpan, 31300 Toulouse. SIRET 889 012 345 00018. Directrice de publication : Maya Rivière. Hébergement : Netlify, Inc. Les réservations de cours sont mémorisées sur votre appareil ; les données du formulaire d'essai servent uniquement à organiser votre venue. Site de démonstration : entreprise fictive.</p></div></div>
+<div class="mobile-bar"><a href="#essai">Essai gratuit</a><a href="#planning">Planning</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, pad, isoDate, fmtDate, cap, store, toast, validate, sendNetlify } = Demo;
+  const KEY = 'pulse:resa';
+  const COACH = { hiit: 'Maya', boxe: 'Maya', yoga: 'Élodie', mobilite: 'Élodie', cycling: 'Jules', pilates: 'Sarah' };
+  const NAMES = { hiit: 'HIIT 30', yoga: 'Yoga vinyasa', pilates: 'Pilates reformer', boxe: 'Boxe cardio', cycling: 'Cycling', mobilite: 'Mobilité & stretch' };
+  /* Grille hebdo : [jour 0-6 (lun=0), heure, type, capacité] */
+  const WEEK = [[0, '07:00', 'hiit', 16], [0, '12:15', 'pilates', 12], [0, '18:30', 'yoga', 16], [0, '19:45', 'boxe', 14], [1, '07:00', 'cycling', 14], [1, '12:15', 'hiit', 16], [1, '18:30', 'pilates', 12], [1, '19:45', 'yoga', 16], [2, '07:00', 'yoga', 16], [2, '12:15', 'boxe', 14], [2, '18:30', 'hiit', 16], [2, '19:45', 'cycling', 14], [3, '07:00', 'hiit', 16], [3, '12:15', 'mobilite', 16], [3, '18:30', 'boxe', 14], [3, '19:45', 'pilates', 12], [4, '07:00', 'pilates', 12], [4, '12:15', 'yoga', 16], [4, '18:30', 'cycling', 14], [4, '19:45', 'hiit', 16], [5, '09:00', 'yoga', 16], [5, '10:15', 'hiit', 16], [5, '11:30', 'boxe', 14], [6, '09:30', 'mobilite', 16], [6, '10:45', 'pilates', 12], [6, '12:00', 'cycling', 14]];
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let day = isoDate(today), filter = 'all';
+  let mine = store.get(KEY, []);
+  const classesOf = (date) => { const dow = (new Date(date + 'T12:00:00').getDay() + 6) % 7; return WEEK.filter((c) => c[0] === dow).map((c) => { const id = date + '_' + c[1] + '_' + c[2]; const base = Math.floor(seeded(id) * (c[3] - 2)); return { id, date, time: c[1], type: c[2], cap: c[3], taken: base + (mine.some((m) => m.id === id && !m.wait) ? 1 : 0) }; }); };
+
+  $('#days').innerHTML = Array.from({ length: 7 }, (_, i) => { const d = new Date(today); d.setDate(d.getDate() + i); return `<button aria-pressed="${i === 0}" data-day="${isoDate(d)}">${i === 0 ? "Auj." : fmtDate(d, { weekday: 'short' })}<b>${d.getDate()}</b></button>`; }).join('');
+  $$('#days button').forEach((b) => b.addEventListener('click', () => { day = b.dataset.day; $$('#days button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); render(); }));
+  $$('#filters button').forEach((b) => b.addEventListener('click', () => { filter = b.dataset.f; $$('#filters button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); render(); }));
+
+  function render() {
+    const now = new Date(); const list = classesOf(day).filter((c) => filter === 'all' || c.type === filter);
+    $('#classes').innerHTML = list.length ? list.map((c) => {
+      const past = new Date(c.date + 'T' + c.time) < now; const left = c.cap - c.taken; const pct = Math.round(c.taken / c.cap * 100);
+      const m = mine.find((x) => x.id === c.id); const state = past ? 'past' : m ? (m.wait ? 'waiting' : 'booked') : left <= 0 ? 'full' : 'open';
+      return `<article class="cls" data-type="${c.type}"><div class="top"><div class="time">${c.time}<small>${c.type === 'hiit' ? '30' : '55'} min</small></div><span class="type ${c.type}">${c.type}</span></div><h3>${NAMES[c.type]}</h3><p class="coach">avec ${COACH[c.type]}</p><div class="gauge"><i class="${pct >= 100 ? 'full' : pct >= 75 ? 'warn' : ''}" style="width:${pct}%"></i></div><div class="places"><span>${left > 0 ? left + ' place' + (left > 1 ? 's' : '') + ' restante' + (left > 1 ? 's' : '') : 'Complet'}</span><span>${c.taken}/${c.cap}</span></div><button class="book ${state === 'booked' ? 'booked' : state === 'waiting' ? 'wait' : state === 'full' ? 'wait' : state === 'past' ? 'full' : ''}" data-book="${c.id}" ${past ? 'disabled' : ''}>${{ past: 'Terminé', booked: '✓ Réservé · annuler', waiting: 'En liste d\'attente · retirer', full: 'Rejoindre la liste d\'attente', open: 'Réserver ma place' }[state]}</button></article>`;
+    }).join('') : '<p class="empty">Aucun cours ce jour pour ce filtre.</p>';
+    $$('[data-book]').forEach((b) => b.addEventListener('click', () => toggle(b.dataset.book)));
+    renderMine();
+  }
+  function toggle(id) {
+    const c = classesOf(day).find((x) => x.id === id); const i = mine.findIndex((m) => m.id === id);
+    if (i >= 0) { mine.splice(i, 1); toast('Réservation annulée.'); }
+    else if (c.cap - c.taken <= 0) { mine.push({ id, date: c.date, time: c.time, type: c.type, wait: true }); toast('Ajouté à la liste d\'attente — on vous prévient par SMS.', 'ok'); }
+    else { mine.push({ id, date: c.date, time: c.time, type: c.type, wait: false }); toast('Place réservée ! Pensez à votre serviette.', 'ok'); }
+    store.set(KEY, mine); render();
+  }
+  function renderMine() {
+    const up = mine.filter((m) => m.date >= isoDate(today)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    $('#mine').innerHTML = up.length ? `<h3>Mes prochains cours (${up.length})</h3><ul role="list">${up.map((m) => `<li><span><strong>${cap(fmtDate(new Date(m.date + 'T12:00:00'), { weekday: 'short', day: 'numeric', month: 'short' }))} · ${m.time}</strong> — ${NAMES[m.type]} avec ${COACH[m.type]}${m.wait ? ' <em style="color:#ff8a65">(liste d\'attente)</em>' : ''}</span><button data-cancel="${m.id}">Annuler</button></li>`).join('')}</ul>` : '<h3>Mes prochains cours</h3><p style="color:var(--muted);font-size:14px">Aucune réservation. Choisissez un cours ci-dessus.</p>';
+    $$('[data-cancel]').forEach((b) => b.addEventListener('click', () => { mine = mine.filter((m) => m.id !== b.dataset.cancel); store.set(KEY, mine); render(); toast('Réservation annulée.'); }));
+  }
+  render();
+
+  /* Abonnements */
+  const PLANS = [{ n: 'À la carte', m: 15, y: null, unit: '/ séance', f: ['Sans engagement', 'Valable 3 mois', 'Tous les cours', ['Muscu en accès libre', 0], ['Invité 1×/mois', 0]] }, { n: 'Illimité', m: 59, y: 47, unit: '/ mois', best: true, f: ['Cours illimités', 'Muscu en accès libre', 'Annulation jusqu\'à 2 h avant', 'Invité 1×/mois', ['Suivi coach mensuel', 0]] }, { n: 'Premium', m: 89, y: 71, unit: '/ mois', f: ['Tout Illimité', 'Suivi coach mensuel', 'Bilan forme trimestriel', 'Serviette incluse', 'Accès 2 studios partenaires'] }];
+  let period = 'm';
+  function renderPlans() { $('#plans').innerHTML = PLANS.map((p) => { const price = period === 'y' && p.y ? p.y : p.m; return `<div class="plan${p.best ? ' best' : ''}" data-reveal>${p.best ? '<span class="badge">Le plus choisi</span>' : ''}<h3>${p.n}</h3><div class="price">${price} €<small> ${p.unit}</small></div><p class="save">${period === 'y' && p.y ? `facturé ${p.y * 12} €/an · vous économisez ${(p.m - p.y) * 12} €` : ''}</p><ul role="list">${p.f.map((x) => Array.isArray(x) ? `<li class="no">${x[0]}</li>` : `<li>${x}</li>`).join('')}</ul><a href="#essai" class="btn ${p.best ? 'btn-lime' : 'btn-line'}">Commencer par un essai</a></div>`; }).join(''); $$('#plans [data-reveal]').forEach((e) => e.classList.add('is-visible')); }
+  $$('.toggle button').forEach((b) => b.addEventListener('click', () => { period = b.dataset.period; $$('.toggle button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); renderPlans(); }));
+  renderPlans();
+
+  /* Essai */
+  $('#trialForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const btn = $('#trialSubmit'); btn.disabled = true; btn.textContent = 'Envoi…';
+    await sendNetlify(f); store.set('pulse:essai', { prenom: f.prenom.value, cours: f.cours.value, at: Date.now() });
+    $('#trialText').textContent = `${f.prenom.value}, on te rappelle au ${f.telephone.value} pour caler ta séance ${f.cours.value === 'Je ne sais pas encore' ? 'découverte' : 'de ' + f.cours.value} (niveau : ${f.niveau.value.toLowerCase()}). Pense à ta serviette !`;
+    f.classList.add('hidden'); $('#trialDone').classList.remove('hidden'); toast('Séance d\'essai demandée', 'ok');
+  });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 6 ? '8:00 – 18:00' : '6:30 – 22:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>
