@@ -44,6 +44,7 @@ body {
 }
 img, video, svg { display: block; max-width: 100%; }
 img { height: auto; }
+img.img-missing { background: linear-gradient(135deg, var(--paper-2, #ece5d8), #d9cfbf); filter: none !important; }
 a { color: inherit; text-decoration: none; }
 p { margin: 0 0 1em; }
 ul, ol { margin: 0; padding: 0; list-style: none; }

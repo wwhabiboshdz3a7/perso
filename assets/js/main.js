@@ -28,6 +28,14 @@
     });
   }
 
+
+  /* ---- Secours si une photo externe ne charge pas ---- */
+  document.querySelectorAll('img').forEach(function (img) {
+    function fallback() { img.classList.add('img-missing'); }
+    img.addEventListener('error', fallback);
+    if (img.complete && img.naturalWidth === 0 && img.src) fallback();
+  });
+
   /* ---- Lien de navigation courant ---- */
   var path = location.pathname.replace(/index\.html$/, '');
   document.querySelectorAll('.nav a').forEach(function (a) {
