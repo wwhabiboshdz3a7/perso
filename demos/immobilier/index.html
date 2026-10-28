@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garonne Immobilier — Agence immobilière à Toulouse Compans-Caffarelli</title>
+<meta name="description" content="Agence immobilière à Compans-Caffarelli, Toulouse : achat, vente, location. Recherche de biens avec filtres par quartier, simulateur de mensualité et estimation gratuite de votre bien en 4 étapes.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231b2a41'/%3E%3Cpath d='M6 18l10-9 10 9v8H6z' fill='%23d4b483'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"RealEstateAgent","name":"Garonne Immobilier","telephone":"+33561620388","address":{"@type":"PostalAddress","streetAddress":"15 boulevard Lascrosses","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6085,"longitude":1.4330},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"19:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"17:00"}],"url":"https://example.com/demos/immobilier/"}
+</script>
+<style>
+:root{--navy:#1b2a41;--navy-2:#24385a;--sand:#d4b483;--sand-l:#f4ecdd;--bg:#faf8f3;--ink:#1a1f2b;--muted:#6b7280;--accent:var(--navy);--focus:var(--sand);--border:#e4ded2;--radius:10px;--ph:linear-gradient(135deg,#d4b483,#1b2a41);--mb-bg:#1b2a41;--mb-bg2:#d4b483}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;line-height:1.08;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:var(--radius);font-weight:600;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:var(--navy-2)}
+.btn-sand{background:var(--sand);color:var(--navy)}.btn-sand:hover{background:#c9a56c}
+.btn-line{border:1.5px solid var(--navy);color:var(--navy)}.btn-line:hover{background:var(--navy);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.header{position:sticky;top:0;z-index:40;background:rgba(250,248,243,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{font-family:"DM Serif Display";font-size:24px;text-decoration:none;display:flex;align-items:center;gap:10px;color:var(--navy)}
+.brand i{width:30px;height:30px;background:var(--navy);clip-path:polygon(50% 0,100% 45%,100% 100%,0 100%,0 45%)}
+.nav{display:flex;gap:26px;align-items:center;font-weight:500;font-size:14px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--sand)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:74px 0 0;background:var(--bg);flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{position:relative;min-height:80vh;display:grid;align-items:center;color:#fff;overflow:hidden}
+.hero .ph{position:absolute;inset:0;--ph:linear-gradient(160deg,#24385a,#1b2a41)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,42,65,.9),rgba(27,42,65,.3))}
+.hero .container{position:relative;z-index:2;padding:72px 0}
+.hero h1{font-size:clamp(40px,6vw,76px);max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--sand)}
+.hero p{font-size:18px;opacity:.9;max-width:50ch;margin:20px 0 32px}
+.search{background:#fff;color:var(--ink);border-radius:14px;padding:16px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:10px;align-items:end;box-shadow:0 30px 60px rgba(0,0,0,.3);max-width:980px}
+@media (max-width:900px){.search{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.search{grid-template-columns:1fr}}
+.search label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+.search select,.search input{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff}
+.hero .kpi{display:flex;gap:32px;margin-top:36px;flex-wrap:wrap}
+.hero .kpi b{display:block;font-family:"DM Serif Display";font-size:34px;color:var(--sand)}
+.hero .kpi span{font-size:13px;opacity:.8}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#a0834e;font-weight:600}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,48px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+/* Biens */
+.res-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;font-size:14px;color:var(--muted)}
+.res-bar select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chips button{padding:7px 12px;border-radius:999px;border:1.5px solid var(--border);font-size:13px;background:#fff}
+.chips button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.biens{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.bien{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border);transition:all .25s;cursor:pointer;display:flex;flex-direction:column}
+.bien:hover{transform:translateY(-4px);box-shadow:0 24px 50px rgba(27,42,65,.12)}
+.bien .ph{aspect-ratio:4/3;position:relative}
+.bien .ph:hover img{transform:scale(1.04)}
+.bien .tag{position:absolute;top:12px;left:12px;background:#fff;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;z-index:2}
+.bien .tag.new{background:var(--sand);color:var(--navy)}
+.bien .fav{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;font-size:16px;z-index:2}
+.bien .fav.on{color:#dc2626}
+.bien .b{padding:18px;flex:1;display:flex;flex-direction:column;gap:6px}
+.bien .price{font-family:"DM Serif Display";font-size:26px;color:var(--navy)}
+.bien .price small{font:500 12px Inter;color:var(--muted)}
+.bien h3{font-size:17px;font-family:Inter;font-weight:600}
+.bien .loc{font-size:13px;color:var(--muted)}
+.bien .specs{display:flex;gap:14px;font-size:13px;color:var(--muted);margin-top:auto;padding-top:10px;border-top:1px solid var(--border)}
+.bien .dpe{display:inline-block;width:22px;height:22px;border-radius:4px;color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:22px}
+.dpe-A{background:#0a8f3c}.dpe-B{background:#4caf50}.dpe-C{background:#a4c639}.dpe-D{background:#f6cd0f;color:#333!important}.dpe-E{background:#f4a01c}.dpe-F{background:#e9602c}.dpe-G{background:#d7251d}
+.empty{grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);background:#fff;border-radius:14px;border:1px dashed var(--border)}
+/* Fiche modale */
+.fiche .ph{aspect-ratio:16/9;border-radius:10px;margin-bottom:16px}
+.fiche h3{font-size:26px}
+.fiche .price{font-family:"DM Serif Display";font-size:30px;color:var(--navy);margin:6px 0}
+.fiche .specs{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:10px 0 14px}
+.fiche p{font-size:14px;color:var(--muted);margin-bottom:10px}
+.fiche .mens{background:var(--sand-l);border-radius:10px;padding:12px 14px;font-size:14px;margin:12px 0}
+.fiche .mens b{font-family:"DM Serif Display";font-size:22px;color:var(--navy)}
+.fiche .acts{display:flex;gap:10px;flex-wrap:wrap}
+/* Simulateur */
+.simu{background:var(--navy);color:#fff}
+.simu .eyebrow{color:var(--sand)}.simu .section-head p{color:rgba(255,255,255,.75)}
+.simu-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media (max-width:860px){.simu-grid{grid-template-columns:1fr}}
+.sliders{display:grid;gap:22px}
+.sl label{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+.sl label b{font-family:"DM Serif Display";font-size:20px;color:var(--sand)}
+.sl input[type=range]{width:100%;accent-color:var(--sand)}
+.result{background:#fff;color:var(--ink);border-radius:16px;padding:28px;text-align:center}
+.result .big{font-family:"DM Serif Display";font-size:56px;color:var(--navy);line-height:1}
+.result .big small{font:500 16px Inter;color:var(--muted)}
+.result .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;font-size:13px}
+.result .grid div{background:var(--sand-l);border-radius:8px;padding:10px}
+.result .grid b{display:block;font-size:17px;color:var(--navy)}
+.result .warn{margin-top:14px;font-size:13px;color:#b45309;background:#fef3c7;padding:8px 12px;border-radius:8px}
+.result .ok{margin-top:14px;font-size:13px;color:#166534;background:#dcfce7;padding:8px 12px;border-radius:8px}
+/* Estimation */
+.estim{background:var(--sand-l)}
+.estim-box{background:#fff;border-radius:18px;padding:32px;max-width:780px;margin:0 auto;border:1px solid var(--border)}
+@media (max-width:600px){.estim-box{padding:20px}}
+.estim-box .steps{margin-bottom:24px}
+.estim-box .steps li.active span{background:var(--navy);border-color:var(--navy)}
+.panel{display:none}.panel.active{display:block}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.opts button{border:1.5px solid var(--border);border-radius:12px;padding:18px 12px;text-align:center;font-weight:500;transition:all .15s;background:#fff}
+.opts button:hover{border-color:var(--navy)}
+.opts button[aria-pressed="true"]{border-color:var(--navy);background:var(--sand-l);box-shadow:inset 0 0 0 1px var(--navy)}
+.opts .ic{display:block;font-size:26px;margin-bottom:6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.acts{display:flex;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.lbl{font-weight:600;font-size:14px;margin:16px 0 8px;display:block}
+.estim-res{text-align:center}
+.estim-res .range{font-family:"DM Serif Display";font-size:clamp(28px,5vw,44px);color:var(--navy);margin:10px 0}
+.estim-res .bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--sand-l),var(--sand),var(--navy));margin:14px auto;max-width:420px;position:relative}
+.estim-res .bar i{position:absolute;top:-6px;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--navy);transform:translateX(-50%);left:50%}
+.estim-res .detail{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0;font-size:13px}
+.estim-res .detail div{background:var(--sand-l);border-radius:8px;padding:10px}
+.estim-res .detail b{display:block;font-size:16px;color:var(--navy)}
+@media (max-width:520px){.estim-res .detail{grid-template-columns:1fr}}
+.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.agent{text-align:center}
+.agent .ph{aspect-ratio:1;border-radius:50%;width:140px;margin:0 auto 12px}
+.agent:nth-child(2) .ph{--ph:linear-gradient(135deg,#24385a,#d4b483)}.agent:nth-child(3) .ph{--ph:linear-gradient(135deg,#d4b483,#6b7280)}
+.agent b{display:block}.agent span{font-size:13px;color:var(--muted)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px}
+.review .stars{color:var(--sand);letter-spacing:2px}
+.review p{font-family:"DM Serif Display";font-size:18px;margin:10px 0 12px;line-height:1.35}
+.review footer{font-size:13px;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:600;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--sand);font-size:22px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:16px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:600;color:#a0834e}
+.map{border-radius:14px;overflow:hidden;min-height:320px;background:var(--sand-l);border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--navy);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box{max-width:720px}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i></i>Garonne Immobilier</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#biens">Nos biens</a><a href="#simulateur">Simulateur</a><a href="#estimation">Estimer mon bien</a><a href="#equipe">L'agence</a><a href="#acces">Accès</a><a href="#estimation" class="btn btn-sand">Estimation gratuite</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top">
+  <div class="ph"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=70" alt="Façade toulousaine en brique rose" fetchpriority="high"></div>
+  <div class="container">
+    <p class="eyebrow" data-reveal style="color:var(--sand)">Compans-Caffarelli · Toulouse</p>
+    <h1 data-reveal>Trouvez votre <em>chez-vous</em> dans la ville rose</h1>
+    <p data-reveal>Achat, vente, location : une agence de quartier qui connaît chaque rue de Toulouse. Recherchez parmi nos biens, simulez votre budget, estimez votre logement en 2 minutes.</p>
+    <form class="search" data-reveal id="searchForm">
+      <div><label for="sQuartier">Quartier</label><select id="sQuartier"><option value="">Tout Toulouse</option></select></div>
+      <div><label for="sType">Type</label><select id="sType"><option value="">Tous</option><option>Appartement</option><option>Maison</option></select></div>
+      <div><label for="sBudget">Budget max</label><select id="sBudget"><option value="">Indifférent</option><option value="200000">200 000 €</option><option value="300000">300 000 €</option><option value="400000">400 000 €</option><option value="600000">600 000 €</option></select></div>
+      <div><label for="sPieces">Pièces min</label><select id="sPieces"><option value="">Indifférent</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5+</option></select></div>
+      <button type="submit" class="btn btn-navy">Rechercher</button>
+    </form>
+    <div class="kpi" data-reveal><div><b>312</b><span>biens vendus en 2025</span></div><div><b>47 j</b><span>délai moyen de vente</span></div><div><b>4,9/5</b><span>sur 280 avis</span></div></div>
+  </div>
+</section>
+
+<section id="biens"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Nos biens à la vente</p><h2>Sélection du moment</h2></div>
+  <div class="chips" id="chips"><button aria-pressed="false" data-chip="new">Nouveautés</button><button aria-pressed="false" data-chip="ext">Extérieur</button><button aria-pressed="false" data-chip="park">Parking</button><button aria-pressed="false" data-chip="fav">♥ Mes favoris</button></div>
+  <div class="res-bar"><span id="resCount"></span><label>Trier : <select id="sort"><option value="rel">Pertinence</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option><option value="m2">Prix au m²</option></select></label></div>
+  <div class="biens" id="list"></div>
+</div></section>
+
+<section class="simu" id="simulateur"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Simulateur de mensualité</p><h2>Combien pouvez-vous emprunter ?</h2><p>Ajustez les curseurs : mensualité, coût du crédit et taux d'endettement se mettent à jour instantanément.</p></div>
+  <div class="simu-grid">
+    <div class="sliders" data-reveal>
+      <div class="sl"><label>Prix du bien <b id="vPrix"></b></label><input type="range" id="prix" min="80000" max="900000" step="5000" value="320000"></div>
+      <div class="sl"><label>Apport personnel <b id="vApport"></b></label><input type="range" id="apport" min="0" max="300000" step="5000" value="40000"></div>
+      <div class="sl"><label>Durée <b id="vDuree"></b></label><input type="range" id="duree" min="7" max="25" step="1" value="20"></div>
+      <div class="sl"><label>Taux d'intérêt <b id="vTaux"></b></label><input type="range" id="taux" min="2" max="6" step="0.05" value="3.4"></div>
+      <div class="sl"><label>Revenus nets mensuels du foyer <b id="vRev"></b></label><input type="range" id="rev" min="1500" max="12000" step="100" value="4200"></div>
+    </div>
+    <div class="result" data-reveal="right"><p class="eyebrow">Mensualité estimée</p><div class="big" id="mens"></div><div class="grid"><div>Montant emprunté<b id="rCap"></b></div><div>Coût total du crédit<b id="rCout"></b></div><div>Frais de notaire (ancien)<b id="rNot"></b></div><div>Taux d'endettement<b id="rEnd"></b></div></div><div id="rMsg"></div></div>
+  </div>
+</div></section>
+
+<section class="estim" id="estimation"><div class="container">
+  <div class="section-head" data-reveal style="text-align:center;margin-inline:auto"><p class="eyebrow">Estimation gratuite</p><h2>Que vaut votre bien aujourd'hui ?</h2><p>Quatre questions, une fourchette immédiate basée sur les ventes récentes du quartier, puis un avis de valeur signé par un négociateur.</p></div>
+  <div class="estim-box" data-reveal>
+    <ol class="steps" role="list" id="eSteps"><li class="active"><span>1</span>Type</li><li><span>2</span>Surface</li><li><span>3</span>Quartier & état</li><li><span>4</span>Résultat</li></ol>
+    <div class="panel active" data-step="1"><span class="lbl">Quel type de bien ?</span><div class="opts" id="eType"><button type="button" data-v="Appartement" aria-pressed="false"><span class="ic">🏢</span>Appartement</button><button type="button" data-v="Maison" aria-pressed="false"><span class="ic">🏡</span>Maison</button><button type="button" data-v="Terrain" aria-pressed="false"><span class="ic">🌳</span>Terrain</button></div><div class="acts"><span></span><button class="btn btn-navy" id="e1" disabled>Continuer</button></div></div>
+    <div class="panel" data-step="2"><div class="row2"><div class="field"><label for="eSurf">Surface habitable (m²)</label><input type="number" id="eSurf" min="9" max="600" placeholder="ex. 68" required></div><div class="field"><label for="ePieces">Nombre de pièces</label><select id="ePieces"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6 et +</option></select></div></div><span class="lbl">Extérieur</span><div class="opts" id="eExt"><button type="button" data-v="aucun" aria-pressed="true">Aucun</button><button type="button" data-v="balcon" aria-pressed="false">Balcon</button><button type="button" data-v="terrasse" aria-pressed="false">Terrasse</button><button type="button" data-v="jardin" aria-pressed="false">Jardin</button></div><div class="acts"><button class="btn btn-line" data-back="1">Retour</button><button class="btn btn-navy" id="e2">Continuer</button></div></div>
+    <div class="panel" data-step="3"><div class="row2"><div class="field"><label for="eQuartier">Quartier</label><select id="eQuartier"></select></div><div class="field"><label for="eEtat">État général</label><select id="eEtat"><option value="0.88">À rénover</option><option value="1" selected>Bon état</option><option value="1.08">Rénové / récent</option><option value="1.15">Neuf / prestations haut de gamme</option></select></div></div><span class="lbl">Vos coordonnées pour recevoir l'avis de valeur détaillé</span>
+      <form name="estimation-immobilier" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="eForm" novalidate><input type="hidden" name="form-name" value="estimation-immobilier"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p><input type="hidden" name="bien" id="fBien"><input type="hidden" name="fourchette" id="fRange"><div class="row2"><div class="field"><label for="eNom">Nom</label><input id="eNom" name="nom" required></div><div class="field"><label for="eTel">Téléphone</label><input id="eTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div><div class="field" style="grid-column:1/-1"><label for="eEmail">E-mail</label><input id="eEmail" name="email" type="email" required></div></div><div class="acts"><button type="button" class="btn btn-line" data-back="2">Retour</button><button type="submit" class="btn btn-sand" id="e3">Voir mon estimation</button></div></form></div>
+    <div class="panel" data-step="4"><div class="estim-res"><p class="eyebrow">Fourchette estimée</p><div class="range" id="eRange"></div><div class="bar"><i></i></div><p id="eSub" style="color:var(--muted);font-size:14px"></p><div class="detail" id="eDetail"></div><p style="font-size:13px;color:var(--muted)">Estimation indicative basée sur les prix médians constatés par quartier. Un négociateur vous contacte sous 24 h pour une visite et un avis de valeur engageant.</p><div class="acts" style="justify-content:center"><button class="btn btn-line" id="eAgain">Estimer un autre bien</button><a href="tel:+33561620388" class="btn btn-navy">Appeler l'agence</a></div></div></div>
+  </div>
+</div></section>
+
+<section id="equipe"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">L'agence</p><h2>Une équipe de quartier, depuis 2009</h2><p>Nous habitons Toulouse, nous y vendons, nous y achetons. Chaque négociateur suit trois quartiers, pas plus.</p></div>
+  <div class="team">
+    <div class="agent" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=70" alt="Portrait de Laurent Vidal" loading="lazy"></div><b>Laurent Vidal</b><span>Directeur · Compans, Minimes</span></div>
+    <div class="agent" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=70" alt="Portrait de Nadia Belkacem" loading="lazy"></div><b>Nadia Belkacem</b><span>Négociatrice · Capitole, Carmes, Saint-Étienne</span></div>
+    <div class="agent" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=70" alt="Portrait de Maxime Roux" loading="lazy"></div><b>Maxime Roux</b><span>Négociateur · Saint-Cyprien, Patte d'Oie</span></div>
+    <div class="agent" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=70" alt="Portrait de Julie Mas" loading="lazy"></div><b>Julie Mas</b><span>Location & gestion</span></div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis clients</p><h2>Ils ont signé avec nous</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Estimation en ligne puis visite de Nadia le lendemain : vendu en 3 semaines au prix. Accompagnement impeccable jusqu'au notaire.</p><footer>Famille Barthe · Carmes</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le simulateur nous a aidés à cadrer notre budget avant même la première visite. Transparence totale sur les frais.</p><footer>Yasmine & Hugo · primo-accédants</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Gestion locative sans souci depuis 4 ans, loyers versés le 5 de chaque mois.</p><footer>Philippe D. · investisseur</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>L'estimation en ligne est-elle fiable ?</summary><p>Elle donne une fourchette à partir des prix médians par quartier et des caractéristiques déclarées. L'avis de valeur après visite affine selon l'étage, l'exposition, la copropriété et l'état réel.</p></details>
+    <details><summary>Quels sont vos honoraires ?</summary><p>4 % TTC du prix de vente, dégressifs au-delà de 500 000 €, à la charge du vendeur. Aucun frais si le bien n'est pas vendu.</p></details>
+    <details><summary>Proposez-vous la gestion locative ?</summary><p>Oui : mise en location, gestion complète (6 % des loyers) et garantie loyers impayés en option.</p></details>
+    <details><summary>Puis-je être alerté des nouveaux biens ?</summary><p>Oui, enregistrez votre recherche : vous recevez les nouveautés correspondant à vos critères avant leur publication sur les portails.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Boulevard Lascrosses</h2><div class="hours" id="hours"></div><address><strong>Garonne Immobilier</strong><br>15 boulevard Lascrosses, 31000 Toulouse<br>Métro B · Compans-Caffarelli<br><a href="tel:+33561620388">05 61 62 03 88</a> · <a href="mailto:contact@garonne-immo.fr">contact@garonne-immo.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=15+boulevard+Lascrosses+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4250%2C43.6045%2C1.4410%2C43.6125&layer=mapnik&marker=43.6085%2C1.4330"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Garonne Immobilier — SAS GI Toulouse · Carte pro CPI 3101 2018 000 012 345</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SAS GI Toulouse, 15 boulevard Lascrosses, 31000 Toulouse. SIRET 890 123 456 00019. Carte professionnelle transactions et gestion délivrée par la CCI de Toulouse. Garantie financière : Galian. Hébergement : Netlify, Inc. Les données du formulaire d'estimation servent à établir l'avis de valeur ; conservation 3 ans. Site de démonstration : agence et biens fictifs, prix indicatifs.</p></div></div>
+<div class="modal" id="ficheModal" aria-hidden="true" role="dialog"><div class="modal-box fiche"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><div id="ficheBody"></div></div></div>
+<div class="mobile-bar"><a href="tel:+33561620388">📞 Appeler</a><a href="#estimation">Estimer</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, store, toast, openModal, validate, sendNetlify } = Demo;
+  const fmt = (n) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  /* Prix médians au m² par quartier (indicatifs) */
+  const QUARTIERS = { 'Capitole': 5400, 'Carmes': 5600, 'Saint-Étienne': 5500, 'Compans-Caffarelli': 4700, 'Saint-Cyprien': 4600, 'Minimes': 3900, 'Jean-Jaurès': 4800, 'Côte Pavée': 4900, 'Rangueil': 3800, 'Saint-Michel': 4300, 'Purpan': 3700, 'Lardenne': 3600, 'Croix-Daurade': 3500, 'Busca': 5000, 'Blagnac': 3800, 'Colomiers': 3300 };
+  const BIENS = [
+    { id: 1, type: 'Appartement', q: 'Carmes', t: 'T3 traversant avec balcon', s: 68, p: 3, price: 389000, dpe: 'C', new: true, ext: true, park: false, img: 'photo-1502672260266-1c1ef2d93688', desc: 'Au 3e étage d\'un immeuble toulousain en brique, séjour de 28 m² ouvert sur un balcon exposé sud, deux chambres, cuisine équipée. Parquet, moulures, double vitrage.' },
+    { id: 2, type: 'Maison', q: 'Côte Pavée', t: 'Toulousaine 5 pièces avec jardin', s: 132, p: 5, price: 695000, dpe: 'D', new: false, ext: true, park: true, img: 'photo-1600596542815-ffad4c1539a9', desc: 'Toulousaine de 1930 rénovée, jardin de 240 m² plein sud, garage. Quatre chambres, bureau, combles aménageables.' },
+    { id: 3, type: 'Appartement', q: 'Compans-Caffarelli', t: 'T2 lumineux, dernier étage', s: 44, p: 2, price: 219000, dpe: 'B', new: true, ext: false, park: true, img: 'photo-1522708323590-d24dbb6b0267', desc: 'Dernier étage avec ascenseur, vue dégagée sur le jardin Compans. Place de parking en sous-sol. Idéal premier achat ou investissement.' },
+    { id: 4, type: 'Appartement', q: 'Saint-Cyprien', t: 'T4 familial avec terrasse', s: 92, p: 4, price: 445000, dpe: 'C', new: false, ext: true, park: true, img: 'photo-1484154218962-a197022b5858', desc: 'Résidence récente, terrasse de 18 m², trois chambres, deux salles d\'eau, parking double. À 5 min du métro.' },
+    { id: 5, type: 'Appartement', q: 'Minimes', t: 'T3 à rénover, fort potentiel', s: 71, p: 3, price: 229000, dpe: 'E', new: false, ext: false, park: false, img: 'photo-1493809842364-78817add7ffb', desc: 'Appartement des années 60 à rénover entièrement, beaux volumes, double exposition. Prix négociable.' },
+    { id: 6, type: 'Maison', q: 'Lardenne', t: 'Villa contemporaine 6 pièces', s: 165, p: 6, price: 759000, dpe: 'A', new: true, ext: true, park: true, img: 'photo-1600585154340-be6161a56a0c', desc: 'Construction 2021, pompe à chaleur, piscine chauffée, garage double. Quatre chambres dont une suite parentale.' },
+    { id: 7, type: 'Appartement', q: 'Capitole', t: 'Studio meublé hypercentre', s: 24, p: 1, price: 149000, dpe: 'D', new: false, ext: false, park: false, img: 'photo-1536376072261-38c75010e6c9', desc: 'Studio rénové et meublé, loué 620 €/mois, rentabilité brute 5 %. Au pied du métro Capitole.' },
+    { id: 8, type: 'Appartement', q: 'Busca', t: 'T5 bourgeois avec parquet', s: 128, p: 5, price: 640000, dpe: 'D', new: false, ext: true, park: false, img: 'photo-1513694203232-719a280e022f', desc: 'Appartement bourgeois de 1900, 3,20 m sous plafond, cheminées, balcons filants. Quatre chambres, cave.' },
+    { id: 9, type: 'Maison', q: 'Croix-Daurade', t: 'Maison de ville 4 pièces', s: 96, p: 4, price: 385000, dpe: 'C', new: true, ext: true, park: true, img: 'photo-1568605114967-8130f3a36994', desc: 'Maison mitoyenne avec jardinet et garage, trois chambres, proche écoles et commerces.' },
+    { id: 10, type: 'Appartement', q: 'Rangueil', t: 'T2 avec parking, proche métro', s: 46, p: 2, price: 179000, dpe: 'C', new: false, ext: true, park: true, img: 'photo-1560448204-e02f11c3d0e2', desc: 'Résidence sécurisée, balcon, parking. Loué jusqu\'en juin, idéal investisseur.' }
+  ];
+  const favs = new Set(store.get('garonne:favs', []));
+  $('#sQuartier').innerHTML += Object.keys(QUARTIERS).sort().map((q) => `<option>${q}</option>`).join('');
+  $('#eQuartier').innerHTML = Object.keys(QUARTIERS).sort().map((q) => `<option>${q}</option>`).join('');
+  const chips = new Set();
+  function mensualite(capital, years, rate) { const r = rate / 100 / 12; const n = years * 12; return r ? capital * r / (1 - Math.pow(1 + r, -n)) : capital / n; }
+  function renderBiens() {
+    const q = $('#sQuartier').value, t = $('#sType').value, b = Number($('#sBudget').value), p = Number($('#sPieces').value);
+    let list = BIENS.filter((x) => (!q || x.q === q) && (!t || x.type === t) && (!b || x.price <= b) && (!p || x.p >= p) && (!chips.has('new') || x.new) && (!chips.has('ext') || x.ext) && (!chips.has('park') || x.park) && (!chips.has('fav') || favs.has(x.id)));
+    const s = $('#sort').value; if (s === 'asc') list.sort((a, c) => a.price - c.price); if (s === 'desc') list.sort((a, c) => c.price - a.price); if (s === 'm2') list.sort((a, c) => a.price / a.s - c.price / c.s);
+    $('#resCount').textContent = `${list.length} bien${list.length > 1 ? 's' : ''} correspond${list.length > 1 ? 'ent' : ''} à votre recherche`;
+    $('#list').innerHTML = list.length ? list.map((x) => `<article class="bien" data-id="${x.id}"><div class="ph"><img src="https://images.unsplash.com/${x.img}?auto=format&fit=crop&w=700&q=70" alt="${x.t}" loading="lazy">${x.new ? '<span class="tag new">Nouveauté</span>' : ''}<button class="fav${favs.has(x.id) ? ' on' : ''}" data-fav="${x.id}" aria-label="Ajouter aux favoris">${favs.has(x.id) ? '♥' : '♡'}</button></div><div class="b"><div class="price">${fmt(x.price)} <small>${fmt(Math.round(x.price / x.s))}/m²</small></div><h3>${x.t}</h3><p class="loc">📍 ${x.q} · Toulouse</p><div class="specs"><span>${x.s} m²</span><span>${x.p} pièce${x.p > 1 ? 's' : ''}</span><span>${x.type}</span><span class="dpe dpe-${x.dpe}">${x.dpe}</span></div></div></article>`).join('') : '<div class="empty">Aucun bien ne correspond. Élargissez vos critères ou <a href="#estimation">enregistrez une alerte</a>.</div>';
+    $$('[data-fav]').forEach((f) => f.addEventListener('click', (e) => { e.stopPropagation(); const id = Number(f.dataset.fav); favs.has(id) ? favs.delete(id) : favs.add(id); store.set('garonne:favs', [...favs]); renderBiens(); toast(favs.has(id) ? 'Ajouté aux favoris' : 'Retiré des favoris'); }));
+    $$('.bien').forEach((c) => c.addEventListener('click', () => openFiche(Number(c.dataset.id))));
+  }
+  function openFiche(id) {
+    const x = BIENS.find((b) => b.id === id); const m = mensualite(x.price * 0.9, 20, 3.4);
+    $('#ficheBody').innerHTML = `<div class="ph"><img src="https://images.unsplash.com/${x.img}?auto=format&fit=crop&w=1000&q=70" alt="${x.t}" loading="lazy"></div><h3>${x.t}</h3><div class="price">${fmt(x.price)}</div><div class="specs"><span>📍 ${x.q}</span><span>${x.s} m²</span><span>${x.p} pièces</span><span>DPE <span class="dpe dpe-${x.dpe}">${x.dpe}</span></span>${x.ext ? '<span>🌿 Extérieur</span>' : ''}${x.park ? '<span>🅿️ Parking</span>' : ''}</div><p>${x.desc}</p><div class="mens">Mensualité indicative : <b>${fmt(m)}/mois</b> sur 20 ans à 3,4 % avec 10 % d'apport — <a href="#simulateur" data-close-modal data-prefill="${x.price}">affiner dans le simulateur</a></div><div class="acts"><a href="tel:+33561620388" class="btn btn-navy">Demander une visite</a><button class="btn btn-line" data-close-modal>Fermer</button></div>`;
+    $('[data-prefill]', $('#ficheBody')).addEventListener('click', () => { $('#prix').value = x.price; simu(); });
+    openModal('#ficheModal');
+  }
+  $('#searchForm').addEventListener('submit', (e) => { e.preventDefault(); renderBiens(); $('#list').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $$('#searchForm select').forEach((s) => s.addEventListener('change', renderBiens));
+  $('#sort').addEventListener('change', renderBiens);
+  $$('#chips button').forEach((c) => c.addEventListener('click', () => { const k = c.dataset.chip; chips.has(k) ? chips.delete(k) : chips.add(k); c.setAttribute('aria-pressed', String(chips.has(k))); renderBiens(); }));
+  renderBiens();
+
+  /* Simulateur */
+  function simu() {
+    const prix = Number($('#prix').value), apport = Math.min(Number($('#apport').value), prix), duree = Number($('#duree').value), taux = Number($('#taux').value), rev = Number($('#rev').value);
+    const notaire = prix * 0.075; const capital = Math.max(0, prix + notaire - apport); const m = mensualite(capital, duree, taux); const cout = m * duree * 12 - capital; const end = m / rev * 100;
+    $('#vPrix').textContent = fmt(prix); $('#vApport').textContent = fmt(apport); $('#vDuree').textContent = duree + ' ans'; $('#vTaux').textContent = taux.toFixed(2).replace('.', ',') + ' %'; $('#vRev').textContent = fmt(rev);
+    $('#mens').innerHTML = fmt(m) + '<small> / mois</small>'; $('#rCap').textContent = fmt(capital); $('#rCout').textContent = fmt(cout); $('#rNot').textContent = fmt(notaire); $('#rEnd').textContent = end.toFixed(1).replace('.', ',') + ' %';
+    $('#rMsg').innerHTML = end > 35 ? `<p class="warn">⚠️ Taux d'endettement supérieur à 35 % : allongez la durée, augmentez l'apport ou visez un bien à ${fmt(Math.floor((rev * 0.35 / mensualite(1, duree, taux) + apport) / 1.075 / 1000) * 1000)} max.</p>` : `<p class="ok">✓ Projet finançable : il vous reste ${fmt(rev - m)} de reste à vivre par mois.</p>`;
+    store.set('garonne:simu', { prix, apport, duree, taux, rev });
+  }
+  const saved = store.get('garonne:simu'); if (saved) ['prix', 'apport', 'duree', 'taux', 'rev'].forEach((k) => { $('#' + k).value = saved[k]; });
+  $$('.sliders input').forEach((i) => i.addEventListener('input', simu)); simu();
+
+  /* Estimation en 4 étapes */
+  const est = { type: null, ext: 'aucun' };
+  $$('#eType button').forEach((b) => b.addEventListener('click', () => { $$('#eType button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); est.type = b.dataset.v; $('#e1').disabled = false; }));
+  $$('#eExt button').forEach((b) => b.addEventListener('click', () => { $$('#eExt button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); est.ext = b.dataset.v; }));
+  function go(n) { $$('.estim-box .panel').forEach((p) => p.classList.toggle('active', Number(p.dataset.step) === n)); $$('#eSteps li').forEach((li, i) => { li.classList.toggle('active', i + 1 === n); li.classList.toggle('done', i + 1 < n); }); $('.estim-box').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  $('#e1').addEventListener('click', () => go(2));
+  $('#e2').addEventListener('click', () => { const s = Number($('#eSurf').value); if (!s || s < 9) { Demo.setError($('#eSurf'), 'Indiquez une surface (9 m² minimum).'); return; } est.surf = s; est.pieces = $('#ePieces').value; go(3); });
+  $$('.estim-box [data-back]').forEach((b) => b.addEventListener('click', () => go(Number(b.dataset.back))));
+  $('#eForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const q = $('#eQuartier').value; const etat = Number($('#eEtat').value); let pm2 = QUARTIERS[q] * etat;
+    if (est.type === 'Maison') pm2 *= 1.05; if (est.type === 'Terrain') pm2 *= 0.25; if (est.ext === 'balcon') pm2 *= 1.03; if (est.ext === 'terrasse') pm2 *= 1.06; if (est.ext === 'jardin') pm2 *= 1.08;
+    if (est.surf < 30) pm2 *= 1.1; if (est.surf > 120) pm2 *= 0.95;
+    const mid = pm2 * est.surf; const lo = Math.round(mid * 0.94 / 1000) * 1000, hi = Math.round(mid * 1.06 / 1000) * 1000;
+    $('#fBien').value = `${est.type} ${est.surf} m² ${est.pieces} p. ${q} (${$('#eEtat').options[$('#eEtat').selectedIndex].text}, ${est.ext})`; $('#fRange').value = `${fmt(lo)} – ${fmt(hi)}`;
+    const btn = $('#e3'); btn.disabled = true; btn.textContent = 'Calcul…'; await sendNetlify(f);
+    store.set('garonne:estimations', [...store.get('garonne:estimations', []), { bien: $('#fBien').value, range: $('#fRange').value, at: Date.now() }]);
+    $('#eRange').textContent = `${fmt(lo)} – ${fmt(hi)}`; $('#eSub').textContent = `${est.type} de ${est.surf} m² · ${est.pieces} pièces · ${q} · prix médian du quartier ${fmt(QUARTIERS[q])}/m²`;
+    $('#eDetail').innerHTML = `<div>Valeur médiane<b>${fmt(Math.round(mid / 1000) * 1000)}</b></div><div>Prix au m² retenu<b>${fmt(Math.round(pm2))}</b></div><div>Délai de vente estimé<b>${mid > 600000 ? '2 – 4 mois' : '3 – 7 semaines'}</b></div>`;
+    btn.disabled = false; btn.textContent = 'Voir mon estimation'; go(4); toast('Estimation calculée — avis de valeur envoyé par e-mail', 'ok');
+  });
+  $('#eAgain').addEventListener('click', () => { est.type = null; $$('#eType button').forEach((x) => x.setAttribute('aria-pressed', 'false')); $('#e1').disabled = true; $('#eSurf').value = ''; go(1); });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Fermé' : i === 6 ? '10:00 – 17:00' : '9:00 – 12:30 · 14:00 – 19:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>
