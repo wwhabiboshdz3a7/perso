@@ -4,10 +4,10 @@ injectCSS('odometre', `
 .od { text-align: center; }
 .od__row { display: inline-flex; align-items: flex-start; font-family: var(--f-display); font-weight: 900; line-height: 1; letter-spacing: -.04em;
   font-variation-settings: "wdth" 60; color: var(--fx); font-variant-numeric: tabular-nums; }
-.od__win { display: inline-block; height: 1em; overflow: hidden; position: relative; }
+.od__win { display: inline-block; height: 1.12em; overflow: hidden; position: relative; }
 .od__strip { display: flex; flex-direction: column; will-change: transform; }
-.od__strip span { display: block; height: 1em; text-align: center; }
-.od__static { display: inline-block; }
+.od__strip span { display: block; height: 1.12em; line-height: 1.12em; text-align: center; }
+.od__static { display: inline-block; line-height: 1.12em; }
 .od__lab { margin-top: 2vh; display: flex; justify-content: center; gap: 3vw; color: var(--mute); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
 .od__lab b { color: var(--paper); font-weight: 400; }
 `);

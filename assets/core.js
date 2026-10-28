@@ -31,7 +31,7 @@ export const FONTS = {
 export function fontsReady(list = []) {
   const loads = list.map((f) => document.fonts.load(f).catch(() => null));
   const all = Promise.all(loads).then(() => document.fonts.ready);
-  return Promise.race([all, new Promise((r) => setTimeout(r, 1500))]);
+  return Promise.race([all, new Promise((r) => setTimeout(r, 4000))]);
 }
 
 // Boucle rAF suspendue hors écran et quand l'onglet est masqué.

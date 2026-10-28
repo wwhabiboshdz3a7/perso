@@ -141,7 +141,7 @@ S.s01 = (sec) => {
   const lines = $$('.s1__l', sec);
   const fit = () => {
     const w = sec.clientWidth - 2 * parseFloat(getComputedStyle(sec.querySelector('.s1')).paddingLeft);
-    let sizes = lines.map((l) => { l.style.fontVariationSettings = `"wdth" ${small ? Math.min(+l.dataset.w, 100) : l.dataset.w}`; return fitText(l, { width: w, max: vh() * 0.34 }); });
+    let sizes = lines.map((l) => { l.style.fontVariationSettings = `"wdth" ${small ? Math.min(+l.dataset.w, 100) : l.dataset.w}`; l.style.fontSize = '100px'; l.style.whiteSpace = 'nowrap'; const rg = document.createRange(); rg.selectNodeContents(l); const rw = rg.getBoundingClientRect().width || 1; const fs = Math.min(vh() * 0.34, (100 * w) / rw); l.style.fontSize = fs + 'px'; return fs; });
     const total = sizes.reduce((a, b) => a + b * 0.78, 0);
     const room = vh() * (small ? 0.5 : 0.6);
     if (total > room) { const k = room / total; lines.forEach((l, i) => (l.style.fontSize = sizes[i] * k + 'px')); }

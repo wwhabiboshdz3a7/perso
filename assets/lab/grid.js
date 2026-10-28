@@ -30,9 +30,9 @@ const io = new IntersectionObserver((entries) => {
 grid.querySelectorAll('.card').forEach((c) => io.observe(c));
 
 // Titre : lettres qui s'élargissent en vague à l'arrivée
-if (!RM) {
+if (!RM) document.fonts.ready.then(() => {
   const h = document.querySelector('.lab-head h1 .w');
   const split = SplitText.create(h, { type: 'chars' });
   gsap.from(split.chars, { yPercent: 100, fontVariationSettings: '"wdth" 50', opacity: 0, duration: 1.4, ease: 'elastic.out(1, .5)', stagger: 0.06 });
   gsap.from('.lab-head h1 em, .lab-head p', { y: 30, opacity: 0, duration: 1.2, ease: 'expo.out', delay: 0.4, stagger: 0.1 });
-}
+});

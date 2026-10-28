@@ -197,5 +197,7 @@ html.lenis, html.lenis body { height: auto; }
 .rm .sc__pin { position: relative; height: auto; min-height: 100vh; }
 .rm .s1, .rm .s3, .rm .s4, .rm .s6, .rm .s12, .rm .s11 { position: relative; min-height: 100vh; }
 .rm .s15__word { display: none; }
+.rm .s9__cv { display: none; }
+.rm .sc--last .cap, .rm .tone-hot .cap__n { display: none; }
 .rm .s15__final { position: relative; min-height: 100vh; }
 .rm .hud__arrow { animation: none; }

@@ -74,5 +74,5 @@ a:hover .arrow { transform: translateX(4px); }
 
 @media (prefers-reduced-motion: reduce) {
   .grain { animation: none; }
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  *, *::before, *::after { transition-duration: 0s !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
