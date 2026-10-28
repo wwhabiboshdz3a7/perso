@@ -114,11 +114,14 @@ window.MOTION = (() => {
       burger.addEventListener('click', () => { const open = nav.classList.toggle('is-open'); burger.setAttribute('aria-expanded', open); document.body.style.overflow = open ? 'hidden' : ''; });
       nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('is-open'); burger.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; }));
     }
-    /* Mot par mot */
+    /* Mot par mot (les éléments en ligne comme <em> ou <i> sont conservés) */
     document.querySelectorAll('[data-words]').forEach(el => {
-      const words = el.textContent.trim().split(/\s+/);
-      el.textContent = '';
-      words.forEach((w, i) => { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--i', i); s.textContent = w; el.appendChild(s); el.appendChild(document.createTextNode(' ')); });
+      const nodes = [...el.childNodes]; el.textContent = ''; let i = 0;
+      const push = (content) => { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--i', i++); if (typeof content === 'string') s.textContent = content; else s.appendChild(content); el.appendChild(s); el.appendChild(document.createTextNode(' ')); };
+      nodes.forEach(n => {
+        if (n.nodeType === 3) n.textContent.trim().split(/\s+/).filter(Boolean).forEach(w => push(w));
+        else if (n.nodeType === 1) { const words = n.textContent.trim().split(/\s+/).filter(Boolean); words.forEach(w => { const c = n.cloneNode(false); c.textContent = w; push(c); }); }
+      });
     });
     /* Reveal */
     const targets = document.querySelectorAll('[data-reveal], [data-words]');

@@ -21,7 +21,7 @@
         for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const a = grid.get((gx + i) + ',' + (gy + j)); if (!a) continue; for (const q of a) { if (q === b) continue; const dx = q.x - b.x, dy = q.y - b.y, d2 = dx * dx + dy * dy; if (d2 < R2) { n++; ax += q.vx; ay += q.vy; cx += q.x; cy += q.y; if (d2 < R2 * .12) { const inv = 1 / (d2 + 1); sx -= dx * inv; sy -= dy * inv; } } } }
         if (n) { b.vx += (ax / n - b.vx) * .06 * o.ali + (cx / n - b.x) * .0025 * o.coh + sx * 14 * o.sep * o.dpr; b.vy += (ay / n - b.vy) * .06 * o.ali + (cy / n - b.y) * .0025 * o.coh + sy * 14 * o.sep * o.dpr; }
         if (px !== null && o.pointer.active) { const dx = px - b.x, dy = py - b.y; const d = Math.hypot(dx, dy) + 1; b.vx += dx / d * .08 * o.attract; b.vy += dy / d * .08 * o.attract; }
-        else { b.vx += (w / 2 - b.x) * .0003; b.vy += (h / 2 - b.y) * .0003; }
+        else { const tx = w * (o.home || .5), ty = h * .5; b.vx += (tx - b.x) * .0003; b.vy += (ty - b.y) * .0003; }
         b.vx += (Math.random() - .5) * .1; b.vy += (Math.random() - .5) * .1;
         const sp = Math.hypot(b.vx, b.vy) || 1; const lim = max * (.8 + b.k * .4); if (sp > lim) { b.vx = b.vx / sp * lim; b.vy = b.vy / sp * lim; } else if (sp < max * .4) { b.vx = b.vx / sp * max * .4; b.vy = b.vy / sp * max * .4; }
         b.x += b.vx * dt * 60; b.y += b.vy * dt * 60;
@@ -39,7 +39,7 @@
   /* ---------- Hero ---------- */
   const wrap = document.getElementById('hero-canvas'); const heroCanvas = wrap.querySelector('canvas');
   const ptr = M.pointer();
-  const hero = flock(heroCanvas, { count: M.mobile ? 140 : 420, pointer: ptr, dpr: Math.min(M.dpr, 1.5) });
+  const hero = flock(heroCanvas, { count: M.mobile ? 140 : 420, pointer: ptr, dpr: Math.min(M.dpr, 1.5), home: M.mobile ? .5 : .72 });
   if (!hero) M.fallback(wrap.closest('.hero'));
   else if (M.reduced) { for (let i = 0; i < 120; i++) hero.step(1 / 60); }
   else M.loop(heroCanvas, (t, dt) => { ptr.update(); hero.step(Math.min(dt, .033)); });

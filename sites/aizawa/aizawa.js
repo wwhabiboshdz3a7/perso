@@ -75,6 +75,8 @@ if (panel) M.params(panel, [
 
 /* ---------- Hero Three.js ---------- */
 let hero = null;
+setTimeout(() => {
+
 const wrap = document.getElementById('hero-canvas'); const canvas = wrap.querySelector('canvas');
 if (!M.hasWebGL()) M.fallback(wrap.closest('.hero'));
 else {
@@ -135,3 +137,5 @@ else {
     });
   }
 }
+
+}, 320);

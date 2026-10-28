@@ -66,6 +66,8 @@ document.querySelectorAll('[data-lorenz]').forEach(tile => {
 });
 
 /* ---------- Hero Three.js ---------- */
+setTimeout(() => {
+
 const wrap = document.getElementById('hero-canvas');
 const canvas = wrap.querySelector('canvas');
 if (!M.hasWebGL()) { M.fallback(wrap.closest('.hero')); }
@@ -160,3 +162,5 @@ else {
     M.loop(canvas, step);
   }
 }
+
+}, 320);

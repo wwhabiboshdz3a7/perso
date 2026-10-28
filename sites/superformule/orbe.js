@@ -59,6 +59,8 @@ if (panel) {
 }
 
 /* ---------- Hero 3D ---------- */
+setTimeout(() => {
+
 const wrap = document.getElementById('hero-canvas'); const canvas = wrap.querySelector('canvas');
 if (!M.hasWebGL()) M.fallback(wrap.closest('.hero'));
 else {
@@ -135,3 +137,5 @@ else {
     if (M.reduced) { frame(0, 0); } else M.loop(canvas, frame);
   }
 }
+
+}, 320);
