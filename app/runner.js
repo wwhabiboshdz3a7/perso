@@ -16,22 +16,30 @@ const workerSource = `
   const log = (...a) => __logs.push(a.map(fmt).join(' '));
   self.console = { log, info: log, warn: log, error: log, table: log, debug: log };
   self.alert = log; self.prompt = () => null;
+  // Suivi des timers en attente : on attend qu'ils soient tous passés avant de renvoyer la sortie.
+  let __attente = 0;
+  const __setTimeout = self.setTimeout.bind(self), __clearTimeout = self.clearTimeout.bind(self);
+  self.setTimeout = (fn, ms, ...args) => { __attente++; return __setTimeout(() => { __attente--; try { fn(...args); } catch (err) { log('⚠ ' + (err && err.message || err)); } }, ms); };
+  self.clearTimeout = id => { __clearTimeout(id); __attente = Math.max(0, __attente - 1); };
   self.onmessage = async (e) => {
     const { code, exprs = [] } = e.data;
     let erreur = null, valeurs = [];
     // Les expressions de test sont évaluées dans la même portée que le code de l'élève
     // (sinon les const/let/class déclarés dans le code ne seraient pas visibles).
-    const suffixe = '\n;self.__valeurs__ = [' + exprs.map(ex => '(() => { try { return { ok: true, valeur: (' + ex + ') }; } catch (err) { return { ok: false, erreur: String(err && err.message || err) }; } })()').join(',') + '];';
+    const suffixe = '\\n;self.__valeurs__ = [' + exprs.map(ex => '(() => { try { return { ok: true, valeur: (' + ex + ') }; } catch (err) { return { ok: false, erreur: String(err && err.message || err) }; } })()').join(',') + '];';
     try {
       const r = (0, eval)(code + suffixe);
       if (r && typeof r.then === 'function') await r;
+      for (let i = 0; i < 5; i++) await null;                       // laisse passer les microtâches
+      while (__attente > 0) await new Promise(res => __setTimeout(res, 5));   // puis les timers (setTimeout)
+      for (let i = 0; i < 5; i++) await null;
       valeurs = (self.__valeurs__ || []).map(v => { try { return v.ok ? { ok: true, valeur: JSON.parse(JSON.stringify(v.valeur ?? null)) } : v; } catch { return { ok: true, valeur: String(v.valeur) }; } });
     } catch (err) {
       erreur = (err && err.name ? err.name + ': ' : '') + (err && err.message ? err.message : String(err));
       __logs.push('⚠ ' + erreur);
       valeurs = exprs.map(() => ({ ok: false, erreur }));
     }
-    self.postMessage({ stdout: __logs.join('\n'), erreur, valeurs });
+    self.postMessage({ stdout: __logs.join('\\n'), erreur, valeurs });
   };
 `;
 let workerURL = null;

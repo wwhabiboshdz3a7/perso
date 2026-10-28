@@ -191,7 +191,7 @@ ${code('html', `<figure>
 <div class="callout warn"><b>Droits</b>Une image trouvée sur le web n'est pas libre par défaut. Utilise tes propres images, des banques sous licence claire (Unsplash, Pexels) ou des images générées, et respecte les conditions.</div>`,
           exercice: {
             type: 'code', langage: 'html', titre: 'Galerie et navigation',
-            enonce: `<p>Crée : une navigation (<code>nav</code> contenant une liste <code>ul</code> de 3 liens vers des ancres <code>#accueil</code>, <code>#galerie</code>, <code>#contact</code>), trois sections avec ces <code>id</code>, dans la galerie une <code>figure</code> avec une <code>img</code> (src <code>https://picsum.photos/400/300</code>, <code>alt</code> descriptif non vide, <code>width</code> et <code>height</code>, <code>loading="lazy"</code>) et une <code>figcaption</code>, et dans contact un lien <code>mailto:</code> ainsi qu'un lien externe en nouvel onglet avec <code>rel="noopener"</code>.</p>`,
+            enonce: `<p>Crée : une navigation (<code>nav</code> contenant une liste <code>ul</code> de 3 liens vers des ancres <code>#accueil</code>, <code>#galerie</code>, <code>#contact</code>), trois sections avec ces <code>id</code>, dans la galerie une <code>figure</code> avec une <code>img</code> (src <code>data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%25' height='100%25' fill='%23cbd5e1'/><circle cx='300' cy='200' r='80' fill='%236d5dfc'/></svg></code>, <code>alt</code> descriptif non vide, <code>width</code> et <code>height</code>, <code>loading="lazy"</code>) et une <code>figcaption</code>, et dans contact un lien <code>mailto:</code> ainsi qu'un lien externe en nouvel onglet avec <code>rel="noopener"</code>.</p>`,
             depart: page(`  <!-- navigation, sections, galerie, contact -->`),
             solution: page(`  <nav>
     <ul>
@@ -207,7 +207,7 @@ ${code('html', `<figure>
   <section id="galerie">
     <h2>Galerie</h2>
     <figure>
-      <img src="https://picsum.photos/400/300" alt="Paysage de montagne au lever du soleil" width="400" height="300" loading="lazy">
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%25' height='100%25' fill='%23cbd5e1'/><circle cx='300' cy='200' r='80' fill='%236d5dfc'/></svg>" alt="Paysage de montagne au lever du soleil" width="400" height="300" loading="lazy">
       <figcaption>Les Alpes, octobre 2025.</figcaption>
     </figure>
   </section>
