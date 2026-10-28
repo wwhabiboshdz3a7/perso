@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Fournil — Boulangerie-pâtisserie à Toulouse Côte Pavée</title>
+<meta name="description" content="Boulangerie-pâtisserie artisanale à la Côte Pavée, Toulouse. Pain au levain, viennoiseries pur beurre, gâteaux d'anniversaire sur commande. Précommandez en ligne, retrait en boutique.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23f3e3c3'/%3E%3Cellipse cx='16' cy='17' rx='10' ry='6' fill='%23b5672a'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Bakery","name":"Maison Fournil","telephone":"+33561340522","priceRange":"€","address":{"@type":"PostalAddress","streetAddress":"41 avenue Camille Pujol","addressLocality":"Toulouse","postalCode":"31500","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.5985,"longitude":1.4680},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"06:30","closes":"19:30"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"07:00","closes":"13:00"}],"url":"https://example.com/demos/boulangerie/"}
+</script>
+<style>
+:root{--wheat:#f3e3c3;--cream:#fdf8ee;--crust:#b5672a;--crust-d:#8a4a1a;--cocoa:#3d2a1e;--leaf:#5f7a4a;--muted:#7a6a5a;--accent:var(--crust);--focus:var(--crust);--border:#e5d6b8;--radius:14px;--ph:linear-gradient(135deg,#e8c98f,#b5672a);--mb-bg:#b5672a;--mb-bg2:#3d2a1e}
+body{font-family:"Work Sans",system-ui,sans-serif;background:var(--cream);color:var(--cocoa)}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;line-height:1.05;letter-spacing:-.02em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:600;text-decoration:none;transition:all .25s;font-size:15px}
+.btn-crust{background:var(--crust);color:#fff}.btn-crust:hover{background:var(--crust-d);transform:translateY(-2px)}
+.btn-cocoa{background:var(--cocoa);color:#fff}.btn-cocoa:hover{background:#000}
+.btn-line{border:2px solid var(--cocoa)}.btn-line:hover{background:var(--cocoa);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:rgba(253,248,238,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{font-family:Fraunces;font-weight:700;font-size:26px;text-decoration:none;display:flex;align-items:center;gap:10px;color:var(--crust)}
+.brand i{font-style:normal;font-size:26px}
+.nav{display:flex;gap:26px;align-items:center;font-weight:500;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--crust)}
+.nav .btn{padding:10px 20px}
+@media (max-width:899px){.nav{position:fixed;inset:74px 0 0;background:var(--cream);flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--wheat);position:relative;overflow:hidden}
+.hero .container{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:64px 0}
+@media (max-width:880px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(44px,6.5vw,88px)}
+.hero h1 em{font-style:italic;color:var(--crust);font-weight:500}
+.hero p{font-size:18px;color:var(--muted);max-width:46ch;margin:20px 0 28px}
+.live{display:inline-flex;align-items:center;gap:10px;background:#fff;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(61,42,30,.08)}
+.live i{width:10px;height:10px;border-radius:50%;background:#16a34a;animation:pulse 1.6s infinite}
+.live.closed i{background:#dc2626;animation:none}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(22,163,74,.2)}}
+.hero-img{position:relative}
+.hero-img .ph{aspect-ratio:1;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;box-shadow:0 40px 80px rgba(61,42,30,.2)}
+.hero-img .tag{position:absolute;bottom:8%;left:-4%;background:var(--cocoa);color:var(--wheat);padding:14px 18px;border-radius:12px;font-family:Fraunces;font-size:18px;transform:rotate(-4deg)}
+@media (max-width:880px){.hero-img .tag{left:0}}
+.hero-img .tag small{display:block;font:500 12px "Work Sans";opacity:.8}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--crust);font-weight:600}
+.section-head{max-width:640px;margin-bottom:40px}
+.section-head h2{font-size:clamp(32px,4.5vw,52px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+/* Fournées du jour */
+.day-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:880px){.day-grid{grid-template-columns:1fr}}
+.fournees{display:grid;gap:10px}
+.fournee{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px}
+.fournee .t{font-family:Fraunces;font-size:22px;font-weight:700;min-width:64px}
+.fournee .nm{flex:1}.fournee .nm small{display:block;color:var(--muted);font-size:13px}
+.fournee .st{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--wheat)}
+.fournee.now .st{background:#dcfce7;color:#166534}.fournee.past{opacity:.5}.fournee.past .st{background:#eee}
+.hours{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.hours h3{font-size:22px;margin-bottom:12px}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:600;color:var(--crust)}
+.hours .next{margin-top:12px;font-size:14px;color:var(--muted)}
+/* Vitrine */
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.prod{background:#fff;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:transform .25s}
+.prod:hover{transform:translateY(-4px)}
+.prod .ph{aspect-ratio:1}
+.prod:nth-child(2n) .ph{--ph:linear-gradient(135deg,#f3e3c3,#c98a4a)}.prod:nth-child(3n) .ph{--ph:linear-gradient(135deg,#5e3a2a,#b5672a)}
+.prod .b{padding:14px}
+.prod h3{font-size:17px}.prod p{font-size:13px;color:var(--muted);margin-top:4px}
+.prod .pr{font-weight:600;margin-top:8px;color:var(--crust)}
+/* Précommande */
+.pre{background:var(--cocoa);color:var(--wheat)}
+.pre .eyebrow{color:#e8c98f}.pre .section-head p{color:rgba(243,227,195,.8)}
+.pre-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start}
+@media (max-width:900px){.pre-grid{grid-template-columns:1fr}}
+.cfg{background:var(--cream);color:var(--cocoa);border-radius:20px;padding:28px}
+@media (max-width:600px){.cfg{padding:20px}}
+.tabs{display:flex;gap:6px;background:var(--wheat);padding:5px;border-radius:999px;margin-bottom:22px}
+.tabs button{flex:1;padding:10px;border-radius:999px;font-weight:600;font-size:14px;transition:all .2s}
+.tabs button[aria-pressed="true"]{background:var(--cocoa);color:var(--wheat)}
+.tabp{display:none}.tabp.active{display:block}
+.lbl{font-weight:600;font-size:14px;margin:16px 0 8px;display:block}
+.lbl:first-child{margin-top:0}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.opts label{border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;background:#fff;font-size:14px;transition:all .15s}
+.opts label:has(input:checked){border-color:var(--crust);background:#fff3e6;box-shadow:inset 0 0 0 1px var(--crust)}
+.opts input{position:absolute;opacity:0}
+.opts b{display:block}.opts small{color:var(--muted);font-size:12px}
+.swatch{width:26px;height:26px;border-radius:50%;margin:0 auto 6px;border:2px solid #fff;box-shadow:0 0 0 1px var(--border)}
+.cake-msg{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:#fff}
+.qty-list{display:grid;gap:8px}
+.qty{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px}
+.qty .nm{flex:1;font-weight:500}.qty .nm small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.qty .c{display:flex;align-items:center;gap:8px}
+.qty .c button{width:30px;height:30px;border-radius:50%;background:var(--wheat);font-weight:700;font-size:16px}
+.qty .c output{min-width:24px;text-align:center;font-weight:600}
+.pre-form{display:grid;gap:12px;margin-top:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.preview{position:sticky;top:96px}
+.cake-view{background:var(--cream);border-radius:20px;padding:28px;color:var(--cocoa)}
+.cake{width:min(260px,70%);margin:0 auto 20px;position:relative;aspect-ratio:1}
+.cake .plate{position:absolute;bottom:4%;left:0;right:0;height:14%;background:#fff;border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.cake .layer{position:absolute;left:50%;transform:translateX(-50%);border-radius:14px 14px 10px 10px;transition:all .4s}
+.cake .l1{bottom:11%;width:88%;height:30%;background:var(--c1,#e8c98f)}
+.cake .l2{bottom:40%;width:70%;height:26%;background:var(--c2,#c98a4a)}
+.cake .l3{bottom:65%;width:50%;height:20%;background:var(--c3,#b5672a)}
+.cake .msg{position:absolute;bottom:46%;left:50%;transform:translateX(-50%) rotate(-3deg);background:#fff;padding:4px 10px;border-radius:6px;font-family:Fraunces;font-style:italic;font-size:13px;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.cake .candle{position:absolute;top:8%;left:50%;transform:translateX(-50%);width:8px;height:14%;background:repeating-linear-gradient(#fff 0 4px,var(--crust) 4px 8px);border-radius:3px}
+.cake .candle::before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:10px;height:14px;background:#ffb703;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;animation:flame .6s infinite alternate}
+@keyframes flame{to{transform:translateX(-50%) scale(1.1,1.25)}}
+.sum{display:grid;gap:6px;font-size:14px}
+.sum div{display:flex;justify-content:space-between;gap:10px}
+.sum .tot{border-top:2px solid var(--cocoa);padding-top:10px;margin-top:6px;font-weight:600;font-size:18px}
+.sum .tot b{font-family:Fraunces;font-size:28px;color:var(--crust)}
+.done{background:#dcfce7;border-radius:16px;padding:24px;text-align:center;color:#14532d}
+.done h3{font-size:24px}.done .ref{font-family:ui-monospace,monospace;font-size:20px;letter-spacing:.1em;margin:8px 0}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.review .stars{color:var(--crust);letter-spacing:2px}
+.review p{font-family:Fraunces;font-size:18px;margin:10px 0 12px;font-weight:500}
+.review footer{font-size:13px;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:600;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--crust);font-size:22px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:16px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--wheat)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--cocoa);color:rgba(243,227,195,.75);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i>🥖</i>Maison Fournil</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#jour">Aujourd'hui</a><a href="#vitrine">La vitrine</a><a href="#precommande">Précommander</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#precommande" class="btn btn-crust">Commander</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal>Côte Pavée · Toulouse</p>
+    <h1 data-reveal>Le pain <em>vivant</em>, les gâteaux qui font la fête</h1>
+    <p data-reveal>Levain naturel, farines bio du Lauragais, beurre AOP Charentes-Poitou. Précommandez votre gâteau d'anniversaire ou vos viennoiseries en nombre : c'est prêt quand vous passez.</p>
+    <div data-reveal><a href="#precommande" class="btn btn-crust">Précommander</a> <a href="#jour" class="btn btn-line">Fournées du jour</a></div>
+    <p style="margin-top:28px" data-reveal><span class="live" id="liveStatus"><i></i>Chargement…</span></p>
+  </div>
+  <div class="hero-img" data-reveal="scale">
+    <div class="ph"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=70" alt="Pains au levain sortis du four" fetchpriority="high"></div>
+    <div class="tag">Levain de 2009<small>nourri chaque matin à 5 h</small></div>
+  </div>
+</div></section>
+
+<section id="jour"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">En direct de la boutique</p><h2>Les fournées d'aujourd'hui</h2><p>Mis à jour en temps réel : sachez à quelle heure sort votre pain préféré.</p></div>
+  <div class="day-grid">
+    <div class="fournees" id="fournees" data-reveal></div>
+    <div class="hours" data-reveal="right"><h3>Horaires</h3><div id="hours"></div><p class="next" id="nextOpen"></p></div>
+  </div>
+</div></section>
+
+<section id="vitrine" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">La vitrine</p><h2>Ce que vous trouverez au comptoir</h2></div>
+  <div class="products">
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=500&q=70" alt="Tourte de meule au levain" loading="lazy"></div><div class="b"><h3>Tourte de meule</h3><p>Levain naturel, 24 h de fermentation</p><p class="pr">4,80 € / 1 kg</p></div></article>
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=500&q=70" alt="Croissants pur beurre" loading="lazy"></div><div class="b"><h3>Croissant</h3><p>Beurre AOP, 3 tours, 48 h</p><p class="pr">1,30 €</p></div></article>
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1530610476181-d83430b64dcd?auto=format&fit=crop&w=500&q=70" alt="Baguettes tradition" loading="lazy"></div><div class="b"><h3>Baguette tradition</h3><p>Farine T65 du Lauragais</p><p class="pr">1,25 €</p></div></article>
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=500&q=70" alt="Gâteau d'anniversaire" loading="lazy"></div><div class="b"><h3>Gâteaux de fête</h3><p>Sur commande, 48 h à l'avance</p><p class="pr">dès 24 €</p></div></article>
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1587241321921-91a834d6d191?auto=format&fit=crop&w=500&q=70" alt="Macarons" loading="lazy"></div><div class="b"><h3>Macarons</h3><p>Violette, pistache, caramel…</p><p class="pr">1,60 €</p></div></article>
+    <article class="prod" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&w=500&q=70" alt="Petits gâteaux" loading="lazy"></div><div class="b"><h3>Pâtisseries</h3><p>Tarte citron, Paris-Brest, flan</p><p class="pr">dès 3,90 €</p></div></article>
+  </div>
+</div></section>
+
+<section class="pre" id="precommande"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Précommande en ligne</p><h2>Composez, on prépare, vous récupérez</h2><p>Gâteaux personnalisés (48 h à l'avance) ou viennoiseries en nombre (la veille avant 18 h). Paiement en boutique.</p></div>
+  <div class="pre-grid">
+    <div class="cfg" data-reveal>
+      <div class="tabs" role="tablist"><button role="tab" aria-pressed="true" data-tab="cake">🎂 Gâteau de fête</button><button role="tab" aria-pressed="false" data-tab="vienn">🥐 Viennoiseries en nombre</button></div>
+      <div class="tabp active" data-tab="cake">
+        <span class="lbl">Taille</span>
+        <div class="opts" id="sizes"><label><input type="radio" name="size" value="4" checked><b>4 – 6 pers.</b><small>24 €</small></label><label><input type="radio" name="size" value="8"><b>8 – 10 pers.</b><small>38 €</small></label><label><input type="radio" name="size" value="12"><b>12 – 15 pers.</b><small>54 €</small></label><label><input type="radio" name="size" value="20"><b>20 pers.</b><small>72 €</small></label></div>
+        <span class="lbl">Parfum</span>
+        <div class="opts" id="flavors"><label><input type="radio" name="flavor" value="Fraisier" data-c="#f4a3b5,#fff5f7,#e85d75" checked><span class="swatch" style="background:#f4a3b5"></span><b>Fraisier</b></label><label><input type="radio" name="flavor" value="Chocolat intense" data-c="#5e3a2a,#8a5a3c,#3d2a1e"><span class="swatch" style="background:#5e3a2a"></span><b>Chocolat</b></label><label><input type="radio" name="flavor" value="Pistache-framboise" data-c="#a8c686,#f7d6e0,#5f7a4a"><span class="swatch" style="background:#a8c686"></span><b>Pistache</b></label><label><input type="radio" name="flavor" value="Vanille-caramel" data-c="#f3e3c3,#e8c98f,#b5672a"><span class="swatch" style="background:#e8c98f"></span><b>Vanille</b></label><label><input type="radio" name="flavor" value="Citron meringué" data-c="#fff1a8,#ffffff,#f2c94c"><span class="swatch" style="background:#fff1a8"></span><b>Citron</b></label></div>
+        <span class="lbl">Options</span>
+        <div class="opts"><label><input type="checkbox" name="opt" value="Bougies" data-p="2"><b>Bougies</b><small>+2 €</small></label><label><input type="checkbox" name="opt" value="Sans gluten" data-p="4"><b>Sans gluten</b><small>+4 €</small></label><label><input type="checkbox" name="opt" value="Décor fleurs" data-p="6"><b>Décor fleurs</b><small>+6 €</small></label></div>
+        <label class="lbl" for="cakeMsg">Message sur le gâteau <span style="font-weight:400;color:var(--muted)">(30 caractères max)</span></label>
+        <input class="cake-msg" id="cakeMsg" maxlength="30" placeholder="Joyeux anniversaire Léo !">
+      </div>
+      <div class="tabp" data-tab="vienn">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:12px">Tarif dégressif : -10 % dès 20 pièces, -15 % dès 50.</p>
+        <div class="qty-list" id="viennList"></div>
+      </div>
+      <form name="precommande-boulangerie" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" class="pre-form" novalidate>
+        <input type="hidden" name="form-name" value="precommande-boulangerie"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="commande" id="fOrder"><input type="hidden" name="total" id="fTotal">
+        <div class="row2"><div class="field"><label for="date">Date de retrait</label><input type="date" id="date" name="date_retrait" required></div><div class="field"><label for="heure">Heure</label><select id="heure" name="heure_retrait"><option>8:00</option><option>9:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>15:00</option><option>17:00</option><option>18:30</option></select></div></div>
+        <div class="row2"><div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required placeholder="Famille Martin"></div><div class="field"><label for="tel">Téléphone</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div>
+        <button type="submit" class="btn btn-crust" id="submit">Valider la précommande</button>
+      </form>
+      <div class="done hidden" id="done"><h3>Précommande enregistrée</h3><div class="ref" id="doneRef"></div><p id="doneText" style="font-size:14px"></p><button class="btn btn-cocoa" style="margin-top:14px" id="again">Nouvelle précommande</button></div>
+    </div>
+    <aside class="preview" data-reveal="right">
+      <div class="cake-view">
+        <div class="cake" id="cake"><div class="plate"></div><div class="layer l1"></div><div class="layer l2"></div><div class="layer l3"></div><div class="candle hidden" id="candle"></div><div class="msg" id="cakeMsgView">Joyeux anniversaire !</div></div>
+        <div class="sum" id="sum"></div>
+      </div>
+    </aside>
+  </div>
+</div></section>
+
+<section id="avis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Les habitués</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le fraisier commandé en ligne pour les 6 ans de ma fille était magnifique, message écrit à la main. Et bon !</p><footer>Claire B. · Côte Pavée</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Je regarde les horaires de fournée le matin pour avoir la tourte encore tiède. Le meilleur pain du quartier.</p><footer>Gérard P. · Guilheméry</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>60 croissants pour le petit-déj' du bureau, commandés la veille, prêts à 8 h pile. Merci !</p><footer>Agence Nova · Montaudran</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:760px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Quel délai pour un gâteau personnalisé ?</summary><p>48 h minimum. Pour un gâteau de 20 personnes ou un décor spécifique, comptez 4 jours.</p></details>
+    <details><summary>Faut-il payer en ligne ?</summary><p>Non, vous réglez en boutique au retrait. Pour les commandes de plus de 100 €, un acompte de 30 % est demandé par téléphone.</p></details>
+    <details><summary>Faites-vous des produits sans gluten ?</summary><p>Oui, une gamme de gâteaux sans gluten (option dans le configurateur) et le pain de sarrasin le samedi. Attention : notre fournil manipule du gluten.</p></details>
+    <details><summary>Livrez-vous ?</summary><p>Pas de livraison aux particuliers. Pour les entreprises du quartier, livraison offerte dès 40 €.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,42px);margin:8px 0 14px">Avenue Camille Pujol</h2><address><strong>Maison Fournil</strong><br>41 avenue Camille Pujol, 31500 Toulouse<br>Bus L1 · arrêt Côte Pavée<br><a href="tel:+33561340522">05 61 34 05 22</a> · <a href="mailto:bonjour@maisonfournil.fr">bonjour@maisonfournil.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=41+avenue+Camille+Pujol+31500+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4600%2C43.5945%2C1.4760%2C43.6025&layer=mapnik&marker=43.5985%2C1.4680"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Maison Fournil — SARL Fournil Pujol</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SARL Fournil Pujol, 41 avenue Camille Pujol, 31500 Toulouse. SIRET 878 901 234 00017. Directrice de publication : Anaïs Roumégoux. Hébergement : Netlify, Inc. Les données de précommande servent à préparer votre commande ; conservation 6 mois. Site de démonstration : entreprise fictive.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561340522">📞 Appeler</a><a href="#precommande">Précommander</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, pad, isoDate, fmtDate, cap, uid, store, toast, validate, sendNetlify } = Demo;
+  /* Horaires & fournées */
+  const OPEN = { 0: [7, 13], 2: [6.5, 19.5], 3: [6.5, 19.5], 4: [6.5, 19.5], 5: [6.5, 19.5], 6: [6.5, 19.5] };
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const now = new Date(); const dow = now.getDay(); const h = now.getHours() + now.getMinutes() / 60;
+  const fmt = (x) => `${Math.floor(x)}h${pad(Math.round((x % 1) * 60))}`;
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${OPEN[i] ? fmt(OPEN[i][0]) + ' – ' + fmt(OPEN[i][1]) : 'Fermé'}</span></div>`).join('');
+  const open = OPEN[dow] && h >= OPEN[dow][0] && h < OPEN[dow][1];
+  const live = $('#liveStatus'); live.classList.toggle('closed', !open);
+  let nextTxt = '';
+  if (open) nextTxt = `Ouvert jusqu'à ${fmt(OPEN[dow][1])}`; else if (OPEN[dow] && h < OPEN[dow][0]) nextTxt = `Ouverture à ${fmt(OPEN[dow][0])}`; else { for (let i = 1; i <= 7; i++) { const d = (dow + i) % 7; if (OPEN[d]) { nextTxt = `Réouverture ${i === 1 ? 'demain' : names[d].toLowerCase()} à ${fmt(OPEN[d][0])}`; break; } } }
+  live.innerHTML = `<i></i>${open ? 'Ouvert en ce moment' : 'Fermé'} · ${nextTxt}`; $('#nextOpen').textContent = nextTxt + '.';
+  const FOURNEES = [[6.5, 'Baguettes tradition', 'Première fournée'], [7, 'Croissants & pains au chocolat', 'Pur beurre, sortis chauds'], [8.5, 'Tourtes de meule', 'Levain, cuisson lente'], [10, 'Pains spéciaux', 'Seigle, graines, sarrasin'], [11.5, 'Baguettes tradition', 'Deuxième fournée'], [16, 'Baguettes & viennoiseries', 'Fournée du goûter'], [17.5, 'Pains de campagne', 'Dernière fournée']];
+  $('#fournees').innerHTML = FOURNEES.map((f) => { const st = !OPEN[dow] ? 'fermé' : h >= f[0] + 1 ? 'past' : h >= f[0] - 0.5 ? 'now' : 'todo'; return `<div class="fournee ${st}"><span class="t">${fmt(f[0])}</span><span class="nm">${f[1]}<small>${f[2]}</small></span><span class="st">${st === 'past' ? 'Sortie' : st === 'now' ? 'En cours · sortie imminente' : st === 'todo' ? 'À venir' : 'Demain'}</span></div>`; }).join('');
+
+  /* Configurateur */
+  const VIENN = [['Croissant', 1.3], ['Pain au chocolat', 1.4], ['Pain aux raisins', 1.6], ['Chausson aux pommes', 1.9], ['Brioche individuelle', 1.5], ['Baguette tradition', 1.25]];
+  const SIZE_PRICE = { 4: 24, 8: 38, 12: 54, 20: 72 };
+  let tab = 'cake'; const qty = store.get('fournil:vienn', {});
+  $('#viennList').innerHTML = VIENN.map((v, i) => `<div class="qty"><span class="nm">${v[0]}<small>${euro(v[1])} pièce</small></span><span class="c"><button type="button" data-q="${i}:-1" aria-label="Moins">−</button><output id="q${i}">${qty[i] || 0}</output><button type="button" data-q="${i}:1" aria-label="Plus">+</button></span></div>`).join('');
+  $$('[data-q]').forEach((b) => b.addEventListener('click', () => { const [i, d] = b.dataset.q.split(':').map(Number); qty[i] = Math.max(0, (qty[i] || 0) + d); $('#q' + i).value = qty[i]; store.set('fournil:vienn', qty); render(); }));
+  $$('.tabs button').forEach((b) => b.addEventListener('click', () => { tab = b.dataset.tab; $$('.tabs button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); $$('.tabp').forEach((p) => p.classList.toggle('active', p.dataset.tab === tab)); setDateMin(); render(); }));
+  const date = $('#date');
+  function setDateMin() { const d = new Date(); d.setDate(d.getDate() + (tab === 'cake' ? 2 : 1)); date.min = isoDate(d); if (!date.value || date.value < date.min) date.value = isoDate(d); }
+  setDateMin();
+  function cakeTotal() { const size = $('input[name=size]:checked').value; return Number(SIZE_PRICE[size]) + $$('input[name=opt]:checked').reduce((s, o) => s + Number(o.dataset.p), 0); }
+  function viennTotal() { const n = Object.values(qty).reduce((s, q) => s + q, 0); const raw = VIENN.reduce((s, v, i) => s + v[1] * (qty[i] || 0), 0); const disc = n >= 50 ? .15 : n >= 20 ? .1 : 0; return { n, raw, disc, total: raw * (1 - disc) }; }
+  function render() {
+    const sum = $('#sum');
+    if (tab === 'cake') {
+      const fl = $('input[name=flavor]:checked'); const [c1, c2, c3] = fl.dataset.c.split(','); const cake = $('#cake'); cake.style.setProperty('--c1', c1); cake.style.setProperty('--c2', c2); cake.style.setProperty('--c3', c3);
+      const size = $('input[name=size]:checked'); cake.style.width = { 4: '55%', 8: '65%', 12: '75%', 20: '85%' }[size.value];
+      $('#cakeMsgView').textContent = $('#cakeMsg').value || 'Joyeux anniversaire !'; $('#candle').classList.toggle('hidden', !$('input[name=opt][value=Bougies]').checked);
+      const opts = $$('input[name=opt]:checked').map((o) => o.value); cake.classList.remove('hidden');
+      sum.innerHTML = `<div><span>${fl.value} · ${size.parentElement.querySelector('b').textContent}</span><span>${euro(SIZE_PRICE[size.value])}</span></div>${opts.map((o) => `<div><span>${o}</span><span>+${euro(Number($(`input[value="${o}"]`).dataset.p))}</span></div>`).join('')}<div class="tot"><span>Total</span><b>${euro(cakeTotal())}</b></div><p style="font-size:12px;color:var(--muted)">Paiement en boutique au retrait.</p>`;
+      $('#fOrder').value = `Gâteau ${fl.value} ${size.parentElement.querySelector('b').textContent}${opts.length ? ' + ' + opts.join(', ') : ''}${$('#cakeMsg').value ? ' — « ' + $('#cakeMsg').value + ' »' : ''}`; $('#fTotal').value = euro(cakeTotal());
+    } else {
+      const t = viennTotal(); $('#cake').classList.add('hidden');
+      sum.innerHTML = (t.n ? VIENN.map((v, i) => qty[i] ? `<div><span>${qty[i]} × ${v[0]}</span><span>${euro(v[1] * qty[i])}</span></div>` : '').join('') + (t.disc ? `<div style="color:#166534"><span>Remise quantité −${t.disc * 100} %</span><span>−${euro(t.raw * t.disc)}</span></div>` : '') : '<p style="color:var(--muted)">Ajoutez des viennoiseries.</p>') + `<div class="tot"><span>Total (${t.n} pièces)</span><b>${euro(t.total)}</b></div>`;
+      $('#fOrder').value = VIENN.map((v, i) => qty[i] ? `${qty[i]} ${v[0]}` : '').filter(Boolean).join(', '); $('#fTotal').value = euro(t.total);
+    }
+  }
+  $$('.cfg input').forEach((i) => i.addEventListener('input', render)); $('#cakeMsg').addEventListener('input', render);
+  $('#form').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    if (tab === 'vienn' && !viennTotal().n) { toast('Ajoutez au moins une viennoiserie.', 'err'); return; }
+    if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    if (new Date(date.value + 'T12:00:00').getDay() === 1) { Demo.setError(date, 'Fermé le lundi, choisissez un autre jour.'); return; }
+    const btn = $('#submit'); btn.disabled = true; btn.textContent = 'Envoi…';
+    const ref = uid('MF-'); await sendNetlify(f, { reference: ref });
+    store.set('fournil:commandes', [...store.get('fournil:commandes', []), { ref, order: $('#fOrder').value, total: $('#fTotal').value, date: date.value, heure: $('#heure').value }]);
+    $('#doneRef').textContent = 'Réf. ' + ref; $('#doneText').textContent = `${$('#fOrder').value} · ${$('#fTotal').value}. À retirer le ${fmtDate(new Date(date.value + 'T12:00:00'))} à ${$('#heure').value}. Confirmation par SMS au ${f.tel.value}.`;
+    f.classList.add('hidden'); $('#done').classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Valider la précommande'; toast('Précommande enregistrée', 'ok');
+    if (tab === 'vienn') { Object.keys(qty).forEach((k) => { qty[k] = 0; $('#q' + k).value = 0; }); store.set('fournil:vienn', qty); }
+  });
+  $('#again').addEventListener('click', () => { $('#form').reset(); setDateMin(); $('#form').classList.remove('hidden'); $('#done').classList.add('hidden'); render(); });
+  render();
+})();
+</script>
+</body>
+</html>
