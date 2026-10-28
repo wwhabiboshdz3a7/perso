@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lab — Motion Lab, typographie cinétique</title>
+<meta name="description" content="Vingt-cinq effets de typographie cinétique isolés, plein écran, réglables : split, scramble, 3D, ressorts, polices variables, particules, shaders, split-flap, Lorenz, Fibonacci.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,100..900;1,50..150,100..900&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&family=Roboto+Flex:opsz,slnt,wdth,wght,GRAD@8..144,-10..0,25..151,100..1000,-200..150&display=swap">
+<link rel="stylesheet" href="../assets/kinetic.css">
+<link rel="stylesheet" href="../assets/lab/lab.css">
+</head>
+<body class="lab-index">
+<header class="top-nav">
+  <a href="../">← Showreel</a>
+  <nav aria-label="Sections"><a href="./" aria-current="page">Lab</a><a href="../maths/">Labo maths</a></nav>
+</header>
+<main>
+  <section class="lab-head">
+    <span class="tag">25 effets · plein écran · réglables</span>
+    <h1><span class="w">Lab</span> <em>de la lettre</em></h1>
+    <p>Chaque effet du showreel, isolé, démonté, à essayer avec <strong>votre propre texte</strong>. Changez la vitesse, la couleur, rejouez. Le nom de la technique est indiqué sur chaque page.</p>
+  </section>
+  <div class="grid" id="grid"></div>
+</main>
+<footer class="lab-foot">
+  <span>Motion Lab — typographie cinétique, Toulouse</span>
+  <span><a href="../">Showreel</a> · <a href="../maths/">Labo maths</a></span>
+</footer>
+<div class="grain" aria-hidden="true"></div>
+<script src="../vendor/gsap/gsap.min.js"></script>
+<script src="../vendor/gsap/SplitText.min.js"></script>
+<script>gsap.registerPlugin(SplitText);</script>
+<script type="module" src="../assets/lab/grid.js"></script>
+</body>
+</html>

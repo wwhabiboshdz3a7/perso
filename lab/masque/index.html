@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masque vivant — Lab · Motion Lab</title>
+<meta name="description" content="Masque vivant : effet de typographie cinétique isolé (mix-blend-mode · canvas animé). Texte, vitesse et couleur réglables.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,100..900;1,50..150,100..900&family=Big+Shoulders+Display:wght@100..900&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&family=Roboto+Flex:opsz,slnt,wdth,wght,GRAD@8..144,-10..0,25..151,100..1000,-200..150&display=swap">
+<link rel="stylesheet" href="../../assets/kinetic.css">
+<link rel="stylesheet" href="../../assets/lab/lab.css">
+</head>
+<body class="lab-page">
+<main class="stage" id="stage"><p class="fallback-text">Masque vivant — mix-blend-mode · canvas animé</p></main>
+<noscript><p class="fallback-text">Cet effet a besoin de JavaScript.</p></noscript>
+<script src="../../vendor/gsap/gsap.min.js"></script>
+<script src="../../vendor/gsap/SplitText.min.js"></script>
+<script src="../../vendor/gsap/ScrambleTextPlugin.min.js"></script>
+<script src="../../vendor/gsap/CustomEase.min.js"></script>
+<script>gsap.registerPlugin(SplitText, ScrambleTextPlugin, CustomEase);</script>
+<script type="module">import { boot } from '../../assets/lab/page.js'; boot('masque');</script>
+</body>
+</html>

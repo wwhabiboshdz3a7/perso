@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Motion Lab — Le texte n’est plus posé</title>
+<meta name="description" content="Showreel de typographie cinétique : quinze scènes plein écran où le texte bouge, respire et réagit au défilement et au pointeur.">
+<meta name="theme-color" content="#0a0a0b">
+<meta property="og:title" content="Motion Lab — Le texte n’est plus posé">
+<meta property="og:description" content="Un manifeste en quinze mouvements sur la typographie cinétique.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,100..900;1,50..150,100..900&family=Big+Shoulders+Display:wght@100..900&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&family=Roboto+Flex:opsz,slnt,wdth,wght,GRAD@8..144,-10..0,25..151,100..1000,-200..150&display=swap">
+<link rel="stylesheet" href="vendor/lenis/lenis.css">
+<link rel="stylesheet" href="assets/kinetic.css">
+<link rel="stylesheet" href="assets/reel.css">
+<script>document.documentElement.classList.add('js'); if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('rm');</script>
+</head>
+<body>
+
+<a class="skip" href="#s15">Aller à la fin du showreel</a>
+
+<!-- Préchargement -->
+<div class="loader" aria-hidden="true">
+  <div class="loader__count mono"><span class="loader__n">000</span></div>
+  <div class="loader__word">Motion<em>Lab</em></div>
+  <div class="loader__bar"><i></i></div>
+</div>
+
+<!-- Interface fixe -->
+<header class="hud">
+  <a class="hud__brand" href="#s01" data-goto="0" aria-label="Motion Lab, retour au début"><b>Motion</b><span>Lab</span></a>
+  <div class="hud__scene mono" aria-live="off"><span class="hud__num">01</span><span class="hud__sep">—</span><span class="hud__name">Ouverture</span></div>
+  <button class="hud__menu" type="button" aria-expanded="false" aria-controls="menu"><span class="hud__menu-l">Menu</span><span class="hud__menu-ico" aria-hidden="true"><i></i><i></i></span></button>
+</header>
+<div class="hud__foot" aria-hidden="true">
+  <div class="hud__count mono"><span class="hud__cur">01</span><span>/</span><span class="hud__tot">15</span></div>
+  <div class="hud__hint mono">Défilez <span class="hud__arrow">↓</span></div>
+</div>
+<div class="progress" aria-hidden="true"><i></i></div>
+
+<nav class="menu" id="menu" aria-label="Scènes du showreel" hidden>
+  <div class="menu__bg"></div>
+  <div class="menu__in">
+    <ol class="menu__list"></ol>
+    <div class="menu__side">
+      <p class="mono menu__k">Ailleurs</p>
+      <a class="menu__big" href="lab/"><span>Le Lab</span><small>25 effets isolés, réglables</small></a>
+      <a class="menu__big" href="maths/"><span>Labo maths</span><small>10 sites animés par des équations</small></a>
+      <p class="menu__note">Showreel de typographie cinétique — Motion Lab, Toulouse.</p>
+    </div>
+  </div>
+</nav>
+
+<main class="reel">
+
+  <!-- 01 — Ouverture -->
+  <section class="sc tone-dark" id="s01" data-name="Ouverture" data-len="1.3">
+    <div class="sc__pin">
+      <div class="s1">
+        <p class="kick mono"><span>Motion Lab</span><span>Manifeste en quinze mouvements</span></p>
+        <h1 class="s1__t" aria-label="Le texte n’est plus posé.">
+          <span class="s1__l" data-w="70">Le texte</span>
+          <span class="s1__l" data-w="118">n’est plus</span>
+          <span class="s1__l s1__l--a" data-w="150">posé.</span>
+        </h1>
+        <p class="s1__sub">Il bouge, il respire, il réagit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 — Il bouge -->
+  <section class="sc tone-dark" id="s02" data-name="Il bouge" data-len="1.4" data-in="clip">
+    <div class="sc__pin">
+      <div class="stage s2__stage"></div>
+      <div class="cap"><span class="cap__n mono">02</span><p>Il bouge. <em>Graisse, chasse, inclinaison : chaque lettre ondule sur ses axes.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 03 — Il respire -->
+  <section class="sc tone-dark" id="s03" data-name="Il respire" data-len="2" data-in="circle">
+    <div class="sc__pin">
+      <div class="s3">
+        <div class="s3__lines">
+          <div class="s3__row"><span class="s3__i mono">01</span><span class="s3__m"><span class="s3__l">Il inspire,</span></span></div>
+          <div class="s3__row"><span class="s3__i mono">02</span><span class="s3__m"><span class="s3__l s3__l--a">il prend du poids,</span></span></div>
+          <div class="s3__row"><span class="s3__i mono">03</span><span class="s3__m"><span class="s3__l">il retient son souffle</span></span></div>
+          <div class="s3__row"><span class="s3__i mono">04</span><span class="s3__m"><span class="s3__l s3__l--o">puis il relâche</span></span></div>
+          <div class="s3__row"><span class="s3__i mono">05</span><span class="s3__m"><span class="s3__l">tout, d’un coup.</span></span></div>
+        </div>
+      </div>
+      <div class="cap"><span class="cap__n mono">03</span><p>Il respire. <em>Une police variable, c’est un poumon : de 100 à 900 en une inspiration.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 04 — Décodage -->
+  <section class="sc tone-dark" id="s04" data-name="Décodage" data-len="1.6" data-in="wipe">
+    <div class="sc__pin">
+      <canvas class="s4__rain" aria-hidden="true"></canvas>
+      <div class="s4">
+        <div class="s4__log mono" aria-hidden="true"></div>
+        <h2 class="s4__words mono" aria-label="Signal, bruit, sens.">
+          <span class="s4__w" data-t="SIGNAL">SIGNAL</span>
+          <span class="s4__w" data-t="BRUIT">BRUIT</span>
+          <span class="s4__w s4__w--a" data-t="SENS.">SENS.</span>
+        </h2>
+      </div>
+      <div class="cap"><span class="cap__n mono">04</span><p>Il se décode. <em>Le sens n’arrive pas d’un bloc : il se calcule, lettre après lettre.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 05 — Élan -->
+  <section class="sc tone-dark" id="s05" data-name="Élan" data-len="1.2" data-in="clip">
+    <div class="sc__pin">
+      <div class="s5"></div>
+      <div class="cap cap--top"><span class="cap__n mono">05</span><p>Il prend de l’élan. <em>Défilez vite : les bandes accélèrent et se penchent.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 06 — Lecture -->
+  <section class="sc tone-light" id="s06" data-name="Lecture" data-len="2" data-in="circle">
+    <div class="sc__pin">
+      <div class="s6">
+        <p class="s6__p">On ne lit plus une page, on la traverse. Chaque mot s’allume à l’instant exact où le regard l’atteint&nbsp;: la typographie devient un tempo, et le défilement, une baguette de chef d’orchestre.</p>
+      </div>
+      <div class="cap"><span class="cap__n mono">06</span><p>Il se lit. <em>Au rythme de votre pouce.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 07 — Rotation -->
+  <section class="sc tone-dark" id="s07" data-name="Rotation" data-len="1.6" data-in="wipe">
+    <div class="sc__pin">
+      <div class="stage s7__stage"></div>
+      <div class="cap"><span class="cap__n mono">07</span><p>Il tourne. <em>Trois anneaux de lettres en vraie 3D CSS, entraînés par le défilement.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 08 — Il réagit -->
+  <section class="sc tone-dark" id="s08" data-name="Il réagit" data-len="1.1" data-in="clip">
+    <div class="sc__pin">
+      <div class="stage s8__stage"></div>
+      <div class="cap"><span class="cap__n mono">08</span><p>Il réagit. <em class="s8__hint">Approchez la souris : chaque lettre est un ressort.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 09 — Poussière -->
+  <section class="sc tone-dark" id="s09" data-name="Poussière" data-len="2" data-in="circle">
+    <div class="sc__pin">
+      <canvas class="s9__cv" role="img" aria-label="Le mot défait se disperse en particules puis se reforme en refait."></canvas>
+      <div class="s9__fb" aria-hidden="true">Défait · Refait</div>
+      <div class="cap"><span class="cap__n mono">09</span><p>Il se défait<span class="s9__dots">…</span> <em>et se refait. Des milliers de pixels échantillonnés, rappelés par des ressorts.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 10 — Trouble -->
+  <section class="sc tone-dark" id="s10" data-name="Trouble" data-len="1.1" data-in="wipe">
+    <div class="sc__pin">
+      <div class="stage s10__stage"></div>
+      <div class="cap"><span class="cap__n mono">10</span><p>Il se trouble. <em>Un shader déforme le texte : bougez, défilez, il bave ses couleurs.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 11 — Lumière -->
+  <section class="sc tone-dark" id="s11" data-name="Lumière" data-len="1.8" data-in="clip">
+    <div class="sc__pin">
+      <div class="s11">
+        <canvas class="s11__cv" aria-hidden="true"></canvas>
+        <div class="s11__cover"><h2 class="s11__t">Lumière</h2></div>
+      </div>
+      <div class="cap"><span class="cap__n mono">11</span><p>Il laisse passer la lumière. <em>Les lettres deviennent des fenêtres… puis tout le mur.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 12 — Chiffres -->
+  <section class="sc tone-hot" id="s12" data-name="Chiffres" data-len="1.6" data-in="circle">
+    <div class="sc__pin">
+      <div class="s12">
+        <div class="s12__item"><div class="s12__n" data-v="060">000</div><p>images par seconde, l’objectif de chaque scène</p></div>
+        <div class="s12__item"><div class="s12__n" data-v="025">000</div><p>effets isolés dans le lab, à essayer avec vos mots</p></div>
+        <div class="s12__item"><div class="s12__n" data-v="015">000</div><p>scènes dans ce showreel</p></div>
+        <div class="s12__item"><div class="s12__n" data-v="000">999</div><p>image de banque, vidéo ou photo&nbsp;: tout est du texte</p></div>
+      </div>
+      <div class="cap"><span class="cap__n mono">12</span><p>Il compte. <em>Les chiffres roulent comme un compteur kilométrique.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 13 — Gravité -->
+  <section class="sc tone-light" id="s13" data-name="Gravité" data-len="1.3" data-in="wipe">
+    <div class="sc__pin">
+      <div class="s13" role="img" aria-label="Des mots tombent et s’empilent : tout ce qui monte finit par retomber, même les mots."></div>
+      <div class="cap cap--top"><span class="cap__n mono">13</span><p>Il pèse. <em class="s13__hint">Attrapez un mot, lancez-le.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 14 — Chaos -->
+  <section class="sc tone-dark" id="s14" data-name="Chaos" data-len="1.5" data-in="circle">
+    <div class="sc__pin">
+      <canvas class="s14__cv" role="img" aria-label="Des lettres tracent l’attracteur de Lorenz."></canvas>
+      <div class="s14">
+        <h2 class="s14__t">Même le chaos<br><em>a une forme.</em></h2>
+        <p>Les lettres suivent l’attracteur de Lorenz&nbsp;: trois équations, aucune répétition, toujours le même papillon.</p>
+        <a class="pill" href="maths/">Ouvrir le Labo maths <span class="arrow">→</span></a>
+      </div>
+      <div class="cap"><span class="cap__n mono">14</span><p>Il obéit aux maths. <em>σ = 10, ρ = 28, β = 8/3.</em></p></div>
+    </div>
+  </section>
+
+  <!-- 15 — Motion -->
+  <section class="sc tone-dark sc--last" id="s15" data-name="Motion" data-len="1.6" data-in="clip">
+    <div class="sc__pin">
+      <div class="s15__final">
+        <div class="s15__board"></div>
+        <p class="s15__type"><span class="s15__typed"></span><span class="s15__cur"></span></p>
+        <div class="s15__cta">
+          <a class="pill" href="lab/">Entrer dans le Lab <span class="arrow">→</span></a>
+          <a class="pill pill--ghost" href="maths/">Labo maths</a>
+          <button class="pill pill--ghost s15__top" type="button">Revoir depuis le début ↑</button>
+        </div>
+      </div>
+      <div class="s15__word" aria-hidden="true"><h2 class="s15__w">M<svg class="s15__o" viewBox="0 0 100 100"><circle cx="50" cy="50" r="43.5" stroke-width="13"/></svg>tion</h2></div>
+      <div class="cap"><span class="cap__n mono">15</span><p>Tout commence par un O. <em>Entrez dedans.</em></p></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__big">Le texte n’est plus posé.</div>
+  <div class="foot__row mono"><span>Motion Lab — Toulouse</span><span><a href="lab/">Lab</a> · <a href="maths/">Labo maths</a></span></div>
+</footer>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/gsap/SplitText.min.js"></script>
+<script src="vendor/gsap/ScrambleTextPlugin.min.js"></script>
+<script src="vendor/gsap/CustomEase.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
+<script>gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin, CustomEase);</script>
+<script type="module" src="assets/reel.js"></script>
+</body>
+</html>
