@@ -96,6 +96,7 @@ async function router() {
   const hash = location.hash.replace(/^#/, '') || '/';
   const id = ++navId;
   $('#topbar').classList.remove('menu-open');
+  if (!hash.startsWith('/recherche')) $('#searchInput').value = '';
   $$('.topnav a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + hash.split('/').slice(0, 2).join('/')));
   for (const [re, fn] of routes) {
     const m = hash.match(re);
@@ -369,7 +370,7 @@ function exerciceSortie(ex, zone, h) {
     z.innerHTML = `<div class="split"><div><h4>Ta version</h4><pre><code class="language-${lang}">${esc(editeur.get())}</code></pre></div><div><h4>Solution de référence</h4><pre><code class="language-${lang}">${esc(ex.solution)}</code></pre></div></div>
       ${ex.sortieAttendue !== undefined ? `<h4>Sortie attendue du programme</h4><pre>${esc(ex.sortieAttendue)}</pre>` : ''}
       ${ex.explication ? `<div class="callout info">${ex.explication}</div>` : ''}
-      <h4>Question de vérification</h4><div class="quiz"><div class="q"><p class="qt">${ex.verification.question}</p>${ex.verification.options.map((o, i) => `<label><input type="radio" name="verif" value="${i}"> <span>${o}</span></label>`).join('')}</div><button class="btn primary valid" type="button">Valider</button></div>`;
+      <h4>Question de vérification</h4><div class="quiz"><div class="q"><p class="qt">${ex.verification.question}</p>${ex.verification.options.map((o, i) => `<label><input type="radio" name="verif" value="${i}"> <span>${esc(o)}</span></label>`).join('')}</div><button class="btn primary valid" type="button">Valider</button></div>`;
     colorer(z);
     $('.valid', z).addEventListener('click', () => {
       const c = $('input[name=verif]:checked', z);
@@ -410,7 +411,7 @@ function exerciceTrous(ex, zone, h) {
 }
 
 function exerciceQCM(ex, zone, h) {
-  zone.innerHTML = `<div class="quiz"><div class="q">${ex.options.map((o, i) => `<label><input type="${ex.multiple ? 'checkbox' : 'radio'}" name="qcm" value="${i}"> <span>${o}</span></label>`).join('')}</div><button class="btn primary valid" type="button">Valider</button></div>`;
+  zone.innerHTML = `<div class="quiz"><div class="q">${ex.options.map((o, i) => `<label><input type="${ex.multiple ? 'checkbox' : 'radio'}" name="qcm" value="${i}"> <span>${esc(o)}</span></label>`).join('')}</div><button class="btn primary valid" type="button">Valider</button></div>`;
   $('.valid', zone).addEventListener('click', () => {
     const choisis = $$('input[name=qcm]:checked', zone).map(c => +c.value);
     if (!choisis.length) return toast('Choisis au moins une réponse.');
@@ -433,7 +434,7 @@ function exerciceTexte(ex, zone, h) {
     const t = ta.value;
     let ok = true, msg = '';
     if (ex.criteres) {
-      $$('.criteres li', zone).forEach((li, i) => { const c = ex.criteres[i]; const r = c.re ? c.re.test(t) : c.verif(t); li.classList.toggle('ok', !!r); li.querySelector('.m').textContent = r ? '✓' : ''; if (!r) ok = false; });
+      $$('.criteres li', zone).forEach((li, i) => { const c = ex.criteres[i]; let r = false; try { r = c.re ? c.re.test(t) : c.verif(t); } catch { r = false; } li.classList.toggle('ok', !!r); li.querySelector('.m').textContent = r ? '✓' : ''; if (!r) ok = false; });
       if (!ok) msg = 'Certains critères ne sont pas encore remplis (voir la liste).';
     }
     if (ex.verif) { const r = ex.verif(t.trim()); if (r !== true) { ok = false; msg = typeof r === 'string' ? r : (msg || 'Réponse incorrecte.'); } }
@@ -451,7 +452,7 @@ function exerciceTexte(ex, zone, h) {
 function rendreQuiz(quiz, cle, cont, onFait) {
   const ancien = progression.quiz(cle);
   cont.innerHTML = `<section class="block quiz" aria-label="Quiz"><header>🎯 Quiz de la leçon<span class="tag">${quiz.length} questions${ancien ? ` · meilleur score ${ancien.score}/${ancien.total}` : ''}</span></header><div class="body">
-    ${quiz.map((q, qi) => `<div class="q"><p class="qt">${qi + 1}. ${q.q}</p>${q.options.map((o, i) => `<label><input type="radio" name="q${qi}" value="${i}"> <span>${o}</span></label>`).join('')}<div class="expl" hidden>${q.explication || ''}</div></div>`).join('')}
+    ${quiz.map((q, qi) => `<div class="q"><p class="qt">${qi + 1}. ${q.q}</p>${q.options.map((o, i) => `<label><input type="radio" name="q${qi}" value="${i}"> <span>${esc(o)}</span></label>`).join('')}<div class="expl" hidden>${q.explication || ''}</div></div>`).join('')}
     <div class="row"><button class="btn primary corr" type="button">Corriger le quiz</button><span class="quiz-score"></span></div></div></section>`;
   $('.corr', cont).addEventListener('click', () => {
     let score = 0;
