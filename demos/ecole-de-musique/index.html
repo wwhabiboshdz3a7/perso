@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Académie Busca — École de musique à Toulouse Busca, cours tous instruments</title>
+<meta name="description" content="École de musique au Busca, Toulouse : piano, guitare, chant, batterie, violon, éveil musical. Simulez votre tarif, choisissez votre créneau hebdomadaire et réservez un cours d'essai gratuit.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23fdf2d0'/%3E%3Ccircle cx='12' cy='22' r='4' fill='%232b1d3a'/%3E%3Cpath d='M16 22V8l8-2v12' stroke='%232b1d3a' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"MusicSchool","name":"Académie Busca","telephone":"+33561522730","address":{"@type":"PostalAddress","streetAddress":"27 rue du Japon","addressLocality":"Toulouse","postalCode":"31400","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.5880,"longitude":1.4500},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"14:00","closes":"21:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"18:00"}],"url":"https://example.com/demos/ecole-de-musique/"}
+</script>
+<style>
+:root{--plum:#2b1d3a;--plum-l:#4a3463;--gold:#f2b134;--cream:#fdf2d0;--coral:#e4573d;--ink:#2b1d3a;--muted:#6f6680;--bg:#fffaf0;--accent:var(--plum);--focus:var(--coral);--border:#e9dfd0;--radius:14px;--ph:linear-gradient(135deg,#f2b134,#2b1d3a);--mb-bg:#e4573d;--mb-bg2:#2b1d3a}
+body{font-family:"PT Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:"Abril Fatface",Georgia,serif;font-weight:400;line-height:1.05}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-coral{background:var(--coral);color:#fff}.btn-coral:hover{background:#c8452d;transform:translateY(-2px)}
+.btn-plum{background:var(--plum);color:#fff}.btn-plum:hover{background:var(--plum-l)}
+.btn-line{border:2px solid var(--plum);color:var(--plum)}.btn-line:hover{background:var(--plum);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,250,240,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-family:"Abril Fatface";font-size:24px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{font-style:normal;width:36px;height:36px;border-radius:50%;background:var(--gold);display:grid;place-items:center;font-size:18px}
+.nav{display:flex;gap:24px;align-items:center;font-weight:700;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--coral)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:72px 0 0;background:var(--bg);flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--plum);color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"♪ ♫ ♩ ♬";position:absolute;right:-10px;top:10px;font-size:140px;opacity:.08;font-family:serif;letter-spacing:20px;line-height:1}
+.hero .container{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:72px 0;position:relative}
+@media (max-width:880px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(40px,6vw,80px)}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:18px;opacity:.9;max-width:48ch;margin:20px 0 28px}
+.hero .inst{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px}
+.hero .inst span{background:rgba(255,255,255,.1);padding:7px 12px;border-radius:999px;font-size:13px}
+.hero-img .ph{aspect-ratio:1;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;border:8px solid var(--gold);box-shadow:0 30px 60px rgba(0,0,0,.4)}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);font-weight:700}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,50px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+.courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.course{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center;transition:all .25s}
+.course:hover{transform:translateY(-4px);border-color:var(--gold)}
+.course .ic{font-size:40px}
+.course h3{font-size:22px;margin:10px 0 4px}
+.course p{font-size:13px;color:var(--muted)}
+.course .pr{margin-top:10px;font-weight:700;color:var(--coral)}
+/* Inscription */
+.insc{background:var(--cream)}
+.insc-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.insc-grid{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border)}
+@media (max-width:600px){.panel{padding:20px}}
+.lbl{display:block;font-weight:700;font-size:14px;margin:16px 0 8px}
+.lbl:first-child{margin-top:0}
+.seg{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.seg label{border:2px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;font-size:14px;font-weight:700}
+.seg label small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.seg label:has(input:checked){border-color:var(--coral);background:#fff3ef}
+.seg input{position:absolute;opacity:0}
+.week{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.week .d h4{font-size:12px;text-align:center;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;color:var(--muted)}
+.week .d button{display:block;width:100%;padding:7px 2px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:5px;background:#fff;font-weight:700}
+.week .d button[disabled]{opacity:.25;text-decoration:line-through;cursor:not-allowed}
+.week .d button.on{background:var(--plum);color:#fff;border-color:var(--plum)}
+@media (max-width:640px){.week{grid-template-columns:repeat(3,1fr)}}
+.tarif{background:var(--plum);color:#fff;border-radius:20px;padding:28px;position:sticky;top:90px}
+.tarif h3{font-size:22px;margin-bottom:12px}
+.tarif .big{font-family:"Abril Fatface";font-size:52px;color:var(--gold);line-height:1}
+.tarif .big small{font:400 14px "PT Sans";color:rgba(255,255,255,.7)}
+.tarif .lines{display:grid;gap:8px;margin:16px 0;font-size:14px}
+.tarif .lines div{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,.2);padding-bottom:6px}
+.tarif .toggle{display:inline-flex;background:rgba(255,255,255,.1);border-radius:999px;padding:4px;margin-bottom:12px}
+.tarif .toggle button{padding:8px 14px;border-radius:999px;font-weight:700;font-size:13px;color:rgba(255,255,255,.7)}
+.tarif .toggle button[aria-pressed="true"]{background:var(--gold);color:var(--plum)}
+.tarif .note{font-size:12px;opacity:.7}
+.tarif form{display:grid;gap:10px;margin-top:16px}
+.tarif .field label{color:rgba(255,255,255,.8)}.tarif input{background:#3a2a4d;border-color:#5a4a6d;color:#fff}
+.tarif .done{text-align:center;padding:12px 0}
+.tarif .done h4{font-family:"Abril Fatface";font-size:22px;color:var(--gold);margin-bottom:8px}
+.profs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.prof{text-align:center}
+.prof .ph{aspect-ratio:1;border-radius:50%;width:140px;margin:0 auto 12px}
+.prof:nth-child(2) .ph{--ph:linear-gradient(135deg,#e4573d,#2b1d3a)}.prof:nth-child(3) .ph{--ph:linear-gradient(135deg,#fdf2d0,#f2b134)}.prof:nth-child(4) .ph{--ph:linear-gradient(135deg,#6f6680,#2b1d3a)}
+.prof b{display:block;font-size:17px}.prof span{font-size:13px;color:var(--muted)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.review .stars{color:var(--gold);letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:700}
+.faq details{background:#fff;border:1px solid var(--border);border-radius:12px;padding:0 16px;margin-bottom:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:700;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--coral);font-size:20px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:14px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:700;color:var(--coral)}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--cream);border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--plum);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i>♪</i>Académie Busca</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#cours">Cours</a><a href="#inscription">Inscription</a><a href="#profs">Professeurs</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#inscription" class="btn btn-coral">Cours d'essai gratuit</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal style="color:var(--gold)">École de musique · Busca · Toulouse</p>
+    <h1 data-reveal>Jouez enfin le morceau que vous avez <span>dans la tête</span></h1>
+    <p data-reveal>Cours individuels et ateliers collectifs, de 4 à 94 ans, avec des musiciens qui jouent encore sur scène. Choisissez votre instrument, votre créneau hebdomadaire et votre formule : le tarif se calcule tout seul.</p>
+    <div data-reveal><a href="#inscription" class="btn btn-coral">Réserver un cours d'essai</a> <a href="#cours" class="btn btn-line" style="border-color:#fff;color:#fff">Voir les cours</a></div>
+    <div class="inst" data-reveal><span>🎹 Piano</span><span>🎸 Guitare</span><span>🎤 Chant</span><span>🥁 Batterie</span><span>🎻 Violon</span><span>🎷 Saxophone</span><span>👶 Éveil musical</span></div>
+  </div>
+  <div class="hero-img" data-reveal="scale"><div class="ph"><img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=900&q=70" alt="Mains sur un clavier de piano" fetchpriority="high"></div></div>
+</div></section>
+
+<section id="cours"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les cours</p><h2>Un instrument, un prof, un créneau fixe</h2><p>Cours individuels de 30, 45 ou 60 minutes chaque semaine, plus les ateliers collectifs (chorale, groupe pop, musique de chambre) inclus dans l'inscription.</p></div>
+  <div class="courses" id="courses"></div>
+</div></section>
+
+<section class="insc" id="inscription"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Inscription</p><h2>Simulez votre tarif et choisissez votre créneau</h2><p>Le premier cours est un essai gratuit, sans engagement. Réduction famille dès le deuxième inscrit.</p></div>
+  <div class="insc-grid">
+    <div class="panel" data-reveal>
+      <span class="lbl">Instrument</span><div class="seg" id="instSeg"></div>
+      <span class="lbl">Niveau</span><div class="seg"><label><input type="radio" name="niv" value="Débutant" checked>Débutant</label><label><input type="radio" name="niv" value="Intermédiaire">Intermédiaire</label><label><input type="radio" name="niv" value="Avancé">Avancé</label></div>
+      <span class="lbl">Durée du cours hebdomadaire</span><div class="seg"><label><input type="radio" name="dur" value="30" checked>30 min<small>enfants, débutants</small></label><label><input type="radio" name="dur" value="45">45 min<small>le plus choisi</small></label><label><input type="radio" name="dur" value="60">60 min<small>avancés, adultes</small></label></div>
+      <span class="lbl">Âge de l'élève</span><div class="seg"><label><input type="radio" name="age" value="enfant" checked>Enfant<small>4 – 12 ans</small></label><label><input type="radio" name="age" value="ado">Ado<small>13 – 17 ans</small></label><label><input type="radio" name="age" value="adulte">Adulte</label></div>
+      <span class="lbl">Membres de la famille déjà inscrits</span><div class="seg"><label><input type="radio" name="fam" value="0" checked>Aucun</label><label><input type="radio" name="fam" value="1">1<small>−10 %</small></label><label><input type="radio" name="fam" value="2">2 et +<small>−15 %</small></label></div>
+      <span class="lbl">Créneau hebdomadaire <span id="profName" style="font-weight:400;color:var(--muted)"></span></span>
+      <div class="week" id="week"></div>
+    </div>
+    <aside class="tarif" data-reveal="right">
+      <div class="toggle" role="group"><button aria-pressed="true" data-per="annee">Année</button><button aria-pressed="false" data-per="trimestre">Trimestre</button><button aria-pressed="false" data-per="mois">Mensuel</button></div>
+      <h3>Votre tarif</h3>
+      <div class="big" id="price"></div>
+      <div class="lines" id="lines"></div>
+      <p class="note">33 semaines de cours (hors vacances scolaires), ateliers collectifs et auditions inclus. Adhésion annuelle 25 €. Paiement en 10 fois sans frais.</p>
+      <form name="inscription-musique" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate>
+        <input type="hidden" name="form-name" value="inscription-musique"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="cours" id="fCours"><input type="hidden" name="creneau" id="fSlot"><input type="hidden" name="tarif" id="fTarif">
+        <div class="field"><label for="eleve">Nom de l'élève</label><input id="eleve" name="eleve" required></div>
+        <div class="field"><label for="tel">Mobile du responsable</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+        <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required></div>
+        <button type="submit" class="btn btn-coral" id="submit" disabled>Réserver mon cours d'essai gratuit</button>
+      </form>
+      <div class="done hidden" id="done"><h4>Cours d'essai réservé !</h4><p id="doneText" style="font-size:14px;color:rgba(255,255,255,.85)"></p></div>
+    </aside>
+  </div>
+</div></section>
+
+<section id="profs"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les professeurs</p><h2>Des musiciens qui enseignent, pas l'inverse</h2></div>
+  <div class="profs">
+    <div class="prof" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=70" alt="Anaïs, professeure de piano" loading="lazy"></div><b>Anaïs</b><span>Piano · conservatoire de Toulouse</span></div>
+    <div class="prof" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=400&q=70" alt="Léo, professeur de guitare" loading="lazy"></div><b>Léo</b><span>Guitare & basse · tournées rock</span></div>
+    <div class="prof" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?auto=format&fit=crop&w=400&q=70" alt="Maëlle, professeure de chant" loading="lazy"></div><b>Maëlle</b><span>Chant & éveil · jazz vocal</span></div>
+    <div class="prof" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=70" alt="Sami, professeur de batterie" loading="lazy"></div><b>Sami</b><span>Batterie & percussions · studio</span></div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Ils ont trouvé leur rythme</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Ma fille de 7 ans attend son cours de piano avec Anaïs toute la semaine. L'audition de juin était adorable.</p><footer>Claire · Busca</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Reprise de la guitare à 45 ans : Léo m'a fait jouer un morceau entier dès le troisième cours. Le simulateur de tarif m'a décidé.</p><footer>Olivier · Saint-Michel</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Deux enfants inscrits, réduction famille appliquée, créneaux consécutifs le mercredi. Organisation parfaite.</p><footer>Famille Nguyen · Rangueil</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Faut-il posséder son instrument ?</summary><p>Pour le piano et la batterie, non : vous travaillez sur place et nous prêtons claviers et pads pour la maison. Pour les autres, nous proposons la location (dès 15 €/mois) via notre luthier partenaire.</p></details>
+    <details><summary>Peut-on s'inscrire en cours d'année ?</summary><p>Oui, à tout moment : le tarif est calculé au prorata des semaines restantes.</p></details>
+    <details><summary>Que se passe-t-il si je rate un cours ?</summary><p>Prévenez 24 h avant : le cours est rattrapé sur un créneau libre du professeur. Deux rattrapages par trimestre.</p></details>
+    <details><summary>Préparez-vous aux examens et au conservatoire ?</summary><p>Oui : formation musicale incluse et préparation aux concours d'entrée du conservatoire pour les élèves avancés.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Rue du Japon, Busca</h2><div class="hours" id="hours"></div><address><strong>Académie Busca</strong><br>27 rue du Japon, 31400 Toulouse<br>Métro B · Saint-Michel – Marcel Langer · Bus L7<br><a href="tel:+33561522730">05 61 52 27 30</a> · <a href="mailto:contact@academie-busca.fr">contact@academie-busca.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=27+rue+du+Japon+31400+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4420%2C43.5840%2C1.4580%2C43.5920&layer=mapnik&marker=43.5880%2C1.4500"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Académie Busca — Association loi 1901</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">Académie Busca, association loi 1901, 27 rue du Japon, 31400 Toulouse. RNA W313012345. Hébergement : Netlify, Inc. Les données d'inscription servent à organiser le cours d'essai ; conservation 1 an. Site de démonstration : école fictive, tarifs indicatifs.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561522730">📞 Appeler</a><a href="#inscription">Cours d'essai</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, uid, store, toast, validate, sendNetlify } = Demo;
+  const INST = [['Piano', '🎹', 'Anaïs', 'Classique, jazz, pop', 1], ['Guitare', '🎸', 'Léo', 'Acoustique, électrique, basse', 1], ['Chant', '🎤', 'Maëlle', 'Technique vocale, jazz, variété', 1.05], ['Batterie', '🥁', 'Sami', 'Rock, funk, percussions', 1], ['Violon', '🎻', 'Anaïs', 'Classique et trad', 1.1], ['Saxophone', '🎷', 'Léo', 'Jazz, soul', 1.1], ['Éveil musical', '👶', 'Maëlle', 'Dès 4 ans, en petit groupe', .7]];
+  const PROF_DAYS = { 'Anaïs': [1, 2, 3, 6], 'Léo': [2, 4, 5, 6], 'Maëlle': [1, 3, 5, 6], 'Sami': [2, 3, 4, 6] };
+  const DAYS = ['', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  $('#courses').innerHTML = INST.map((i) => `<article class="course" data-reveal><div class="ic">${i[1]}</div><h3>${i[0]}</h3><p>${i[3]}<br>avec ${i[2]}</p><p class="pr">dès ${euro(Math.round(28 * i[4]))} / cours</p></article>`).join('');
+  $('#instSeg').innerHTML = INST.map((i, k) => `<label><input type="radio" name="inst" value="${i[0]}" ${k === 0 ? 'checked' : ''}>${i[1]} ${i[0]}<small>${i[2]}</small></label>`).join('');
+  let period = 'annee', slot = null;
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  function inst() { return INST.find((i) => i[0] === $('input[name=inst]:checked').value); }
+  function renderWeek() {
+    const i = inst(); const prof = i[2]; $('#profName').textContent = `· avec ${prof}`; const dur = Number($('input[name=dur]:checked').value); const age = $('input[name=age]:checked').value;
+    $('#week').innerHTML = [1, 2, 3, 4, 5, 6].map((d) => { const open = PROF_DAYS[prof].includes(d); let btns = ''; if (open) { const start = d === 6 ? 9 : d === 3 ? 13 : 16; const end = d === 6 ? 18 : age === 'enfant' ? 19 : 21; for (let m = start * 60; m + dur <= end * 60; m += dur) { const t = `${String(m / 60 | 0).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; const busy = seeded(prof + d + t) < 0.45 || store.get('busca:insc', []).some((x) => x.prof === prof && x.day === d && x.time === t); btns += `<button type="button" data-slot="${d}|${t}" ${busy ? 'disabled' : ''} ${slot === d + '|' + t ? 'class="on"' : ''}>${t}</button>`; } } return `<div class="d"><h4>${DAYS[d].slice(0, 3)}</h4>${open ? btns : '<p style="font-size:11px;color:var(--muted);text-align:center">—</p>'}</div>`; }).join('');
+    $$('[data-slot]').forEach((b) => b.addEventListener('click', () => { slot = b.dataset.slot; $$('[data-slot]').forEach((x) => x.classList.remove('on')); b.classList.add('on'); calc(); }));
+    if (slot && !$(`[data-slot="${slot}"]:not([disabled])`)) slot = null; calc();
+  }
+  function calc() {
+    const i = inst(); const dur = Number($('input[name=dur]:checked').value); const fam = Number($('input[name=fam]:checked').value); const age = $('input[name=age]:checked').value;
+    const perCourse = Math.round(28 * (dur / 30) * i[4] * (age === 'adulte' ? 1.1 : 1)); const year = perCourse * 33; const disc = fam === 1 ? .1 : fam === 2 ? .15 : 0; const net = year * (1 - disc) + 25;
+    const shown = period === 'annee' ? net : period === 'trimestre' ? net / 3 : net / 10; const lbl = period === 'annee' ? '/ an' : period === 'trimestre' ? '/ trimestre' : '/ mois (10 mensualités)';
+    $('#price').innerHTML = `${euro(shown)}<small> ${lbl}</small>`;
+    $('#lines').innerHTML = `<div><span>${i[0]} ${dur} min × 33 semaines</span><span>${euro(year)}</span></div>${disc ? `<div style="color:var(--gold)"><span>Réduction famille −${disc * 100} %</span><span>−${euro(year * disc)}</span></div>` : ''}<div><span>Adhésion annuelle</span><span>${euro(25)}</span></div><div><span>Soit par cours</span><span>${euro(net / 33)}</span></div>${slot ? `<div><span>Créneau</span><span>${DAYS[Number(slot.split('|')[0])]} ${slot.split('|')[1]}</span></div>` : ''}`;
+    $('#fCours').value = `${i[0]} ${dur} min · ${$('input[name=niv]:checked').value} · ${age}`; $('#fSlot').value = slot ? `${DAYS[Number(slot.split('|')[0])]} ${slot.split('|')[1]} avec ${i[2]}` : ''; $('#fTarif').value = euro(net) + ' / an';
+    $('#submit').disabled = !slot; store.set('busca:simu', { inst: i[0], dur, fam, age, period });
+  }
+  $$('input[name=inst], input[name=dur], input[name=age]').forEach((r) => r.addEventListener('change', () => { slot = null; renderWeek(); }));
+  $$('input[name=fam], input[name=niv]').forEach((r) => r.addEventListener('change', calc));
+  $$('.toggle button').forEach((b) => b.addEventListener('click', () => { period = b.dataset.per; $$('.toggle button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); calc(); }));
+  renderWeek();
+  $('#form').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } const btn = $('#submit'); btn.disabled = true; btn.textContent = 'Envoi…'; const ref = uid('AB-'); await sendNetlify(f, { reference: ref }); const [d, t] = slot.split('|'); store.set('busca:insc', [...store.get('busca:insc', []), { ref, prof: inst()[2], day: Number(d), time: t, eleve: f.eleve.value }]); $('#doneText').textContent = `${f.eleve.value} est attendu·e pour un cours d'essai de ${inst()[0].toLowerCase()} avec ${inst()[2]}, ${DAYS[Number(d)].toLowerCase()} à ${t}. Référence ${ref}. Le créneau est bloqué 7 jours, le temps de décider.`; f.classList.add('hidden'); $('#done').classList.remove('hidden'); toast('Cours d\'essai réservé', 'ok'); });
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Fermé' : i === 6 ? '9:00 – 18:00' : i === 3 ? '13:00 – 21:00' : '14:00 – 21:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>
