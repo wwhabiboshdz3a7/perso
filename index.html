@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion Lab — Sites vitrines animés par les mathématiques</title>
+<meta name="description" content="Une collection de sites vitrines haut de gamme dont chaque animation est pilotée par une formule : attracteurs étranges, champs de vecteurs, épicycles de Fourier, réaction-diffusion, fractales. Conçus à Toulouse.">
+<meta property="og:title" content="Motion Lab — Sites vitrines animés par les mathématiques">
+<meta property="og:description" content="Dix concepts de sites où l'effet « wow » vient d'une équation. Attracteurs, flow fields, Fourier, Gray-Scott, Julia, superformule, boids, automates.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0c'/%3E%3Cpath d='M12 44c8-26 14-26 20 0s12 26 20 0' fill='none' stroke='%23ff7a45' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  :root {
+    --bg: #0a0a0c; --bg-2: #121216; --fg: #f3f1ec; --muted: #9c9a94; --line: rgba(243,241,236,.12);
+    --accent: #ff7a45; --accent-2: #8fd3ff; --accent-ink: #0a0a0c;
+    --font-display: 'Space Grotesk', sans-serif; --font-body: 'Space Grotesk', sans-serif; --radius: 20px;
+  }
+  h1, h2 { font-weight: 500; letter-spacing: -.04em; }
+  h1 { font-size: clamp(2.8rem, 7vw, 6.4rem); line-height: .95; }
+  h1 em, h2 em, .serif { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+  h1 em { color: var(--accent); }
+  .hero { align-items: center; }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 60% at 30% 50%, rgba(10,10,12,.7), transparent 70%); pointer-events: none; }
+  .hero__content { max-width: 900px; }
+  .hero__meta { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 40px; font-size: .85rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .intro { font-size: clamp(1.4rem, 2.6vw, 2.3rem); line-height: 1.3; max-width: 30ch; letter-spacing: -.02em; }
+  .intro em { color: var(--accent-2); }
+  .grid { display: grid; gap: 22px; grid-template-columns: 1fr; }
+  @media (min-width: 680px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } .grid .site:first-child, .grid .site:last-child { grid-column: span 2; } .grid .site:first-child .site__viz, .grid .site:last-child .site__viz { aspect-ratio: auto; min-height: 320px; } }
+  .site { display: grid; grid-template-rows: auto 1fr; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--bg-2); transition: transform .6s var(--ease), border-color .4s; position: relative; }
+  .site:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); }
+  .site__viz { aspect-ratio: 16/10; position: relative; overflow: hidden; background: #000; }
+  .site__viz canvas { width: 100%; height: 100%; display: block; transition: transform 1.2s var(--ease); }
+  .site:hover .site__viz canvas { transform: scale(1.05); }
+  .site__num { position: absolute; top: 14px; left: 16px; font-size: .75rem; letter-spacing: .14em; color: rgba(255,255,255,.7); font-family: ui-monospace, monospace; z-index: 1; }
+  .site__tag { position: absolute; top: 12px; right: 14px; padding: 5px 10px; border-radius: 999px; background: rgba(0,0,0,.45); backdrop-filter: blur(6px); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: #fff; z-index: 1; }
+  .site__body { padding: 24px 26px 28px; display: grid; gap: 8px; align-content: start; }
+  .site__body h3 { margin: 0; font-size: 1.35rem; font-weight: 500; letter-spacing: -.02em; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .site__body h3 span { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; color: var(--muted); font-size: 1.05rem; white-space: nowrap; }
+  .site__body p { margin: 0; color: var(--muted); font-size: .98rem; }
+  .site__math { margin-top: 10px; font-family: ui-monospace, monospace; font-size: .8rem; color: var(--accent-2); letter-spacing: .02em; }
+  .site__cta { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--fg); }
+  .site__cta::after { content: "→"; transition: transform .3s; }
+  .site:hover .site__cta::after { transform: translateX(6px); }
+  .site > a.site__link { position: absolute; inset: 0; z-index: 2; }
+  .principles { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .principle { padding: 28px; border-radius: var(--radius); border: 1px solid var(--line); }
+  .principle strong { display: block; font-size: 1.1rem; margin-bottom: 8px; font-weight: 500; }
+  .principle p { margin: 0; color: var(--muted); font-size: .98rem; }
+  .cursor { background: var(--accent-2); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Motion Lab, accueil"><span class="brand__mark">∞</span>Motion Lab</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#collection">Collection</a>
+      <a href="#principes">Principes</a>
+      <a href="#contact">Contact</a>
+      <a class="btn" href="#collection">Explorer les sites</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Collection de sites vitrines — Toulouse</p>
+      <h1 data-words>Des sites qui bougent parce que les maths bougent.</h1>
+      <p class="lead" data-reveal style="--d:.5s">Dix concepts de sites complets, chacun animé par une équation : attracteurs étranges, champs de vecteurs, épicycles, réaction-diffusion, fractales. Pas de vidéo de fond, pas d'image de banque : tout est calculé sous vos yeux.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#collection">Voir la collection</a>
+        <a class="btn btn--ghost" href="#principes">Comment c'est fait</a>
+      </div>
+      <div class="hero__meta" data-reveal style="--d:.9s"><span>10 sites</span><span>0 image de banque</span><span>100 % calculé</span></div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true">Explorer</div>
+  </section>
+
+  <section class="section" id="collection">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La collection</span><h2 data-reveal>Chaque vignette est <em>vivante</em></h2></div>
+        <p class="lead" data-reveal>Ce que vous voyez dans les cartes n'est pas une capture : c'est la même formule que sur le site, en miniature. Cliquez pour ouvrir le site complet.</p>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="principes">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Principes</span><h2 data-reveal>Beau, mais <em>lisible</em> et rapide</h2></div>
+        <p class="lead" data-reveal>Un site vitrine animé ne sert à rien s'il fait ramer un téléphone ou s'il cache le texte. Chaque concept suit les mêmes règles.</p>
+      </div>
+      <div class="principles">
+        <div class="principle" data-reveal><strong>La formule est expliquée</strong><p>Chaque site a une section « La formule » : une phrase, l'équation, et des curseurs pour la régler en direct.</p></div>
+        <div class="principle" data-reveal style="--d:.1s"><strong>Mobile d'abord</strong><p>Nombre de particules réduit sur petit écran, résolution plafonnée, animations coupées hors écran et onglet masqué.</p></div>
+        <div class="principle" data-reveal style="--d:.2s"><strong>Accessible</strong><p>Contrastes AA, polices de 16 px minimum, respect de « réduire les animations », repli en CSS si WebGL est absent.</p></div>
+        <div class="principle" data-reveal style="--d:.3s"><strong>Un vrai site</strong><p>Navigation, offre, galerie, tarifs, formulaire de contact prêt pour Netlify. Pas une démo technique : une vitrine prête à livrer.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="container grid-2">
+      <div>
+        <span class="eyebrow" data-reveal>Votre site</span>
+        <h2 data-reveal>Vous voulez <em>le vôtre</em> ?</h2>
+        <p class="lead" data-reveal>Choisissez un concept, ou décrivez l'effet que vous avez en tête. On adapte la formule, la palette et le contenu à votre activité.</p>
+      </div>
+      <form class="form" name="contact-motion-lab" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="contact-motion-lab">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="field"><label for="concept">Concept préféré</label><select id="concept" name="concept"><option>Attracteur de Lorenz</option><option>Attracteurs Aizawa / Thomas / Halvorsen</option><option>Clifford / De Jong</option><option>Champ de vecteurs</option><option>Épicycles de Fourier</option><option>Réaction-diffusion</option><option>Superformule</option><option>Fractale de Julia</option><option>Boids</option><option>Automate cellulaire</option><option>Autre chose</option></select></div>
+          <div class="field"><label for="message">Votre activité, votre idée</label><textarea id="message" name="message" required></textarea></div>
+          <div><button class="btn" type="submit">Envoyer</button></div>
+        </div>
+        <p class="form__ok">Merci, message bien reçu. Réponse sous 48 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Motion Lab — Toulouse</span>
+    <div class="footer__links"><a href="#collection">Collection</a><a href="#principes">Principes</a><a href="#contact">Contact</a></div>
+  </div>
+</footer>
+
+<script src="assets/common.js"></script>
+<script src="assets/hub.js"></script>
+</body>
+</html>

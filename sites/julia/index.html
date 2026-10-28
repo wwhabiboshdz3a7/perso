@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Itéra Conseil — Cabinet de conseil en données & décision, Toulouse</title>
+<meta name="description" content="Itéra Conseil aide les directions à transformer leurs données en décisions : stratégie data, modèles prédictifs, tableaux de bord qui servent vraiment. Cabinet basé à Toulouse.">
+<meta property="og:title" content="Itéra Conseil — Données & décision">
+<meta property="og:description" content="Des décisions qui se répètent bien. Cabinet de conseil data à Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305060a'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%237c5cff' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23c9ff3d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #05060a; --bg-2: #0c0e16; --fg: #f2f3f7; --muted: #9a9db0; --line: rgba(242,243,247,.12);
+    --accent: #c9ff3d; --accent-2: #7c5cff; --accent-ink: #05060a;
+    --font-display: 'Unbounded', sans-serif; --font-body: 'Figtree', sans-serif; --radius: 16px;
+  }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -.02em; }
+  h1 { font-size: clamp(2.4rem, 6.4vw, 5.6rem); line-height: 1.02; font-weight: 800; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); }
+  .brand { font-family: var(--font-display); font-weight: 600; font-size: 1rem; letter-spacing: .04em; }
+  .brand__mark { background: var(--accent-2); color: #fff; border-radius: 8px; }
+  .hero { align-items: center; }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 70% at 25% 50%, rgba(5,6,10,.85) 0%, rgba(5,6,10,.45) 50%, rgba(5,6,10,0) 100%); pointer-events: none; }
+  .hero__content { max-width: 760px; }
+  .hero__tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 36px; }
+  .hero__tags span { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: .82rem; color: var(--muted); backdrop-filter: blur(6px); }
+  .logos { display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: center; justify-content: space-between; font-family: var(--font-display); font-size: .9rem; color: var(--muted); letter-spacing: .04em; }
+  .offers { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .offers { grid-template-columns: repeat(3, 1fr); } }
+  .offer { padding: 36px; border-radius: var(--radius); background: var(--bg-2); border: 1px solid var(--line); display: grid; gap: 14px; align-content: start; position: relative; overflow: hidden; }
+  .offer::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+  .offer span { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+  .offer h3 { margin: 0; font-size: 1.3rem; }
+  .offer p { margin: 0; color: var(--muted); }
+  .offer ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; color: var(--muted); font-size: .95rem; }
+  .offer li::before { content: "→ "; color: var(--accent-2); }
+  .formula__math { font-family: ui-monospace, 'Courier New', monospace; }
+  .formula__canvas { width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); margin-top: 24px; background: var(--bg-2); border: 1px solid var(--line); }
+  .cases { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .cases { grid-template-columns: 1fr 1fr; } }
+  .case { padding: 32px; border-radius: var(--radius); border: 1px solid var(--line); display: grid; gap: 10px; background: color-mix(in srgb, var(--fg) 3%, transparent); }
+  .case strong { font-family: var(--font-display); font-size: clamp(2rem, 3.6vw, 3rem); color: var(--accent); font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+  .case h3 { margin: 0; font-size: 1.15rem; }
+  .case p { margin: 0; color: var(--muted); font-size: .98rem; }
+  .tile { border-radius: 12px; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { border-radius: 10px; }
+  .cursor { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Itéra Conseil, accueil"><span class="brand__mark">i</span>Itéra Conseil</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#approche">Approche</a>
+      <a href="#offres">Offres</a>
+      <a href="#formule">La formule</a>
+      <a href="#resultats">Résultats</a>
+      <a href="#methode">Méthode</a>
+      <a class="btn" href="#contact">Parler à un associé</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Conseil en données &amp; décision — Toulouse</p>
+      <h1 data-words>Des décisions qui se répètent bien</h1>
+      <p class="lead" data-reveal style="--d:.5s">Une bonne décision est une règle simple appliquée des milliers de fois. Nous aidons les directions à trouver cette règle dans leurs données, puis à la faire tourner.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#contact">Prendre rendez-vous</a>
+        <a class="btn btn--ghost" href="#resultats">Voir les résultats</a>
+      </div>
+      <div class="hero__tags" data-reveal style="--d:.9s"><span>Stratégie data</span><span>Modèles prédictifs</span><span>Pilotage</span><span>Formation des équipes</span></div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container logos" data-reveal>
+      <span>Aérospatiale</span><span>Santé</span><span>Énergie</span><span>Retail</span><span>Collectivités</span><span>Industrie</span>
+    </div>
+  </section>
+
+  <section class="section" id="approche">
+    <div class="container grid-2">
+      <div>
+        <span class="eyebrow" data-reveal>Approche</span>
+        <h2 data-reveal>Ce qu'on voit derrière vous : une seule règle, répétée</h2>
+      </div>
+      <div>
+        <p data-reveal>Le fond de cette page est un ensemble de Julia : chaque pixel applique la même opération, z → z² + c, encore et encore, et on regarde s'il s'échappe ou s'il reste. Une règle minuscule, une structure infinie.</p>
+        <p data-reveal style="--d:.1s">Les organisations fonctionnent pareil. Les règles de décision — accorder un crédit, réassortir un stock, prioriser un patient — s'appliquent des milliers de fois par jour. Les améliorer de quelques pour cent change tout. C'est notre métier : trouver la règle, la mesurer, l'industrialiser.</p>
+        <div class="stats">
+          <div class="stat" data-reveal><strong>38</strong><span>missions depuis 2018</span></div>
+          <div class="stat" data-reveal style="--d:.1s"><strong>11</strong><span>consultantes et consultants</span></div>
+          <div class="stat" data-reveal style="--d:.2s"><strong>×4,2</strong><span>retour médian sur honoraires, à 12 mois</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="offres">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Offres</span><h2 data-reveal>Trois façons de travailler ensemble</h2></div>
+        <p class="lead" data-reveal>Des missions courtes et chiffrées. Un livrable que vos équipes peuvent faire tourner sans nous.</p>
+      </div>
+      <div class="offers">
+        <article class="offer" data-reveal><span>Diagnostic</span><h3>Audit de décision — 3 semaines</h3><p>On cartographie vos décisions répétées, on mesure leur qualité, on chiffre le gain possible.</p><ul><li>Cartographie des flux de décision</li><li>Audit de la donnée disponible</li><li>Feuille de route priorisée</li></ul></article>
+        <article class="offer" data-reveal style="--d:.1s"><span>Construction</span><h3>Modèle en production — 3 à 4 mois</h3><p>Un modèle prédictif ou une règle optimisée, branchée sur vos outils, avec son suivi.</p><ul><li>Prototype en 4 semaines</li><li>Mise en production avec vos équipes</li><li>Tableau de suivi de la dérive</li></ul></article>
+        <article class="offer" data-reveal style="--d:.2s"><span>Autonomie</span><h3>Équipe data interne — 6 mois</h3><p>On recrute, on forme et on outille votre équipe, puis on s'efface.</p><ul><li>Recrutement et intégration</li><li>Rituels et gouvernance</li><li>Passation documentée</li></ul></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>z → z² + c, et une palette en cosinus</h2></div>
+        <p class="lead" data-reveal>L'image est calculée en temps réel sur votre carte graphique. Le paramètre c tourne lentement sur un cercle ; le zoom respire. Les couleurs viennent d'une formule de palette due à Inigo Quilez.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>z<sub>n+1</sub> = z<sub>n</sub>² + c        c = 0,7885 · e<sup>iθ</sup>
+couleur(t) = a + b · cos( 2π (c·t + d) )</pre>
+          <p class="muted" data-reveal>Pour chaque pixel, on compte combien d'itérations il faut pour que |z| dépasse 2. Ce nombre, lissé, devient t, puis une couleur. Réglez θ, le nombre d'itérations et le zoom ci-dessous ; le hero suit.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Ensemble de Julia avec les paramètres choisis"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="resultats">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Résultats</span><h2 data-reveal>Des chiffres que les clients ont vérifiés</h2></div>
+        <p class="lead" data-reveal>Chaque mission se termine par une mesure contradictoire, faite par le client, pas par nous.</p>
+      </div>
+      <div class="cases">
+        <div class="case" data-reveal><strong>−18 %</strong><h3>Stock immobilisé, distributeur de pièces aéronautiques</h3><p>Règle de réassort probabiliste, 14 000 références, mise en production en 11 semaines.</p></div>
+        <div class="case" data-reveal style="--d:.1s"><strong>+26 %</strong><h3>Rendez-vous honorés, réseau de centres de santé</h3><p>Modèle de risque d'absence et relances ciblées. 9 centres, 60 000 patients.</p></div>
+        <div class="case" data-reveal style="--d:.2s"><strong>2,1 M€</strong><h3>Économies annuelles, syndicat d'énergie</h3><p>Optimisation des achats d'électricité à partir de prévisions horaires de consommation.</p></div>
+        <div class="case" data-reveal style="--d:.3s"><strong>6 sem.</strong><h3>Délai de recrutement d'une équipe data de 4 personnes</h3><p>Pour un industriel de 800 personnes, avec passation complète à 6 mois.</p></div>
+      </div>
+      <div class="gallery" style="margin-top:64px">
+        <div class="tile" data-reveal data-julia="2.45,180"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 2,45</span><em>Julia</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-julia="2.0,120"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 2,0</span><em>Julia</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-julia="2.4,120"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 2,4</span><em>Julia</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-julia="3.6,160"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 3,6</span><em>Julia</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-julia="4.6,120"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 4,6</span><em>Julia</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-julia="5.5,120"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>θ = 5,5</span><em>Julia</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="methode">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Méthode</span><h2 data-reveal>Itérer, mesurer, répéter</h2></div>
+        <p class="lead" data-reveal>Des cycles de deux semaines, un comité de décision par cycle, et un chiffre à la fin de chacun.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Cadrer</h3><p>Une décision, un indicateur, une valeur cible. Si on ne peut pas écrire ces trois choses en une phrase, on ne commence pas.</p></div>
+        <div class="step" data-reveal><h3>Prototyper</h3><p>Un premier modèle sur vos données réelles en quatre semaines, évalué contre la pratique actuelle, en aveugle.</p></div>
+        <div class="step" data-reveal><h3>Industrialiser</h3><p>Branchement sur vos outils, suivi de la dérive, procédures de repli. Vos équipes tiennent les commandes dès le premier jour.</p></div>
+        <div class="step" data-reveal><h3>Mesurer</h3><p>Trois mois après la mise en production, votre contrôle de gestion mesure le gain. C'est ce chiffre qui figure sur notre site.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Contact</span>
+        <h2 data-reveal>Quelle décision voulez-vous améliorer ?</h2>
+        <p class="lead" data-reveal>Un premier échange de quarante-cinq minutes avec un associé, sans engagement. On vous dit honnêtement si la donnée est là.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Bureaux</strong>3 rue d'Alsace-Lorraine<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:contact@itera-conseil.fr">contact@itera-conseil.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33582000000">05 82 00 00 00</a></p>
+        </div>
+      </div>
+      <form class="form" name="contact-itera" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="contact-itera">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail professionnel</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="organisation">Organisation</label><input id="organisation" name="organisation" autocomplete="organization"></div>
+            <div class="field"><label for="taille">Effectif</label><select id="taille" name="taille"><option>Moins de 50</option><option>50 – 250</option><option>250 – 1 000</option><option>Plus de 1 000</option></select></div>
+          </div>
+          <div class="field"><label for="message">La décision à améliorer</label><textarea id="message" name="message" required placeholder="Qui décide, combien de fois par jour, et ce qui se passe quand c'est raté."></textarea></div>
+          <div><button class="btn" type="submit">Demander un échange</button></div>
+        </div>
+        <p class="form__ok">Merci. Un associé vous écrit sous 24 h ouvrées pour fixer l'échange.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Itéra Conseil — Toulouse</span>
+    <div class="footer__links"><a href="#offres">Offres</a><a href="#resultats">Résultats</a><a href="#contact">Contact</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="julia.js"></script>
+</body>
+</html>

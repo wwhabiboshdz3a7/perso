@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Osmose Laboratoire — Soins biologiques formulés à Toulouse</title>
+<meta name="description" content="Osmose Laboratoire formule des soins de peau biologiques à partir de cultures cellulaires végétales. Laboratoire et boutique à Toulouse, formules transparentes, résultats mesurés.">
+<meta property="og:title" content="Osmose Laboratoire — Soins biologiques">
+<meta property="og:description" content="Des soins formulés comme des réactions vivantes. Laboratoire à Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230b1a1c'/%3E%3Ccircle cx='24' cy='28' r='10' fill='%23b8f2d6'/%3E%3Ccircle cx='40' cy='38' r='8' fill='%23ff9f7a'/%3E%3Ccircle cx='32' cy='20' r='4' fill='%23b8f2d6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #0b1a1c; --bg-2: #10262a; --fg: #eef7f3; --muted: #9fb8b0; --line: rgba(238,247,243,.13);
+    --accent: #b8f2d6; --accent-2: #ff9f7a; --accent-ink: #0b1a1c;
+    --font-display: 'Sora', sans-serif; --font-body: 'Inter', sans-serif; --radius: 24px;
+  }
+  h1, h2, h3 { font-weight: 300; letter-spacing: -.03em; }
+  h1 { font-size: clamp(3rem, 8vw, 7.2rem); line-height: .98; }
+  h1 b { font-weight: 600; color: var(--accent); }
+  .brand { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
+  .brand__mark { border-radius: 50%; }
+  .hero { align-items: center; }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,26,28,.85) 0%, rgba(11,26,28,.35) 50%, rgba(11,26,28,.1) 100%); pointer-events: none; }
+  @media (max-width: 760px) { .hero__canvas::after { background: linear-gradient(rgba(11,26,28,.3), rgba(11,26,28,.85)); } }
+  .hero__hint { margin-top: 28px; font-size: .85rem; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+  .hero__hint::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 0 6px rgba(255,159,122,.2); }
+  .pillars { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .pillar { padding: 32px; border-radius: var(--radius); background: var(--bg-2); border: 1px solid var(--line); }
+  .pillar strong { display: block; font-family: var(--font-display); font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 300; letter-spacing: -.04em; line-height: 1; color: var(--accent); margin-bottom: 12px; }
+  .pillar p { margin: 0; color: var(--muted); }
+  .products { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 800px) { .products { grid-template-columns: repeat(3, 1fr); } }
+  .product { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); display: grid; }
+  .product canvas { width: 100%; aspect-ratio: 4/3; display: block; }
+  .product__body { padding: 28px; display: grid; gap: 8px; }
+  .product__body span { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-2); }
+  .product h3 { margin: 0; font-weight: 600; font-size: 1.4rem; }
+  .product p { margin: 0; color: var(--muted); font-size: .98rem; }
+  .product strong { font-family: var(--font-display); font-weight: 300; font-size: 1.5rem; margin-top: 8px; }
+  .formula__canvas { width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); margin-top: 24px; background: var(--bg-2); border: 1px solid var(--line); touch-action: none; }
+  .proof { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .proof { grid-template-columns: 1fr 1fr; } }
+  .proof__item { padding: 28px; border-radius: var(--radius); border: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+  .proof__item strong { font-family: var(--font-display); font-weight: 300; font-size: 2.4rem; letter-spacing: -.04em; color: var(--accent); }
+  .proof__item p { margin: 0; color: var(--muted); font-size: .98rem; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { border-radius: 14px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Osmose Laboratoire, accueil"><span class="brand__mark">O</span>Osmose</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#science">Science</a>
+      <a href="#soins">Soins</a>
+      <a href="#formule">La formule</a>
+      <a href="#preuves">Preuves</a>
+      <a href="#abonnement">Abonnement</a>
+      <a class="btn" href="#contact">Diagnostic de peau</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Laboratoire de soins biologiques — Toulouse</p>
+      <h1 data-words>La peau est une réaction qui ne s'arrête jamais</h1>
+      <p class="lead" data-reveal style="--d:.5s">Nous formulons des soins à partir de cultures cellulaires végétales, avec des actifs dosés pour accompagner votre peau plutôt que la forcer. Tout est mesuré, tout est publié.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#soins">Découvrir les soins</a>
+        <a class="btn btn--ghost" href="#science">Notre science</a>
+      </div>
+      <p class="hero__hint" data-reveal style="--d:.9s">Déplacez le pointeur sur la page : la réaction suit votre geste.</p>
+    </div>
+  </section>
+
+  <section class="section" id="science">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Science</span><h2 data-reveal>Des formules qui travaillent comme des tissus vivants</h2></div>
+        <p class="lead" data-reveal>Les motifs qui se forment derrière le titre sont ceux d'une réaction-diffusion : deux substances qui se nourrissent et se consomment. C'est le même mécanisme qui dessine les taches d'un léopard ou les rides d'un corail.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar" data-reveal><strong>0</strong><p>parfum, colorant ou conservateur synthétique. La liste INCI complète est imprimée sur chaque flacon, avec les dosages.</p></div>
+        <div class="pillar" data-reveal style="--d:.1s"><strong>7</strong><p>actifs issus de cultures cellulaires de plantes occitanes, cultivés dans notre bioréacteur de Labège.</p></div>
+        <div class="pillar" data-reveal style="--d:.2s"><strong>28 j</strong><p>de test instrumental sur chaque formule, avec mesures d'hydratation, d'élasticité et de barrière cutanée publiées.</p></div>
+        <div class="pillar" data-reveal style="--d:.3s"><strong>100 %</strong><p>des emballages consignés. Rapportez le flacon, repartez avec une recharge et 4 € de moins.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="soins">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Soins</span><h2 data-reveal>Trois gestes, dans l'ordre</h2></div>
+        <p class="lead" data-reveal>Chaque soin porte le motif de la réaction qui lui ressemble : une mitose pour le nettoyant, des vers pour le sérum, du corail pour la crème.</p>
+      </div>
+      <div class="products">
+        <article class="product" data-reveal data-sim="0.0367,0.0649,#b8f2d6,#0b1a1c"><canvas aria-hidden="true"></canvas><div class="product__body"><span>01 — Nettoyer</span><h3>Gelée de camomille</h3><p>Nettoie sans décaper. Mousse légère, pH 5,5, pour tous les matins.</p><strong>28 €</strong></div></article>
+        <article class="product" data-reveal style="--d:.1s" data-sim="0.078,0.061,#ff9f7a,#0b1a1c"><canvas aria-hidden="true"></canvas><div class="product__body"><span>02 — Réparer</span><h3>Sérum cellules de pivoine</h3><p>Hydratation profonde, barrière renforcée en 14 jours mesurés.</p><strong>64 €</strong></div></article>
+        <article class="product" data-reveal style="--d:.2s" data-sim="0.0545,0.062,#b8f2d6,#1c3a36"><canvas aria-hidden="true"></canvas><div class="product__body"><span>03 — Protéger</span><h3>Crème corail d'immortelle</h3><p>Texture fondante, filtre minéral, pour fermer la routine.</p><strong>52 €</strong></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Gray-Scott : deux substances, une infinité de motifs</h2></div>
+        <p class="lead" data-reveal>Le fond de page est une simulation calculée sur votre carte graphique, pixel par pixel, soixante fois par seconde. Deux nombres seulement, f et k, décident si vous verrez des taches, des rayures ou des labyrinthes.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>∂u/∂t = D<sub>u</sub>·∇²u − u·v² + <b>f</b>·(1 − u)
+∂v/∂t = D<sub>v</sub>·∇²v + u·v² − (<b>f</b> + <b>k</b>)·v</pre>
+          <p class="muted" data-reveal>u est la substance nourricière, v le produit qui la consomme. ∇² (le laplacien) fait diffuser chacune vers ses voisins. f nourrit, k retire. Touchez la simulation ci-dessous pour y déposer du produit, puis changez f et k.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Simulation de réaction-diffusion interactive"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="preuves">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Preuves</span><h2 data-reveal>Ce que la peau mesure</h2></div>
+        <p class="lead" data-reveal>Études instrumentales réalisées sur 42 volontaires pendant 28 jours, sous contrôle dermatologique indépendant. Rapports complets disponibles sur demande.</p>
+      </div>
+      <div class="proof">
+        <div class="proof__item" data-reveal><strong>+31 %</strong><p>d'hydratation cornéométrique après 14 jours de sérum, maintenue à J28.</p></div>
+        <div class="proof__item" data-reveal style="--d:.1s"><strong>−22 %</strong><p>de perte insensible en eau après 28 jours de crème, mesure TEWL.</p></div>
+        <div class="proof__item" data-reveal style="--d:.2s"><strong>0</strong><p>réaction d'intolérance sur 42 volontaires, dont 12 peaux réactives déclarées.</p></div>
+        <div class="proof__item" data-reveal style="--d:.3s"><strong>94 %</strong><p>des volontaires ont poursuivi la routine après la fin de l'étude, à leurs frais.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="abonnement">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Abonnement</span><h2 data-reveal>Une routine qui se recharge</h2></div>
+        <p class="lead" data-reveal>Les recharges arrivent avant que le flacon soit vide. Vous pouvez tout arrêter en un clic, sans question.</p>
+      </div>
+      <div class="pricing">
+        <div class="price" data-reveal><span class="eyebrow">À l'unité</span><strong>Dès 28 €</strong><ul><li>Chaque soin séparément</li><li>Flacon consigné, 4 € remboursés</li><li>Livraison 48 h en France</li></ul><a class="btn btn--ghost" href="#contact">Commander</a></div>
+        <div class="price price--featured" data-reveal style="--d:.1s"><span class="price__tag">Recommandé</span><span class="eyebrow">Routine complète</span><strong>119 €<small> / 2 mois</small></strong><ul><li>Les trois soins, −17 %</li><li>Recharges automatiques</li><li>Diagnostic de peau trimestriel offert</li></ul><a class="btn" href="#contact">Commencer</a></div>
+        <div class="price" data-reveal style="--d:.2s"><span class="eyebrow">Professionnels</span><strong>Sur devis</strong><ul><li>Instituts, spas, dermatologues</li><li>Formats cabine et protocoles</li><li>Formation produit sur site</li></ul><a class="btn btn--ghost" href="#contact">Nous contacter</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Diagnostic</span>
+        <h2 data-reveal>Commencez par votre peau</h2>
+        <p class="lead" data-reveal>Un diagnostic instrumental gratuit de vingt minutes au laboratoire, ou un questionnaire en ligne si vous êtes loin.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Laboratoire &amp; boutique</strong>12 rue des Lois<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:bonjour@osmose-lab.fr">bonjour@osmose-lab.fr</a></p>
+          <p data-reveal><strong>Horaires</strong>Mardi – samedi, 10 h – 19 h</p>
+        </div>
+      </div>
+      <form class="form" name="diagnostic-osmose" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="diagnostic-osmose">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="peau">Votre peau</label><select id="peau" name="peau"><option>Sèche</option><option>Mixte</option><option>Grasse</option><option>Réactive</option><option>Je ne sais pas</option></select></div>
+            <div class="field"><label for="mode">Diagnostic</label><select id="mode" name="mode"><option>Au laboratoire</option><option>En ligne</option></select></div>
+          </div>
+          <div class="field"><label for="message">Ce qui vous préoccupe</label><textarea id="message" name="message" placeholder="Tiraillements, rougeurs, routine actuelle…"></textarea></div>
+          <div><button class="btn" type="submit">Demander mon diagnostic</button></div>
+        </div>
+        <p class="form__ok">Merci ! Nous revenons vers vous sous 48 h pour fixer le diagnostic.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Osmose Laboratoire — Toulouse</span>
+    <div class="footer__links"><a href="#soins">Soins</a><a href="#preuves">Preuves</a><a href="#contact">Contact</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="grayscott.js"></script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strange Studio — Agence de design & motion à Toulouse</title>
+<meta name="description" content="Strange Studio conçoit des identités, des sites et des expériences interactives qui ne ressemblent à rien d'autre. Agence de design et motion basée à Toulouse.">
+<meta property="og:title" content="Strange Studio — Agence de design & motion">
+<meta property="og:description" content="Identités, sites et expériences interactives dessinées par les mathématiques du chaos. Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307080f'/%3E%3Cpath d='M18 44c6-18 10-24 14-24s4 10 0 18 10-6 14-8' fill='none' stroke='%23ff5c35' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #07080f; --bg-2: #0e1019; --fg: #f3f1ea; --muted: #9b9ca8; --line: rgba(243,241,234,.12);
+    --accent: #ff5c35; --accent-2: #7df9ff; --accent-ink: #07080f;
+    --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif; --radius: 22px;
+  }
+  h1, h2 { font-weight: 800; letter-spacing: -.04em; }
+  .hero { align-items: center; }
+  .hero__content { max-width: 1000px; }
+  .hero h1 { font-size: clamp(3rem, 7.5vw, 6.8rem); line-height: .95; }
+  .hero h1 em { font-style: normal; color: transparent; -webkit-text-stroke: 2px var(--fg); }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 40%); pointer-events: none; }
+  .intro { font-size: clamp(1.4rem, 2.6vw, 2.4rem); line-height: 1.3; letter-spacing: -.02em; font-family: var(--font-display); font-weight: 500; max-width: 24ch; }
+  .intro b { color: var(--accent); font-weight: 700; }
+  .services .card::before { content: ""; position: absolute; inset: auto -40% -60% auto; width: 60%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, var(--accent) 0%, transparent 70%); opacity: 0; transition: opacity .5s; }
+  .services .card:hover::before { opacity: .35; }
+  .formula__canvas { width: 100%; aspect-ratio: 4/3; border-radius: var(--radius); border: 1px solid var(--line); background: var(--bg-2); }
+  .tile__art { background: var(--bg-2); }
+  .clients { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; color: var(--muted); }
+  .clients span { opacity: .7; transition: opacity .3s, color .3s; }
+  .clients span:hover { opacity: 1; color: var(--fg); }
+  .quote { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.6rem); line-height: 1.25; letter-spacing: -.02em; max-width: 30ch; }
+  .quote footer { font-family: var(--font-body); font-size: 1rem; color: var(--muted); margin-top: 24px; letter-spacing: 0; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .8fr 1.2fr; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Strange Studio, accueil"><span class="brand__mark">S</span>Strange Studio</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#studio">Studio</a>
+      <a href="#services">Services</a>
+      <a href="#formule">La formule</a>
+      <a href="#projets">Projets</a>
+      <a href="#process">Process</a>
+      <a class="btn" href="#contact">Lancer un projet</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Agence de design &amp; motion — Toulouse</p>
+      <h1 data-words>Le chaos, mis en forme.</h1>
+      <p class="lead" data-reveal style="--d:.5s">Nous dessinons des marques, des sites et des expériences interactives qui captent l'attention en trois secondes et la gardent. Avec une obsession : que ça bouge, et que ça bouge bien.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#contact">Parler de votre projet <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#projets">Voir nos projets</a>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true">Faites défiler</div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee__track"><span>Identité visuelle</span><span>Sites immersifs</span><span>Motion design</span><span>Direction artistique</span><span>WebGL</span><span>Identité visuelle</span><span>Sites immersifs</span><span>Motion design</span><span>Direction artistique</span><span>WebGL</span></div></div>
+
+  <section class="section" id="studio">
+    <div class="container grid-2">
+      <div>
+        <span class="eyebrow" data-reveal>Le studio</span>
+        <p class="intro" data-reveal>Un studio de <b>douze personnes</b> qui pense le design comme un système vivant plutôt qu'une image figée.</p>
+      </div>
+      <div>
+        <p data-reveal>Depuis 2016, Strange Studio accompagne des marques qui veulent se distinguer sans crier. Nous construisons des identités capables de respirer sur un écran, un packaging ou une façade, et des sites qui donnent envie de rester.</p>
+        <p data-reveal style="--d:.1s">Notre méthode tient en une idée : définir quelques règles simples, puis laisser émerger la complexité. C'est exactement ce que fait l'attracteur qui tourne au-dessus de vous.</p>
+        <div class="stats">
+          <div class="stat" data-reveal><strong>140+</strong><span>projets livrés</span></div>
+          <div class="stat" data-reveal style="--d:.1s"><strong>9</strong><span>prix et distinctions</span></div>
+          <div class="stat" data-reveal style="--d:.2s"><strong>96 %</strong><span>de clients qui reviennent</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt services" id="services">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Services</span><h2 data-reveal>Tout ce qu'il faut pour qu'une marque prenne vie</h2></div>
+        <p class="lead" data-reveal>Quatre pôles, une seule équipe. Vous n'avez qu'un interlocuteur du brief à la mise en ligne.</p>
+      </div>
+      <div class="cards">
+        <article class="card" data-reveal><span class="card__num">01</span><h3>Identité &amp; branding</h3><p>Plateforme de marque, logotype, système graphique génératif, charte animée. Une identité pensée pour bouger dès le premier jour.</p></article>
+        <article class="card" data-reveal style="--d:.1s"><span class="card__num">02</span><h3>Sites &amp; expériences web</h3><p>Sites vitrines, e-commerce et installations interactives en WebGL. Performants, accessibles, et mémorables.</p></article>
+        <article class="card" data-reveal style="--d:.2s"><span class="card__num">03</span><h3>Motion design</h3><p>Films de marque, animations UI, habillages d'événements. Du storyboard à l'export final, en interne.</p></article>
+        <article class="card" data-reveal style="--d:.3s"><span class="card__num">04</span><h3>Direction artistique</h3><p>Campagnes, shootings, scénographies. Nous tenons la cohérence visuelle sur tous les points de contact.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Trois équations, un papillon</h2></div>
+        <p class="lead" data-reveal>Le fond de la page est un système de Lorenz : des milliers de points qui suivent trois règles de mouvement toutes simples, et qui ne repassent jamais deux fois au même endroit.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>dx/dt = <b>σ</b> (y − x)
+dy/dt = x (<b>ρ</b> − z) − y
+dz/dt = x y − <b>β</b> z</pre>
+          <p class="muted" data-reveal>À chaque image, chaque particule calcule sa vitesse à partir de sa position, puis avance d'un tout petit pas. La couleur traduit cette vitesse : lente et froide près des ailes, vive et chaude dans le passage central. Modifiez σ, ρ et β : l'attracteur change de forme, et le hero aussi.</p>
+          <canvas class="formula__canvas" id="formula-canvas" width="800" height="600" aria-label="Projection 2D de l'attracteur de Lorenz avec les paramètres choisis"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="projets">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Projets</span><h2 data-reveal>Des marques qui ne tiennent pas en place</h2></div>
+        <p class="lead" data-reveal>Chaque vignette est générée avec des paramètres différents du même système. Comme nos clients : mêmes règles, résultats uniques.</p>
+      </div>
+      <div class="gallery">
+        <a class="tile" href="#contact" data-reveal data-lorenz="10,28,2.667,#ff5c35,#7df9ff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Halo Festival</span><em>Identité</em></span></a>
+        <a class="tile" href="#contact" data-reveal style="--d:.1s" data-lorenz="10,22,1.4,#7df9ff,#ffffff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Nuage Immobilier</span><em>Site</em></span></a>
+        <a class="tile" href="#contact" data-reveal style="--d:.2s" data-lorenz="14,35,3.5,#ffd166,#ff5c35"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Opéra de Toulouse</span><em>Motion</em></span></a>
+        <a class="tile" href="#contact" data-reveal style="--d:.3s" data-lorenz="8,24,2.2,#ffffff,#7df9ff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Kiosque Café</span><em>Branding</em></span></a>
+        <a class="tile" href="#contact" data-reveal style="--d:.4s" data-lorenz="12,30,1.9,#ff5c35,#ffd166"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Aérolithe</span><em>WebGL</em></span></a>
+        <a class="tile" href="#contact" data-reveal style="--d:.5s" data-lorenz="10,40,2.667,#7df9ff,#ff5c35"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Studio Ravel</span><em>DA</em></span></a>
+      </div>
+      <div class="clients" style="margin-top:64px" data-reveal>
+        <span>Halo Festival</span><span>Opéra de Toulouse</span><span>Aérolithe</span><span>Nuage</span><span>Kiosque</span><span>Ravel</span><span>Météore</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="process">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Process</span><h2 data-reveal>Quatre étapes, zéro surprise</h2></div>
+        <p class="lead" data-reveal>Un projet type dure entre six et douze semaines. Vous voyez des choses bouger dès la deuxième.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Immersion</h3><p>Deux jours chez vous pour comprendre le métier, les clients, les contraintes. On repart avec une conviction, pas un questionnaire.</p></div>
+        <div class="step" data-reveal><h3>Territoires</h3><p>Trois directions créatives, chacune prototypée en mouvement. On choisit ensemble, sur des écrans, pas sur des planches.</p></div>
+        <div class="step" data-reveal><h3>Production</h3><p>Design et développement en parallèle, revues hebdomadaires, environnement de test accessible en permanence.</p></div>
+        <div class="step" data-reveal><h3>Lancement &amp; suite</h3><p>Mise en ligne, formation de vos équipes, puis un mois d'ajustements inclus. Ensuite, on reste à portée de main.</p></div>
+      </div>
+      <blockquote class="quote" style="margin:80px 0 0" data-reveal>« Ils ont transformé un cahier des charges de douze pages en une identité qu'on reconnaît à cent mètres. »<footer>Camille Doré, directrice de la communication, Halo Festival</footer></blockquote>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Contact</span>
+        <h2 data-reveal>Un projet en tête ?</h2>
+        <p class="lead" data-reveal>Racontez-nous l'idée en quelques lignes. On vous répond sous 48 h avec un premier avis honnête.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Studio</strong>14 rue des Blanchers<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:bonjour@strange.studio">bonjour@strange.studio</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33561000000">05 61 00 00 00</a></p>
+        </div>
+      </div>
+      <form class="form" name="contact-strange" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="contact-strange">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="societe">Société</label><input id="societe" name="societe" autocomplete="organization"></div>
+            <div class="field"><label for="budget">Budget estimé</label><select id="budget" name="budget"><option>Moins de 10 k€</option><option>10 – 25 k€</option><option>25 – 60 k€</option><option>Plus de 60 k€</option></select></div>
+          </div>
+          <div class="field"><label for="message">Le projet</label><textarea id="message" name="message" required placeholder="Quelques lignes suffisent."></textarea></div>
+          <div><button class="btn" type="submit">Envoyer le brief</button></div>
+        </div>
+        <p class="form__ok">Merci ! Votre message est bien arrivé. On revient vers vous sous 48 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Strange Studio — Toulouse</span>
+    <div class="footer__links"><a href="#studio">Studio</a><a href="#projets">Projets</a><a href="#contact">Contact</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script type="importmap">{ "imports": { "three": "../../vendor/three.module.min.js" } }</script>
+<script src="../../assets/common.js"></script>
+<script type="module" src="lorenz.js"></script>
+</body>
+</html>

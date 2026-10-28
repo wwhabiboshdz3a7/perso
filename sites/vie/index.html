@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cellule — Espace de coworking & incubateur, Toulouse</title>
+<meta name="description" content="Cellule est un espace de coworking et un incubateur à Toulouse : 120 postes, 18 bureaux fermés, un programme d'accompagnement de six mois pour les jeunes entreprises.">
+<meta property="og:title" content="Cellule — Coworking & incubateur">
+<meta property="og:description" content="Des règles simples, une communauté qui grandit. Coworking et incubateur à Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230e0f12'/%3E%3Crect x='14' y='14' width='10' height='10' rx='2' fill='%23ffcc00'/%3E%3Crect x='27' y='14' width='10' height='10' rx='2' fill='%23ffcc00'/%3E%3Crect x='40' y='27' width='10' height='10' rx='2' fill='%23ffcc00'/%3E%3Crect x='27' y='40' width='10' height='10' rx='2' fill='%23ffcc00'/%3E%3Crect x='14' y='27' width='10' height='10' rx='2' fill='%23ffcc00'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800&family=Archivo+Narrow:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #0e0f12; --bg-2: #16181d; --fg: #f5f4ef; --muted: #a2a39c; --line: rgba(245,244,239,.12);
+    --accent: #ffcc00; --accent-2: #4ad1ff; --accent-ink: #0e0f12;
+    --font-display: 'Archivo', sans-serif; --font-body: 'Archivo', sans-serif; --radius: 8px;
+  }
+  h1, h2, h3 { font-weight: 800; letter-spacing: -.04em; text-transform: uppercase; }
+  h1 { font-size: clamp(3rem, 10vw, 9rem); line-height: .9; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .brand { font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .btn { border-radius: var(--radius); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; }
+  .hero { align-items: end; }
+  .hero__canvas { opacity: .9; }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 10%, rgba(14,15,18,.4) 60%, transparent); pointer-events: none; }
+  .hero__content { max-width: 1000px; }
+  .hero__live { display: inline-flex; gap: 14px; align-items: center; margin-top: 32px; font-family: 'Archivo Narrow', sans-serif; font-size: 1rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .hero__live b { color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .rules { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .rules { grid-template-columns: repeat(3, 1fr); } }
+  .rule { background: var(--bg); padding: 36px 32px; display: grid; gap: 12px; }
+  .rule strong { font-family: 'Archivo Narrow', sans-serif; font-size: 3rem; font-weight: 500; color: var(--accent); line-height: 1; }
+  .rule h3 { margin: 0; font-size: 1.1rem; }
+  .rule p { margin: 0; color: var(--muted); }
+  .formula__math { font-family: 'Archivo Narrow', sans-serif; font-size: 1.3rem; letter-spacing: .02em; }
+  .formula__canvas { width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); background: var(--bg-2); border: 1px solid var(--line); margin-top: 24px; cursor: crosshair; touch-action: none; }
+  .tile { border-radius: var(--radius); }
+  .steps .step::before { font-family: 'Archivo Narrow', sans-serif; font-size: 1.4rem; }
+  .price strong { text-transform: none; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { border-radius: var(--radius); }
+  .marquee { font-weight: 800; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Cellule, accueil"><span class="brand__mark">C</span>Cellule</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#regles">Règles</a>
+      <a href="#espaces">Espaces</a>
+      <a href="#formule">La formule</a>
+      <a href="#incubateur">Incubateur</a>
+      <a href="#tarifs">Tarifs</a>
+      <a class="btn" href="#contact">Visiter</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Coworking &amp; incubateur — Toulouse</p>
+      <h1 data-words>Des règles simples, une communauté <em>vivante</em></h1>
+      <p class="lead" data-reveal style="--d:.5s">120 postes, 18 bureaux, un programme d'incubation de six mois. Et une seule règle d'or : chacun fait grandir ses voisins.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#contact">Réserver une visite</a>
+        <a class="btn btn--ghost" href="#incubateur">Candidater à l'incubateur</a>
+      </div>
+      <p class="hero__live" data-reveal style="--d:.9s"><span>Génération <b id="gen">0</b></span><span>·</span><span>Cellules vivantes <b id="alive">0</b></span></p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee__track"><span>Ouvert 24 h / 24</span><span>Fibre 10 Gb/s</span><span>Café à volonté</span><span>Salles de réunion incluses</span><span>Ouvert 24 h / 24</span><span>Fibre 10 Gb/s</span><span>Café à volonté</span><span>Salles de réunion incluses</span></div></div>
+
+  <section class="section" id="regles">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Les règles</span><h2 data-reveal>Trois règles, et ça vit</h2></div>
+        <p class="lead" data-reveal>Le fond du haut de page est le Jeu de la vie de Conway. Chaque case ne regarde que ses huit voisines. C'est exactement comme ça que nous avons pensé Cellule.</p>
+      </div>
+      <div class="rules">
+        <div class="rule" data-reveal><strong>&lt; 2</strong><h3>Isolement</h3><p>Une cellule seule meurt. Ici, personne ne travaille dans son coin : déjeuners communs, tableau des compétences, entraide obligatoire.</p></div>
+        <div class="rule" data-reveal style="--d:.1s"><strong>2 – 3</strong><h3>Équilibre</h3><p>Avec deux ou trois voisins, on survit et on prospère. Nous plafonnons les équipes par bureau et nous mélangeons les métiers.</p></div>
+        <div class="rule" data-reveal style="--d:.2s"><strong>= 3</strong><h3>Naissance</h3><p>Trois voisins font naître une nouvelle cellule. Chaque année, huit entreprises sont nées ici de rencontres entre résidents.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="espaces">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Espaces</span><h2 data-reveal>1 800 m² dans une ancienne imprimerie</h2></div>
+        <p class="lead" data-reveal>Quartier Bonnefoy, à sept minutes de la gare Matabiau. Lumière du nord, plafonds de cinq mètres, et une cour où l'on mange dehors d'avril à octobre.</p>
+      </div>
+      <div class="cards">
+        <article class="card" data-reveal><span class="card__num">120</span><h3>Postes en open space</h3><p>Bureaux réglables, double écran, casier. Places fixes ou nomades.</p></article>
+        <article class="card" data-reveal style="--d:.1s"><span class="card__num">18</span><h3>Bureaux fermés</h3><p>De 2 à 12 personnes, insonorisés, avec votre logo sur la porte.</p></article>
+        <article class="card" data-reveal style="--d:.2s"><span class="card__num">9</span><h3>Salles de réunion</h3><p>De la cabine téléphonique à l'amphithéâtre de 80 places. Réservation en ligne, incluse.</p></article>
+        <article class="card" data-reveal style="--d:.3s"><span class="card__num">1</span><h3>Atelier de prototypage</h3><p>Imprimantes 3D, découpe laser, électronique. Pour fabriquer avant de pitcher.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>B3 / S23</h2></div>
+        <p class="lead" data-reveal>C'est toute la règle du Jeu de la vie : une cellule naît (B) avec 3 voisines, survit (S) avec 2 ou 3. Tout le reste meurt. De là naissent planeurs, canons et oscillateurs.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>naissance  : morte  et voisines = 3   → vivante
+survie     : vivante et voisines ∈ {2, 3} → vivante
+sinon      : → morte</pre>
+          <p class="muted" data-reveal>Dessinez sur la grille ci-dessous pour semer des cellules, puis changez la règle : B36/S23 (« HighLife ») fait apparaître des répliquateurs, B3/S012345678 ne meurt jamais. La vitesse règle le nombre de générations par seconde.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Jeu de la vie interactif"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="incubateur">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Incubateur</span><h2 data-reveal>Six mois pour passer de 1 à 3 voisins</h2></div>
+        <p class="lead" data-reveal>Deux promotions par an, dix projets chacune. Pas de prise de participation : vous payez un loyer réduit, nous apportons le reste.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Candidature</h3><p>Un formulaire de dix questions, puis un entretien de trente minutes avec deux résidents. Réponse sous deux semaines.</p></div>
+        <div class="step" data-reveal><h3>Mois 1 – 2 : fondations</h3><p>Ateliers juridique, financier, produit. Un mentor résident par projet, rencontré chaque semaine.</p></div>
+        <div class="step" data-reveal><h3>Mois 3 – 5 : premiers clients</h3><p>Accès au réseau des 400 anciens, à nos partenaires et à l'atelier. Objectif : un chiffre d'affaires, même petit.</p></div>
+        <div class="step" data-reveal><h3>Mois 6 : la suite</h3><p>Journée de présentation devant investisseurs et clients. Puis un bureau fermé à tarif résident pour un an.</p></div>
+      </div>
+      <div class="gallery" style="margin-top:64px">
+        <div class="tile" data-reveal data-life="glider"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Planeur</span><em>Se déplace</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-life="pulsar"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Pulsar</span><em>Période 3</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-life="gun"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Canon de Gosper</span><em>Produit des planeurs</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-life="random"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Soupe</span><em>Aléatoire</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-life="rpent"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>R-pentomino</span><em>Chaos de 5 cellules</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-life="lwss"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Vaisseau léger</span><em>Se déplace</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tarifs">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Tarifs</span><h2 data-reveal>Sans engagement, sans surprise</h2></div>
+        <p class="lead" data-reveal>Tout est inclus : fibre, café, salles de réunion, impressions, domiciliation. Préavis d'un mois.</p>
+      </div>
+      <div class="pricing">
+        <div class="price" data-reveal><span class="eyebrow">Nomade</span><strong>190 €<small> HT / mois</small></strong><ul><li>Poste non attribué</li><li>Accès 7 j / 7, 24 h / 24</li><li>Salles de réunion incluses</li></ul><a class="btn btn--ghost" href="#contact">Essayer une journée</a></div>
+        <div class="price price--featured" data-reveal style="--d:.1s"><span class="price__tag">Résidents</span><span class="eyebrow">Poste fixe</span><strong>320 €<small> HT / mois</small></strong><ul><li>Bureau attribué, casier, écran</li><li>Domiciliation de l'entreprise</li><li>Atelier de prototypage</li></ul><a class="btn" href="#contact">Réserver une visite</a></div>
+        <div class="price" data-reveal style="--d:.2s"><span class="eyebrow">Bureau fermé</span><strong>Dès 1 100 €<small> HT / mois</small></strong><ul><li>De 2 à 12 personnes</li><li>Logo sur la porte, clé badge</li><li>Mobilier et câblage inclus</li></ul><a class="btn btn--ghost" href="#contact">Voir les disponibilités</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Visite</span>
+        <h2 data-reveal>Venez voir le voisinage</h2>
+        <p class="lead" data-reveal>Une visite dure vingt minutes et se termine par un café avec un résident. Journée d'essai offerte.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Adresse</strong>58 rue du Faubourg-Bonnefoy<br>31500 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:bonjour@cellule-toulouse.fr">bonjour@cellule-toulouse.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33561000004">05 61 00 00 04</a></p>
+        </div>
+      </div>
+      <form class="form" name="visite-cellule" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="visite-cellule">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="besoin">Vous cherchez</label><select id="besoin" name="besoin"><option>Un poste nomade</option><option>Un poste fixe</option><option>Un bureau fermé</option><option>L'incubateur</option></select></div>
+            <div class="field"><label for="equipe">Taille de l'équipe</label><select id="equipe" name="equipe"><option>1</option><option>2 – 4</option><option>5 – 12</option><option>Plus de 12</option></select></div>
+          </div>
+          <div class="field"><label for="message">Un mot sur votre activité</label><textarea id="message" name="message"></textarea></div>
+          <div><button class="btn" type="submit">Demander une visite</button></div>
+        </div>
+        <p class="form__ok">Merci ! On vous propose un créneau sous 24 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Cellule — Toulouse</span>
+    <div class="footer__links"><a href="#espaces">Espaces</a><a href="#incubateur">Incubateur</a><a href="#contact">Visite</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="vie.js"></script>
+</body>
+</html>

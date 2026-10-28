@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Ophélia — Parfums de haute composition, Toulouse</title>
+<meta name="description" content="Maison Ophélia compose des parfums rares en petites séries à Toulouse. Trois sillages, trois attracteurs : découvrez Nuit d'Encre, Brume et Ambre Vif.">
+<meta property="og:title" content="Maison Ophélia — Parfums de haute composition">
+<meta property="og:description" content="Des parfums composés comme des trajectoires : trois sillages rares, créés et embouteillés à Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230b0806'/%3E%3Ccircle cx='32' cy='32' r='16' fill='none' stroke='%23d4af5f' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23e8c7b8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #0b0806; --bg-2: #141008; --fg: #f1e8dc; --muted: #a8998a; --line: rgba(241,232,220,.14);
+    --accent: #d4af5f; --accent-2: #e8c7b8; --accent-ink: #0b0806;
+    --font-display: 'Cormorant Garamond', serif; --font-body: 'Jost', sans-serif; --radius: 4px;
+  }
+  body { font-weight: 300; }
+  h1, h2, h3 { font-weight: 500; letter-spacing: 0; }
+  h1 { font-size: clamp(3.4rem, 9vw, 8rem); line-height: .95; }
+  h1 i { font-style: italic; color: var(--accent); }
+  .brand { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+  .brand__mark { border-radius: 50%; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  .btn { border-radius: 2px; text-transform: uppercase; letter-spacing: .14em; font-size: .82rem; font-weight: 500; padding: 16px 30px; }
+  .hero { align-items: center; text-align: center; }
+  .hero__content { margin-inline: auto; display: grid; justify-items: center; }
+  .hero__kicker::before { display: none; }
+  .hero__kicker { letter-spacing: .32em; }
+  .lead { margin-inline: auto; color: #d8cdbf; }
+  .hero__content { text-shadow: 0 2px 28px rgba(11,8,6,.9), 0 0 6px rgba(11,8,6,.8); }
+  .switcher { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 44px; }
+  .switcher button { background: transparent; border: 1px solid var(--line); color: var(--fg); padding: 12px 22px; border-radius: 2px; cursor: pointer; letter-spacing: .12em; text-transform: uppercase; font-size: .78rem; transition: border-color .4s, background .4s, color .4s; }
+  .switcher button.is-active, .switcher button:hover { border-color: var(--accent); color: var(--accent); }
+  .switcher button small { display: block; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: .75rem; margin-top: 2px; }
+  .ornament { width: 1px; height: 80px; background: linear-gradient(transparent, var(--accent), transparent); margin: 0 auto; }
+  .maison p { font-size: clamp(1.15rem, 1.5vw, 1.3rem); }
+  .maison .big { font-family: var(--font-display); font-size: clamp(1.9rem, 3.4vw, 3rem); line-height: 1.2; font-style: italic; }
+  .collection { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 800px) { .collection { grid-template-columns: repeat(3, 1fr); } }
+  .parfum { position: relative; padding: 36px 32px 40px; border: 1px solid var(--line); min-height: 460px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: border-color .5s; background: var(--bg-2); }
+  .parfum:hover, .parfum.is-active { border-color: var(--accent); }
+  .parfum canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .9; transition: transform 1.2s var(--ease); }
+  .parfum:hover canvas { transform: scale(1.05); }
+  .parfum::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, rgba(20,16,8,.95) 60%); pointer-events: none; }
+  .parfum__body { position: relative; margin-top: auto; z-index: 1; }
+  .parfum__num { font-family: var(--font-display); font-style: italic; color: var(--accent); font-size: 1.1rem; }
+  .parfum h3 { font-size: 2rem; margin: 6px 0 8px; }
+  .parfum p { color: var(--muted); font-size: .98rem; margin: 0; }
+  .parfum__notes { display: flex; gap: 18px; margin-top: 16px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+  .formula__math { font-family: var(--font-display); font-size: clamp(1.15rem, 1.8vw, 1.45rem); font-style: italic; }
+  .tile { border-radius: 2px; }
+  .tile__art { background: var(--bg-2); }
+  .ritual { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: center; }
+  @media (min-width: 900px) { .ritual { grid-template-columns: 1fr 1fr; } }
+  .ritual ol { list-style: none; padding: 0; margin: 0; counter-reset: r; display: grid; gap: 22px; }
+  .ritual li { counter-increment: r; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .ritual li::before { content: counter(r, upper-roman); font-family: var(--font-display); font-size: 1.6rem; color: var(--accent); line-height: 1; }
+  .ritual li strong { display: block; font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; margin-bottom: 4px; }
+  .price { border-radius: 2px; }
+  .price strong { font-weight: 500; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: 1fr 1fr; } }
+  .field input, .field textarea, .field select { border-radius: 2px; }
+  .cursor { mix-blend-mode: normal; background: transparent; border: 1px solid var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Maison Ophélia, accueil"><span class="brand__mark">O</span>Ophélia</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#maison">La maison</a>
+      <a href="#collection">Collection</a>
+      <a href="#formule">La formule</a>
+      <a href="#notes">Matières</a>
+      <a href="#flacons">Flacons</a>
+      <a class="btn" href="#contact">Prendre rendez-vous</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Haute composition — Toulouse</p>
+      <h1 data-words>Un sillage qui ne se répète <i>jamais</i></h1>
+      <p class="lead" data-reveal style="--d:.5s">Trois parfums composés comme des trajectoires : ils tournent autour d'un même cœur sans jamais repasser par le même point. Chaque flacon est numéroté, chaque sillage est le vôtre.</p>
+      <div class="switcher" role="group" aria-label="Choisir un parfum" data-reveal style="--d:.7s">
+        <button type="button" class="is-active" data-attractor="aizawa">Nuit d'Encre<small>Attracteur d'Aizawa</small></button>
+        <button type="button" data-attractor="thomas">Brume<small>Attracteur de Thomas</small></button>
+        <button type="button" data-attractor="halvorsen">Ambre Vif<small>Attracteur de Halvorsen</small></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section maison" id="maison">
+    <div class="container">
+      <div class="ornament" data-reveal></div>
+      <div class="grid-2" style="margin-top:56px">
+        <p class="big" data-reveal>« Un parfum réussi n'est pas une note, c'est un mouvement. »</p>
+        <div>
+          <p data-reveal>Fondée en 2011 dans une ancienne droguerie du quartier Saint-Cyprien, la Maison Ophélia compose des parfums en séries de trois cents flacons. Pas de marketing olfactif, pas de brief de tendance : une matière première exceptionnelle, un nez, et le temps qu'il faut.</p>
+          <p data-reveal style="--d:.1s">Nous aimons les sillages qui évoluent sur la peau : un départ net, un cœur qui tourne, un fond qui revient par surprise. Le mouvement que vous voyez à l'écran est l'image exacte de cette idée.</p>
+          <div class="stats">
+            <div class="stat" data-reveal><strong>3</strong><span>parfums, pas un de plus</span></div>
+            <div class="stat" data-reveal style="--d:.1s"><strong>300</strong><span>flacons par série</span></div>
+            <div class="stat" data-reveal style="--d:.2s"><strong>18</strong><span>mois de macération</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="collection">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Collection</span><h2 data-reveal>Trois sillages, trois géométries</h2></div>
+        <p class="lead" data-reveal>Cliquez sur un parfum : la forme qui danse dans le ciel de la page prend celle de son attracteur.</p>
+      </div>
+      <div class="collection">
+        <article class="parfum is-active" data-attractor="aizawa" data-reveal tabindex="0">
+          <canvas aria-hidden="true"></canvas>
+          <div class="parfum__body"><span class="parfum__num">N° I</span><h3>Nuit d'Encre</h3><p>Un cœur dense qui s'ouvre en spirale : encens, iris noir, cuir de Russie. Pour les soirs où l'on veut être suivi.</p><div class="parfum__notes"><span>Encens</span><span>Iris</span><span>Cuir</span></div></div>
+        </article>
+        <article class="parfum" data-attractor="thomas" data-reveal style="--d:.1s" tabindex="0">
+          <canvas aria-hidden="true"></canvas>
+          <div class="parfum__body"><span class="parfum__num">N° II</span><h3>Brume</h3><p>Une boucle douce et symétrique : thé blanc, figuier, musc de coton. Il entoure sans jamais peser.</p><div class="parfum__notes"><span>Thé blanc</span><span>Figuier</span><span>Musc</span></div></div>
+        </article>
+        <article class="parfum" data-attractor="halvorsen" data-reveal style="--d:.2s" tabindex="0">
+          <canvas aria-hidden="true"></canvas>
+          <div class="parfum__body"><span class="parfum__num">N° III</span><h3>Ambre Vif</h3><p>Trois ailes qui se répondent : ambre gris, cardamome, bois de gaïac. Le sillage le plus solaire de la maison.</p><div class="parfum__notes"><span>Ambre</span><span>Cardamome</span><span>Gaïac</span></div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Des équations qui tournent sans fin</h2></div>
+        <p class="lead" data-reveal>Chaque parfum est associé à un attracteur étrange : un système de trois équations où la position d'un point dicte sa vitesse. On lâche vingt mille points et on regarde.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal id="formula-text">Aizawa
+dx/dt = (z − b)·x − d·y
+dy/dt = d·x + (z − b)·y
+dz/dt = c + a·z − z³/3 − (x² + y²)(1 + e·z) + f·z·x³</pre>
+          <p class="muted" data-reveal>Lorsque vous changez de parfum, les points ne sautent pas : chacun glisse de son ancienne trajectoire vers la nouvelle, et la forme se métamorphose. Les curseurs règlent la vitesse d'intégration, la taille du halo et la densité, sur la scène du haut de page.</p>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="notes">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Matières</span><h2 data-reveal>Ce que nous mettons dans le flacon</h2></div>
+        <p class="lead" data-reveal>Des matières traçables, achetées aux producteurs, macérées dans nos caves. Rien d'autre.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile" data-reveal data-art="aizawa,#d4af5f,#e8c7b8"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Encens d'Oman</span><em>Résine</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-art="thomas,#e8c7b8,#ffffff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Thé blanc du Fujian</span><em>Infusion</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-art="halvorsen,#d4af5f,#ff9f6e"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Ambre gris</span><em>Teinture</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-art="aizawa,#8d7bb5,#e8c7b8"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Iris de Florence</span><em>Beurre</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-art="thomas,#9fc5a5,#d4af5f"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Figuier de Provence</span><em>Absolue</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-art="halvorsen,#e8c7b8,#d4af5f"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Cardamome verte</span><em>Essence</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="flacons">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Flacons</span><h2 data-reveal>Trois formats, un seul jus</h2></div>
+        <p class="lead" data-reveal>Chaque flacon est rempli à la main, numéroté et scellé à la cire. Livraison offerte en France.</p>
+      </div>
+      <div class="pricing">
+        <div class="price" data-reveal><span class="eyebrow">Découverte</span><strong>45 €<small> / 10 ml</small></strong><ul><li>Vaporisateur de voyage</li><li>Les trois parfums disponibles</li><li>Déductible d'un achat 50 ml</li></ul><a class="btn btn--ghost" href="#contact">Commander</a></div>
+        <div class="price price--featured" data-reveal style="--d:.1s"><span class="price__tag">Signature</span><span class="eyebrow">Extrait</span><strong>190 €<small> / 50 ml</small></strong><ul><li>Flacon numéroté, scellé à la cire</li><li>Coffret en chêne de la Montagne Noire</li><li>Gravure du prénom offerte</li></ul><a class="btn" href="#contact">Commander</a></div>
+        <div class="price" data-reveal style="--d:.2s"><span class="eyebrow">Sur mesure</span><strong>Dès 1 200 €<small> / 100 ml</small></strong><ul><li>Trois séances avec le nez de la maison</li><li>Formule déposée à votre nom</li><li>Rééditions garanties dix ans</li></ul><a class="btn btn--ghost" href="#contact">Demander un rendez-vous</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>La boutique</span>
+        <h2 data-reveal>Venez sentir avant de choisir</h2>
+        <p class="lead" data-reveal>Un rendez-vous olfactif dure quarante minutes. On vous reçoit dans la cave de macération, à deux pas de la Garonne.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Adresse</strong>27 rue de la République<br>31300 Toulouse — Saint-Cyprien</p>
+          <p data-reveal><strong>Horaires</strong>Mardi – samedi, 11 h – 19 h</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:atelier@maison-ophelia.fr">atelier@maison-ophelia.fr</a></p>
+        </div>
+      </div>
+      <form class="form" name="rendez-vous-ophelia" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="rendez-vous-ophelia">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="parfum">Parfum qui vous attire</label><select id="parfum" name="parfum"><option>Nuit d'Encre</option><option>Brume</option><option>Ambre Vif</option><option>Je ne sais pas encore</option></select></div>
+            <div class="field"><label for="date">Date souhaitée</label><input id="date" name="date" type="date"></div>
+          </div>
+          <div class="field"><label for="message">Un mot sur vous</label><textarea id="message" name="message" placeholder="Ce que vous portez aujourd'hui, ce que vous ne supportez pas…"></textarea></div>
+          <div><button class="btn" type="submit">Réserver mon rendez-vous</button></div>
+        </div>
+        <p class="form__ok">Merci. Nous vous confirmons le rendez-vous par e-mail sous 24 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Maison Ophélia — Toulouse</span>
+    <div class="footer__links"><a href="#collection">Collection</a><a href="#flacons">Flacons</a><a href="#contact">Boutique</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script type="importmap">{ "imports": { "three": "../../vendor/three.module.min.js" } }</script>
+<script src="../../assets/common.js"></script>
+<script type="module" src="aizawa.js"></script>
+</body>
+</html>

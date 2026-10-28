@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier Rive — Architectes paysagistes à Toulouse</title>
+<meta name="description" content="Atelier Rive conçoit des jardins, des parcs et des espaces publics qui laissent passer l'eau, le vent et les gens. Architectes paysagistes à Toulouse.">
+<meta property="og:title" content="Atelier Rive — Architectes paysagistes">
+<meta property="og:description" content="Jardins, parcs et espaces publics dessinés par les flux. Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f1f17'/%3E%3Cpath d='M10 40c10-14 20 6 30-8s12 2 16 0M10 50c10-14 20 6 30-8s12 2 16 0' fill='none' stroke='%239fc5a5' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #0f1f17; --bg-2: #142a1f; --fg: #eef3ea; --muted: #a3b5a6; --line: rgba(238,243,234,.13);
+    --accent: #9fc5a5; --accent-2: #e9dcc4; --accent-ink: #0f1f17;
+    --font-display: 'Fraunces', serif; --font-body: 'Manrope', sans-serif; --radius: 28px;
+  }
+  h1, h2, h3 { font-weight: 300; letter-spacing: -.01em; }
+  h1 { font-size: clamp(3rem, 8vw, 7.2rem); line-height: .98; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .brand { font-family: var(--font-display); font-weight: 500; font-size: 1.3rem; }
+  .hero { align-items: center; }
+  .hero__content { max-width: 820px; }
+  .flow-band { display: block; width: 100%; height: clamp(120px, 20vw, 240px); }
+  .flow-band canvas { width: 100%; height: 100%; }
+  .values { display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .value { display: grid; grid-template-columns: 1fr; gap: 10px 40px; padding: 36px 0; border-bottom: 1px solid var(--line); }
+  @media (min-width: 760px) { .value { grid-template-columns: 1fr 2fr; } }
+  .value h3 { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.2rem); font-style: italic; }
+  .value p { margin: 0; color: var(--muted); }
+  .card { border-radius: var(--radius); }
+  .formula__math { font-family: var(--font-display); font-style: italic; font-size: clamp(1.1rem, 1.8vw, 1.5rem); }
+  .formula__canvas { width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); margin-top: 24px; background: var(--bg-2); border: 1px solid var(--line); }
+  .tile { border-radius: 20px; }
+  .steps .step::before { font-style: italic; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { border-radius: 14px; }
+  .cursor { background: var(--accent-2); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Atelier Rive, accueil"><span class="brand__mark">R</span>Atelier Rive</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#approche">Approche</a>
+      <a href="#expertises">Expertises</a>
+      <a href="#formule">La formule</a>
+      <a href="#projets">Projets</a>
+      <a href="#methode">Méthode</a>
+      <a class="btn" href="#contact">Nous écrire</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Architectes paysagistes — Toulouse</p>
+      <h1 data-words>Dessiner avec ce qui coule, pousse et passe</h1>
+      <p class="lead" data-reveal style="--d:.5s">Nous concevons des jardins, des parcs et des places qui laissent circuler l'eau, le vent et les gens. Des lieux qui s'améliorent avec le temps au lieu de s'user.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#projets">Découvrir nos projets</a>
+        <a class="btn btn--ghost" href="#approche">Notre approche</a>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true">Suivre le courant</div>
+  </section>
+
+  <section class="section" id="approche">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Approche</span><h2 data-reveal>Un paysage est un champ de forces</h2></div>
+        <p class="lead" data-reveal>Avant de dessiner une allée, nous regardons comment l'eau ruisselle, d'où vient le vent, par où les gens coupent déjà. Le plan vient après.</p>
+      </div>
+      <div class="values">
+        <div class="value" data-reveal><h3>Lire le terrain</h3><p>Relevés d'écoulement, ensoleillement saison par saison, sols, usages existants. Quatre semaines d'observation avant la première esquisse. On dessine les lignes de courant avant les lignes de plantation.</p></div>
+        <div class="value" data-reveal><h3>Planter pour dans vingt ans</h3><p>Des essences locales, des mélanges qui se régulent seuls, des sols vivants. Un jardin qui demande moins d'entretien chaque année, pas plus.</p></div>
+        <div class="value" data-reveal><h3>Laisser passer</h3><p>Ni clôtures inutiles ni bitume partout : des sols perméables, des cheminements qui suivent les pentes naturelles, des lisières plutôt que des murs.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flow-band" aria-hidden="true"><canvas data-band></canvas></div>
+
+  <section class="section section--alt" id="expertises">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Expertises</span><h2 data-reveal>Du jardin privé à la place publique</h2></div>
+        <p class="lead" data-reveal>Une équipe de huit paysagistes, ingénieurs et botanistes. Toutes les échelles, un même regard.</p>
+      </div>
+      <div class="cards">
+        <article class="card" data-reveal><span class="card__num">01</span><h3>Jardins privés</h3><p>Terrasses, patios, grands jardins. Conception, suivi de chantier et plan d'entretien sur trois ans.</p></article>
+        <article class="card" data-reveal style="--d:.1s"><span class="card__num">02</span><h3>Espaces publics</h3><p>Places, parcs, cours d'école, berges. Concertation avec les habitants, gestion des eaux pluviales, îlots de fraîcheur.</p></article>
+        <article class="card" data-reveal style="--d:.2s"><span class="card__num">03</span><h3>Tertiaire &amp; logement</h3><p>Pieds d'immeubles, toitures végétalisées, cœurs d'îlot pour promoteurs et bailleurs qui veulent des lieux habités.</p></article>
+        <article class="card" data-reveal style="--d:.3s"><span class="card__num">04</span><h3>Études &amp; stratégie</h3><p>Plans guides, trames vertes et bleues, diagnostics climatiques pour les collectivités du Sud-Ouest.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Un champ de vecteurs tiré du bruit</h2></div>
+        <p class="lead" data-reveal>Les particules du fond de page suivent un champ de vecteurs calculé à partir d'un bruit de Perlin-simplex. On ne dessine pas les courbes : on les laisse apparaître.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>θ(x, y, t) = 2π · n · bruit(x·f, y·f, t)
+v = (cos θ, sin θ) · vitesse</pre>
+          <p class="muted" data-reveal>En chaque point, le bruit donne un angle ; la particule avance dans cette direction, et l'angle change doucement d'un point à l'autre. La fréquence règle la taille des méandres, l'enroulement le nombre de tours, la vitesse l'allure du courant.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Champ de vecteurs avec les paramètres choisis"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="projets">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Projets</span><h2 data-reveal>Quelques lieux qui vivent sans nous</h2></div>
+        <p class="lead" data-reveal>Chaque vignette est le plan de flux du projet : la trace des écoulements et des cheminements que nous avons suivis pour le dessiner.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile" data-reveal data-flow="0.0025,2,#9fc5a5,#e9dcc4"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Berges du Canal — Ramonville</span><em>Parc, 4 ha</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-flow="0.006,1,#e9dcc4,#9fc5a5"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Cour Jaurès</span><em>École</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-flow="0.004,3,#9fc5a5,#ffffff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Jardin Montplaisir</span><em>Privé</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-flow="0.003,1.5,#e9dcc4,#ffffff"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Place des Carmes</span><em>Espace public</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-flow="0.008,2,#9fc5a5,#e9dcc4"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Toiture Compans</span><em>Tertiaire</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-flow="0.005,4,#ffffff,#9fc5a5"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Lisière Borderouge</span><em>Logement</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flow-band" aria-hidden="true"><canvas data-band></canvas></div>
+
+  <section class="section" id="methode">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Méthode</span><h2 data-reveal>Comment se passe un projet</h2></div>
+        <p class="lead" data-reveal>De la première visite à la dernière plantation, vous savez toujours où on en est et ce que ça coûte.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Visite &amp; diagnostic</h3><p>Une demi-journée sur place, gratuite pour les particuliers. On repart avec un relevé, des photos et une note de cadrage.</p></div>
+        <div class="step" data-reveal><h3>Esquisse</h3><p>Deux scénarios dessinés à la main, chiffrés. On les discute sur le terrain, pas en salle de réunion.</p></div>
+        <div class="step" data-reveal><h3>Projet &amp; consultation</h3><p>Plans d'exécution, palette végétale, choix des entreprises. Nous comparons les devis avec vous.</p></div>
+        <div class="step" data-reveal><h3>Chantier &amp; suivi</h3><p>Présence hebdomadaire, réception des plantations, puis trois visites par an pendant trois ans. Un jardin se livre à la fin de la troisième saison.</p></div>
+      </div>
+      <div class="pricing" style="margin-top:72px">
+        <div class="price" data-reveal><span class="eyebrow">Particuliers</span><strong>Dès 2 400 €<small> / esquisse</small></strong><ul><li>Diagnostic et relevé inclus</li><li>Deux scénarios chiffrés</li><li>Palette végétale détaillée</li></ul><a class="btn btn--ghost" href="#contact">Demander une visite</a></div>
+        <div class="price price--featured" data-reveal style="--d:.1s"><span class="price__tag">Le plus courant</span><span class="eyebrow">Mission complète</span><strong>8 – 12 %<small> du montant des travaux</small></strong><ul><li>De l'esquisse à la réception</li><li>Consultation des entreprises</li><li>Trois ans de suivi inclus</li></ul><a class="btn" href="#contact">Parler du projet</a></div>
+        <div class="price" data-reveal style="--d:.2s"><span class="eyebrow">Collectivités</span><strong>Sur consultation</strong><ul><li>Réponse aux marchés publics</li><li>Concertation habitants</li><li>Études climatiques et hydrauliques</li></ul><a class="btn btn--ghost" href="#contact">Recevoir nos références</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Contact</span>
+        <h2 data-reveal>Parlons de votre terrain</h2>
+        <p class="lead" data-reveal>Envoyez-nous une adresse et quelques photos. Nous vous rappelons sous deux jours ouvrés pour fixer une visite.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Atelier</strong>41 allées Jean-Jaurès<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:bonjour@atelier-rive.fr">bonjour@atelier-rive.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33534000000">05 34 00 00 00</a></p>
+        </div>
+      </div>
+      <form class="form" name="contact-rive" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="contact-rive">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="adresse">Adresse du terrain</label><input id="adresse" name="adresse" autocomplete="street-address"></div>
+            <div class="field"><label for="surface">Surface approximative</label><select id="surface" name="surface"><option>Moins de 200 m²</option><option>200 – 1 000 m²</option><option>1 000 – 5 000 m²</option><option>Plus de 5 000 m²</option></select></div>
+          </div>
+          <div class="field"><label for="message">Le projet</label><textarea id="message" name="message" required placeholder="Ce que vous aimez déjà dans ce lieu, et ce qui vous gêne."></textarea></div>
+          <div><button class="btn" type="submit">Envoyer</button></div>
+        </div>
+        <p class="form__ok">Merci ! Nous vous rappelons sous deux jours ouvrés.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Atelier Rive — Toulouse</span>
+    <div class="footer__links"><a href="#expertises">Expertises</a><a href="#projets">Projets</a><a href="#contact">Contact</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="flow.js"></script>
+</body>
+</html>

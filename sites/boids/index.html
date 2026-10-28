@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuée — Agence événementielle, Toulouse</title>
+<meta name="description" content="Nuée conçoit et produit des événements qui rassemblent : lancements, conventions, festivals. Agence événementielle à Toulouse, de 50 à 5 000 personnes.">
+<meta property="og:title" content="Nuée — Agence événementielle">
+<meta property="og:description" content="Faire bouger des milliers de personnes comme une seule. Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f4f6fb'/%3E%3Cpath d='M14 40l10-6 6 4 8-10 12-4' fill='none' stroke='%231c2340' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='24' r='4' fill='%23ff4d6d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #f4f6fb; --bg-2: #e9edf6; --fg: #1c2340; --muted: #5d647d; --line: rgba(28,35,64,.14);
+    --accent: #ff4d6d; --accent-2: #1c2340; --accent-ink: #ffffff;
+    --font-display: 'Outfit', sans-serif; --font-body: 'Outfit', sans-serif; --radius: 24px;
+  }
+  body { font-weight: 300; }
+  h1, h2, h3 { font-weight: 700; letter-spacing: -.03em; }
+  h1 { font-size: clamp(3rem, 9vw, 8rem); line-height: .95; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .header.is-scrolled { background: rgba(244,246,251,.85); }
+  .brand { font-weight: 700; font-size: 1.3rem; }
+  .brand__mark { background: var(--fg); color: #fff; }
+  .btn { font-weight: 500; }
+  .btn--ghost { color: var(--fg); border-color: var(--fg); }
+  .hero { align-items: center; }
+  .hero__content { max-width: 820px; }
+  .no-webgl .hero__canvas { opacity: .25; }
+  .cursor { mix-blend-mode: normal; background: var(--accent); }
+  .counter { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .counter div { padding: 28px; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); }
+  .counter strong { display: block; font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--accent); }
+  .counter span { color: var(--muted); }
+  .card { background: #fff; }
+  .card p { color: var(--muted); }
+  .formula__math, .params { background: #fff; }
+  .formula__canvas { width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); margin-top: 24px; }
+  .tile { background: #fff; border-color: var(--line); }
+  .tile__label { text-shadow: none; color: var(--fg); background: linear-gradient(transparent, rgba(255,255,255,.95)); left: 0; right: 0; bottom: 0; padding: 32px 18px 14px; }
+  .tile__label em { color: var(--muted); }
+  .price { background: #fff; }
+  .price--featured { background: var(--fg); color: #fff; border-color: var(--fg); }
+  .price--featured ul, .price--featured small { color: rgba(255,255,255,.7); }
+  .price__tag { color: #fff; }
+  .field input, .field textarea, .field select { background: #fff; border-radius: 14px; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Nuée, accueil"><span class="brand__mark">N</span>Nuée</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#agence">Agence</a>
+      <a href="#formats">Formats</a>
+      <a href="#formule">La formule</a>
+      <a href="#realisations">Réalisations</a>
+      <a href="#tarifs">Tarifs</a>
+      <a class="btn" href="#contact">Organiser un événement</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Agence événementielle — Toulouse</p>
+      <h1 data-words>Faire bouger mille personnes comme une seule</h1>
+      <p class="lead" data-reveal style="--d:.5s">Lancements, conventions, festivals. Nous concevons des événements où chacun sait où aller, quoi ressentir et de quoi parler le lendemain. La volée qui vous entoure suit votre curseur : essayez.</p>
+      <div class="btn-row" data-reveal style="--d:.7s">
+        <a class="btn" href="#contact">Parler de votre événement</a>
+        <a class="btn btn--ghost" href="#realisations">Voir nos réalisations</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="agence">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>L'agence</span><h2 data-reveal>Une foule n'est pas une somme de gens</h2></div>
+        <p class="lead" data-reveal>C'est un organisme. Elle se déplace, s'arrête, s'enthousiasme et se lasse comme un seul être. Notre métier, c'est de la comprendre pour la guider sans qu'elle s'en aperçoive.</p>
+      </div>
+      <div class="counter">
+        <div data-reveal><strong>260</strong><span>événements produits depuis 2015</span></div>
+        <div data-reveal style="--d:.1s"><strong>5 000</strong><span>personnes, notre plus grande jauge</span></div>
+        <div data-reveal style="--d:.2s"><strong>14</strong><span>permanents, 200 intermittents fidèles</span></div>
+        <div data-reveal style="--d:.3s"><strong>0</strong><span>événement annulé pour cause technique</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="formats">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Formats</span><h2 data-reveal>Ce que nous savons faire voler</h2></div>
+        <p class="lead" data-reveal>Du séminaire de direction au festival en plein air, avec la même exigence : un lieu, un rythme, une mémoire.</p>
+      </div>
+      <div class="cards">
+        <article class="card" data-reveal><span class="card__num">01</span><h3>Lancements de produit</h3><p>Révélation, démonstration, presse. Nous scénarisons le moment où tout le monde regarde la même chose.</p></article>
+        <article class="card" data-reveal style="--d:.1s"><span class="card__num">02</span><h3>Conventions &amp; séminaires</h3><p>De 50 à 2 000 collaborateurs. Plénières qui tiennent, ateliers qui servent, soirées dont on parle.</p></article>
+        <article class="card" data-reveal style="--d:.2s"><span class="card__num">03</span><h3>Festivals &amp; grand public</h3><p>Flux, sécurité, restauration, scénographie. Nous dessinons les parcours avant les scènes.</p></article>
+        <article class="card" data-reveal style="--d:.3s"><span class="card__num">04</span><h3>Événements hybrides</h3><p>Captation, diffusion, interaction à distance. Une seule expérience, dans la salle et derrière l'écran.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Trois règles pour une nuée</h2></div>
+        <p class="lead" data-reveal>Les oiseaux du haut de page suivent le modèle des « boids » de Craig Reynolds : chacun ne regarde que ses voisins, et pourtant la volée se forme.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>v′ = v + <b>s</b>·séparation + <b>a</b>·alignement + <b>c</b>·cohésion
+séparation : s'écarter des voisins trop proches
+alignement : adopter la direction moyenne des voisins
+cohésion   : se rapprocher du centre des voisins</pre>
+          <p class="muted" data-reveal>Aucun oiseau ne connaît la forme du groupe. Chaque règle a un poids ; c'est leur équilibre qui fait une nuée fluide, un essaim nerveux ou une file disciplinée. Réglez les poids et le rayon de vision ci-dessous.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Simulation de boids avec les paramètres choisis"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="realisations">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Réalisations</span><h2 data-reveal>Quelques volées récentes</h2></div>
+        <p class="lead" data-reveal>Chaque vignette est le plan de flux de l'événement : la trace des déplacements du public, simulée avec les mêmes règles.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile" data-reveal data-trace="1"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Convention Aéro Sud — 1 800 pers.</span><em>Parc des expositions</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-trace="2"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Lancement Volta</span><em>Halle aux grains</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-trace="3"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Festival Rives</span><em>Prairie des Filtres</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-trace="4"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Séminaire Garonne</span><em>Château</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-trace="5"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Soirée Météore</span><em>Hangar</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-trace="6"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Forum Emploi</span><em>Stadium</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tarifs">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Tarifs</span><h2 data-reveal>Des honoraires clairs, séparés des achats</h2></div>
+        <p class="lead" data-reveal>Nous facturons notre conception et notre production ; les prestataires sont payés au prix coûtant, devis à l'appui.</p>
+      </div>
+      <div class="pricing">
+        <div class="price" data-reveal><span class="eyebrow">Séminaire</span><strong>Dès 6 500 €<small> HT</small></strong><ul><li>Jusqu'à 150 personnes</li><li>Conception, régie, coordination</li><li>Un chef de projet dédié</li></ul><a class="btn btn--ghost" href="#contact">Demander un devis</a></div>
+        <div class="price price--featured" data-reveal style="--d:.1s"><span class="price__tag">Le plus demandé</span><span class="eyebrow">Convention</span><strong>Dès 24 000 €<small> HT</small></strong><ul><li>150 à 2 000 personnes</li><li>Scénographie et contenus</li><li>Captation et diffusion incluses</li></ul><a class="btn" href="#contact">Parler du projet</a></div>
+        <div class="price" data-reveal style="--d:.2s"><span class="eyebrow">Grand public</span><strong>Sur consultation</strong><ul><li>Au-delà de 2 000 personnes</li><li>Sécurité, flux, autorisations</li><li>Partenariats et billetterie</li></ul><a class="btn btn--ghost" href="#contact">Nous contacter</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Contact</span>
+        <h2 data-reveal>Quand, où, combien ?</h2>
+        <p class="lead" data-reveal>Trois réponses suffisent pour qu'on vous rappelle avec des idées et une première estimation.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Agence</strong>22 boulevard de Strasbourg<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:bonjour@nuee-events.fr">bonjour@nuee-events.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33561000003">05 61 00 00 03</a></p>
+        </div>
+      </div>
+      <form class="form" name="contact-nuee" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="contact-nuee">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="date">Date envisagée</label><input id="date" name="date" type="date"></div>
+            <div class="field"><label for="jauge">Nombre de personnes</label><select id="jauge" name="jauge"><option>Moins de 150</option><option>150 – 500</option><option>500 – 2 000</option><option>Plus de 2 000</option></select></div>
+          </div>
+          <div class="field"><label for="message">L'événement</label><textarea id="message" name="message" required placeholder="Le pourquoi, le public, le lieu si vous l'avez."></textarea></div>
+          <div><button class="btn" type="submit">Envoyer</button></div>
+        </div>
+        <p class="form__ok">Merci ! On vous rappelle sous 48 h avec des premières idées.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Nuée — Toulouse</span>
+    <div class="footer__links"><a href="#formats">Formats</a><a href="#realisations">Réalisations</a><a href="#contact">Contact</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="boids.js"></script>
+</body>
+</html>

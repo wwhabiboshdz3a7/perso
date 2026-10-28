@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Hélion — Horlogerie mécanique, Toulouse</title>
+<meta name="description" content="Maison Hélion fabrique des montres mécaniques à Toulouse, en séries de douze pièces. Mouvements décorés à la main, cadrans émaillés, garantie à vie.">
+<meta property="og:title" content="Maison Hélion — Horlogerie mécanique">
+<meta property="og:description" content="Des montres mécaniques fabriquées à Toulouse, douze par an. Chaque cercle compte.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f6f1e8'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%231b1a19' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='9' fill='none' stroke='%23a8763e' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='2.5' fill='%231b1a19'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #f6f1e8; --bg-2: #ece5d8; --fg: #1b1a19; --muted: #6a645c; --line: rgba(27,26,25,.14);
+    --accent: #a8763e; --accent-2: #1b1a19; --accent-ink: #f6f1e8;
+    --font-display: 'Bodoni Moda', serif; --font-body: 'IBM Plex Sans', sans-serif; --radius: 0px;
+  }
+  h1, h2, h3 { font-weight: 400; letter-spacing: 0; }
+  h1 { font-size: clamp(2.6rem, 6vw, 5.4rem); line-height: 1.02; }
+  .hero { padding-top: calc(var(--header-h) + 16px); }
+  .hero .lead { max-width: 42ch; font-size: clamp(1.05rem, 1.4vw, 1.2rem); }
+  .traced { margin-top: 18px; }
+  .header.is-scrolled { background: rgba(246,241,232,.82); }
+  .brand { font-family: var(--font-display); font-size: 1.35rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; }
+  .brand__mark { border-radius: 50%; background: transparent; border: 1.5px solid var(--fg); color: var(--fg); }
+  .btn { border-radius: 0; background: var(--fg); border-color: var(--fg); color: var(--bg); text-transform: uppercase; letter-spacing: .14em; font-size: .8rem; }
+  .btn:hover { box-shadow: none; background: var(--accent); border-color: var(--accent); }
+  .btn--ghost { background: transparent; color: var(--fg); }
+  .btn--ghost:hover { background: var(--fg); color: var(--bg); }
+  .nav a.btn { color: var(--bg); }
+  .hero { align-items: center; }
+  .hero__grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+  @media (min-width: 900px) { .hero__grid { grid-template-columns: 1fr 1fr; } }
+  .hero__canvas { position: relative; z-index: 0; aspect-ratio: 1; width: min(100%, 72vh); margin-inline: auto; inset: auto; }
+  .hero__canvas canvas { width: 100%; height: 100%; }
+  .no-webgl .hero__canvas { background: none; opacity: 1; }
+  .hero__kicker::before { background: var(--fg); }
+  .traced { font-family: var(--font-display); font-size: clamp(1.4rem, 2.2vw, 2rem); font-style: italic; margin-top: 28px; min-height: 2.4em; color: var(--muted); }
+  .traced .tw { display: inline-block; opacity: .12; transition: opacity .6s; }
+  .traced .tw.is-on { opacity: 1; color: var(--fg); }
+  .cursor { mix-blend-mode: multiply; background: var(--accent); }
+  .manifesto { font-family: var(--font-display); font-size: clamp(1.7rem, 3.2vw, 3rem); line-height: 1.25; max-width: 26ch; }
+  .manifesto em { color: var(--accent); }
+  .pieces { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .pieces { grid-template-columns: repeat(3, 1fr); } }
+  .piece { background: var(--bg); padding: 40px 32px; display: grid; gap: 14px; }
+  .piece svg { width: 110px; height: 110px; margin-bottom: 10px; }
+  .piece span { font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .piece h3 { margin: 0; font-size: 1.7rem; }
+  .piece p { color: var(--muted); margin: 0; }
+  .piece strong { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; }
+  .formula__math { background: var(--bg-2); border: none; font-family: var(--font-display); font-style: italic; font-size: clamp(1.2rem, 2vw, 1.6rem); }
+  .params { background: var(--bg-2); border: none; }
+  .formula__canvas { width: 100%; aspect-ratio: 4/3; background: var(--bg-2); margin-top: 24px; }
+  .tile { background: var(--bg-2); border: none; }
+  .tile__label { text-shadow: none; color: var(--fg); }
+  .tile__label em { color: var(--muted); }
+  .steps .step::before { font-family: var(--font-display); }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { background: #fff; border-radius: 0; }
+  .marquee { font-family: var(--font-display); text-transform: none; font-style: italic; letter-spacing: 0; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Maison Hélion, accueil"><span class="brand__mark">H</span>Hélion</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#maison">Maison</a>
+      <a href="#pieces">Pièces</a>
+      <a href="#formule">La formule</a>
+      <a href="#atelier">Atelier</a>
+      <a href="#commande">Commande</a>
+      <a class="btn" href="#contact">Rendez-vous</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="container hero__grid">
+      <div class="hero__content">
+        <p class="hero__kicker" data-reveal>Horlogerie mécanique — Toulouse</p>
+        <h1 data-words>Chaque cercle compte</h1>
+        <p class="lead" data-reveal style="--d:.5s">Douze montres par an, assemblées et décorées à la main dans notre atelier du quai de Tounis. Des mécaniques qui dessinent le temps, cercle après cercle.</p>
+        <p class="traced" id="traced" aria-live="polite" data-reveal style="--d:.6s">Le temps est une somme de cercles qui tournent chacun à leur rythme.</p>
+        <div class="btn-row" data-reveal style="--d:.7s">
+          <a class="btn" href="#pieces">Voir les pièces</a>
+          <a class="btn btn--ghost" href="#contact">Visiter l'atelier</a>
+        </div>
+      </div>
+      <div class="hero__canvas" id="hero-canvas"><canvas aria-label="Épicycles de Fourier dessinant le monogramme Hélion"></canvas></div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee__track"><span>Calibre HL-01, remontage manuel</span><span>Cadran émail grand feu</span><span>Réserve de marche 72 h</span><span>Garantie à vie</span><span>Calibre HL-01, remontage manuel</span><span>Cadran émail grand feu</span><span>Réserve de marche 72 h</span><span>Garantie à vie</span></div></div>
+
+  <section class="section" id="maison">
+    <div class="container grid-2">
+      <p class="manifesto" data-reveal>Une montre n'indique pas l'heure. Elle la <em>reconstruit</em>, à chaque seconde, avec des roues qui tournent les unes dans les autres.</p>
+      <div>
+        <span class="eyebrow" data-reveal>La maison</span>
+        <p data-reveal>Maison Hélion a été fondée en 2014 par deux horlogers formés en Suisse et revenus à Toulouse avec une obsession : fabriquer, ici, un mouvement complet. Platine, ponts, balancier, spiral : tout est usiné, anglé et poli dans l'atelier.</p>
+        <p data-reveal style="--d:.1s">Nous produisons douze pièces par an. Pas une de plus, parce qu'une montre bien faite demande environ six semaines de travail à une seule personne, du premier copeau à la dernière vis bleuie.</p>
+        <div class="stats">
+          <div class="stat" data-reveal><strong>12</strong><span>montres par an</span></div>
+          <div class="stat" data-reveal style="--d:.1s"><strong>214</strong><span>composants par calibre</span></div>
+          <div class="stat" data-reveal style="--d:.2s"><strong>−2 / +4</strong><span>secondes par jour</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="pieces">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Pièces</span><h2 data-reveal>Trois montres, un seul calibre</h2></div>
+        <p class="lead" data-reveal>Le même mouvement HL-01, trois habillages. Toutes sont livrées avec leur certificat de chronométrie et une garantie à vie sur le mouvement.</p>
+      </div>
+      <div class="pieces">
+        <article class="piece" data-reveal>
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#1b1a19" stroke-width="2"/><circle cx="50" cy="50" r="36" fill="none" stroke="#a8763e" stroke-width="1"/><path d="M50 50V22M50 50l18 10" stroke="#1b1a19" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="50" r="2.5" fill="#1b1a19"/></svg>
+          <span>Référence 01</span><h3>Méridienne</h3><p>Cadran émail blanc, chiffres Breguet, boîtier acier 38 mm. La montre de tous les jours, pour toujours.</p><strong>6 900 €</strong>
+        </article>
+        <article class="piece" data-reveal style="--d:.1s">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#1b1a19" stroke-width="2"/><circle cx="50" cy="62" r="12" fill="none" stroke="#a8763e" stroke-width="1"/><path d="M50 50V18M50 50l-20 8" stroke="#1b1a19" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="50" r="2.5" fill="#1b1a19"/></svg>
+          <span>Référence 02</span><h3>Nocturne</h3><p>Cadran émail bleu nuit, petite seconde à six heures, boîtier or rose 39 mm. Celle qu'on sort le soir.</p><strong>14 200 €</strong>
+        </article>
+        <article class="piece" data-reveal style="--d:.2s">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#1b1a19" stroke-width="2"/><circle cx="50" cy="50" r="28" fill="none" stroke="#a8763e" stroke-width="1" stroke-dasharray="3 4"/><path d="M50 50V20M50 50l24-6" stroke="#1b1a19" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="50" r="2.5" fill="#1b1a19"/></svg>
+          <span>Référence 03</span><h3>Épicycle</h3><p>Cadran ajouré sur le mouvement, rotor squeletté, boîtier titane 40 mm. Pour voir les cercles tourner.</p><strong>19 800 €</strong>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>Des cercles qui dessinent n'importe quoi</h2></div>
+        <p class="lead" data-reveal>Le monogramme du haut de page est tracé par des épicycles : des cercles emboîtés dont chacun tourne à sa propre vitesse. C'est la série de Fourier, celle qui décompose toute courbe fermée en rotations.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>z(t) = Σ  c<sub>k</sub> · e<sup>i·k·t</sup>      c<sub>k</sub> = (1/N) Σ z<sub>n</sub> · e<sup>−i·k·n·2π/N</sup></pre>
+          <p class="muted" data-reveal>Chaque coefficient c<sub>k</sub> est un cercle : son rayon est l'amplitude, son angle de départ la phase, et k sa vitesse de rotation. Avec cinq cercles on obtient une ébauche ; avec soixante, le tracé est net. Réglez le nombre de cercles et la vitesse.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Épicycles avec le nombre de cercles choisi"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="atelier">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Atelier</span><h2 data-reveal>Ce que dessinent nos machines</h2></div>
+        <p class="lead" data-reveal>Quelques formes reconstruites par épicycles, comme nos guillochages sont tracés par des cames qui tournent les unes sur les autres.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile" data-reveal data-shape="heart,24"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Guillochage cœur</span><em>24 cercles</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-shape="star,16"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Étoile</span><em>16 cercles</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-shape="square,12"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Carré</span><em>12 cercles</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-shape="lemniscate,10"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Lemniscate</span><em>10 cercles</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-shape="heart,5"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Cœur, ébauche</span><em>5 cercles</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-shape="star,40"><canvas aria-hidden="true"></canvas><span class="tile__label"><span>Étoile, fine</span><em>40 cercles</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="commande">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Commande</span><h2 data-reveal>Comment on fabrique la vôtre</h2></div>
+        <p class="lead" data-reveal>Il faut compter huit mois entre la première visite et la remise de la montre. Chaque étape se fait avec vous.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Visite de l'atelier</h3><p>Vous essayez les trois références, vous voyez le calibre à la loupe, et nous parlons de vos habitudes de port.</p></div>
+        <div class="step" data-reveal><h3>Configuration</h3><p>Cadran, aiguilles, gravure du fond, bracelet. Un acompte de 30 % lance la fabrication. Nous vous donnons un numéro de série.</p></div>
+        <div class="step" data-reveal><h3>Fabrication &amp; réglage</h3><p>Six semaines de main-d'œuvre, puis trois semaines de réglage en six positions. Vous recevez des photos à chaque étape.</p></div>
+        <div class="step" data-reveal><h3>Remise &amp; entretien</h3><p>Remise en main propre à l'atelier. Révision offerte tous les cinq ans, garantie à vie sur le mouvement.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Rendez-vous</span>
+        <h2 data-reveal>Venez voir tourner les cercles</h2>
+        <p class="lead" data-reveal>L'atelier se visite sur rendez-vous, du mardi au vendredi. Nous ne vendons rien en ligne : une montre se choisit au poignet.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Atelier</strong>8 quai de Tounis<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:atelier@maison-helion.fr">atelier@maison-helion.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33561000001">05 61 00 00 01</a></p>
+        </div>
+      </div>
+      <form class="form" name="rendez-vous-helion" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="rendez-vous-helion">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="reference">Référence qui vous intéresse</label><select id="reference" name="reference"><option>Méridienne</option><option>Nocturne</option><option>Épicycle</option><option>Je veux les voir toutes</option></select></div>
+            <div class="field"><label for="date">Date souhaitée</label><input id="date" name="date" type="date"></div>
+          </div>
+          <div class="field"><label for="message">Message</label><textarea id="message" name="message" placeholder="Vos habitudes, vos montres actuelles, vos questions."></textarea></div>
+          <div><button class="btn" type="submit">Demander un rendez-vous</button></div>
+        </div>
+        <p class="form__ok">Merci. Nous vous proposons un créneau par e-mail sous 48 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Maison Hélion — Toulouse</span>
+    <div class="footer__links"><a href="#pieces">Pièces</a><a href="#atelier">Atelier</a><a href="#contact">Rendez-vous</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script src="../../assets/common.js"></script>
+<script src="fourier.js"></script>
+</body>
+</html>

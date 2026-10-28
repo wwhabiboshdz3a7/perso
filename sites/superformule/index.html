@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbe Joaillerie — Bijoux dessinés par la géométrie, Toulouse</title>
+<meta name="description" content="Orbe Joaillerie crée des bijoux dont les formes naissent d'équations : superformule, courbes de Lissajous. Pièces uniques en or recyclé, atelier à Toulouse.">
+<meta property="og:title" content="Orbe Joaillerie — Bijoux dessinés par la géométrie">
+<meta property="og:description" content="Des formes qui n'existent qu'une fois, en or recyclé. Atelier à Toulouse.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101014'/%3E%3Cpath d='M32 12l14 8v24l-14 8-14-8V20z' fill='none' stroke='%23e8d5b5' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%238b7cf6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<style>
+  :root {
+    --bg: #101014; --bg-2: #17171d; --fg: #f1ece3; --muted: #a39d93; --line: rgba(241,236,227,.13);
+    --accent: #e8d5b5; --accent-2: #8b7cf6; --accent-ink: #101014;
+    --font-display: 'Italiana', serif; --font-body: 'Karla', sans-serif; --radius: 6px;
+  }
+  h1, h2, h3 { font-weight: 400; letter-spacing: .01em; }
+  h1 { font-size: clamp(3rem, 7vw, 6.4rem); line-height: .95; }
+  h2 { font-size: clamp(2.2rem, 5vw, 4.4rem); }
+  .brand { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: .12em; text-transform: uppercase; }
+  .brand__mark { border-radius: 50%; background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  .btn { border-radius: 2px; letter-spacing: .14em; text-transform: uppercase; font-size: .8rem; }
+  .hero { align-items: center; }
+  .hero__content { max-width: 720px; }
+  .hero__canvas::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(16,16,20,.7), transparent 55%); pointer-events: none; }
+  @media (max-width: 760px) { .hero__canvas::after { background: linear-gradient(rgba(16,16,20,.2), rgba(16,16,20,.85)); } }
+  .shapes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 36px; }
+  .shapes button { background: transparent; border: 1px solid var(--line); color: var(--fg); padding: 10px 18px; border-radius: 2px; cursor: pointer; font-size: .85rem; letter-spacing: .08em; transition: border-color .3s, color .3s; }
+  .shapes button:hover, .shapes button.is-active { border-color: var(--accent); color: var(--accent); }
+  .manifesto { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.15; max-width: 22ch; }
+  .manifesto em { font-style: normal; color: var(--accent-2); }
+  .collection { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .collection { grid-template-columns: repeat(3, 1fr); } }
+  .bijou { border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: grid; gap: 10px; background: var(--bg-2); transition: border-color .4s; }
+  .bijou:hover { border-color: var(--accent); }
+  .bijou svg { width: 100%; height: 180px; }
+  .bijou span { font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-2); }
+  .bijou h3 { margin: 0; font-size: 1.9rem; }
+  .bijou p { color: var(--muted); margin: 0; font-size: .98rem; }
+  .bijou strong { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--accent); }
+  .formula__math { font-family: var(--font-display); font-size: clamp(1.2rem, 2vw, 1.6rem); letter-spacing: .02em; }
+  .formula__canvas { width: 100%; aspect-ratio: 1; max-height: 520px; border-radius: var(--radius); margin-top: 24px; background: var(--bg-2); border: 1px solid var(--line); }
+  .tile { border-radius: var(--radius); }
+  .tile svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 1s var(--ease); }
+  .tile:hover svg { transform: scale(1.08) rotate(6deg); }
+  .steps .step::before { font-family: var(--font-display); font-size: 1.5rem; }
+  .contact { display: grid; gap: 48px; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .contact { grid-template-columns: .9fr 1.1fr; } }
+  .field input, .field textarea, .field select { border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <a class="brand" href="#top" aria-label="Orbe Joaillerie, accueil"><span class="brand__mark">O</span>Orbe</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#manifeste">Manifeste</a>
+      <a href="#collection">Collection</a>
+      <a href="#formule">La formule</a>
+      <a href="#galerie">Galerie</a>
+      <a href="#surmesure">Sur mesure</a>
+      <a class="btn" href="#contact">Prendre rendez-vous</a>
+    </nav>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="hero__canvas" id="hero-canvas"><canvas aria-hidden="true"></canvas></div>
+    <div class="container hero__content">
+      <p class="hero__kicker" data-reveal>Joaillerie contemporaine — Toulouse</p>
+      <h1 data-words>Des formes qui n'existent qu'une fois</h1>
+      <p class="lead" data-reveal style="--d:.5s">Chaque bijou Orbe est né d'une équation et de vos coordonnées : une date, un lieu, un nombre qui compte. Puis il est coulé en or recyclé, à la main, dans notre atelier.</p>
+      <div class="shapes" role="group" aria-label="Choisir une forme" data-reveal style="--d:.7s">
+        <button type="button" class="is-active" data-shape="0">Orbe</button>
+        <button type="button" data-shape="1">Étoile</button>
+        <button type="button" data-shape="2">Corolle</button>
+        <button type="button" data-shape="3">Galet</button>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true">Explorer</div>
+  </section>
+
+  <section class="section" id="manifeste">
+    <div class="container grid-2">
+      <p class="manifesto" data-reveal>Nous ne dessinons pas les bijoux. Nous dessinons <em>la règle</em> qui les dessine.</p>
+      <div>
+        <span class="eyebrow" data-reveal>Manifeste</span>
+        <p data-reveal>Orbe est né en 2019 de la rencontre d'une joaillière et d'un mathématicien. L'une savait couler l'or, l'autre savait qu'une seule formule, découverte par le botaniste Johan Gielis, pouvait décrire une étoile de mer, une fleur, une coquille ou un galet, en changeant six nombres.</p>
+        <p data-reveal style="--d:.1s">Nous avons fait de ces six nombres votre histoire. Une date de naissance, les coordonnées d'un lieu, un âge : ils deviennent les paramètres d'une forme que personne d'autre ne portera. Vous la voyez naître à l'écran, puis nous l'imprimons en cire et la coulons.</p>
+        <div class="stats">
+          <div class="stat" data-reveal><strong>100 %</strong><span>or recyclé, certifié</span></div>
+          <div class="stat" data-reveal style="--d:.1s"><strong>1</strong><span>exemplaire par forme, garanti</span></div>
+          <div class="stat" data-reveal style="--d:.2s"><strong>6</strong><span>semaines de fabrication</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="collection">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Collection</span><h2 data-reveal>Trois familles de formes</h2></div>
+        <p class="lead" data-reveal>Chaque famille correspond à une plage de paramètres de la superformule. À l'intérieur, votre pièce est unique.</p>
+      </div>
+      <div class="collection">
+        <article class="bijou" data-reveal><svg viewBox="-110 -110 220 220" data-sf="6,1,1,3,1.6,1.6"></svg><span>Famille I</span><h3>Orbes</h3><p>Pendentifs ronds à facettes douces, forme fermée, paramètres m pairs. La famille la plus portée.</p><strong>Dès 890 €</strong></article>
+        <article class="bijou" data-reveal style="--d:.1s"><svg viewBox="-110 -110 220 220" data-sf="5,1,1,1,1.7,1.7"></svg><span>Famille II</span><h3>Étoiles</h3><p>Bagues et boucles aux pointes nettes, m impair, exposants faibles. Pour celles et ceux qui aiment les angles.</p><strong>Dès 1 250 €</strong></article>
+        <article class="bijou" data-reveal style="--d:.2s"><svg viewBox="-110 -110 220 220" data-sf="8,1,1,2,4,4"></svg><span>Famille III</span><h3>Corolles</h3><p>Broches et manchettes aux lobes multiples. La famille des grandes occasions, souvent sertie.</p><strong>Dès 2 400 €</strong></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="formule">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>La formule</span><h2 data-reveal>La superformule de Gielis</h2></div>
+        <p class="lead" data-reveal>Une seule équation en coordonnées polaires. Six paramètres. Toutes les formes du vivant, ou presque. En trois dimensions, on la multiplie par elle-même.</p>
+      </div>
+      <div class="formula">
+        <div>
+          <pre class="formula__math" data-reveal>r(φ) = [ |cos(mφ/4)/a|<sup>n₂</sup> + |sin(mφ/4)/b|<sup>n₃</sup> ]<sup>−1/n₁</sup></pre>
+          <p class="muted" data-reveal>m donne le nombre de lobes ou de pointes, n₁ arrondit ou creuse, n₂ et n₃ étirent les pointes. Ci-dessous, la forme 2D se redessine en direct ; en haut de page, la version 3D passe d'une forme à l'autre en glissant.</p>
+          <canvas class="formula__canvas" id="formula-canvas" aria-label="Superformule 2D avec les paramètres choisis"></canvas>
+        </div>
+        <div class="params" id="params" data-reveal></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="galerie">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Galerie</span><h2 data-reveal>Quelques pièces déjà parties</h2></div>
+        <p class="lead" data-reveal>Chaque forme a été générée pour une personne précise. Nous ne la referons jamais ; en voici l'empreinte.</p>
+      </div>
+      <div class="gallery">
+        <div class="tile" data-reveal data-art="7,1,1,0.5,1.5,1.5,#e8d5b5"><span class="tile__label"><span>Pendentif « 12.03.1988 »</span><em>Or jaune</em></span></div>
+        <div class="tile" data-reveal style="--d:.1s" data-art="3,1,1,0.3,0.3,0.3,#8b7cf6"><span class="tile__label"><span>Bague « Canal »</span><em>Or gris</em></span></div>
+        <div class="tile" data-reveal style="--d:.2s" data-art="12,1,1,15,15,15,#e8d5b5"><span class="tile__label"><span>Broche « Garonne »</span><em>Or rose</em></span></div>
+        <div class="tile" data-reveal style="--d:.3s" data-art="4,1,1,1,1,1,#f1ece3"><span class="tile__label"><span>Manchette « 43.6° N »</span><em>Or jaune</em></span></div>
+        <div class="tile" data-reveal style="--d:.4s" data-art="5,1,1,2,7,7,#8b7cf6"><span class="tile__label"><span>Boucles « Mai »</span><em>Or gris</em></span></div>
+        <div class="tile" data-reveal style="--d:.5s" data-art="9,1,1,0.8,2.5,2.5,#e8d5b5"><span class="tile__label"><span>Pendentif « Neuf »</span><em>Or rose</em></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="surmesure">
+    <div class="container">
+      <div class="section__head">
+        <div><span class="eyebrow" data-reveal>Sur mesure</span><h2 data-reveal>De vos nombres à votre bijou</h2></div>
+        <p class="lead" data-reveal>Six semaines, quatre étapes, et une forme que vous validez à l'écran avant qu'une goutte d'or ne soit coulée.</p>
+      </div>
+      <div class="steps">
+        <div class="step" data-reveal><h3>Vos coordonnées</h3><p>Une date, un lieu, un nombre qui compte. Nous les convertissons en paramètres et nous générons trois variantes devant vous.</p></div>
+        <div class="step" data-reveal><h3>Choix &amp; ajustements</h3><p>On affine la forme à l'écran, on choisit l'or, l'éventuelle pierre, la taille. Vous repartez avec une impression 3D en résine.</p></div>
+        <div class="step" data-reveal><h3>Cire &amp; fonte</h3><p>Impression de la cire, fonte à cire perdue en or recyclé 18 carats, dans notre atelier. Puis polissage et sertissage à la main.</p></div>
+        <div class="step" data-reveal><h3>Remise</h3><p>Livrée dans son écrin avec la formule gravée au laser à l'intérieur de la pièce et son certificat d'unicité.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="contact">
+    <div class="container contact">
+      <div>
+        <span class="eyebrow" data-reveal>Rendez-vous</span>
+        <h2 data-reveal>Venez voir naître votre forme</h2>
+        <p class="lead" data-reveal>Une heure à l'atelier, sans engagement. Apportez vos nombres, on apporte l'écran et le café.</p>
+        <div class="contact__info" style="margin-top:40px">
+          <p data-reveal><strong>Atelier</strong>19 rue de la Pomme<br>31000 Toulouse</p>
+          <p data-reveal><strong>Écrire</strong><a href="mailto:atelier@orbe-joaillerie.fr">atelier@orbe-joaillerie.fr</a></p>
+          <p data-reveal><strong>Appeler</strong><a href="tel:+33561000002">05 61 00 00 02</a></p>
+        </div>
+      </div>
+      <form class="form" name="rendez-vous-orbe" method="POST" data-netlify="true" netlify-honeypot="site-web" data-reveal>
+        <input type="hidden" name="form-name" value="rendez-vous-orbe">
+        <p class="sr-only"><label>Ne pas remplir : <input name="site-web"></label></p>
+        <div class="form__fields">
+          <div class="form__row">
+            <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="piece">Type de pièce</label><select id="piece" name="piece"><option>Pendentif</option><option>Bague</option><option>Boucles d'oreilles</option><option>Broche ou manchette</option></select></div>
+            <div class="field"><label for="budget">Budget</label><select id="budget" name="budget"><option>Moins de 1 000 €</option><option>1 000 – 2 500 €</option><option>2 500 – 6 000 €</option><option>Plus de 6 000 €</option></select></div>
+          </div>
+          <div class="field"><label for="message">Vos nombres, votre histoire</label><textarea id="message" name="message" placeholder="Une date, un lieu, une personne…"></textarea></div>
+          <div><button class="btn" type="submit">Demander un rendez-vous</button></div>
+        </div>
+        <p class="form__ok">Merci. Nous vous proposons un créneau à l'atelier sous 48 h.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© <span data-year></span> Orbe Joaillerie — Toulouse</span>
+    <div class="footer__links"><a href="#collection">Collection</a><a href="#galerie">Galerie</a><a href="#contact">Rendez-vous</a><a href="../../">Collection Motion</a></div>
+  </div>
+</footer>
+
+<script type="importmap">{ "imports": { "three": "../../vendor/three.module.min.js" } }</script>
+<script src="../../assets/common.js"></script>
+<script type="module" src="orbe.js"></script>
+</body>
+</html>
