@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Garonne — Chambres d'hôtes à Toulouse Saint-Cyprien, réservation en ligne</title>
+<meta name="description" content="Maison d'hôtes de charme à Saint-Cyprien, Toulouse, face à la Garonne. Cinq chambres, petit-déjeuner maison, jardin. Vérifiez les disponibilités et réservez en ligne.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23123b3f'/%3E%3Cpath d='M6 26V12l10-7 10 7v14z' fill='none' stroke='%23e6d8b8' stroke-width='2'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BedAndBreakfast","name":"Maison Garonne","telephone":"+33561428870","priceRange":"€€€","address":{"@type":"PostalAddress","streetAddress":"5 quai de la Daurade","addressLocality":"Toulouse","postalCode":"31300","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6005,"longitude":1.4375},"checkinTime":"16:00","checkoutTime":"11:00","url":"https://example.com/demos/hotel/"}
+</script>
+<style>
+:root{--teal:#123b3f;--teal-l:#1d5a60;--ivory:#f8f4ea;--brass:#c3a86b;--ink:#1c2426;--muted:#6b7678;--accent:var(--teal);--focus:var(--brass);--border:#e0d9c8;--radius:6px;--ph:linear-gradient(135deg,#1d5a60,#123b3f);--mb-bg:#123b3f;--mb-bg2:#c3a86b}
+body{font-family:Raleway,system-ui,sans-serif;background:var(--ivory);color:var(--ink);font-weight:400}
+h1,h2,h3{font-family:Cinzel,Georgia,serif;font-weight:400;line-height:1.15;letter-spacing:.02em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;transition:all .3s;border:1px solid var(--teal);border-radius:var(--radius)}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:var(--teal-l)}
+.btn-brass{background:var(--brass);color:var(--teal);border-color:var(--brass)}.btn-brass:hover{background:#d4ba7e}
+.btn-line{color:var(--teal)}.btn-line:hover{background:var(--teal);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.header{position:sticky;top:0;z-index:40;background:rgba(248,244,234,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:78px}
+.brand{font-family:Cinzel;font-size:22px;letter-spacing:.1em;text-decoration:none;color:var(--teal)}
+.brand small{display:block;font:500 10px Raleway;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);margin-top:2px}
+.nav{display:flex;gap:28px;align-items:center;font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--brass)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:78px 0 0;background:var(--ivory);flex-direction:column;padding:40px;gap:28px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:16px}.nav.open{transform:none;visibility:visible}}
+.hero{position:relative;min-height:88vh;display:grid;align-items:center;color:#fff;overflow:hidden}
+.hero .ph{position:absolute;inset:0}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to right,rgba(18,59,63,.85),rgba(18,59,63,.35))}
+.hero .container{position:relative;z-index:2;padding:72px 0}
+.hero h1{font-size:clamp(36px,5.5vw,68px);max-width:18ch}
+.hero p{font-size:18px;opacity:.9;max-width:50ch;margin:20px 0 28px;font-weight:300}
+.search{background:#fff;color:var(--ink);padding:18px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;max-width:860px;box-shadow:0 30px 60px rgba(0,0,0,.3);border-radius:var(--radius)}
+@media (max-width:800px){.search{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.search{grid-template-columns:1fr}}
+.search label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+.search input,.search select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius);background:#fff}
+section{padding:96px 0}
+@media (max-width:700px){section{padding:64px 0}}
+.eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass);font-weight:600}
+.section-head{max-width:680px;margin-bottom:44px}
+.section-head h2{font-size:clamp(28px,4vw,44px);margin-top:12px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px;font-weight:300}
+.res-info{background:#fff;border:1px solid var(--border);padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:15px;border-radius:var(--radius)}
+.res-info b{font-family:Cinzel;font-weight:400}
+.rooms{display:grid;gap:20px}
+.room{display:grid;grid-template-columns:360px 1fr;background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .3s}
+.room:hover{box-shadow:0 24px 50px rgba(18,59,63,.12)}
+@media (max-width:800px){.room{grid-template-columns:1fr}}
+.room .ph{min-height:240px}
+.room:nth-child(2) .ph{--ph:linear-gradient(135deg,#c3a86b,#7a6235)}.room:nth-child(3) .ph{--ph:linear-gradient(135deg,#e0d9c8,#8a8275)}.room:nth-child(4) .ph{--ph:linear-gradient(135deg,#1c2426,#5a6a6c)}.room:nth-child(5) .ph{--ph:linear-gradient(135deg,#8f9e9c,#123b3f)}
+.room .b{padding:26px 28px;display:flex;flex-direction:column;gap:10px}
+.room h3{font-size:24px}
+.room .feats{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.room p{font-size:15px;color:var(--muted);font-weight:300;flex:1}
+.room .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-top:8px}
+.room .pr{font-family:Cinzel;font-size:28px;color:var(--teal)}
+.room .pr small{font:400 13px Raleway;color:var(--muted)}
+.room .tot{font-size:13px;color:var(--muted)}
+.room.unavail{opacity:.55}
+.room .na{font-size:13px;color:#b91c1c;font-weight:600}
+.room.hidden{display:none}
+/* Calendrier */
+.cal-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.month h3{font-size:18px;margin-bottom:10px;text-transform:capitalize}
+.month .g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.month .dow{font-size:10px;text-align:center;color:var(--muted);letter-spacing:.1em}
+.month .d{aspect-ratio:1;display:grid;place-items:center;font-size:12px;background:#fff;border:1px solid var(--border)}
+.month .d.full{background:var(--teal);color:#fff;opacity:.85}
+.month .d.few{background:#fdf0d5}
+.month .d.past{opacity:.3}
+.month .d.sel{outline:2px solid var(--brass);outline-offset:-2px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+.legend i{width:12px;height:12px;display:inline-block;border:1px solid var(--border);margin-right:6px;vertical-align:middle}
+.legend i.f{background:var(--teal)}.legend i.w{background:#fdf0d5}
+/* Modale réservation */
+.bk h3{font-size:24px;margin:6px 0 12px}
+.bk .recap{background:var(--ivory);padding:14px 16px;font-size:14px;display:grid;gap:6px;margin-bottom:14px;border-radius:var(--radius)}
+.bk .recap div{display:flex;justify-content:space-between}
+.bk .opts label{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--border);margin-bottom:8px;font-size:14px;cursor:pointer;border-radius:var(--radius)}
+.bk .opts label:has(input:checked){border-color:var(--teal);background:var(--ivory)}
+.bk .opts input{accent-color:var(--teal);margin-right:10px}
+.bk form{display:grid;gap:10px;margin-top:12px}
+.bk .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.bk .row{grid-template-columns:1fr}}
+.bk .total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border);padding-top:10px;margin-top:6px}
+.bk .total b{font-family:Cinzel;font-size:26px;color:var(--teal);font-weight:400}
+.bk .done{text-align:center;padding:12px 0}
+.bk .done .ref{font-family:ui-monospace,monospace;letter-spacing:.15em;margin:10px 0;font-size:18px}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gallery .ph{aspect-ratio:1}
+.gallery .ph:nth-child(1){grid-column:span 2;grid-row:span 2}
+.gallery .ph:nth-child(2){--ph:linear-gradient(135deg,#c3a86b,#7a6235)}.gallery .ph:nth-child(4){--ph:linear-gradient(135deg,#e0d9c8,#8a8275)}
+.gallery .ph:hover img{transform:scale(1.04)}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(2,1fr)}}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.review{background:#fff;border:1px solid var(--border);padding:28px;border-radius:var(--radius)}
+.review .stars{color:var(--brass);letter-spacing:3px;font-size:12px}
+.review p{font-size:16px;margin:12px 0;font-weight:300;line-height:1.6}
+.review footer{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-family:Cinzel;font-size:17px;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--brass)}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:18px;font-weight:300}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.map{min-height:320px;background:#e8e2d4;border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.9;margin:14px 0;font-weight:300}
+footer.site{background:var(--teal);color:rgba(255,255,255,.75);padding:44px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand">Maison Garonne<small>Chambres d'hôtes · Toulouse</small></a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#chambres">Chambres</a><a href="#dispo">Disponibilités</a><a href="#maison">La maison</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#chambres" class="btn btn-brass">Réserver</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top" style="padding:0">
+  <div class="ph"><img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=70" alt="Façade de la maison d'hôtes au bord de la Garonne" fetchpriority="high"></div>
+  <div class="container">
+    <p class="eyebrow" data-reveal>Quai de la Daurade · Saint-Cyprien</p>
+    <h1 data-reveal>Cinq chambres face à la Garonne, au cœur de Toulouse</h1>
+    <p data-reveal>Une maison toulousaine du XVIIIe, un jardin clos, des petits-déjeuners au miel du Lauragais. À dix minutes à pied du Capitole, et à mille lieues du bruit.</p>
+    <form class="search" data-reveal id="search">
+      <div><label for="arr">Arrivée</label><input type="date" id="arr" required></div>
+      <div><label for="dep">Départ</label><input type="date" id="dep" required></div>
+      <div><label for="guests">Voyageurs</label><select id="guests"><option value="1">1 personne</option><option value="2" selected>2 personnes</option><option value="3">3 personnes</option><option value="4">4 personnes</option></select></div>
+      <button type="submit" class="btn btn-teal">Vérifier</button>
+    </form>
+  </div>
+</section>
+
+<section id="chambres"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les chambres</p><h2>Chacune a son histoire</h2><p>Literie 180 cm, linge en lin lavé, salles de bain en pierre de Caunes. Petit-déjeuner inclus, servi au jardin dès les beaux jours.</p></div>
+  <div class="res-info" id="resInfo">Indiquez vos dates ci-dessus pour afficher les disponibilités et le tarif exact de votre séjour.</div>
+  <div class="rooms" id="rooms"></div>
+</div></section>
+
+<section id="dispo" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Disponibilités</p><h2>Les trois prochains mois</h2></div>
+  <div class="legend" data-reveal><span><i></i>Disponible</span><span><i class="w"></i>Dernières chambres</span><span><i class="f"></i>Complet</span></div>
+  <div class="cal-wrap" id="cal" data-reveal></div>
+</div></section>
+
+<section id="maison" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">La maison</p><h2>Un hôtel particulier, une famille, un jardin</h2><p>Restaurée en 2019 par Anne et Pierre Lagarde, la maison a gardé ses tomettes, ses poutres et ses volets couleur pastel.</p></div>
+  <div class="gallery" data-reveal>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=70" alt="Chambre Garonne, lit en lin" loading="lazy"></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=600&q=70" alt="Détail de literie" loading="lazy"></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=600&q=70" alt="Jardin clos et table du petit-déjeuner" loading="lazy"></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=600&q=70" alt="Petit-déjeuner maison" loading="lazy"></div>
+    <div class="ph"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=70" alt="Salle de bain en pierre" loading="lazy"></div>
+  </div>
+</div></section>
+
+<section id="avis" style="background:#fff"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Livre d'or</p><h2>9,6 / 10 sur 480 avis</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>La chambre Garonne avec vue sur le fleuve au réveil… Anne nous a conseillé les meilleures adresses des Carmes. On reviendra pour le marché.</p><footer>Isabelle & Marc · Lyon</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Réservation en ligne simple, confirmation immédiate, accueil chaleureux à 22 h malgré notre retard de train.</p><footer>Tom · Londres</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le petit-déjeuner au jardin vaut le voyage : brioche maison, confitures, œufs du marché. Calme absolu en plein centre.</p><footer>Famille Dubois · Nantes</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0;padding-bottom:0"><div class="container" style="max-width:760px;padding:64px 0">
+  <div class="section-head" data-reveal><p class="eyebrow">Informations</p><h2>Bon à savoir</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Horaires d'arrivée et de départ</summary><p>Arrivée de 16 h à 21 h (plus tard sur demande), départ avant 11 h. Bagagerie disponible.</p></details>
+    <details><summary>Conditions d'annulation</summary><p>Gratuite jusqu'à 7 jours avant l'arrivée. Entre 7 jours et 48 h : première nuit due. Moins de 48 h : totalité du séjour.</p></details>
+    <details><summary>Peut-on venir avec un animal ?</summary><p>Les chiens de moins de 15 kg sont les bienvenus dans les chambres Jardin et Pastel (12 € par nuit).</p></details>
+    <details><summary>Y a-t-il un parking ?</summary><p>Parking Saint-Cyprien à 150 m (tarif négocié 12 €/24 h). Garage à vélos fermé dans la cour.</p></details>
+  </div>
+</div></section>
+
+<section id="acces"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(26px,4vw,38px);margin:12px 0 14px">Quai de la Daurade</h2><address><strong>Maison Garonne</strong><br>5 quai de la Daurade, 31300 Toulouse<br>Métro A · Saint-Cyprien République (4 min) · Aéroport 20 min<br><a href="tel:+33561428870">05 61 42 88 70</a> · <a href="mailto:bonjour@maison-garonne.fr">bonjour@maison-garonne.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=5+quai+de+la+Daurade+31300+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4295%2C43.5965%2C1.4455%2C43.6045&layer=mapnik&marker=43.6005%2C1.4375"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Maison Garonne — SARL Lagarde Hospitalité</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SARL Lagarde Hospitalité, 5 quai de la Daurade, 31300 Toulouse. SIRET 967 890 123 00026. Taxe de séjour 1,65 €/nuit/personne en sus. Hébergement : Netlify, Inc. Les données de réservation sont conservées 3 ans. Site de démonstration : établissement fictif, aucun paiement réel.</p></div></div>
+<div class="modal" id="bkModal" aria-hidden="true" role="dialog"><div class="modal-box bk"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><div id="bkBody"></div></div></div>
+<div class="mobile-bar"><a href="tel:+33561428870">📞 Appeler</a><a href="#chambres">Réserver</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, isoDate, fmtDate, cap, uid, store, toast, openModal, validate, sendNetlify } = Demo;
+  const KEY = 'garonne:resa';
+  const ROOMS = [
+    { id: 'garonne', n: 'Chambre Garonne', p: 165, cap: 2, m2: 28, feats: ['Vue fleuve', 'Lit 180', 'Baignoire'], img: 'photo-1611892440504-42a792e24d32', d: 'La plus demandée : deux fenêtres sur la Garonne, baignoire îlot, bureau en noyer.' },
+    { id: 'jardin', n: 'Chambre Jardin', p: 145, cap: 2, m2: 24, feats: ['Accès jardin', 'Lit 160', 'Douche italienne'], img: 'photo-1631049307264-da0ec9d70304', d: 'Au rez-de-jardin, terrasse privée sous le figuier. Animaux acceptés.' },
+    { id: 'pastel', n: 'Chambre Pastel', p: 125, cap: 2, m2: 20, feats: ['Côté cour', 'Lit 160', 'Douche'], img: 'photo-1505693416388-ac5ce068fe85', d: 'Douce et silencieuse, murs bleu pastel, parquet d\'origine.' },
+    { id: 'suite', n: 'Suite Capitole', p: 240, cap: 4, m2: 45, feats: ['2 chambres', 'Salon', 'Vue fleuve'], img: 'photo-1618773928121-c32242e63f39', d: 'Deux chambres communicantes et un salon : idéale en famille ou entre amis.' },
+    { id: 'atelier', n: 'L\'Atelier', p: 155, cap: 3, m2: 32, feats: ['Mezzanine', 'Lit 160 + 90', 'Kitchenette'], img: 'photo-1522708323590-d24dbb6b0267', d: 'Ancien atelier de peintre sous les toits, lumière du nord, mezzanine pour un troisième voyageur.' }
+  ];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const arr = $('#arr'), dep = $('#dep'), guests = $('#guests');
+  arr.min = isoDate(today); const d1 = new Date(today); d1.setDate(d1.getDate() + 1); dep.min = isoDate(d1);
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  const saved = store.get('garonne:search'); if (saved && saved.arr >= isoDate(today)) { arr.value = saved.arr; dep.value = saved.dep; guests.value = saved.guests; }
+  /* Occupation simulée : une chambre est prise un jour donné selon un hasard déterministe + réservations locales */
+  function booked(roomId, iso) { const we = [5, 6].includes(new Date(iso + 'T12:00:00').getDay()); if (seeded(roomId + iso) < (we ? 0.55 : 0.3)) return true; return store.get(KEY, []).some((r) => r.room === roomId && iso >= r.arr && iso < r.dep); }
+  function nights() { if (!arr.value || !dep.value) return []; const list = []; for (let d = new Date(arr.value + 'T12:00:00'); isoDate(d) < dep.value; d.setDate(d.getDate() + 1)) list.push(isoDate(d)); return list; }
+  function rate(room, iso) { const d = new Date(iso + 'T12:00:00'); const we = [5, 6].includes(d.getDay()); const m = d.getMonth(); const season = m >= 4 && m <= 8 ? 1.15 : m === 11 || m === 0 ? 0.9 : 1; return Math.round(room.p * (we ? 1.12 : 1) * season); }
+  function renderRooms() {
+    const ns = nights(); const g = Number(guests.value);
+    $('#resInfo').innerHTML = ns.length ? `<span><b>${ns.length} nuit${ns.length > 1 ? 's' : ''}</b> du ${fmtDate(new Date(arr.value + 'T12:00:00'), { day: 'numeric', month: 'long' })} au ${fmtDate(new Date(dep.value + 'T12:00:00'), { day: 'numeric', month: 'long' })} · ${g} voyageur${g > 1 ? 's' : ''}</span><span id="availCount"></span>` : 'Indiquez vos dates ci-dessus pour afficher les disponibilités et le tarif exact de votre séjour.';
+    let avail = 0;
+    $('#rooms').innerHTML = ROOMS.map((r) => {
+      const tooSmall = g > r.cap; const full = ns.length && ns.some((n) => booked(r.id, n)); const total = ns.reduce((s, n) => s + rate(r, n), 0);
+      const ok = ns.length && !full && !tooSmall; if (ok) avail++;
+      return `<article class="room${ns.length && !ok ? ' unavail' : ''}" data-reveal><div class="ph"><img src="https://images.unsplash.com/${r.img}?auto=format&fit=crop&w=700&q=70" alt="${r.n}" loading="lazy"></div><div class="b"><h3>${r.n}</h3><div class="feats"><span>${r.m2} m²</span><span>${r.cap} pers. max</span>${r.feats.map((f) => `<span>· ${f}</span>`).join('')}</div><p>${r.d}</p><div class="foot"><div><div class="pr">${euro(r.p)} <small>/ nuit, petit-déjeuner inclus</small></div>${ns.length ? `<div class="tot">${ok ? `Total séjour : <strong>${euro(total)}</strong>` : ''}</div>` : ''}</div>${ns.length ? (ok ? `<button class="btn btn-teal" data-book="${r.id}">Réserver</button>` : `<span class="na">${tooSmall ? 'Capacité insuffisante' : 'Complet à ces dates'}</span>`) : `<a href="#top" class="btn btn-line">Choisir des dates</a>`}</div></div></article>`;
+    }).join('');
+    $$('#rooms [data-reveal]').forEach((e) => e.classList.add('is-visible'));
+    if (ns.length) $('#availCount').textContent = avail ? `${avail} chambre${avail > 1 ? 's' : ''} disponible${avail > 1 ? 's' : ''}` : 'Aucune chambre disponible — essayez d\'autres dates';
+    $$('[data-book]').forEach((b) => b.addEventListener('click', () => openBooking(b.dataset.book)));
+  }
+  $('#search').addEventListener('submit', (e) => { e.preventDefault(); if (!arr.value || !dep.value) { toast('Indiquez vos dates d\'arrivée et de départ.', 'err'); return; } if (dep.value <= arr.value) { toast('La date de départ doit suivre l\'arrivée.', 'err'); return; } store.set('garonne:search', { arr: arr.value, dep: dep.value, guests: guests.value }); renderRooms(); $('#chambres').scrollIntoView({ behavior: 'smooth' }); });
+  arr.addEventListener('change', () => { const n = new Date(arr.value + 'T12:00:00'); n.setDate(n.getDate() + 1); dep.min = isoDate(n); if (dep.value <= arr.value) dep.value = isoDate(n); });
+  function openBooking(id) {
+    const r = ROOMS.find((x) => x.id === id); const ns = nights(); const base = ns.reduce((s, n) => s + rate(r, n), 0); const g = Number(guests.value);
+    const OPTS = [['Dîner d\'accueil au jardin (par pers.)', 38 * g], ['Transfert aéroport aller-retour', 60], ['Bouteille de champagne en chambre', 55], ['Lit bébé & chaise haute', 0]];
+    const total = () => base + $$('#bkOpts input:checked').reduce((s, i) => s + Number(i.dataset.p), 0) + 1.65 * ns.length * g;
+    $('#bkBody').innerHTML = `<p class="eyebrow">Réservation</p><h3>${r.n}</h3><div class="recap"><div><span>Dates</span><span>${fmtDate(new Date(arr.value + 'T12:00:00'), { day: 'numeric', month: 'short' })} → ${fmtDate(new Date(dep.value + 'T12:00:00'), { day: 'numeric', month: 'short' })} · ${ns.length} nuit${ns.length > 1 ? 's' : ''}</span></div><div><span>Voyageurs</span><span>${g}</span></div><div><span>Hébergement + petit-déjeuner</span><span>${euro(base)}</span></div><div><span>Taxe de séjour</span><span>${euro(1.65 * ns.length * g)}</span></div></div><div class="opts" id="bkOpts">${OPTS.map((o, i) => `<label><span><input type="checkbox" data-p="${o[1]}" value="${o[0]}">${o[0]}</span><span>${o[1] ? '+' + euro(o[1]) : 'Offert'}</span></label>`).join('')}</div><form name="reservation-hotel" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="bkForm" novalidate><input type="hidden" name="form-name" value="reservation-hotel"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p><input type="hidden" name="chambre" value="${r.n}"><input type="hidden" name="dates" value="${arr.value} → ${dep.value}"><input type="hidden" name="voyageurs" value="${g}"><input type="hidden" name="options" id="fOpts"><input type="hidden" name="total" id="fTotal"><div class="row"><div class="field"><label for="bkNom">Nom</label><input id="bkNom" name="nom" required></div><div class="field"><label for="bkTel">Téléphone</label><input id="bkTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div><div class="field"><label for="bkEmail">E-mail</label><input id="bkEmail" name="email" type="email" required></div><div class="field"><label for="bkMsg">Heure d'arrivée, demandes particulières</label><input id="bkMsg" name="message" placeholder="Arrivée vers 19 h, allergie aux noix…"></div><div class="total"><span>Total du séjour</span><b id="bkTotal">${euro(total())}</b></div><button type="submit" class="btn btn-teal" id="bkSubmit">Confirmer la réservation</button><p style="font-size:12px;color:var(--muted);text-align:center">Aucun prélèvement maintenant : carte bancaire demandée en garantie, annulation gratuite jusqu'à 7 jours avant.</p></form>`;
+    $$('#bkOpts input').forEach((i) => i.addEventListener('change', () => { $('#bkTotal').textContent = euro(total()); }));
+    $('#bkForm').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } $('#fOpts').value = $$('#bkOpts input:checked').map((i) => i.value).join(', '); $('#fTotal').value = euro(total()); const btn = $('#bkSubmit'); btn.disabled = true; btn.textContent = 'Envoi…'; const ref = uid('MG-'); await sendNetlify(f, { reference: ref }); store.set(KEY, [...store.get(KEY, []), { ref, room: r.id, arr: arr.value, dep: dep.value, guests: g, total: total() }]); $('#bkBody').innerHTML = `<div class="done"><p class="eyebrow">Confirmé</p><h3>À très bientôt, ${f.nom.value} !</h3><div class="ref">${ref}</div><p style="font-size:14px;color:var(--muted)">${r.n}, du ${fmtDate(new Date(arr.value + 'T12:00:00'))} au ${fmtDate(new Date(dep.value + 'T12:00:00'))}, ${g} voyageur${g > 1 ? 's' : ''} · ${euro(total())}. Confirmation envoyée à ${f.email.value}. Arrivée à partir de 16 h, quai de la Daurade.</p><button class="btn btn-teal" style="margin-top:16px" data-close-modal>Fermer</button></div>`; renderRooms(); renderCal(); toast('Réservation confirmée', 'ok'); });
+    openModal('#bkModal');
+  }
+  function renderCal() {
+    const wrap = $('#cal'); wrap.innerHTML = '';
+    for (let m = 0; m < 3; m++) {
+      const first = new Date(today.getFullYear(), today.getMonth() + m, 1); const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate(); const off = (first.getDay() + 6) % 7;
+      let cells = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d) => `<div class="dow">${d}</div>`).join('') + '<div></div>'.repeat(off);
+      for (let d = 1; d <= days; d++) { const iso = isoDate(new Date(first.getFullYear(), first.getMonth(), d)); const free = ROOMS.filter((r) => !booked(r.id, iso)).length; const past = iso < isoDate(today); const sel = arr.value && dep.value && iso >= arr.value && iso < dep.value; cells += `<div class="d${past ? ' past' : free === 0 ? ' full' : free <= 2 ? ' few' : ''}${sel ? ' sel' : ''}" title="${free} chambre(s) libre(s)">${d}</div>`; }
+      wrap.innerHTML += `<div class="month"><h3>${fmtDate(first, { month: 'long', year: 'numeric' })}</h3><div class="g">${cells}</div></div>`;
+    }
+  }
+  renderRooms(); renderCal();
+})();
+</script>
+</body>
+</html>
