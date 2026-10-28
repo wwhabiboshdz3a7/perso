@@ -1,0 +1,11 @@
+{
+  "name": "NEXORA — Agence digitale",
+  "short_name": "NEXORA",
+  "description": "Sites web, vidéo, publicité en ligne et création d’entreprise pour commerces et artisans. Toulouse · Alger.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f6f1e9",
+  "theme_color": "#f6f1e9",
+  "lang": "fr",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
