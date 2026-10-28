@@ -1,16 +1,48 @@
-# perso
+# NEXORA — site de l’agence
 
-Projets web personnels. Chaque branche est un site autonome, publiable tel quel sur Netlify (dossier racine).
+Site statique multi-pages (HTML, CSS, JavaScript), sans étape de build. Publiable tel quel sur Netlify.
 
-| Branche | Contenu |
-|---|---|
-| `motion-lab` | Sites vitrines « motion » : animations pilotées par des maths (attracteurs étranges, champs de vecteurs, épicycles de Fourier, réaction-diffusion, shaders). |
-| `demos-toulouse` | Démos de sites pour commerces toulousains (restaurant, coiffeur, garage, etc.), chacune avec sa fonctionnalité métier (réservation, prise de RDV, devis…). |
-| `academy` | Plateforme de formation au code (C, Python, HTML/CSS, JS, C++, cyber, IA) et à la vidéo IA, du débutant à l'avancé, avec éditeur intégré. |
-| `nexora-v2` | Refonte complète du site de l'agence NEXORA. |
+## Structure
 
-## Publier sur Netlify
+```
+.
+├── index.html                      Accueil
+├── services/
+│   ├── index.html                  Vue d’ensemble des quatre pôles
+│   ├── web.html                    NEXORA Web (sites, SEO)
+│   ├── films.html                  NEXORA Films (vidéo)
+│   ├── ads.html                    NEXORA Ads (publicité, réseaux)
+│   └── admin.html                  NEXORA Admin (création d’entreprise)
+├── tarifs.html                     Offres, comparatif, options, simulateur
+├── realisations.html               Exemples de projets, filtres par secteur
+├── a-propos.html                   Histoire, équipe, engagements
+├── contact.html                    Formulaire Netlify, carte
+├── merci.html                      Confirmation après envoi du formulaire
+├── mentions-legales.html
+├── politique-confidentialite.html
+├── 404.html
+├── assets/
+│   ├── css/style.css               Feuille de style commune
+│   ├── js/main.js                  Menu, animations, filtres, simulateur
+│   └── og.png                      Image de partage (réseaux sociaux)
+├── favicon.svg · site.webmanifest
+├── robots.txt · sitemap.xml
+└── netlify.toml                    Publication, en-têtes de sécurité, redirections
+```
 
-1. Nouveau site → « Import from Git » → ce dépôt.
-2. Choisir la branche voulue, dossier de publication : `/` (ou celui indiqué dans le `netlify.toml` de la branche).
-3. Aucune commande de build nécessaire.
+## Déploiement sur Netlify
+
+1. Nouveau site → « Import from Git » → ce dépôt, branche `nexora-v2`.
+2. Dossier de publication : `.` (déjà indiqué dans `netlify.toml`). Aucune commande de build.
+3. Dans Netlify → *Forms*, vérifier que le formulaire `contact` est détecté et activer les notifications par e-mail.
+
+Aperçu local : `python3 -m http.server 8000` puis http://localhost:8000.
+
+## Où modifier
+
+- **Textes et contenus** : directement dans chaque fichier HTML. L’en-tête (`<header>`) et le pied de page (`<footer>`) sont copiés dans chaque page : une modification de menu doit être reportée dans tous les fichiers.
+- **Couleurs, polices, espacements** : variables en tête de `assets/css/style.css` (`--accent`, `--paper`, `--ink`…).
+- **Tarifs** : `tarifs.html` (cartes, tableau comparatif, options) et `index.html` (section offres). Le simulateur lit les attributs `data-min` / `data-max` des cases de `tarifs.html`.
+- **Adresse du site** : remplacer `https://www.nexora-agence.fr` dans les balises `canonical`, `og:url`, les données structurées JSON-LD, `sitemap.xml` et `robots.txt`.
+- **Mentions légales** : compléter les champs entre crochets (`[SIRET]`, adresse, etc.) dans `mentions-legales.html` et `politique-confidentialite.html`.
+- **Photos** : images Unsplash chargées par URL ; remplacer par vos propres photos dans `assets/` quand elles sont disponibles.
