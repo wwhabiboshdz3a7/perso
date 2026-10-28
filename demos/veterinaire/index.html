@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clinique Vétérinaire des Argoulets — Vétérinaire à Toulouse Croix-Daurade</title>
+<meta name="description" content="Clinique vétérinaire à Croix-Daurade, Toulouse : chiens, chats, NAC. Prise de rendez-vous en ligne, urgences 7j/7, carnet de santé numérique avec rappels de vaccins.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23f97316'/%3E%3Ccircle cx='11' cy='11' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='11' r='3' fill='%23fff'/%3E%3Ccircle cx='8' cy='17' r='2.5' fill='%23fff'/%3E%3Ccircle cx='24' cy='17' r='2.5' fill='%23fff'/%3E%3Cellipse cx='16' cy='21' rx='6' ry='4.5' fill='%23fff'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VeterinaryCare","name":"Clinique Vétérinaire des Argoulets","telephone":"+33561481155","address":{"@type":"PostalAddress","streetAddress":"74 avenue de Croix-Daurade","addressLocality":"Toulouse","postalCode":"31200","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6290,"longitude":1.4660},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"19:30"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"17:00"}],"url":"https://example.com/demos/veterinaire/"}
+</script>
+<style>
+:root{--orange:#f97316;--orange-d:#c2410c;--cream:#fff7ed;--teal:#0f766e;--ink:#1f2937;--muted:#6b7280;--bg:#fff;--accent:var(--orange);--focus:var(--teal);--border:#fde3c8;--radius:20px;--ph:linear-gradient(135deg,#fed7aa,#f97316);--mb-bg:#f97316;--mb-bg2:#0f766e}
+body{font-family:Nunito,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:Quicksand,sans-serif;font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 8px 20px rgba(249,115,22,.3)}.btn-orange:hover{background:var(--orange-d);transform:translateY(-2px)}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#115e59}
+.btn-soft{background:var(--cream);color:var(--orange-d)}.btn-soft:hover{background:#ffedd5}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.urgence{background:var(--teal);color:#fff;text-align:center;padding:9px 16px;font-size:14px;font-weight:700}
+.urgence a{color:#fff}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-family:Quicksand;font-weight:700;font-size:19px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{width:38px;height:38px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-style:normal;font-size:20px}
+.nav{display:flex;gap:22px;align-items:center;font-weight:700;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--orange)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:72px 0 0;background:#fff;flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--cream);overflow:hidden;position:relative}
+.hero::before{content:"🐾";position:absolute;right:-20px;top:-30px;font-size:260px;opacity:.07;transform:rotate(20deg)}
+.hero .container{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:64px 0;position:relative}
+@media (max-width:880px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(38px,5.5vw,70px)}
+.hero h1 span{color:var(--orange)}
+.hero p{font-size:18px;color:var(--muted);max-width:48ch;margin:20px 0 28px}
+.hero .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.hero .pills span{background:#fff;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;border:1px solid var(--border)}
+.hero-img .ph{aspect-ratio:1;border-radius:40% 60% 55% 45%/55% 45% 55% 45%;box-shadow:0 30px 60px rgba(249,115,22,.2)}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);font-weight:800}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,48px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.svc{background:var(--cream);border-radius:var(--radius);padding:24px;transition:transform .25s}
+.svc:hover{transform:translateY(-4px)}
+.svc .ic{font-size:30px}
+.svc h3{font-size:18px;margin:10px 0 6px}
+.svc p{font-size:14px;color:var(--muted)}
+.svc .pr{margin-top:10px;font-weight:800;color:var(--orange-d);font-size:14px}
+/* Carnet */
+.carnet{background:var(--teal);color:#fff}
+.carnet .eyebrow{color:#99f6e4}.carnet .section-head p{color:rgba(255,255,255,.8)}
+.carnet-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.carnet-grid{grid-template-columns:1fr}}
+.panel{background:#fff;color:var(--ink);border-radius:var(--radius);padding:28px}
+.panel h3{font-size:22px;margin-bottom:14px}
+.panel form{display:grid;gap:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.species{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.species label{border:2px solid var(--border);border-radius:16px;padding:12px 4px;text-align:center;cursor:pointer;font-size:13px;font-weight:700}
+.species label span{display:block;font-size:26px}
+.species label:has(input:checked){border-color:var(--orange);background:var(--cream)}
+.species input{position:absolute;opacity:0}
+.pets{display:grid;gap:12px}
+.pet{background:#fff;color:var(--ink);border-radius:var(--radius);padding:20px;display:grid;gap:10px}
+.pet .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pet .head h4{font-family:Quicksand;font-size:20px;display:flex;align-items:center;gap:8px}
+.pet .head button{color:#b91c1c;font-size:12px;text-decoration:underline}
+.pet .meta{font-size:13px;color:var(--muted)}
+.vax{display:grid;gap:6px}
+.vax div{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;padding:8px 12px;border-radius:12px;background:var(--cream)}
+.vax .st{font-size:12px;font-weight:800;padding:3px 8px;border-radius:999px}
+.vax .ok{background:#dcfce7;color:#166534}.vax .soon{background:#fef3c7;color:#92400e}.vax .late{background:#fee2e2;color:#991b1b}
+.pet .btn{justify-self:start;padding:9px 16px;font-size:13px}
+.empty{background:rgba(255,255,255,.1);border-radius:var(--radius);padding:24px;text-align:center;font-size:14px}
+/* RDV */
+.rdv-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+@media (max-width:900px){.rdv-grid{grid-template-columns:1fr}}
+.card{background:var(--cream);border-radius:var(--radius);padding:28px}
+.lbl{display:block;font-weight:800;font-size:14px;margin:16px 0 8px}
+.lbl:first-child{margin-top:0}
+.motifs{display:grid;gap:8px}
+.motifs label{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:2px solid #fff;border-radius:14px;cursor:pointer;font-size:14px;font-weight:600}
+.motifs label:has(input:checked){border-color:var(--orange)}
+.motifs input{accent-color:var(--orange)}
+.motifs small{margin-left:auto;color:var(--muted);font-weight:400}
+.motifs label.urg{border-color:#fecaca;background:#fef2f2}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.days button{flex:none;width:64px;padding:8px 0;border:2px solid #fff;background:#fff;border-radius:14px;font-size:11px;color:var(--muted);font-weight:700}
+.days button b{display:block;font-size:20px;color:var(--ink)}
+.days button[aria-pressed="true"]{border-color:var(--orange)}
+.days button[disabled]{opacity:.35;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-top:8px}
+.slots button{padding:10px 4px;border:2px solid #fff;background:#fff;border-radius:12px;font-weight:700;font-size:14px}
+.slots button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.slots button.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.done{text-align:center;padding:14px}
+.done h3{font-size:24px;color:var(--teal)}
+.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.vet{text-align:center}
+.vet .ph{aspect-ratio:1;border-radius:50%;width:150px;margin:0 auto 12px}
+.vet:nth-child(2) .ph{--ph:linear-gradient(135deg,#99f6e4,#0f766e)}.vet:nth-child(3) .ph{--ph:linear-gradient(135deg,#fde68a,#f97316)}
+.vet b{display:block;font-family:Quicksand}.vet span{font-size:13px;color:var(--muted)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:var(--cream);border-radius:var(--radius);padding:22px}
+.review .stars{color:var(--orange);letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:700}
+.faq details{background:var(--cream);border-radius:14px;padding:0 16px;margin-bottom:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:800;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--orange);font-size:20px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:14px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:800;color:var(--orange-d)}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--cream)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<div class="urgence">🚨 Urgence vétérinaire 7j/7, 24h/24 : <a href="tel:+33561481155">05 61 48 11 55</a> — nuits et dimanches via notre service de garde</div>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i>🐾</i>Clinique des Argoulets</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#soins">Soins</a><a href="#carnet">Carnet de santé</a><a href="#rdv">Rendez-vous</a><a href="#equipe">L'équipe</a><a href="#acces">Accès</a><a href="#rdv" class="btn btn-orange">Prendre RDV</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal>Clinique vétérinaire · Croix-Daurade · Toulouse</p>
+    <h1 data-reveal>On prend soin de ceux qui <span>vous attendent</span> à la maison</h1>
+    <p data-reveal>Trois vétérinaires, un plateau d'imagerie et de chirurgie, et un carnet de santé numérique qui vous rappelle les vaccins avant qu'ils ne soient en retard. Chiens, chats, lapins, rongeurs et oiseaux.</p>
+    <div data-reveal><a href="#rdv" class="btn btn-orange">Prendre rendez-vous</a> <a href="#carnet" class="btn btn-soft">Mon carnet de santé</a></div>
+    <div class="pills" data-reveal><span>🩺 Médecine & chirurgie</span><span>📷 Radio & échographie</span><span>🧪 Laboratoire sur place</span><span>🐰 NAC</span></div>
+  </div>
+  <div class="hero-img" data-reveal="scale"><div class="ph"><img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=70" alt="Chien et chat côte à côte" fetchpriority="high"></div></div>
+</div></section>
+
+<section id="soins"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Nos soins</p><h2>Tarifs clairs, affichés avant la consultation</h2></div>
+  <div class="services">
+    <article class="svc" data-reveal><div class="ic">🩺</div><h3>Consultation</h3><p>Examen complet, conseils, ordonnance.</p><p class="pr">45 €</p></article>
+    <article class="svc" data-reveal><div class="ic">💉</div><h3>Vaccination</h3><p>Consultation + vaccin, carnet mis à jour.</p><p class="pr">dès 58 €</p></article>
+    <article class="svc" data-reveal><div class="ic">✂️</div><h3>Stérilisation</h3><p>Chat ou chien, anesthésie gazeuse, retour le soir même.</p><p class="pr">dès 120 €</p></article>
+    <article class="svc" data-reveal><div class="ic">🦷</div><h3>Détartrage</h3><p>Sous anesthésie, bilan dentaire inclus.</p><p class="pr">dès 150 €</p></article>
+    <article class="svc" data-reveal><div class="ic">📷</div><h3>Imagerie</h3><p>Radiographie numérique, échographie abdominale et cardiaque.</p><p class="pr">dès 60 €</p></article>
+    <article class="svc" data-reveal><div class="ic">🚨</div><h3>Urgences</h3><p>Accueil immédiat aux heures d'ouverture, garde la nuit.</p><p class="pr">consultation 75 €</p></article>
+  </div>
+</div></section>
+
+<section class="carnet" id="carnet"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Carnet de santé numérique</p><h2>Ne ratez plus jamais un rappel de vaccin</h2><p>Enregistrez vos compagnons : nous calculons les prochaines échéances (vaccins, vermifuge, antiparasitaire) et vous les rappelons par SMS.</p></div>
+  <div class="carnet-grid">
+    <div class="panel" data-reveal>
+      <h3>Ajouter un compagnon</h3>
+      <form id="petForm">
+        <div class="species"><label><input type="radio" name="sp" value="Chien" checked><span>🐕</span>Chien</label><label><input type="radio" name="sp" value="Chat"><span>🐈</span>Chat</label><label><input type="radio" name="sp" value="Lapin"><span>🐇</span>Lapin</label><label><input type="radio" name="sp" value="Autre"><span>🦜</span>Autre</label></div>
+        <div class="row2"><div class="field"><label for="petName">Nom</label><input id="petName" required placeholder="Pistache"></div><div class="field"><label for="petBirth">Date de naissance</label><input id="petBirth" type="date" required></div></div>
+        <div class="row2"><div class="field"><label for="lastVax">Dernier vaccin</label><input id="lastVax" type="date"></div><div class="field"><label for="lastVerm">Dernier vermifuge</label><input id="lastVerm" type="date"></div></div>
+        <button type="submit" class="btn btn-orange">Ajouter au carnet</button>
+      </form>
+    </div>
+    <div class="pets" id="pets" data-reveal="right"></div>
+  </div>
+</div></section>
+
+<section id="rdv"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Rendez-vous</p><h2>Choisissez un créneau</h2><p>Pour une urgence vitale (détresse respiratoire, intoxication, accident), appelez directement : nous vous attendons.</p></div>
+  <div class="rdv-grid">
+    <div class="card" data-reveal>
+      <span class="lbl">Pour qui ?</span>
+      <div class="field"><select id="rdvPet"><option value="">Un nouvel animal</option></select></div>
+      <span class="lbl">Motif</span>
+      <div class="motifs"><label><input type="radio" name="motif" value="Consultation" checked>Consultation / contrôle<small>20 min · 45 €</small></label><label><input type="radio" name="motif" value="Vaccination">Vaccination<small>20 min · dès 58 €</small></label><label><input type="radio" name="motif" value="Chirurgie / stérilisation">Chirurgie / stérilisation<small>dépôt le matin</small></label><label><input type="radio" name="motif" value="Bilan senior">Bilan senior (+7 ans)<small>40 min · 95 €</small></label><label class="urg"><input type="radio" name="motif" value="Urgence">Urgence du jour<small>créneau prioritaire</small></label></div>
+      <span class="lbl">Jour</span><div class="days" id="days"></div>
+      <span class="lbl">Heure</span><div class="slots" id="slots"></div>
+    </div>
+    <div class="card" data-reveal="right">
+      <form name="rdv-veterinaire" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate>
+        <input type="hidden" name="form-name" value="rdv-veterinaire"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="animal" id="fPet"><input type="hidden" name="motif_rdv" id="fMotif"><input type="hidden" name="creneau" id="fSlot">
+        <div class="row2"><div class="field"><label for="nom">Votre nom</label><input id="nom" name="nom" required></div><div class="field"><label for="tel">Mobile</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div>
+        <div class="field" style="margin-top:12px"><label for="email">E-mail</label><input id="email" name="email" type="email" required></div>
+        <div class="field" style="margin-top:12px"><label for="sympt">Symptômes ou précisions</label><textarea id="sympt" name="message" rows="3" placeholder="Boite depuis hier, mange moins…"></textarea></div>
+        <button type="submit" class="btn btn-orange" style="width:100%;margin-top:14px" id="submit" disabled>Confirmer le rendez-vous</button>
+      </form>
+      <div class="done hidden" id="done"><h3>Rendez-vous confirmé 🐾</h3><p id="doneText" style="color:var(--muted);font-size:15px;margin-top:8px"></p></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="equipe" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">L'équipe</p><h2>Trois vétérinaires, deux ASV, un chat de clinique</h2></div>
+  <div class="team">
+    <div class="vet" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=70" alt="Dr Claire Fabre" loading="lazy"></div><b>Dr Claire Fabre</b><span>Chirurgie · orthopédie</span></div>
+    <div class="vet" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=70" alt="Dr Mathieu Rey" loading="lazy"></div><b>Dr Mathieu Rey</b><span>Médecine interne · imagerie</span></div>
+    <div class="vet" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=400&q=70" alt="Dr Léa Mendes" loading="lazy"></div><b>Dr Léa Mendes</b><span>NAC · médecine préventive</span></div>
+    <div class="vet" data-reveal><div class="ph" style="--ph:linear-gradient(135deg,#fed7aa,#f97316)"><img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=400&q=70" alt="Biscotte, chat de la clinique" loading="lazy"></div><b>Biscotte</b><span>Chat de la clinique · accueil</span></div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Ils nous confient leurs compagnons</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le rappel SMS pour le vaccin de Pistache est arrivé pile une semaine avant. RDV pris en ligne en 1 minute.</p><footer>Émilie · Croix-Daurade</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Urgence un samedi soir pour notre lapin : prise en charge immédiate par le Dr Mendes. Il va très bien.</p><footer>Jules · Borderouge</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Stérilisation de notre chienne : devis clair, appel le soir pour prendre des nouvelles. Équipe adorable.</p><footer>Nadia · Argoulets</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Quand vacciner mon chiot ou mon chaton ?</summary><p>Première injection à 8 semaines, rappel à 12 semaines, puis rappel annuel. Le carnet numérique calcule ces dates pour vous.</p></details>
+    <details><summary>Que faire en cas d'urgence la nuit ?</summary><p>Appelez le 05 61 48 11 55 : vous êtes mis en relation avec le vétérinaire de garde qui vous oriente ou vous reçoit.</p></details>
+    <details><summary>Acceptez-vous les assurances santé animale ?</summary><p>Oui, nous remplissons les feuilles de soins de toutes les assurances et proposons le tiers payant avec certaines.</p></details>
+    <details><summary>Mon animal est stressé par la voiture…</summary><p>Prévenez-nous : nous vous ferons entrer directement en salle de consultation, sans attente en salle d'attente.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Avenue de Croix-Daurade</h2><div class="hours" id="hours"></div><address><strong>Clinique Vétérinaire des Argoulets</strong><br>74 avenue de Croix-Daurade, 31200 Toulouse<br>Métro A · Argoulets · Parking clients<br><a href="tel:+33561481155">05 61 48 11 55</a> · <a href="mailto:contact@vet-argoulets.fr">contact@vet-argoulets.fr</a></address><a class="btn btn-soft" href="https://www.google.com/maps/dir/?api=1&destination=74+avenue+de+Croix-Daurade+31200+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4580%2C43.6250%2C1.4740%2C43.6330&layer=mapnik&marker=43.6290%2C1.4660"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Clinique Vétérinaire des Argoulets — SELARL VetArgoulets</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SELARL VetArgoulets, 74 avenue de Croix-Daurade, 31200 Toulouse. SIRET 989 012 345 00028. Vétérinaires inscrits à l'Ordre (CROV Occitanie). Hébergement : Netlify, Inc. Le carnet de santé numérique est mémorisé sur votre appareil ; les données de rendez-vous servent à organiser la consultation. Site de démonstration : clinique fictive.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561481155">🚨 Urgence</a><a href="#rdv">Prendre RDV</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, isoDate, fmtDate, cap, uid, store, toast, validate, sendNetlify } = Demo;
+  const KEY = 'argoulets:pets'; let pets = store.get(KEY, []);
+  const ICON = { Chien: '🐕', Chat: '🐈', Lapin: '🐇', Autre: '🦜' };
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const addMonths = (iso, m) => { const d = new Date(iso + 'T12:00:00'); d.setMonth(d.getMonth() + m); return isoDate(d); };
+  const status = (due) => { const diff = (new Date(due + 'T12:00:00') - today) / 864e5; return diff < 0 ? ['late', 'En retard'] : diff < 30 ? ['soon', 'Dans ' + Math.ceil(diff) + ' j'] : ['ok', 'À jour']; };
+  function schedule(p) {
+    const age = (today - new Date(p.birth + 'T12:00:00')) / 864e5;
+    const items = [];
+    if (p.sp === 'Chien' || p.sp === 'Chat') { items.push(['Vaccins (rappel annuel)', p.vax ? addMonths(p.vax, 12) : (age < 56 ? addMonths(p.birth, 2) : isoDate(today))]); items.push(['Vermifuge', p.verm ? addMonths(p.verm, age < 365 ? 1 : 3) : isoDate(today)]); items.push(['Antiparasitaire', p.verm ? addMonths(p.verm, 1) : isoDate(today)]); if (age > 7 * 365) items.push(['Bilan senior', addMonths(p.vax || isoDate(today), 6)]); }
+    else if (p.sp === 'Lapin') { items.push(['Vaccin myxomatose / VHD', p.vax ? addMonths(p.vax, 12) : isoDate(today)]); items.push(['Contrôle dentaire', addMonths(p.vax || isoDate(today), 6)]); }
+    else items.push(['Bilan annuel', p.vax ? addMonths(p.vax, 12) : isoDate(today)]);
+    return items;
+  }
+  function renderPets() {
+    $('#pets').innerHTML = pets.length ? pets.map((p, i) => { const age = Math.floor((today - new Date(p.birth + 'T12:00:00')) / 864e5 / 365.25); return `<div class="pet"><div class="head"><h4>${ICON[p.sp]} ${p.name}</h4><button data-rm="${i}">Retirer</button></div><p class="meta">${p.sp} · ${age < 1 ? 'moins d\'un an' : age + ' an' + (age > 1 ? 's' : '')} · né·e le ${fmtDate(new Date(p.birth + 'T12:00:00'), { day: 'numeric', month: 'short', year: 'numeric' })}</p><div class="vax">${schedule(p).map(([n, due]) => { const [cls, lbl] = status(due); return `<div><span>${n}<br><small style="color:var(--muted)">échéance ${fmtDate(new Date(due + 'T12:00:00'), { day: 'numeric', month: 'short', year: 'numeric' })}</small></span><span class="st ${cls}">${lbl}</span></div>`; }).join('')}</div><a href="#rdv" class="btn btn-teal" data-rdv="${i}">Prendre RDV pour ${p.name}</a></div>`; }).join('') : '<div class="empty">Aucun compagnon enregistré. Ajoutez-en un pour voir ses prochaines échéances.</div>';
+    $$('[data-rm]').forEach((b) => b.addEventListener('click', () => { pets.splice(Number(b.dataset.rm), 1); store.set(KEY, pets); renderPets(); }));
+    $$('[data-rdv]').forEach((a) => a.addEventListener('click', () => { $('#rdvPet').value = pets[Number(a.dataset.rdv)].name; }));
+    $('#rdvPet').innerHTML = '<option value="">Un nouvel animal</option>' + pets.map((p) => `<option>${p.name}</option>`).join('');
+  }
+  $('#petBirth').max = isoDate(today); $('#lastVax').max = isoDate(today); $('#lastVerm').max = isoDate(today);
+  $('#petForm').addEventListener('submit', (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Nom et date de naissance sont obligatoires.', 'err'); return; } pets.push({ name: $('#petName').value.trim(), sp: $('input[name=sp]:checked').value, birth: $('#petBirth').value, vax: $('#lastVax').value, verm: $('#lastVerm').value }); store.set(KEY, pets); f.reset(); renderPets(); toast('Compagnon ajouté au carnet', 'ok'); });
+  renderPets();
+
+  /* RDV */
+  const st = { date: null, time: null }; const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  const box = $('#days');
+  for (let i = 0; i < 14; i++) { const d = new Date(today); d.setDate(d.getDate() + i); const closed = d.getDay() === 0; const b = document.createElement('button'); b.type = 'button'; b.disabled = closed; b.dataset.date = isoDate(d); b.innerHTML = `${i === 0 ? 'Auj.' : fmtDate(d, { weekday: 'short' })}<b>${d.getDate()}</b>`; if (!closed && !st.date) st.date = isoDate(d); b.setAttribute('aria-pressed', String(st.date === isoDate(d))); b.addEventListener('click', () => { st.date = b.dataset.date; st.time = null; $$('#days button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); renderSlots(); }); box.appendChild(b); }
+  function renderSlots() { const s = $('#slots'); s.innerHTML = ''; const now = new Date(); const urg = $('input[name=motif]:checked').value === 'Urgence'; const sat = new Date(st.date + 'T12:00:00').getDay() === 6; const times = []; for (let h = sat ? 9 : 8; h < (sat ? 17 : 19.5); h += 0.5) times.push(`${String(Math.floor(h)).padStart(2, '0')}:${h % 1 ? '30' : '00'}`); times.forEach((t) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; const past = st.date === isoDate(now) && t <= `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; b.disabled = past || (!urg && seeded(st.date + t) < 0.4) || store.get('argoulets:rdv', []).some((r) => r.date === st.date && r.time === t); if (st.time === t) b.classList.add('on'); b.addEventListener('click', () => { st.time = t; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#submit').disabled = false; }); s.appendChild(b); }); $('#submit').disabled = !st.time; }
+  $$('input[name=motif]').forEach((r) => r.addEventListener('change', () => { st.time = null; renderSlots(); }));
+  renderSlots();
+  $('#form').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } const motif = $('input[name=motif]:checked').value; const pet = $('#rdvPet').value || 'nouvel animal'; $('#fPet').value = pet; $('#fMotif').value = motif; $('#fSlot').value = st.date + ' ' + st.time; const btn = $('#submit'); btn.disabled = true; const r = { id: uid('VA-'), date: st.date, time: st.time, motif, pet }; await sendNetlify(f, { reference: r.id }); store.set('argoulets:rdv', [...store.get('argoulets:rdv', []), r]); $('#doneText').textContent = `${motif} pour ${pet}, le ${fmtDate(new Date(st.date + 'T12:00:00'))} à ${st.time}. Référence ${r.id}. ${motif === 'Chirurgie / stérilisation' ? 'Animal à jeun depuis la veille 20 h.' : 'Rappel par SMS la veille.'}`; f.classList.add('hidden'); $('#done').classList.remove('hidden'); toast('Rendez-vous confirmé', 'ok'); });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Urgences uniquement' : i === 6 ? '9:00 – 17:00' : '8:00 – 19:30'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>
