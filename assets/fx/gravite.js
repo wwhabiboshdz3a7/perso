@@ -6,11 +6,11 @@ injectCSS('gravite', `
 .gv { position: absolute; inset: 0; overflow: hidden; }
 .gv__w { position: absolute; left: 0; top: 0; padding: .06em .32em .1em; border-radius: 99px; font-family: var(--f-display); font-weight: 900; text-transform: uppercase;
   line-height: 1; letter-spacing: -.02em; font-variation-settings: "wdth" 115; white-space: nowrap; cursor: grab; will-change: transform; touch-action: none; }
-.gv__w.s0 { background: var(--ink); color: var(--paper); }
-.gv__w.s1 { background: var(--fx); color: var(--ink); }
-.gv__w.s2 { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
-.gv__w.s3 { background: var(--hot); color: var(--ink); }
-.gv__w.s4 { background: transparent; color: var(--ink); font-family: var(--f-serif); font-style: italic; font-weight: 300; text-transform: none; }
+.gv__w.gv-s0 { background: var(--ink); color: var(--paper); }
+.gv__w.gv-s1 { background: var(--fx); color: var(--ink); }
+.gv__w.gv-s2 { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+.gv__w.gv-s3 { background: var(--hot); color: var(--ink); }
+.gv__w.gv-s4 { background: transparent; color: var(--ink); font-family: var(--f-serif); font-style: italic; font-weight: 300; text-transform: none; }
 .gv__w.grab { cursor: grabbing; }
 .gv__hint { position: absolute; left: var(--gutter); top: 84px; color: #55524b; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
 `);
@@ -19,7 +19,7 @@ injectCSS('gravite', `
 export function createPile(root, words, { fs, styles = 5, floorPad = 0, onSettle } = {}) {
   const els = words.map((w, i) => {
     const el = document.createElement('div');
-    el.className = 'gv__w s' + (i % styles);
+    el.className = 'gv__w gv-s' + (i % styles);
     el.textContent = w;
     el.style.fontSize = fs + 'px';
     root.appendChild(el);

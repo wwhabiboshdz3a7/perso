@@ -283,7 +283,7 @@ S.s06 = (sec) => {
   };
   size();
   const split = SplitText.create(p, { type: 'words', wordsClass: 'w' });
-  const keyWords = ['traverse,', 'regard', 'tempo,', 'orchestre.'];
+  const keyWords = ['traverse.', 'regard', 'tempo,', 'orchestre.'];
   const keys = split.words.filter((w) => keyWords.includes(w.textContent.trim()));
   keys.forEach((k, i) => { k.classList.add('k'); if (i % 2) k.classList.add('hot'); });
   if (RM) { gsap.set(split.words, { color: '#0a0a0b' }); gsap.set(keys, { backgroundSize: '100% 72%' }); return { resize: size }; }
@@ -327,9 +327,9 @@ S.s09 = (sec) => {
   loop($('.sc__pin', sec), (t, dt) => {
     const want = prog >= 0.5 ? 'REFAIT' : 'DÉFAIT';
     if (want !== word) { word = want; sw.setTarget(word, { font }); }
-    const spread = Math.pow(Math.sin(Math.PI * clamp((prog - 0.08) / 0.84, 0, 1)), 1.2);
+    const spread = Math.pow(Math.sin(Math.PI * clamp((prog - 0.18) / 0.66, 0, 1)), 1.2);
     const p = virtualPointer(t, cv.getBoundingClientRect());
-    sw.step(dt, { px: p.x * DPR, py: p.y * DPR, spread: prog > 0.02 ? spread : -1, color: prog >= 0.5 ? ACID : '#eeeae1', alt: prog >= 0.5 ? '#eeeae1' : ACID, t });
+    sw.step(dt, { px: p.x * DPR, py: p.y * DPR, spread: prog > 0.18 && prog < 0.84 ? spread : -1, color: prog >= 0.5 ? ACID : '#eeeae1', alt: prog >= 0.5 ? '#eeeae1' : ACID, t });
   });
   return { resize: () => sw.setTarget(word, { font }) };
 };
@@ -346,8 +346,8 @@ S.s10 = (sec) => {
 
 // 11 — Lumière : les lettres comme fenêtres, puis plongée dans le I
 S.s11 = (sec) => {
-  const cv = $('.s11__cv', sec), h = $('.s11__t', sec);
-  const draw = blobField(cv, () => ({ base: '#140b22', list: ['198,255,61', '255,77,36', '123,97,255', '255,176,0', '238,234,225', '198,255,61'] }), { count: 7 });
+  const cv = $('.s11__cv', sec), h = $('.s11__t', sec), cap = $('.cap', sec);
+  const draw = blobField(cv, () => ({ base: '#140b22', list: ['198,255,61', '255,77,36', '123,97,255', '255,176,0', '255,77,36', '123,97,255'] }), { count: 6 });
   let split, origin = [0, 0], iw = 1, zoom = 1;
   const fit = () => {
     if (split) split.revert();
@@ -365,6 +365,7 @@ S.s11 = (sec) => {
     const S = (Math.hypot(innerWidth, vh()) * 1.3) / iw;
     zoom = Math.pow(S, p * p);
     h.style.transform = `scale(${zoom})`;
+    cap.style.opacity = String(clamp(1 - p * 3, 0, 1));
   } });
   loop($('.sc__pin', sec), (t) => {
     const p = virtualPointer(t, cv.getBoundingClientRect());
@@ -417,7 +418,7 @@ S.s14 = (sec) => {
   const frame = (t) => {
     const p = virtualPointer(t, cv.getBoundingClientRect());
     const narrow = innerWidth < 760;
-    draw(t, { text: 'Chaos·forme·', color: HOT, rotY: t * 0.15 + prog * 4 + (p.x / innerWidth - 0.5) * 0.8, rotX: (p.y / vh() - 0.5) * 0.6, steps: 3, scale: narrow ? 0.8 : 1, cx: narrow ? 0.5 : 0.36, cy: narrow ? 0.36 : 0.5 });
+    draw(t, { text: 'Chaos·forme·', color: HOT, rotY: Math.sin(t * 0.2) * 0.45 + (prog - 0.5) * 1.4 + (p.x / innerWidth - 0.5) * 0.6, rotX: (p.y / vh() - 0.5) * 0.6, steps: 3, scale: narrow ? 0.8 : 1, cx: narrow ? 0.5 : 0.36, cy: narrow ? 0.36 : 0.5 });
   };
   if (RM) { frame(2); return {}; }
   loop($('.sc__pin', sec), frame);
@@ -461,6 +462,7 @@ S.s15 = (sec) => {
   };
   const reveal = () => {
     if (revealed) return; revealed = true;
+    gsap.to($('.cap', sec), { opacity: 0, duration: 0.4 });
     board.show(msgs, 1.2);
     type();
   };

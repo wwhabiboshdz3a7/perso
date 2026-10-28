@@ -48,9 +48,9 @@ export function createBoard(root, { cols, rows, cw }) {
     });
     return new Promise((done) => setTimeout(async () => {
       let i = Math.max(0, SET.indexOf(cell.cur)), steps = 0;
-      while (cell.cur !== target && g === cell.gen && steps < 14) {
+      while (cell.cur !== target && g === cell.gen && steps < 9) {
         i = (i + 1) % SET.length;
-        const next = steps === 13 ? SET[ti] : SET[i];
+        const next = steps === 8 ? SET[ti] : SET[i];
         await one(next); steps++;
         if (SET[i] === target) break;
       }

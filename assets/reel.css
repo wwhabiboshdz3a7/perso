@@ -137,11 +137,8 @@ html.lenis, html.lenis body { height: auto; }
 /* 12 — Chiffres */
 .s12 { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 4vw; align-content: center; padding: 80px var(--gutter) 150px; }
 .s12__item { border-top: 2px solid var(--ink); padding: 1.4vh 0 3vh; display: flex; align-items: flex-end; gap: 2vw; }
-.s12__n { font-family: var(--f-display); font-weight: 900; font-size: min(15vw, 26vh); line-height: .86; letter-spacing: -.05em; font-variation-settings: "wdth" 55; color: var(--ink); display: inline-flex; }
+.s12__n { font-family: var(--f-display); font-weight: 900; font-size: min(15vw, 24vh); line-height: 1; letter-spacing: -.05em; font-variation-settings: "wdth" 55; color: var(--ink); display: inline-flex; }
 .s12__item p { margin: 0 0 .6em; max-width: 15em; font-size: clamp(16px, 1.3vw, 20px); line-height: 1.25; font-weight: 600; }
-.s12 .od__win { display: inline-block; height: .86em; overflow: hidden; }
-.s12 .od__strip { display: flex; flex-direction: column; }
-.s12 .od__strip span { display: block; height: .86em; line-height: .86; }
 
 /* 13 — Gravité */
 .s13 { position: absolute; inset: 0; overflow: hidden; }

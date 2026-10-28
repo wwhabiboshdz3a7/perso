@@ -1,50 +1,63 @@
-# Motion Lab — sites vitrines animés par les mathématiques
+# Motion Lab — typographie cinétique
 
-Une collection de dix sites vitrines complets, en français, dont chaque animation est pilotée par une formule : attracteurs étranges, champs de vecteurs, épicycles de Fourier, réaction-diffusion, superformule, fractales, boids, automates cellulaires. Le public visé : un client qui veut refaire son site avec un effet mémorable, sans sacrifier la lisibilité ni la performance.
+Un site de démonstration consacré au texte en mouvement : un showreel immersif piloté par le défilement, un lab de vingt-cinq effets isolés et réglables, et, en section secondaire, le Labo maths (dix sites vitrines animés par des équations).
 
-Tout est en HTML, CSS et JavaScript sans étape de build. Le dossier racine se publie tel quel sur Netlify (`netlify.toml` fourni, publication du dossier `.`).
+Tout est en HTML, CSS et JavaScript, sans étape de build. Le dossier racine se publie tel quel sur Netlify (`netlify.toml` fourni, publication du dossier `.`).
 
 ## Structure
 
 ```
-index.html              Page galerie : une vignette vivante (canvas) par site
-assets/base.css         Socle commun : grille, composants, micro-interactions
-assets/common.js        Boucle d'animation économe, panneau de paramètres, reveal, curseur…
-assets/hub.js           Miniatures de la galerie
-vendor/                 three.js 0.170.0 (module ES), chargé en local via import map
-sites/<slug>/           Un site par concept (index.html + script dédié)
-netlify.toml            Configuration de publication
+index.html                  Showreel : 15 scènes plein écran enchaînées au défilement
+assets/kinetic.css          Socle commun : couleurs, polices, grain, curseur, composants
+assets/reel.css, reel.js    Mise en scène du showreel (scènes empilées, transitions, HUD, menu)
+assets/core.js              Outils : boucles suspendues hors écran, pointeur/gyroscope, mesure du texte
+assets/fx/<effet>.js        Un module par effet (réutilisé par le lab et par le showreel)
+assets/lab/                 Catalogue des effets, page d'effet (réglages, rejouer), galerie
+lab/index.html              Galerie : vignettes vivantes de chaque effet
+lab/<effet>/index.html      Un effet plein écran, texte / vitesse / couleur réglables
+maths/                      Labo maths : hub + 10 sites (maths/sites/<slug>/)
+vendor/gsap/                GSAP 3.13 et plugins (ScrollTrigger, SplitText, ScrambleText…)
+vendor/lenis/               Lenis (défilement lissé)
+vendor/three.module.min.js  three.js 0.170 pour le Labo maths
 ```
 
-## Les sites
+## Le showreel
 
-| Slug | Entreprise fictive | Secteur | Mathématiques | Technique |
-|---|---|---|---|---|
-| `lorenz` | Strange Studio | Agence de design | Système de Lorenz (σ, ρ, β), couleur par vitesse, rotation liée au scroll | Three.js, points + traînées |
-| `aizawa` | Maison Ophélia | Parfumerie | Attracteurs d'Aizawa, Thomas et Halvorsen, morphing entre systèmes | Three.js, mélange additif |
-| `clifford` | Anouk Ferrand | Photographe | Attracteurs de Clifford et De Jong en accumulation de densité, coefficients qui dérivent et suivent la souris | Canvas 2D, ImageData |
-| `flowfield` | Atelier Rive | Paysagistes | Champ de vecteurs tiré d'un bruit simplex 3D, bandes de courant entre sections | Canvas 2D |
-| `fourier` | Maison Hélion | Horlogerie | Série de Fourier discrète, épicycles qui tracent un monogramme et révèlent le texte | Canvas 2D |
-| `grayscott` | Osmose Laboratoire | Cosmétique | Réaction-diffusion de Gray-Scott, ping-pong de textures flottantes, pointeur qui dépose du réactif | WebGL2 |
-| `superformule` | Orbe Joaillerie | Joaillerie | Superformule de Gielis en 3D (produit sphérique), morphing, courbe de Lissajous | Three.js, matériau physique, environnement PMREM |
-| `julia` | Itéra Conseil | Conseil data | Ensemble de Julia, c = 0,7885·e^{iθ} animé, zoom qui respire, palette par cosinus | GLSL |
-| `boids` | Nuée | Événementiel | Boids de Reynolds (séparation, alignement, cohésion), attirés par le curseur | Canvas 2D, grille spatiale |
-| `vie` | Cellule | Coworking | Jeu de la vie de Conway et variantes B/S, dessin à la souris | Canvas 2D |
+Un manifeste en quinze mouvements — « Le texte n'est plus posé. Il bouge, il respire, il réagit. » Chaque scène reste collée à l'écran pendant que la suivante la recouvre (clip-path en carte, en cercle ou en diagonale), avec compteur de scène, barre de progression et menu plein écran.
 
-Chaque site comprend : un hero plein écran animé, une navigation, une section concept, une offre, une section « La formule » (l'équation en une phrase et un panneau de paramètres interactifs qui agit sur l'animation), une galerie générée, des tarifs ou un process, un formulaire de contact prêt pour Netlify Forms, un pied de page.
+| # | Scène | Effet |
+|---|---|---|
+| 01 | Ouverture | Split lettre par lettre en élastique, puis les lettres décollent en 3D au défilement |
+| 02 | Il bouge | Roboto Flex : graisse, chasse et inclinaison en vagues, accélérées par la vitesse de défilement |
+| 03 | Il respire | Rideau de lignes qui entrent en prenant du poids (police variable), puis relâchent |
+| 04 | Décodage | Mots déchiffrés au défilement, journal de terminal, pluie de glyphes |
+| 05 | Élan | Marquees croisés qui accélèrent et se penchent avec la vitesse de défilement |
+| 06 | Lecture | Paragraphe colorié mot à mot, surlignage des mots clés (bascule en clair) |
+| 07 | Rotation | Cylindre de lettres en 3D CSS entraîné par le défilement |
+| 08 | Il réagit | Lettres-ressorts repoussées par le pointeur (gyroscope ou auto-animation sur mobile) |
+| 09 | Poussière | Texte échantillonné en particules : DÉFAIT se disperse et se reforme en REFAIT |
+| 10 | Trouble | Shader WebGL : ondulation, séparation RGB, tranches de glitch |
+| 11 | Lumière | Texte-fenêtre sur un fond animé, puis plongée dans le I jusqu'à remplir l'écran |
+| 12 | Chiffres | Compteurs géants façon odomètre |
+| 13 | Gravité | Mots qui tombent, rebondissent, s'empilent et se lancent à la souris |
+| 14 | Chaos | Lettres posées sur l'attracteur de Lorenz, lien vers le Labo maths |
+| 15 | Motion | Zoom infini à travers le O, tableau split-flap et machine à écrire |
 
-## Règles communes
+## Le lab
 
-- Responsive mobile, polices de 16 px minimum, contrastes AA.
-- `prefers-reduced-motion` respecté : rendu statique à la place des boucles.
-- Repli CSS (dégradés) si WebGL n'est pas disponible.
-- Nombre de particules réduit sur petit écran, `devicePixelRatio` plafonné à 2.
-- Boucles `requestAnimationFrame` suspendues quand l'onglet est masqué ou le canvas hors écran.
-- Aucune image de banque : toutes les visuels sont calculés au chargement.
+Vingt-cinq effets plein écran, chacun avec le nom de sa technique, un bouton « Rejouer » (ou touche R), un champ pour taper son propre texte, la vitesse et la couleur (et un mode pour certains) : split élastique, décodage, cylindre, tunnel, sphère de lettres, ressorts, police variable, masque vivant, particules, liquide & glitch, marquees croisés, texte sur chemin, contour SVG, machine à écrire, zoom infini, kaléidoscope, rideau de lignes, odomètre, gravité, surlignage, ASCII, split-flap, vague, lettres de Lorenz, spirale dorée. La galerie affiche des vignettes vivantes, chargées seulement quand elles sont visibles. Le texte peut aussi être passé dans l'URL : `lab/split/?t=Bonjour`.
 
-## Publier
+## Le Labo maths
 
-Sur Netlify : « Import from Git », branche `motion-lab`, dossier de publication `/`, aucune commande de build. Les formulaires (`data-netlify="true"`) sont détectés automatiquement au déploiement.
+La collection précédente, déplacée dans `maths/` : dix sites vitrines dont l'animation est pilotée par une formule (Lorenz, Aizawa, Clifford, champ de vecteurs, Fourier, Gray-Scott, superformule, Julia, boids, jeu de la vie).
+
+## Principes
+
+- Animations sur `transform`, `opacity`, canvas ou WebGL ; boucles suspendues hors écran et quand l'onglet est masqué ; `devicePixelRatio` plafonné.
+- Mobile : moins de particules, pointeur remplacé par le gyroscope ou une trajectoire automatique.
+- `prefers-reduced-motion` : pas de défilement lissé ni de scène collée, chaque scène est affichée dans son état final lisible.
+- Sans WebGL : la scène « Trouble » et l'effet « Liquide » passent sur une version CSS.
+- Polices Google variables : Anybody, Roboto Flex, Fraunces, Recursive, Big Shoulders Display.
 
 ## Développer en local
 
@@ -52,4 +65,4 @@ Sur Netlify : « Import from Git », branche `motion-lab`, dossier de publicatio
 python3 -m http.server 8000
 ```
 
-puis ouvrir `http://localhost:8000/`. Les modules ES exigent un serveur HTTP (pas d'ouverture directe du fichier).
+puis ouvrir `http://localhost:8000/`. Les modules ES exigent un serveur HTTP.
