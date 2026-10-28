@@ -1,4 +1,4 @@
-// Éditeur de code : CodeMirror 5 (CDN) avec repli sur un textarea si le CDN est indisponible.
+// Éditeur de code : CodeMirror 5 (servi localement depuis vendor/) avec repli sur un textarea.
 const MODES = {
   javascript: 'javascript', js: 'javascript', python: 'python', html: 'htmlmixed', css: 'css',
   c: 'text/x-csrc', cpp: 'text/x-c++src', bash: 'shell', shell: 'shell', sql: 'text/x-sql', json: { name: 'javascript', json: true }

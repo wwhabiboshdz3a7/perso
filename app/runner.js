@@ -1,6 +1,7 @@
 // Exécution de code dans le navigateur : JavaScript (Worker isolé), Python (Pyodide), HTML/CSS (iframe).
 
-const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+// Pyodide est servi localement (vendor/pyodide) : la plateforme fonctionne sans CDN externe.
+const PYODIDE_URL = new URL('../vendor/pyodide/', import.meta.url).href;
 
 // ---------- JavaScript : Worker + timeout ----------
 const workerSource = `
@@ -52,7 +53,7 @@ export function pythonPret() { return !!(pyodidePromise); }
 export function chargerPython(onStatut = () => {}) {
   if (pyodidePromise) return pyodidePromise;
   pyodidePromise = (async () => {
-    onStatut('Chargement de Python (Pyodide, ~10 Mo)…');
+    onStatut('Chargement de Python (~12 Mo, une seule fois)…');
     if (!window.loadPyodide) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
