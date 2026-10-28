@@ -21,6 +21,15 @@ const workerSource = `
   const __setTimeout = self.setTimeout.bind(self), __clearTimeout = self.clearTimeout.bind(self);
   self.setTimeout = (fn, ms, ...args) => { __attente++; return __setTimeout(() => { __attente--; try { fn(...args); } catch (err) { log('⚠ ' + (err && err.message || err)); } }, ms); };
   self.clearTimeout = id => { __clearTimeout(id); __attente = Math.max(0, __attente - 1); };
+  // Idem pour les opérations Web Crypto asynchrones (labs de cybersécurité).
+  if (self.crypto && self.crypto.subtle) {
+    const proto = Object.getPrototypeOf(self.crypto.subtle);
+    for (const k of ['digest', 'encrypt', 'decrypt', 'sign', 'verify', 'importKey', 'exportKey', 'deriveKey', 'deriveBits', 'generateKey', 'wrapKey', 'unwrapKey']) {
+      const orig = proto[k];
+      if (typeof orig !== 'function') continue;
+      proto[k] = function (...args) { __attente++; let p; try { p = orig.apply(this, args); } catch (e) { __attente--; throw e; } return p.finally(() => { __attente--; }); };
+    }
+  }
   self.onmessage = async (e) => {
     const { code, exprs = [] } = e.data;
     let erreur = null, valeurs = [];
