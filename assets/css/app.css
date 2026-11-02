@@ -489,6 +489,7 @@ mark { background: var(--accent-soft); color: inherit; border-radius: 3px; paddi
 .provider-card span { font-size: .76rem; color: var(--muted); line-height: 1.35; }
 .provider-card .tag { position: absolute; right: 10px; top: 10px; font-size: .64rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
 .provider-card[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.provider-card[aria-pressed="true"] span:not(.tag), .persona-card[aria-pressed="true"] span { color: var(--text-2); }
 
 /* ---------- Saisie ---------- */
 .composer { position: relative; width: 100%; max-width: calc(var(--thread-w) + 48px); margin: 0 auto; padding: 0 24px calc(14px + var(--safe-b)); }

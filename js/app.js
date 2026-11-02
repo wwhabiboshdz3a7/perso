@@ -905,7 +905,6 @@ function updateSlash() {
 function renderSlash() {
   const { items, index } = state.slash;
   els.slash.hidden = false;
-  els.input.setAttribute('aria-expanded', 'true');
   els.slash.innerHTML = `<div class="slash-head" aria-hidden="true"><span>Modèles de requêtes</span><span>↑↓ · Entrée</span></div>`
     + (items.length ? items.map((t, i) => `<div class="slash-item" role="option" id="slash-opt-${i}" data-i="${i}" aria-selected="${i === index}"><code>/${esc(t.cmd)}</code><b>${esc(t.title)}</b><span>${esc(t.body.replace(/\s+/g, ' '))}</span></div>`).join('')
       : '<div class="slash-empty">Aucun modèle. Créez-en dans la Bibliothèque.</div>');
@@ -931,7 +930,6 @@ function closeSlash() {
   if (!state.slash.open && els.slash.hidden) return;
   state.slash.open = false;
   els.slash.hidden = true;
-  els.input.setAttribute('aria-expanded', 'false');
   els.input.removeAttribute('aria-activedescendant');
 }
 
