@@ -1,0 +1,15 @@
+{
+  "name": "levier-formation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Formation « Gagner de l'argent avec Claude » : page de vente, espace membre et accès payant par fonctions Netlify.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/fonctions.test.mjs tests/contenu.test.mjs",
+    "serveur": "node outils/serveur-local.mjs",
+    "codes": "node outils/generer-codes.mjs",
+    "verifier": "node outils/verifier-contenu.mjs",
+    "e2e": "node tests/e2e.mjs"
+  }
+}
