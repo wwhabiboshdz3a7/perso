@@ -7,7 +7,9 @@
 .ctf-intro { max-width: 760px; }
 .danger-txt { color: var(--err) !important; }
 .btn.danger { background: var(--err); border-color: var(--err); color: #fff; }
-.ctf-check { display: inline-flex; gap: 8px; align-items: center; font-size: .92rem; cursor: pointer; }
+.ctf-check { display: inline-flex; gap: 8px; align-items: flex-start; font-size: .92rem; cursor: pointer; }
+.ctf-check input { margin-top: .25em; flex-shrink: 0; }
+.ctf-check code { overflow-wrap: anywhere; }
 .ctf-check.small { font-size: .82rem; }
 .table-scroll { position: relative; overflow-x: auto; max-width: 100%; }
 

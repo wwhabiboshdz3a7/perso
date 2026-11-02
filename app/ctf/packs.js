@@ -98,7 +98,7 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
         <h2 class="ctf-h">Créer un pack</h2>
         <div class="field"><label for="pkTitre">Titre du pack</label><input id="pkTitre" value="${esc(b.titre)}" placeholder="ex. Mes vacances à Oran" maxlength="60"></div>
         <div class="field"><label for="pkAuteur">Auteur</label><input id="pkAuteur" value="${esc(b.auteur)}" placeholder="ton pseudo" maxlength="40"></div>
-        <label class="ctf-check"><input type="checkbox" id="pkProprio" ${b.proprietaire ? 'checked' : ''}> Pack « Mes photos » du propriétaire du site (images dans <code>assets/ctf/photos/</code>)</label>
+        <label class="ctf-check"><input type="checkbox" id="pkProprio" ${b.proprietaire ? 'checked' : ''}><span>Pack « Mes photos » du propriétaire du site (images dans <code>assets/ctf/photos/</code>)</span></label>
         <h3 style="margin-top:14px">Défis du brouillon (${b.defis.length})</h3>
         ${b.defis.length ? `<ol class="ctf-brouillon">${b.defis.map((x, i) => `<li><span><b>${esc(x.titre)}</b> <span class="muted">${x.validation === 'carte' ? 'carte' : 'flag'} · ${x.points} pts</span></span><button type="button" class="btn small ghost" data-rm="${i}">Retirer</button></li>`).join('')}</ol>` : '<p class="muted">Ajoute un premier défi avec le formulaire ci-dessous.</p>'}
         <div class="row"><button type="button" class="btn primary" id="genPack" ${b.defis.length ? '' : 'disabled'}>Générer le pack (JSON)</button><button type="button" class="btn ghost" id="viderPack" ${b.defis.length ? '' : 'disabled'}>Vider le brouillon</button></div>
