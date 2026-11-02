@@ -73,6 +73,7 @@ export class SequencePlayer {
 /**
  * Main virtuelle : la souris (ou le doigt) devient une main.
  *   déplacement = index pointé · clic bref = pincement · appui maintenu = poing
+ *   relâcher après un appui maintenu = main ouverte (lâcher)
  */
 export class MouseHand {
   constructor({ onFrame, toCamera, mirror, isActive }) {
@@ -88,6 +89,7 @@ export class MouseHand {
     this.from = 'point';
     this.blendStart = 0;
     this.pinchUntil = 0;
+    this.openUntil = 0;
     this.inside = false;
     this.suppressClick = false;
     this._tick = this._tick.bind(this);
@@ -146,6 +148,7 @@ export class MouseHand {
     const held = performance.now() - this.downAt;
     if (!this._inViewport(e)) { this.inside = false; this.pos = null; return; } // la main « sort » fermée
     if (held < 230) this.pinchUntil = performance.now() + 160; // clic bref = pincement
+    else this.openUntil = performance.now() + 450; // fin d'appui long : la main s'ouvre (lâcher)
     this.suppressClick = true;
   }
 
@@ -169,6 +172,7 @@ export class MouseHand {
 
   _desiredPose(now) {
     if (now < this.pinchUntil) return 'pinch';
+    if (now < this.openUntil) return 'open';
     if (this.down && now - this.downAt >= 230) return 'fist';
     return 'point';
   }

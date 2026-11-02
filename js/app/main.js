@@ -344,7 +344,7 @@ class App {
     this.hideWelcome();
     this.setMouseHand(true);
     this.openSim(true);
-    this.ui.toast('Démonstration', 'Main virtuelle : la souris est votre index. Clic bref = pincement, clic maintenu = poing. Ouvrez une 2e fenêtre pour tester le partage.', { ms: 9000 });
+    this.ui.toast('Démonstration', 'Main virtuelle : la souris est votre index. Clic bref = pincement, clic maintenu = poing, relâcher = ouvrir la main. Ouvrez une 2e fenêtre pour tester le partage.', { ms: 9000 });
   }
 
   setMouseHand(on) {

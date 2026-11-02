@@ -46,6 +46,8 @@ export class Share {
   /** Geste « attraper » (poing) à l'endroit du curseur. */
   async grab(ev) {
     if (this.carry) return false;
+    // Une photo arrive d'un autre appareil : le poing la « tient », il n'attrape rien ici.
+    if (this.hasIncoming()) return false;
     const id = this.app.gallery.photoUnderCursor();
     if (!id) return false;
     if (this.role === 'receiver') {
