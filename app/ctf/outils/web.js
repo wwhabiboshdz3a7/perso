@@ -57,7 +57,7 @@ export async function monter(el, opts) {
     const params = Object.fromEntries(x.searchParams);
     const ctx = { cookie: jar[x.hostname], champ: { ...params, ...donnees }, requete: params };
     let page = null;
-    if ((methode === 'post' || Object.keys(donnees).length) && site.formulaires && site.formulaires[chemin]) page = choisir(site.formulaires[chemin], ctx);
+    if ((methode === 'post' || Object.keys(donnees).length || Object.keys(params).length) && site.formulaires && site.formulaires[chemin]) page = choisir(site.formulaires[chemin], ctx);
     if (!page && site.pages[chemin]) page = choisir(site.pages[chemin], ctx);
     if (!page && site.pages[chemin.replace(/\/$/, '')]) page = choisir(site.pages[chemin.replace(/\/$/, '')], ctx);
     if (!page && site.pages[chemin + '/']) page = choisir(site.pages[chemin + '/'], ctx);

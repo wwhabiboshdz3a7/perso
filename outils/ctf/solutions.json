@@ -1,4 +1,46 @@
 {
+ "exif-appareil": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{x-t30}",
+   "LUMIO{xt30}",
+   "LUMIO{x_t30}",
+   "LUMIO{fujifilm_x-t30}",
+   "LUMIO{fujifilm_xt30}"
+  ]
+ },
+ "exif-gps": {
+  "type": "carte",
+  "lat": 43.2839,
+  "lon": 5.3712,
+  "faux": {
+   "lat": 46.2839,
+   "lon": 8.3712
+  }
+ },
+ "exif-date": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{2023-07-14}",
+   "LUMIO{14-07-2023}",
+   "LUMIO{2023:07:14}",
+   "LUMIO{14/07/2023}",
+   "LUMIO{2023/07/14}",
+   "LUMIO{14_juillet_2023}"
+  ]
+ },
+ "exif-miniature": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{la_miniature_se_souvient}"
+  ]
+ },
+ "exif-auteur": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{mathis_roques}"
+  ]
+ },
  "crypto-cesar": {
   "type": "flag",
   "flags": [
@@ -47,6 +89,105 @@
    "LUMIO{kindi}",
    "LUMIO{al_kindi}",
    "LUMIO{alkindi}"
+  ]
+ },
+ "steg-strings": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{strings_lit_ce_que_tu_ne_vois_pas}"
+  ]
+ },
+ "steg-invisible": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{presque_invisible}"
+  ]
+ },
+ "steg-lsb": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{les_bits_de_poids_faible}"
+  ]
+ },
+ "steg-zip": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{un_zip_colle_apres_la_fin}"
+  ]
+ },
+ "steg-spectre": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{ecoute_avec_les_yeux}"
+  ]
+ },
+ "web-source": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{le_code_source_est_public}"
+  ]
+ },
+ "web-robots": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{robots_txt_nest_pas_un_coffre}"
+  ]
+ },
+ "web-entetes": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{les_entetes_parlent_trop}"
+  ]
+ },
+ "web-cookie": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{ne_jamais_croire_un_cookie}"
+  ]
+ },
+ "web-prix": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{le_serveur_doit_recalculer_le_prix}"
+  ]
+ },
+ "web-js": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{jamais_de_mot_de_passe_cote_client}"
+  ]
+ },
+ "foren-ip": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{203.0.113.77}"
+  ]
+ },
+ "foren-chrono": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{deploy_03:14:07}",
+   "LUMIO{deploy_031407}",
+   "LUMIO{deploy_3:14:07}",
+   "LUMIO{deploy_03h14m07s}"
+  ]
+ },
+ "foren-signature": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{les_extensions_mentent}"
+  ]
+ },
+ "foren-terminal": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{les_fichiers_caches_commencent_par_un_point}"
+  ]
+ },
+ "foren-persistance": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{c2.ombre-noire.example}"
   ]
  }
 }

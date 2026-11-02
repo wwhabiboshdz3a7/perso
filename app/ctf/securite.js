@@ -144,7 +144,10 @@ export function demasquer(code, graine) {
 export function ouvrir(valeur, graine) {
   if (Array.isArray(valeur)) return valeur.map(v => ouvrir(v, graine));
   if (valeur && typeof valeur === 'object') {
-    if (typeof valeur['~'] === 'string' && Object.keys(valeur).length === 1) return demasquer(valeur['~'], graine);
+    if (typeof valeur['~'] === 'string' && (Object.keys(valeur).length === 1 || valeur.j === 1)) {
+      const t = demasquer(valeur['~'], graine);
+      return valeur.j === 1 ? JSON.parse(t) : t;
+    }
     const o = {};
     for (const k of Object.keys(valeur)) o[k] = ouvrir(valeur[k], graine);
     return o;

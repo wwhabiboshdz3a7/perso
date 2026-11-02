@@ -98,7 +98,7 @@
 .ctf-ethique { margin-bottom: 18px; }
 .ctf-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; align-items: start; }
 .ctf-col { display: grid; gap: 18px; min-width: 0; }
-.ctf-side { position: sticky; top: calc(var(--topbar-h) + 16px); display: grid; gap: 14px; }
+.ctf-side { position: sticky; top: calc(var(--topbar-h) + 16px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
 .ctf-h { font-size: 1.05rem; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
 .ctf-brief { border-top: 3px solid var(--c); }
 .ctf-brief p:last-child { margin-bottom: 0; }
@@ -191,7 +191,8 @@
 .ctf-ind-txt { padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); border-left: 3px solid var(--accent); font-size: .9rem; line-height: 1.5; width: 100%; }
 .ctf-ind-txt .muted { display: block; font-size: .75rem; margin-bottom: 2px; }
 .ctf-prevnext { display: flex; justify-content: space-between; gap: 8px; }
-.ctf-prevnext .btn { max-width: 49%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.ctf-prevnext { min-width: 0; }
+.ctf-prevnext .btn { max-width: 49%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
 .ctf-writeup { border-top: 3px solid var(--ctf-vert); }
 .ctf-writeup:focus { outline: none; }
 .ctf-writeup .theorie { font-size: .98rem; }
@@ -284,7 +285,7 @@
 .ex-fig { margin: 0 0 12px; }
 .ex-fig img { max-width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
 .ex-fig figcaption { font-size: .8rem; color: var(--text-3); margin-top: 4px; }
-.ex-mini img { max-width: 200px; image-rendering: auto; }
+.ex-mini img { width: 320px; max-width: 100%; }
 .ex-com { font-size: .85rem; overflow-wrap: anywhere; }
 /* labo image */
 .lab-grille { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; }

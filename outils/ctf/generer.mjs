@@ -21,7 +21,7 @@ for (const c of ORDRE) {
 function masquerProfond(v, id) {
   if (Array.isArray(v)) return v.map(x => masquerProfond(x, id));
   if (v && typeof v === 'object') {
-    if ('__cache' in v) return { '~': S.masquer(typeof v.__cache === 'string' ? v.__cache : JSON.stringify(v.__cache), id) };
+    if ('__cache' in v) return typeof v.__cache === 'string' ? { '~': S.masquer(v.__cache, id) } : { '~': S.masquer(JSON.stringify(v.__cache), id), j: 1 };
     return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, masquerProfond(x, id)]));
   }
   return v;
