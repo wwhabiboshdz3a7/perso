@@ -49,6 +49,9 @@ if (zoneGuide) {
       if (!d.ok) { try { localStorage.removeItem(CLE_GUIDE); } catch { /* */ } return sansGuide(d.erreur); }
       zoneGuide.innerHTML = d.html; // contenu servi par la fonction du site (fichier de prive/guide/)
       $('#imprimer').hidden = false;
+      let envoye = params.has('g');
+      try { envoye ||= sessionStorage.getItem('levier.guideEnvoye') === '1'; } catch { /* */ }
+      if (envoye) $('#merciChapo').textContent = 'Il vous est aussi envoyé par email : vous le retrouverez quand vous voulez. Les modules gratuits vous attendent dans l\'espace membre, sans autre inscription.';
     } catch {
       $('#guideEtat').innerHTML = '';
       $('#guideEtat').append('Le guide n\'a pas pu être chargé (connexion ?). ');

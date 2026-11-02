@@ -150,7 +150,7 @@ formAimant?.addEventListener('submit', async e => {
     if (!rep.ok || !d.ok || !d.jeton) throw new Error(d.erreur || '');
     // 2. Inscription enregistrée dans Netlify Forms (export vers l'outil d'emailing).
     await envoyer(formAimant);
-    try { localStorage.setItem('levier.guide', d.jeton); } catch { /* */ }
+    try { localStorage.setItem('levier.guide', d.jeton); sessionStorage.setItem('levier.guideEnvoye', d.envoye ? '1' : '0'); } catch { /* */ }
     try { sessionStorage.setItem('levier.prenom', formAimant.prenom.value.trim().slice(0, 60)); } catch { /* */ }
     location.href = formAimant.getAttribute('action') || '/merci/';
   } catch (err) {
