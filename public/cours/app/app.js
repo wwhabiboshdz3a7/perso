@@ -3,7 +3,7 @@ import { modules, bonus, trouverModule, chargerModule, chargerAccessibles, estAc
 import { RANGS, NOMS_OFFRES, offrePermet, totalLecons, fichiers } from '../content/catalogue.js';
 import { progression, BADGES } from './progress.js';
 import { colorer } from './surligneur.js';
-import { accesActuel, offreActuelle, activerCle, oublierAcces, telechargerFichier, ErreurAcces } from '../../assets/js/acces-client.js';
+import { accesActuel, offreActuelle, cleActuelle, activerCle, oublierAcces, telechargerFichier, telechargerCle, brancherRecuperation, ErreurAcces } from '../../assets/js/acces-client.js';
 
 const CFG = window.LEVIER_CONFIG || {};
 const NOM_PRODUIT = CFG.produit?.nom || 'Levier';
@@ -245,6 +245,11 @@ function brancherFormulaireAcces(form, apres) {
     btn.disabled = true; msg.textContent = 'Vérification…';
     try {
       const a = await activerCle(cle);
+      if (a.conserve) {
+        msg.textContent = `Votre accès ${NOMS_OFFRES[a.offre]} reste actif : la clé saisie correspond à l'offre ${NOMS_OFFRES[a.offreSaisie]}, inférieure. Pour la remplacer malgré tout, retirez d'abord l'accès de cet appareil.`;
+        msg.classList.add('ok');
+        return;
+      }
       viderCache();
       msg.textContent = `Accès ${NOMS_OFFRES[a.offre]} activé.`; msg.classList.add('ok');
       toast(`Accès ${NOMS_OFFRES[a.offre]} activé. Bonne formation !`, 'ok');
@@ -560,13 +565,21 @@ function vueAcces() {
   setTitre('Mon accès');
   const a = accesActuel();
   const o = offreActuelle();
+  const cle = cleActuelle();
+  const dateFr = t => new Date(t * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const support = CFG.contact?.email ? `<a href="mailto:${esc(CFG.contact.email)}">${esc(CFG.contact.email)}</a> (réponse sous ${esc(CFG.contact.delaiReponse || '48 h ouvrées')})` : '';
   main.innerHTML = `<div class="wrap narrow">
     <div class="crumbs"><a href="#/">Tableau de bord</a> › <span>Accès</span></div>
     <h1>Mon accès</h1>
     <div class="card acces-etat">
       <p class="eyebrow">Offre active</p>
       <p class="acces-offre">${o === 'gratuit' ? 'Gratuit' : esc(NOMS_OFFRES[o])}</p>
-      ${a ? `<p class="muted">Activé sur cet appareil${a.expire ? `, valable jusqu'au ${new Date(a.expire * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} (il suffira de ressaisir votre code ensuite)` : ''}.</p>` : '<p class="muted">Modules 0 et 1 ouverts à tous.</p>'}
+      ${a ? `<p class="muted">Activé sur cet appareil${a.expire ? `. ${cle ? `Vérification renouvelée automatiquement (prochaine échéance : ${dateFr(a.expire)})` : `Valable jusqu'au ${dateFr(a.expire)}`}` : ''}.</p>` : '<p class="muted">Modules 0 et 1 ouverts à tous.</p>'}
+      ${cle ? `<div class="cle-zone">
+        <p class="small"><b>Votre clé</b> : gardez-la pour vos autres appareils ou si vous videz votre navigateur.</p>
+        <code class="cle-valeur" id="cleValeur" data-masquee="1">${esc(cle.slice(0, 6))}${'•'.repeat(10)}</code>
+        <div class="row"><button class="btn small" id="cleVoir" type="button" aria-controls="cleValeur" aria-pressed="false">Afficher</button><button class="btn small" id="cleCopier" type="button">${ICO.copy} Copier</button><button class="btn small" id="cleTelecharger" type="button">${ICO.dl} Télécharger (.txt)</button></div>
+      </div>` : ''}
       ${a ? '<button class="btn small ghost" id="oublier" type="button">Retirer l\'accès de cet appareil</button>' : ''}
     </div>
     <section class="card">
@@ -575,16 +588,41 @@ function vueAcces() {
       <details class="aide"><summary>Où trouver mon code ou ma clé ?</summary>
         <ul>
           <li><b>Achat via Gumroad ou Lemon Squeezy</b> : la clé de licence figure dans l'email de confirmation et dans votre espace client du vendeur.</li>
-          <li><b>Achat via Stripe</b> : votre clé (commençant par <code>cs_</code>) s'affiche sur la page de confirmation après le paiement. Conservez-la.</li>
+          <li><b>Achat via Stripe</b> : votre clé (commençant par <code>cs_</code>) s'affiche sur la page de confirmation après le paiement. Perdue ? Utilisez le formulaire ci-dessous.</li>
           <li><b>Code reçu par email</b> (format <code>LEV-XXXXX-XXXXX-XXXXX</code>) : copiez-collez-le tel quel.</li>
-          <li>Un problème ? ${CFG.contact?.email ? `Écrivez à <a href="mailto:${esc(CFG.contact.email)}">${esc(CFG.contact.email)}</a> (réponse sous ${esc(CFG.contact.delaiReponse || '48 h ouvrées')}).` : 'Contactez le support indiqué dans votre email de confirmation.'}</li>
+          <li>Un problème ? ${support ? `Écrivez à ${support}.` : 'Contactez le support indiqué dans votre email de confirmation.'}</li>
         </ul>
       </details>
+    </section>
+    <section class="card">
+      <h2 class="h3" id="recTitre">Clé Stripe perdue ?</h2>
+      <p class="muted small">Indiquez l'adresse email utilisée lors du paiement : si un achat y correspond, vous y recevez votre lien d'activation.</p>
+      <form class="acces-form" id="recForm" aria-labelledby="recTitre" novalidate>
+        <label for="recForm-email">Adresse email du paiement</label>
+        <div class="inline-field">
+          <input id="recForm-email" name="email" type="email" autocomplete="email" maxlength="200" aria-describedby="recForm-msg">
+          <button class="btn" type="submit">Recevoir le lien</button>
+        </div>
+        <p class="form-msg" id="recForm-msg" role="status" aria-live="polite"></p>
+      </form>
     </section>
     ${RANGS[o] < RANGS.pro ? `<p class="muted">Pas encore d'offre ou besoin des modules 4 à 6 ? <a href="../#offres">Voir les offres</a>.</p>` : ''}
   </div>`;
   brancherFormulaireAcces($('#accesForm'), () => { location.hash = '#/'; });
+  brancherRecuperation($('#recForm'), CFG.contact?.email || '');
   $('#oublier')?.addEventListener('click', () => { oublierAcces(); viderCache(); toast('Accès retiré de cet appareil.'); router(); });
+  if (cle) {
+    const zone = $('#cleValeur'), voir = $('#cleVoir');
+    voir.addEventListener('click', () => {
+      const masquee = zone.dataset.masquee === '1';
+      zone.textContent = masquee ? cle : cle.slice(0, 6) + '•'.repeat(10);
+      zone.dataset.masquee = masquee ? '0' : '1';
+      voir.textContent = masquee ? 'Masquer' : 'Afficher';
+      voir.setAttribute('aria-pressed', String(masquee));
+    });
+    $('#cleCopier').addEventListener('click', e => copier(cle, e.currentTarget));
+    $('#cleTelecharger').addEventListener('click', () => telechargerCle(cle, NOM_PRODUIT));
+  }
 }
 
 /* ---------- bonus : prompts ---------- */

@@ -49,18 +49,35 @@ export async function lireFichier(nom) {
   return { ...decl, nom, contenu };
 }
 
-let codesCache = null;
+const cacheLignes = new Map();
+/** Lignes utiles d'un fichier texte de prive/ (sans lignes vides ni commentaires « # »). */
+export function lignesPrivees(nom) {
+  if (cacheLignes.has(nom)) return cacheLignes.get(nom);
+  let lignes = '';
+  try {
+    const f = path.join(dossierPrive(), nom);
+    lignes = existsSync(f) ? readFileSync(f, 'utf8').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#')).join('\n') : '';
+  } catch { lignes = ''; }
+  cacheLignes.set(nom, lignes);
+  return lignes;
+}
+
 /**
  * Hachages de codes d'accès stockés dans prive/codes-acces.txt (une ligne « offre:hachage »).
  * Complète la variable ACCESS_CODE_HASHES, limitée en taille sur Netlify (4 Ko pour l'ensemble
  * des variables d'une fonction). Les codes générés ont 75 bits d'entropie : leurs hachages
  * peuvent être versionnés sans risque.
  */
-export function codesDepuisFichier() {
-  if (codesCache !== null) return codesCache;
-  try {
-    const f = path.join(dossierPrive(), 'codes-acces.txt');
-    codesCache = existsSync(f) ? readFileSync(f, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#')).join('\n') : '';
-  } catch { codesCache = ''; }
-  return codesCache;
+export const codesDepuisFichier = () => lignesPrivees('codes-acces.txt');
+
+/** Accès révoqués listés dans prive/revocations.txt (complète la variable REVOKED_KEYS). */
+export const revocationsDepuisFichier = () => lignesPrivees('revocations.txt');
+
+/** Variables d'environnement complétées par les fichiers de prive/ (codes et révocations). */
+export function envAcces(env) {
+  return {
+    ...env,
+    ACCESS_CODE_HASHES: [env.ACCESS_CODE_HASHES, codesDepuisFichier()].filter(Boolean).join('\n'),
+    REVOKED_KEYS: [env.REVOKED_KEYS, revocationsDepuisFichier()].filter(Boolean).join('\n')
+  };
 }

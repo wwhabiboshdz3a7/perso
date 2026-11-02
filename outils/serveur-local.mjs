@@ -1,6 +1,8 @@
 // Serveur de développement : sert public/ comme Netlify, émule /.netlify/functions/* et Netlify Forms.
 // Usage : TOKEN_SECRET=… ACCESS_CODE_HASHES=… node outils/serveur-local.mjs [--port 9540]
 // Les variables peuvent aussi être placées dans un fichier .env à la racine (non versionné).
+// LEVIER_SIMULATION=chemin/module.mjs : remplace les appels aux fournisseurs (Stripe, Gumroad,
+// Lemon Squeezy, emails) par la fonction `fetch` exportée par ce module (tests de bout en bout).
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -29,6 +31,13 @@ const TYPES = {
 };
 
 export const formulaires = [];
+
+if (process.env.LEVIER_SIMULATION) {
+  const simulation = await import(pathToFileURL(path.resolve(racine, process.env.LEVIER_SIMULATION)).href);
+  const fetchReel = globalThis.fetch;
+  globalThis.fetch = (url, options) => /^https:\/\/api\./.test(String(url)) ? simulation.fetch(String(url), options) : fetchReel(url, options);
+  console.log('Fournisseurs simulés :', process.env.LEVIER_SIMULATION, '(emails envoyés : /__emails)');
+}
 
 // En-têtes déclarés dans netlify.toml ([[headers]]), appliqués comme en production (dont la CSP).
 const reglesEntetes = [];
@@ -95,6 +104,7 @@ const serveur = http.createServer(async (req, res) => {
       return res.end('ok');
     }
     if (req.url === '/__formulaires') { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify(formulaires)); }
+    if (req.url === '/__emails') { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify(globalThis.__levierEmails || [])); }
     return await fichierStatique(req.url, res);
   } catch (e) {
     console.error(e);

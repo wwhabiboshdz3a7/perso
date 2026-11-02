@@ -195,9 +195,13 @@ h1:focus { outline: none; }
 .inline-field input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
 .inline-field input[aria-invalid="true"] { border-color: var(--ko); }
 .form-msg { min-height: 1.4em; margin: 8px 0 0; font-size: .9rem; color: var(--text-2); }
+.form-msg:empty { min-height: 0; margin: 0; }
 .form-msg.ok { color: var(--ok); font-weight: 600; }
 .form-msg.ko { color: var(--ko); font-weight: 600; }
 .acces-etat .acces-offre { margin-bottom: 6px; }
+.cle-zone { border-top: 1px solid var(--line); margin: 14px 0; padding-top: 14px; }
+.cle-zone p { margin-bottom: 8px; }
+.cle-valeur { display: block; padding: 10px 12px; margin-bottom: 10px; font-size: .9rem; overflow-wrap: anywhere; word-break: break-all; user-select: all; }
 .aide { margin-top: 16px; }
 .aide summary { cursor: pointer; font-weight: 600; color: var(--accent-text); }
 .aide ul { padding-left: 1.2em; margin-top: 10px; }

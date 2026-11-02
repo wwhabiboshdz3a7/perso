@@ -9,6 +9,7 @@ import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hacherCode } from '../netlify/lib/verificateurs.mjs';
+import { SESSION_PAYEE, SESSION_REMBOURSEE } from './simulation-fournisseurs.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -24,7 +25,12 @@ function demarrerServeur() {
   return new Promise((ok, ko) => {
     const p = spawn(process.execPath, ['outils/serveur-local.mjs', '--port', String(PORT)], {
       cwd: racine,
-      env: { ...process.env, TOKEN_SECRET: randomBytes(32).toString('hex'), ACCESS_CODE_HASHES: `pro:${hacherCode(CODE_PRO)},essentiel:${hacherCode(CODE_ESS)}` },
+      env: {
+        ...process.env, TOKEN_SECRET: randomBytes(32).toString('hex'), ACCESS_CODE_HASHES: `pro:${hacherCode(CODE_PRO)},essentiel:${hacherCode(CODE_ESS)}`,
+        // Stripe et l'envoi d'emails sont simulés (tests/simulation-fournisseurs.mjs).
+        LEVIER_SIMULATION: 'tests/simulation-fournisseurs.mjs', STRIPE_SECRET_KEY: 'rk_test_e2e', STRIPE_LIENS: 'pro:plink_e2e_pro',
+        EMAIL_FOURNISSEUR: 'brevo', EMAIL_API_KEY: 'cle-e2e', EMAIL_EXPEDITEUR: 'Levier <acces@exemple.fr>'
+      },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     const t = setTimeout(() => ko(new Error('Le serveur local ne démarre pas')), 10000);
@@ -259,6 +265,16 @@ async function scenarios(navigateur, largeur) {
       await sansDebordement(page);
       await capture(page, `e2e-m6-${suffixe}`);
     });
+    await etape('code d\'une offre inférieure saisi ensuite : l\'accès Pro est conservé', async () => {
+      await page.goto(BASE + '/cours/#/acces');
+      await page.fill('#accesForm-cle', CODE_ESS);
+      await page.locator('#accesForm button[type=submit]').click();
+      await page.locator('#accesForm-msg.ok').waitFor();
+      verifier(/reste actif/.test(await page.locator('#accesForm-msg').innerText()), 'message de conservation');
+      verifier(/Accès Pro/.test(await page.locator('#accesBtn').innerText()), 'toujours Pro');
+      await page.locator('#cleVoir').click();
+      verifier((await page.locator('#cleValeur').innerText()) === CODE_PRO, 'clé affichée sur la page Mon accès');
+    });
     await etape('workflow n8n téléchargeable (JSON valide)', async () => {
       await page.goto(BASE + '/cours/#/lecon/m6/1');
       const bouton = page.locator('button.dl').first();
@@ -301,6 +317,37 @@ async function scenarios(navigateur, largeur) {
       await Promise.all([page.waitForURL(/\/cours\/#\/$/), page.locator('#formActivation button').click()]);
       await page.locator('#accesBtn.actif').waitFor();
       await sansDebordement(page);
+    });
+    await etape('achat Stripe : activation, clé à conserver (copie, téléchargement)', async () => {
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(BASE + '/merci/achat.html?session_id=' + SESSION_PAYEE, { waitUntil: 'networkidle' });
+      await page.locator('#formActivation button').click();
+      await page.locator('#panneauCle').waitFor();
+      verifier((await page.locator('#cleTexte').innerText()) === SESSION_PAYEE, 'clé affichée');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.locator('#telechargerCle').click()]);
+      verifier((await readFile(await dl.path(), 'utf8')).includes(SESSION_PAYEE), 'fichier de la clé');
+      await sansDebordement(page);
+      await capture(page, `e2e-achat-stripe-${suffixe}`);
+      await page.locator('#panneauCle a[href="../cours/#/"]').click();
+      await page.locator('#accesBtn.actif').waitFor();
+      verifier(/Accès Pro/.test(await page.locator('#accesBtn').innerText()), 'accès Pro');
+    });
+    await etape('achat Stripe remboursé : clé refusée', async () => {
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(BASE + '/merci/achat.html?session_id=' + SESSION_REMBOURSEE, { waitUntil: 'networkidle' });
+      await page.locator('#formActivation button').click();
+      await page.locator('#activationMsg.ko').waitFor();
+      verifier(/remboursé/.test(await page.locator('#activationMsg').innerText()), 'message de refus');
+    });
+    await etape('clé Stripe perdue : lien d\'activation envoyé à l\'adresse du paiement', async () => {
+      await page.fill('#recEmail', 'pas-un-email');
+      await page.locator('#formRecuperer button').click();
+      verifier(/adresse email/.test(await page.locator('#recMsg').innerText()), 'email exigé');
+      await page.fill('#recEmail', 'acheteur@example.com');
+      await page.locator('#formRecuperer button').click();
+      await page.locator('#recMsg.ok').waitFor();
+      const emails = await (await page.request.get(BASE + '/__emails')).json();
+      verifier(emails.some(e => e.to[0].email === 'acheteur@example.com' && e.textContent.includes('/merci/achat.html?session_id=' + SESSION_PAYEE)), 'email avec le lien');
     });
     await etape('pages légales : informations à compléter signalées', async () => {
       for (const p of ['mentions-legales', 'cgv', 'confidentialite']) {

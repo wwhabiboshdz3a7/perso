@@ -33,8 +33,12 @@ Trois noms ont été étudiés ; aucun ne doit laisser croire à un produit offi
 
 **Accès payant réel**
 - Les modules payants (M2 à M8, bonus, workflows) ne sont **pas** dans le dossier publié : ils vivent dans `prive/` et ne sont servis que par la fonction `content`, qui les embarque via `included_files`.
-- `netlify/functions/access.mjs` vérifie un **code d'accès** (hachage SHA-256 dans `ACCESS_CODE_HASHES` ou `prive/codes-acces.txt`), une **licence Gumroad**, une **licence Lemon Squeezy** ou une **session Stripe** (lien de paiement), puis renvoie un jeton signé HMAC (`TOKEN_SECRET`). Limitation des essais par IP.
-- `netlify/functions/content.mjs` renvoie un module ou un fichier si le jeton est valide et si l'offre le permet (Essentiel < Pro < VIP).
+- `netlify/functions/access.mjs` vérifie un **code d'accès** (hachage SHA-256 dans `ACCESS_CODE_HASHES` ou `prive/codes-acces.txt`), une **licence Gumroad**, une **licence Lemon Squeezy** ou une **session Stripe** (lien de paiement), puis renvoie un jeton signé HMAC (`TOKEN_SECRET`) valable 30 jours. Limitation des essais par IP.
+- `netlify/functions/content.mjs` renvoie un module ou un fichier si le jeton est valide, **non révoqué**, et si l'offre le permet (Essentiel < Pro < VIP).
+- **Renouvellement silencieux** : l'espace membre garde la clé de l'élève et renouvelle son jeton en arrière-plan une fois par semaine d'utilisation. Chaque renouvellement revérifie l'achat chez le fournisseur : un achat remboursé ou contesté perd son accès au plus tard à l'expiration du jeton, et **immédiatement** si vous révoquez la clé (voir « Rembourser ou couper un accès »).
+- **Limites d'appareils** : Lemon Squeezy applique la limite d'activations réglée sur le produit ; Gumroad est limité par `LICENCE_MAX_ACTIVATIONS` (5 par défaut). Un appareil déjà activé se renouvelle sans consommer d'activation.
+- **Clé Stripe perdue** : `netlify/functions/recuperer.mjs` retrouve les achats Stripe d'une adresse email et y envoie le lien d'activation (Brevo ou Resend). La page d'activation et la page « Mon accès » permettent aussi de copier et télécharger sa clé.
+- Un code d'une offre inférieure saisi après un code supérieur ne rétrograde pas l'accès.
 
 ## Structure
 
@@ -50,8 +54,8 @@ public/                    dossier publié (aucun contenu payant)
 prive/                     contenu payant (jamais publié)
   modules/                 m2.mjs … m8.mjs, bonus.mjs
   n8n/                     01 à 06 : workflows à importer
-netlify/functions/         access.mjs, content.mjs
-netlify/lib/               jetons HMAC, vérificateurs de licences, lecture du contenu privé
+netlify/functions/         access.mjs (activation, renouvellement), content.mjs (contenu payant), recuperer.mjs (clé Stripe perdue)
+netlify/lib/               jetons HMAC, vérificateurs de licences, révocation, envoi d'emails, lecture du contenu privé
 outils/                    serveur local, générateurs (codes, programme, workflows n8n), vérification du contenu
 tests/                     tests unitaires des fonctions, tests du contenu, tests de bout en bout (Playwright)
 VENTE.md                   guide de lancement pour le propriétaire
@@ -95,18 +99,30 @@ Les tests de bout en bout démarrent le serveur local et vérifient : page de ve
 | `ACCESS_CODE_HASHES` | Codes d'accès : `offre:hachage` séparés par des virgules (sortie de `outils/generer-codes.mjs`). Pour de nombreux codes, utilisez `--fichier` (ils vont dans `prive/codes-acces.txt`). |
 | `GUMROAD_PRODUCT_IDS` | `essentiel:ID,pro:ID,vip:ID` (identifiant produit Gumroad, licences activées). |
 | `LEMONSQUEEZY_STORE_ID` et `LEMONSQUEEZY_PRODUITS` | Identifiant de la boutique, puis `essentiel:ID,pro:ID,vip:ID` (variante ou produit, licences activées). |
-| `STRIPE_SECRET_KEY` et `STRIPE_LIENS` | Clé restreinte en lecture des sessions Checkout, puis `essentiel:plink_…,pro:plink_…,vip:plink_…`. |
-| `TOKEN_TTL_DAYS` | Facultatif : durée de validité d'un jeton sur un appareil (180 jours par défaut ; l'élève ressaisit sa clé ensuite). |
+| `STRIPE_SECRET_KEY` et `STRIPE_LIENS` | Clé **restreinte**, en lecture seule sur *Checkout Sessions*, *PaymentIntents* et *Charges* (ces deux derniers servent à détecter un remboursement ou un litige), puis `essentiel:plink_…,pro:plink_…,vip:plink_…`. |
+| `REVOKED_KEYS` | Accès coupés immédiatement : clés (code `LEV-…`, licence, `cs_…`) ou références de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`), séparées par des virgules. Pour une longue liste : `prive/revocations.txt` (une par ligne). |
+| `LICENCE_MAX_ACTIVATIONS` | Facultatif : nombre d'activations d'une licence Gumroad sur de nouveaux appareils (5 par défaut). |
+| `EMAIL_FOURNISSEUR`, `EMAIL_API_KEY`, `EMAIL_EXPEDITEUR` | Facultatif, pour la récupération d'une clé Stripe perdue : `brevo` ou `resend`, la clé d'API, et l'expéditeur `Levier <acces@votre-domaine.fr>` (domaine vérifié chez le prestataire). Sans ces variables, l'élève est invité à écrire au support. |
+| `SITE_URL` | Facultatif : adresse publique du site dans les emails (sinon l'adresse Netlify du site). |
+| `TOKEN_TTL_DAYS` | Facultatif : durée de validité d'un jeton (30 jours par défaut, renouvelé automatiquement). Plus court, un remboursement est pris en compte plus vite sans révocation manuelle. |
 
 4. **Formulaires** : activez la détection des formulaires (Forms → Enable form detection), puis redéployez. Les formulaires `aimant` et `liste-attente` apparaissent ; branchez une notification ou un export vers votre outil d'emailing.
 5. **Domaine** : ajoutez votre domaine, HTTPS est automatique.
 
 ### Brancher le paiement
 
-- **Stripe (Payment Links)** : un lien par offre. Dans « Après le paiement », choisissez la redirection vers votre site : `https://votre-domaine.fr/merci/achat.html?session_id={CHECKOUT_SESSION_ID}`. L'élève active son accès en un clic ; sa clé `cs_…` lui sert ensuite sur ses autres appareils. Activez l'acceptation des conditions (lien vers vos CGV).
+- **Stripe (Payment Links)** : un lien par offre. Dans « Après le paiement », choisissez la redirection vers votre site : `https://votre-domaine.fr/merci/achat.html?session_id={CHECKOUT_SESSION_ID}`. L'élève active son accès en un clic, puis la page lui fait copier ou télécharger sa clé `cs_…` (le reçu Stripe ne la contient pas). Activez l'acceptation des conditions (lien vers vos CGV) et la collecte de l'email. Une clé perdue se récupère par email (variables `EMAIL_*`) ; à défaut, retrouvez le paiement dans le tableau de bord Stripe (Paiements → le paiement → « Checkout Session », identifiant `cs_…`) et envoyez le lien `…/merci/achat.html?session_id=cs_…`, ou générez un code avec `node outils/generer-codes.mjs`.
 - **Gumroad** : activez la génération d'une clé de licence unique par vente sur chaque produit ; l'acheteur colle sa clé dans l'espace membre.
 - **Lemon Squeezy** : activez les clés de licence sur chaque variante ; l'acheteur colle sa clé.
 - **Codes manuels** (virement, offre entreprise, partenaire) : `node outils/generer-codes.mjs vip 5`.
+
+### Rembourser ou couper un accès
+
+1. Remboursez chez le prestataire (Stripe, Gumroad, Lemon Squeezy).
+2. Ajoutez la clé de l'acheteur à `REVOKED_KEYS` (ou à `prive/revocations.txt`) : sa session `cs_…`, sa clé de licence, ou la référence de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`). Pour un code `LEV-…`, retirez simplement son hachage de `ACCESS_CODE_HASHES` (ou de `prive/codes-acces.txt`).
+3. Redéployez (Deploys → Trigger deploy) : les variables d'environnement sont lues au déploiement. L'accès est coupé à la requête suivante, sur tous les appareils.
+
+Sans l'étape 2, l'accès s'arrête de lui-même au prochain renouvellement (le remboursement est détecté chez le fournisseur), donc au plus tard à l'expiration du jeton en cours (30 jours).
 
 **Renonciation au droit de rétractation** : pour un contenu numérique fourni immédiatement, le client doit demander l'accès immédiat et renoncer expressément à son droit de rétractation **avant** le paiement (case à cocher ou mention acceptée sur la page de paiement), et cette renonciation doit être confirmée dans l'email de confirmation. Configurez-le chez votre prestataire (acceptation des conditions sur Stripe, texte du produit et email de confirmation sur Gumroad et Lemon Squeezy).
 
@@ -133,7 +149,9 @@ Pour ajouter les vidéos des leçons : `cours.videos` dans `config.js` (`'m6-5':
 - [ ] `garantie` : active ou non, durée et conditions.
 - [ ] `legal` : raison sociale, forme, adresse, SIRET, RCS ou capital si société, TVA intracommunautaire, directeur de publication, téléphone, **médiateur de la consommation**, outil d'emailing, conditions de l'accompagnement VIP. Vérifiez l'adresse de l'hébergeur.
 - [ ] Faire relire les CGV, les mentions légales et la politique de confidentialité par un professionnel.
-- [ ] Variables d'environnement Netlify, puis un **achat test** sur chaque offre (mode test du prestataire) jusqu'à l'activation.
+- [ ] Variables d'environnement Netlify, puis un **achat test** sur chaque offre (mode test du prestataire) jusqu'à l'activation, et un **remboursement test** (l'accès doit être refusé à la réactivation).
+- [ ] Stripe : clé restreinte avec lecture des Checkout Sessions, PaymentIntents et Charges ; collecte de l'email activée sur les liens.
+- [ ] Récupération des clés Stripe : compte Brevo ou Resend, domaine d'envoi vérifié, variables `EMAIL_*` (sinon, procédure de support décrite ci-dessus).
 - [ ] Case de renonciation au droit de rétractation et email de confirmation chez le prestataire de paiement.
 - [ ] Formulaires Netlify détectés, notifications ou export vers l'outil d'emailing, double opt-in conseillé.
 - [ ] `temoignages` : ne rien ajouter tant que vous n'avez pas d'avis réels avec accord écrit.
@@ -141,7 +159,8 @@ Pour ajouter les vidéos des leçons : `cours.videos` dans `config.js` (`'m6-5':
 
 ## Sécurité et limites connues
 
-- Le jeton d'accès est conservé dans le navigateur de l'élève ; un même code peut être saisi sur plusieurs appareils. Pour limiter le partage, préférez les licences Gumroad ou Lemon Squeezy (révocables, remboursements refusés automatiquement) et désactivez un code partagé en retirant son hachage.
+- Le jeton d'accès et la clé sont conservés dans le navigateur de l'élève (pour le renouvellement silencieux). Un code `LEV-…` peut être saisi sur plusieurs appareils : pour limiter le partage, préférez les licences Gumroad ou Lemon Squeezy (limite d'appareils, remboursements refusés). Un code partagé se coupe aussitôt en retirant son hachage ; une licence ou une session Stripe, en l'ajoutant à `REVOKED_KEYS`.
+- La limite d'appareils Gumroad repose sur le compteur `uses` de la licence, qui ne redescend pas : un élève qui change souvent de navigateur peut l'atteindre. Augmentez `LICENCE_MAX_ACTIVATIONS` ou donnez-lui un code `LEV-…`.
 - La limitation des essais est faite par instance de fonction (en mémoire) : suffisante contre les essais manuels, ce n'est pas un pare-feu.
 - La progression est stockée localement (pas de compte élève) : l'élève l'exporte et l'importe depuis son profil pour changer d'appareil.
 - Les tarifs et fonctionnalités des outils tiers évoluent vite : prévoyez une révision du contenu tous les trois mois.

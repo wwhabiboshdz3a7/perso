@@ -33,12 +33,33 @@
         <button class="bouton encre" type="submit">Activer mon accès</button>
         <p class="form-msg" id="activationMsg" role="status" aria-live="polite"></p>
       </form>
-      <h2>Où trouver ma clé ?</h2>
+      <section class="encadre citron panneau-cle" id="panneauCle" aria-labelledby="titreCle" hidden>
+        <h2 id="titreCle">Accès activé. <em>Gardez votre clé.</em></h2>
+        <p>Elle sert sur vos autres appareils, ou si vous videz votre navigateur. Le reçu de paiement ne la contient pas : copiez-la ou téléchargez-la maintenant.</p>
+        <p class="cle-affichee"><code id="cleTexte"></code></p>
+        <div class="actions">
+          <button class="bouton contour" type="button" id="copierCle">Copier la clé</button>
+          <button class="bouton contour" type="button" id="telechargerCle">Télécharger la clé (.txt)</button>
+          <a class="bouton encre" href="../cours/#/">Ouvrir l'espace membre</a>
+        </div>
+        <p class="form-msg" id="cleMsg" role="status" aria-live="polite"></p>
+      </section>
+      <h2>Où trouver ma clé&nbsp;?</h2>
       <ul>
-        <li><b>Paiement par Stripe</b> : la clé commence par <code>cs_</code> ; elle est ajoutée automatiquement à l'adresse de cette page. Copiez-la et conservez-la : elle vous servira à vous reconnecter sur un autre appareil.</li>
+        <li><b>Paiement par Stripe</b> : la clé commence par <code>cs_</code> ; elle est ajoutée automatiquement à l'adresse de cette page. Après l'activation, copiez-la ou téléchargez-la : elle vous servira sur vos autres appareils.</li>
         <li><b>Achat sur Gumroad ou Lemon Squeezy</b> : la clé de licence figure dans l'email de confirmation de la plateforme et dans votre espace client.</li>
         <li><b>Code reçu par email</b> : il a la forme <code>LEV-XXXXX-XXXXX-XXXXX</code>.</li>
       </ul>
+      <h2 id="titreRecuperer">Clé Stripe perdue&nbsp;?</h2>
+      <p>Indiquez l'adresse email utilisée lors du paiement : si un achat y correspond, nous y envoyons votre lien d'activation.</p>
+      <form class="recuperer" id="formRecuperer" aria-labelledby="titreRecuperer" novalidate>
+        <div class="champ">
+          <label for="recEmail">Adresse email du paiement</label>
+          <input id="recEmail" name="email" type="email" autocomplete="email" maxlength="200" aria-describedby="recMsg">
+        </div>
+        <button class="bouton contour" type="submit">Recevoir mon lien d'activation</button>
+        <p class="form-msg" id="recMsg" role="status" aria-live="polite"></p>
+      </form>
       <p class="note" id="supportAchat">Un problème d'activation ? Répondez à l'email de confirmation de votre achat : nous vous aidons rapidement.</p>
       <p class="note">Rappel : les contenus étant accessibles immédiatement, vous avez renoncé à votre droit de rétractation lors de l'achat (voir les <a href="../legal/cgv.html">CGV</a>).</p>
     </article>

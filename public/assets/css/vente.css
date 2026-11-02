@@ -268,6 +268,7 @@ details[open] > summary .prog-num { color: var(--encre); }
 .case { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; font-size: .92rem; color: var(--texte-2); }
 .case input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--encre); }
 .form-msg { margin: 0; min-height: 1.4em; font-weight: 600; font-size: .95rem; }
+.form-msg:empty { min-height: 0; }
 .form-msg.ok { color: var(--vert); }
 .form-msg.ko { color: var(--rouge); }
 

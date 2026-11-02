@@ -1,20 +1,23 @@
 // GET /.netlify/functions/content?module=m4          → contenu JSON d'un module payant
 // GET /.netlify/functions/content?fichier=n8n/…json  → fichier téléchargeable (workflow n8n)
 // En-tête requis : Authorization: Bearer <jeton renvoyé par /access>
+// Un jeton révoqué (REVOKED_KEYS, prive/revocations.txt) ou issu d'un code retiré est refusé (401).
 import { verifierJeton, jetonDepuisRequete } from '../lib/jeton.mjs';
-import { chargerModule, lireFichier } from '../lib/contenu.mjs';
+import { chargerModule, lireFichier, envAcces } from '../lib/contenu.mjs';
+import { motifRetrait } from '../lib/revocation.mjs';
 import { json, lireEnv } from '../lib/http.mjs';
 import { trouverModule, offrePermet, NOMS_OFFRES } from '../../public/cours/content/catalogue.js';
 
 export default async function content(req) {
   if (req.method !== 'GET') return json(405, { erreur: 'Méthode non autorisée.' }, { Allow: 'GET' });
-  const env = lireEnv();
+  const env = envAcces(lireEnv());
   const url = new URL(req.url);
   const idModule = url.searchParams.get('module');
   const nomFichier = url.searchParams.get('fichier');
 
   const charge = verifierJeton(jetonDepuisRequete(req), env.TOKEN_SECRET);
-  if (!charge) return json(401, { erreur: 'Accès non autorisé ou expiré. Saisissez à nouveau votre code.' }, { 'WWW-Authenticate': 'Bearer' });
+  if (!charge) return json(401, { erreur: 'Accès non autorisé ou expiré. Saisissez à nouveau votre code.', code: 'expire' }, { 'WWW-Authenticate': 'Bearer' });
+  if (motifRetrait(charge, env)) return json(401, { erreur: 'Cet accès a été désactivé (remboursement ou code retiré). Une question ? Écrivez au support.', code: 'revoque' }, { 'WWW-Authenticate': 'Bearer' });
 
   try {
     if (nomFichier) {
