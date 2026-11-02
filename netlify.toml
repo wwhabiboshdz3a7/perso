@@ -17,3 +17,21 @@
   for = "/vendor/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Les outils d'auteur (sources des défis, solutions, générateurs) ne sont jamais servis en ligne.
+[[redirects]]
+  from = "/outils"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/outils/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[headers]]
+  for = "/assets/ctf/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

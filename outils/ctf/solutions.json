@@ -1,8 +1,8 @@
 {
  "geo-capitole": {
   "type": "carte",
-  "lat": 43.6044,
-  "lon": 1.4436,
+  "lat": 43.6043,
+  "lon": 1.4433,
   "faux": {
    "lat": -38.5,
    "lon": 145

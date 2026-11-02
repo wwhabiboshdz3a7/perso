@@ -65,7 +65,15 @@ export async function monter(el, opts) {
     if (page.cookies) Object.assign(jar[x.hostname], page.cookies);
     return { statut: page.statut || 200, ...page, site };
   }
-  function documentHTML(r, avecPont) {
+  // Dans la vue « Page », les scripts externes du site simulé sont servis par le serveur simulé et intégrés
+  // à la page (l'iframe isolée ne peut rien charger d'autre). La vue « Code source » garde la balise d'origine.
+  const integrerScripts = (html, base) => String(html || '').replace(/<script\s+src="([^"]+)"\s*><\/script>/g, (m, src) => {
+    let cible; try { cible = new URL(src, base).href; } catch { return ''; }
+    const r = servir(cible);
+    return r.statut === 200 && r.type === 'text/plain' ? `<script data-src="${esc(src)}">${String(r.corps || '').replace(/<\/script/gi, '<\\/script')}</script>` : `<!-- ${esc(src)} : ${r.statut} -->`;
+  });
+  function documentHTML(r, avecPont, base) {
+    if (avecPont && base && r.html) r = { ...r, html: integrerScripts(r.html, base) };
     if (r.type === 'text/plain') return `<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;padding:14px;font:14px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;color:#111;background:#fff}</style></head><body>${esc(r.corps || '')}</body></html>`;
     return `<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n<title>${esc(r.titre || '')}</title>\n${r.site && r.site.style ? `<style>${r.site.style}</style>\n` : ''}</head>\n<body>\n${r.html || ''}\n${avecPont ? `<script>${PONT}</script>` : ''}</body>\n</html>`;
   }
@@ -76,7 +84,7 @@ export async function monter(el, opts) {
     adr.value = u;
     $('[data-a="prec"]', el).disabled = pos <= 0;
     $('[data-a="suiv"]', el).disabled = pos >= hist.length - 1;
-    frame.srcdoc = documentHTML(r, true);
+    frame.srcdoc = documentHTML(r, true, u);
     $('.wb-source', el).textContent = r.type === 'text/plain' ? (r.corps || '') : documentHTML(r, false).replace(r.site && r.site.style ? `<style>${r.site.style}</style>\n` : '\0', '<link rel="stylesheet" href="/style.css">\n');
     rendreCookies(); rendreReseau(donnees);
   }

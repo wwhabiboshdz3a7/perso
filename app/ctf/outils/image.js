@@ -23,7 +23,7 @@ export function monter(el) {
       <div class="lab-ctrl">
         <fieldset><legend>Géométrie</legend><div class="row">
           <button type="button" class="btn small" data-t="miroirH" aria-pressed="false">Miroir ↔</button><button type="button" class="btn small" data-t="miroirV" aria-pressed="false">Miroir ↕</button><button type="button" class="btn small" data-t="rot">Rotation 90°</button></div>
-          <label class="lab-range"><span>Zoom <output data-o="zoom">100 %</output></span><input type="range" min="0.25" max="8" step="0.25" value="1" data-r="zoom"></label></fieldset>
+          <label class="lab-range"><span>Zoom <output data-o="zoom">100 %</output></span><input type="range" min="0.1" max="8" step="0.05" value="1" data-r="zoom"></label></fieldset>
         <fieldset><legend>Couleurs</legend>
           <label class="lab-range"><span>Luminosité <output data-o="lum">0</output></span><input type="range" min="-100" max="100" value="0" data-r="lum"></label>
           <label class="lab-range"><span>Contraste <output data-o="con">0</output></span><input type="range" min="-100" max="100" value="0" data-r="con"></label>
@@ -110,6 +110,13 @@ export function monter(el) {
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
     const cg = c.getContext('2d'); cg.drawImage(img, 0, 0);
     original = cg.getImageData(0, 0, img.width, img.height);
+    // zoom initial : l'image entière tient dans le cadre (sans jamais agrandir)
+    const largeur = $('.lab-cadre', el).clientWidth;
+    if (largeur > 0) {
+      const z = $('[data-r="zoom"]', el);
+      z.value = Math.max(0.1, Math.min(1, Math.floor((largeur - 4) / img.width * 20) / 20));
+      z.dispatchEvent(new Event('input'));
+    }
     dessiner();
   }
   $('#labFile', el).addEventListener('change', async e => {

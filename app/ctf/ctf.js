@@ -218,6 +218,9 @@ async function vueDefi(id, navId) {
   const page = { defi, ressources, carte: null, etabli: null };
   page.etabli = monterEtabli(outils);
   await rendreRessources(page);
+  // le premier outil de l'établi s'ouvre directement sur le fichier du défi qui lui correspond
+  const premier = outils[0] && ressources.find(r => (r.outils || []).includes(outils[0]) && r.src);
+  if (premier) page.etabli.ouvrir(outils[0], { src: premier.src, nom: premier.nom }, false).catch(() => {});
   rendreValidation(page);
   rendreIndices(page);
   if (progression.ctfResolu(id) || progression.ctfAbandonne(id)) afficherWriteup(page);
@@ -228,7 +231,7 @@ const texteEnParagraphes = t => String(t || '').split(/\n{2,}/).map(p => `<p>${e
 function monterEtabli(outils) {
   const montes = {};
   const api = {
-    async ouvrir(nom, charge) {
+    async ouvrir(nom, charge, defiler = !!charge) {
       if (!OUTILS[nom] || !$('#tab-' + nom)) return null;
       $$('.ctf-tabs [role=tab]').forEach(t => { const on = t.dataset.outil === nom; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; $('#pan-' + t.dataset.outil).hidden = !on; });
       if (!montes[nom]) {
@@ -238,7 +241,7 @@ function monterEtabli(outils) {
       }
       const outil = await montes[nom];
       if (charge && outil.charger) await outil.charger(charge);
-      if (charge) $('#etabli').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      if (charge && defiler) $('#etabli').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
       return outil;
     }
   };
