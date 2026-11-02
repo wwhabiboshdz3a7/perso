@@ -50,7 +50,9 @@ window.LEVIER_CONFIG = {
   },
 
   /* Offres. `lienPaiement` : lien Stripe Payment Link, Lemon Squeezy (checkout) ou Gumroad.
-     Tant qu'un lien est vide, le bouton propose de laisser son email (liste d'attente). */
+     Tant qu'un lien est vide, le bouton propose de laisser son email (liste d'attente).
+     `prixBarre` : à n'utiliser que pour une vraie réduction, par rapport au prix le plus bas
+     pratiqué dans les 30 jours précédents (Code de la consommation). Sinon, laisser null. */
   offres: [
     {
       id: 'essentiel', nom: 'Essentiel', prix: 97, prixBarre: null,
