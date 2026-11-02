@@ -1,0 +1,15 @@
+{
+  "name": "JARVIS — Interface gestuelle NEXORA",
+  "short_name": "JARVIS",
+  "description": "Interface HUD pilotée à la main et à la voix : partage de photos d’un geste, dessin dans l’air, hologramme, commandes vocales.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#03080c",
+  "theme_color": "#03080c",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>JARVIS — Interface gestuelle et vocale · NEXORA</title>
+  <meta name="description" content="JARVIS, l’interface HUD pilotée à la main et à la voix : partage de photos d’un appareil à l’autre d’un geste, curseur aérien, dessin dans l’air, hologramme 3D, commandes vocales. Tout est traité localement.">
+  <meta name="theme-color" content="#03080c">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="vendor/fonts/chakra-petch-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="vendor/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/jarvis.css">
+</head>
+<body class="is-booting">
+  <a class="skip-link" href="#stage">Aller au module principal</a>
+
+  <!-- Sprite d'icônes -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8h3.5L8 5.5h8L17.5 8H21v11H3z"/><circle cx="12" cy="13.2" r="3.6"/></symbol>
+    <symbol id="i-camera-off" viewBox="0 0 24 24"><path d="M3 8h3.5L8 5.5h8L17.5 8H21v11H3z"/><path d="M4 4l16 16"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2.2-2.6 4"/><path d="M12 17.6v.2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="1"/><circle cx="8.5" cy="9.5" r="1.7"/><path d="M3.5 17l5-5 4 4 2.5-2.5L20.5 19"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1.2-4.6L16 4.6a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z"/><path d="M14 6.5l3.5 3.5"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M3.5 11.5L20.5 4l-7.5 17-2.2-7.3z"/><path d="M10.8 13.7L20.5 4"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6.5h16M9 6.5V4h6v2.5M6 6.5l1 13.5h10l1-13.5M10 10.5v6M14 10.5v6"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4M7.5 8.5L12 4l4.5 4.5M4 14.5V20h16v-5.5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11.5M7.5 11L12 15.5 16.5 11M4 14.5V20h16v-5.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 4.5L7.5 12l7.5 7.5"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 4.5l7.5 7.5L9 19.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+    <symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" class="fill"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8 12.5V5.8a1.4 1.4 0 0 1 2.8 0V11M10.8 10.5V4.4a1.4 1.4 0 0 1 2.8 0v6.1M13.6 10.6V5.4a1.4 1.4 0 0 1 2.8 0v6.8M16.4 11.6V8.4a1.4 1.4 0 0 1 2.8 0v5.4c0 4-2.6 6.9-6.4 6.9-2.7 0-4.4-1.3-5.8-3.6l-2.4-4c-.7-1.2.9-2.4 1.9-1.4L8 13.5"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M4.5 15.5l9-9a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L11 19H7.5z"/><path d="M9 11l5 5M11 19h9"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.4L19 10l-5.2 1.7L12 17l-1.8-5.3L5 10l5.2-1.6z"/><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="6.5" height="6.5"/><rect x="14" y="3.5" width="6.5" height="6.5"/><rect x="3.5" y="14" width="6.5" height="6.5"/><path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM18 14h2.5M14 18v2.5"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="1"/><path d="M6 9.5h1M9.5 9.5h1M13 9.5h1M16.5 9.5h1M6 12.5h1M17 12.5h1M8.5 15h7M9.5 12.5h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v6L4.8 18.6A1.3 1.3 0 0 0 6 20.5h12a1.3 1.3 0 0 0 1.2-1.9L13.5 9.5v-6"/><path d="M7.5 14.5h9"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2.8l8.2 4.6v9.2L12 21.2l-8.2-4.6V7.4z"/><path d="M3.8 7.4L12 12l8.2-4.6M12 12v9.2"/></symbol>
+    <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 3h5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="1"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+  </svg>
+
+  <!-- Fond : vidéo fantôme, grille, scanlines -->
+  <div class="backdrop" aria-hidden="true">
+    <video id="bgVideo" class="backdrop__video" muted playsinline></video>
+    <div class="backdrop__grid"></div>
+    <div class="backdrop__rings">
+      <svg class="ring ring--a" viewBox="0 0 800 800"><circle cx="400" cy="400" r="380"/></svg>
+      <svg class="ring ring--b" viewBox="0 0 800 800"><circle cx="400" cy="400" r="300"/></svg>
+      <svg class="ring ring--c" viewBox="0 0 800 800"><circle cx="400" cy="400" r="228"/></svg>
+    </div>
+    <div class="backdrop__scan"></div>
+    <div class="backdrop__vignette"></div>
+  </div>
+
+  <!-- Séquence de démarrage -->
+  <div id="boot" class="boot" role="status" aria-live="polite" aria-label="Démarrage de JARVIS">
+    <div class="boot__core" aria-hidden="true">
+      <svg viewBox="0 0 240 240" class="boot__svg">
+        <circle cx="120" cy="120" r="108" class="b-ring b-ring--1"/>
+        <circle cx="120" cy="120" r="92" class="b-ring b-ring--2"/>
+        <circle cx="120" cy="120" r="74" class="b-ring b-ring--3"/>
+        <circle cx="120" cy="120" r="52" class="b-ring b-ring--4"/>
+        <circle cx="120" cy="120" r="22" class="b-core"/>
+        <g class="b-ticks"></g>
+      </svg>
+    </div>
+    <p class="boot__title">JARVIS</p>
+    <ol class="boot__log" id="bootLog"></ol>
+    <button type="button" class="btn btn--ghost boot__skip" id="bootSkip">Passer <kbd>Échap</kbd></button>
+  </div>
+
+  <!-- Accueil -->
+  <section id="welcome" class="welcome" aria-labelledby="welcomeTitle" hidden>
+    <div class="welcome__inner">
+      <p class="eyebrow">Système d’interface gestuelle · NEXORA</p>
+      <h1 id="welcomeTitle" class="welcome__title">Bonjour<span id="welcomeName"></span>.<br>Prenez la main sur l’écran.</h1>
+      <p class="welcome__lead">JARVIS lit vos gestes avec la caméra et écoute vos commandes vocales. Attrapez une photo d’un poing fermé sur un appareil, ouvrez la main devant un autre : elle y atterrit.</p>
+      <ul class="welcome__points">
+        <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span><strong>Tout reste sur votre appareil.</strong> L’image de la caméra est analysée localement et n’est jamais envoyée. Seule la photo que vous choisissez de partager part, en direct, vers l’appareil relié.</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span><strong>Caméra</strong> : suivi des deux mains à 21 points, avec un modèle embarqué (pas de serveur).</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span><strong>Micro</strong> (facultatif) : dites « Jarvis » puis votre commande. Le clavier fonctionne aussi.</span></li>
+      </ul>
+      <div class="welcome__actions">
+        <button type="button" class="btn btn--primary btn--lg" id="welcomeStart"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Activer la caméra</button>
+        <button type="button" class="btn btn--lg" id="welcomeDemo"><svg class="ic" aria-hidden="true"><use href="#i-flask"/></svg>Démonstration sans caméra</button>
+        <button type="button" class="btn btn--ghost btn--lg" id="welcomeTuto"><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg>Voir les gestes</button>
+      </div>
+      <p class="welcome__foot"><a href="confidentialite.html">Confidentialité : ce qui est traité, et où</a> · Fonctionne mieux dans Chrome, Edge ou Safari récents, en HTTPS.</p>
+    </div>
+  </section>
+
+  <!-- Application -->
+  <div id="app" class="app" inert>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="JARVIS, accueil">
+        <svg class="brand__mark" viewBox="0 0 48 48" aria-hidden="true">
+          <circle cx="24" cy="24" r="21" class="bm-ring"/>
+          <path d="M24 6a18 18 0 0 1 15.6 9" class="bm-arc"/>
+          <path d="M39.6 33A18 18 0 0 1 8.4 33" class="bm-arc"/>
+          <path d="M8.4 15A18 18 0 0 1 17 7.3" class="bm-arc bm-arc--amber"/>
+          <circle cx="24" cy="24" r="8" class="bm-core"/>
+        </svg>
+        <span class="brand__text"><span class="brand__name">JARVIS</span><span class="brand__sub">Interface gestuelle · NEXORA</span></span>
+      </a>
+      <nav class="modes" aria-label="Modules">
+        <button type="button" class="mode-tab" data-mode="galerie" aria-pressed="true" data-air><span class="mode-tab__n">01</span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><span>Galerie</span></button>
+        <button type="button" class="mode-tab" data-mode="dessin" aria-pressed="false" data-air><span class="mode-tab__n">02</span><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg><span>Dessin</span></button>
+        <button type="button" class="mode-tab" data-mode="holo" aria-pressed="false" data-air><span class="mode-tab__n">03</span><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>Hologramme</span></button>
+      </nav>
+      <div class="topbar__status" role="group" aria-label="État des capteurs">
+        <span class="chip" id="chipCam" data-state="off" title="Caméra"><span class="chip__dot"></span><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span class="chip__label">Caméra</span><span class="chip__val" id="chipCamVal">éteinte</span></span>
+        <span class="chip" id="chipMic" data-state="off" title="Micro"><span class="chip__dot"></span><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span class="chip__label">Voix</span><span class="chip__val" id="chipMicVal">clavier</span></span>
+        <span class="chip" id="chipLink" data-state="off" title="Liaison"><span class="chip__dot"></span><svg class="ic" aria-hidden="true"><use href="#i-link"/></svg><span class="chip__label">Liaison</span><span class="chip__val" id="chipLinkVal">0</span></span>
+      </div>
+      <div class="topbar__actions">
+        <button type="button" class="icon-btn" id="btnSleep" aria-label="Mettre en veille" title="Veille" data-air><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button type="button" class="icon-btn" id="btnTuto" aria-label="Tutoriel des gestes" title="Gestes" data-air><svg class="ic" aria-hidden="true"><use href="#i-help"/></svg></button>
+        <button type="button" class="icon-btn" id="btnSettings" aria-label="Réglages" title="Réglages" data-air><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg></button>
+      </div>
+    </header>
+
+    <!-- Colonne gauche -->
+    <aside class="rail rail--left" aria-label="Capteurs">
+      <section class="panel panel--optic" aria-labelledby="optTitle">
+        <header class="panel__head"><h2 id="optTitle" class="panel__title">Optique</h2><span class="panel__meta" id="optMeta">hors ligne</span></header>
+        <div class="optic" id="optic">
+          <video id="camVideo" class="optic__video" muted playsinline aria-label="Aperçu de la caméra"></video>
+          <canvas id="opticCanvas" class="optic__canvas" aria-hidden="true"></canvas>
+          <div class="optic__corners" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="optic__idle" id="opticIdle">
+            <p class="optic__msg" id="opticMsg">Caméra inactive</p>
+            <div class="optic__progress" id="opticProgress" hidden><span class="optic__bar"><i id="opticBar"></i></span><span class="optic__pct" id="opticPct">0 %</span></div>
+            <div class="optic__btns">
+              <button type="button" class="btn btn--primary btn--sm" id="btnCamStart" data-air><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Activer</button>
+              <button type="button" class="btn btn--sm" id="btnDemo" data-air><svg class="ic" aria-hidden="true"><use href="#i-flask"/></svg>Démo</button>
+            </div>
+          </div>
+          <span class="optic__tag" id="opticTag" aria-hidden="true"></span>
+        </div>
+        <div class="optic__tools">
+          <button type="button" class="btn btn--xs" id="btnCamToggle" data-air hidden><svg class="ic" aria-hidden="true"><use href="#i-camera-off"/></svg>Couper</button>
+          <button type="button" class="btn btn--xs" id="btnRecord" data-air hidden><svg class="ic" aria-hidden="true"><use href="#i-record"/></svg>Enregistrer un geste</button>
+        </div>
+      </section>
+
+      <section class="panel panel--sensors" aria-labelledby="sensTitle">
+        <header class="panel__head"><h2 id="sensTitle" class="panel__title">Capteurs</h2><span class="panel__meta" id="sensSource">—</span></header>
+        <dl class="sensors">
+          <div class="sensor"><dt>Images/s</dt><dd><span class="sensor__big" id="sFps">0</span><canvas class="sensor__spark" id="sFpsSpark" width="96" height="22" aria-hidden="true"></canvas></dd></div>
+          <div class="sensor"><dt>Mains</dt><dd><span class="sensor__big" id="sHands">0</span><span class="sensor__hands" id="sHandsIcons" aria-hidden="true"><i></i><i></i></span></dd></div>
+          <div class="sensor"><dt>Latence</dt><dd><span class="sensor__big" id="sLatency">—</span><span class="sensor__unit">ms</span></dd></div>
+          <div class="sensor sensor--wide"><dt>Geste</dt><dd><span class="sensor__pose" id="sPose">—</span><span class="sensor__model" id="sModel"></span><span class="sensor__meter" aria-hidden="true"><i id="sPinch"></i></span></dd></div>
+        </dl>
+      </section>
+
+      <section class="panel panel--log" aria-labelledby="logTitle">
+        <header class="panel__head"><h2 id="logTitle" class="panel__title">Journal</h2><button type="button" class="link-btn" id="btnLogClear">effacer</button></header>
+        <ol class="log" id="log" aria-live="off"></ol>
+      </section>
+    </aside>
+
+    <!-- Module principal -->
+    <main id="stage" class="stage" tabindex="-1" aria-label="Module principal">
+      <div class="stage__frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <!-- Galerie -->
+      <section class="view view--galerie" id="viewGalerie" data-view="galerie" aria-labelledby="galTitle">
+        <header class="view__head">
+          <div class="view__titles">
+            <p class="eyebrow">Module 01 · Partage gestuel</p>
+            <h2 id="galTitle" class="view__title">Galerie</h2>
+          </div>
+          <p class="view__stats" id="galStats" aria-live="polite"></p>
+          <div class="view__actions">
+            <div class="seg" role="group" aria-label="Filtrer">
+              <button type="button" class="seg__btn" data-filter="all" aria-pressed="true" data-air>Toutes</button>
+              <button type="button" class="seg__btn" data-filter="fav" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Favoris</button>
+            </div>
+            <label class="btn btn--sm" data-air><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Importer<input type="file" id="fileInput" accept="image/*" multiple class="visually-hidden"></label>
+          </div>
+        </header>
+        <div class="carry-bar" id="carryBar" hidden>
+          <span class="carry-bar__thumb" id="carryThumb"></span>
+          <div class="carry-bar__text"><strong id="carryTitle">Photo en main</strong><span id="carryHint">Ouvrez la main devant l’autre appareil.</span></div>
+          <span class="carry-bar__progress" aria-hidden="true"><i id="carryProg"></i></span>
+          <button type="button" class="btn btn--primary btn--sm" id="btnCarrySend" data-air><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg>Envoyer</button>
+          <button type="button" class="btn btn--sm" id="btnCarryDrop" data-air>Reposer</button>
+        </div>
+        <div class="grid-wrap">
+          <ul class="photo-grid" id="photoGrid" aria-label="Photos"></ul>
+          <div class="dropzone" id="dropzone" aria-hidden="true"><p>Déposez vos photos ici</p></div>
+        </div>
+        <div class="viewer" id="viewer" hidden role="dialog" aria-modal="false" aria-labelledby="viewerTitle">
+          <div class="viewer__stage" id="viewerStage">
+            <img id="viewerImg" class="viewer__img" alt="">
+          </div>
+          <header class="viewer__bar">
+            <button type="button" class="icon-btn" id="viewerClose" aria-label="Fermer la visionneuse" data-air><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+            <div class="viewer__meta"><h3 id="viewerTitle" class="viewer__title"></h3><p class="viewer__sub" id="viewerSub"></p></div>
+            <button type="button" class="icon-btn" id="viewerFav" aria-label="Ajouter aux favoris" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></button>
+            <button type="button" class="icon-btn" id="viewerSend" aria-label="Envoyer à l’appareil relié" data-air><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg></button>
+            <button type="button" class="icon-btn" id="viewerDelete" aria-label="Supprimer la photo" data-air><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg></button>
+          </header>
+          <button type="button" class="viewer__nav viewer__nav--prev" id="viewerPrev" aria-label="Photo précédente" data-air><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+          <button type="button" class="viewer__nav viewer__nav--next" id="viewerNext" aria-label="Photo suivante" data-air><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
+          <p class="viewer__hint">Swipe ← → · deux mains qui pincent : zoom et rotation · pouce levé : favori · poing : attraper</p>
+          <p class="viewer__readout" id="viewerReadout" aria-hidden="true"></p>
+        </div>
+      </section>
+
+      <!-- Dessin -->
+      <section class="view view--dessin" id="viewDessin" data-view="dessin" hidden aria-labelledby="drawTitle">
+        <header class="view__head">
+          <div class="view__titles">
+            <p class="eyebrow">Module 02 · Tracé aérien</p>
+            <h2 id="drawTitle" class="view__title">Dessin dans l’air</h2>
+          </div>
+          <div class="view__actions draw-tools">
+            <div class="swatches" role="radiogroup" aria-label="Couleur" id="swatches"></div>
+            <label class="range" data-air><span>Épaisseur</span><input type="range" id="brushSize" min="2" max="40" value="8" data-air-range></label>
+            <button type="button" class="btn btn--sm" id="btnEraser" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-eraser"/></svg>Gomme</button>
+            <button type="button" class="btn btn--sm" id="btnClear" data-air><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg>Tout effacer</button>
+            <button type="button" class="btn btn--primary btn--sm" id="btnExport" data-air><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Vers la galerie</button>
+          </div>
+        </header>
+        <div class="canvas-wrap" id="drawWrap">
+          <canvas id="drawCanvas" class="draw-canvas" aria-label="Zone de dessin : index levé pour dessiner, ou souris et doigt" role="img"></canvas>
+          <div class="draw-brush" id="drawBrush" aria-hidden="true"></div>
+          <p class="canvas-hint">Index levé : dessiner · pincement : couleur suivante · poing : gommer · deux index : tout effacer</p>
+        </div>
+      </section>
+
+      <!-- Hologramme -->
+      <section class="view view--holo" id="viewHolo" data-view="holo" hidden aria-labelledby="holoTitle">
+        <header class="view__head">
+          <div class="view__titles">
+            <p class="eyebrow">Module 03 · Projection</p>
+            <h2 id="holoTitle" class="view__title">Hologramme</h2>
+          </div>
+          <div class="view__actions">
+            <div class="seg" role="group" aria-label="Objet">
+              <button type="button" class="seg__btn" data-holo="globe" aria-pressed="true" data-air><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg>Globe</button>
+              <button type="button" class="seg__btn" data-holo="reactor" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg>Réacteur</button>
+            </div>
+            <button type="button" class="btn btn--sm" id="btnHoloReset" data-air>Recentrer</button>
+          </div>
+        </header>
+        <div class="holo-wrap" id="holoWrap">
+          <canvas id="holoCanvas" class="holo-canvas" aria-label="Hologramme 3D : faites-le tourner en pinçant, zoomez à deux mains" role="img"></canvas>
+          <div class="holo-labels" id="holoLabels" aria-hidden="true"></div>
+          <p class="holo-readout" id="holoReadout" aria-hidden="true"></p>
+          <p class="canvas-hint">Pincer et déplacer : rotation · deux mains qui pincent : zoom · swipe : lancer la rotation</p>
+        </div>
+      </section>
+
+      <!-- Réception -->
+      <div class="incoming" id="incoming" hidden role="status" aria-live="polite">
+        <div class="incoming__ghost" id="incomingThumb" aria-hidden="true"></div>
+        <div class="incoming__text">
+          <p class="eyebrow" id="incomingFrom">Photo en approche</p>
+          <p class="incoming__title">Ouvrez la main devant la caméra pour la lâcher ici</p>
+          <span class="incoming__progress" aria-hidden="true"><i id="incomingProg"></i></span>
+        </div>
+        <button type="button" class="btn btn--primary btn--sm" id="btnReceive" data-air><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg>Recevoir ici</button>
+      </div>
+    </main>
+
+    <!-- Colonne droite -->
+    <aside class="rail rail--right" aria-label="Informations et liaison">
+      <section class="panel panel--clock" aria-labelledby="clockTitle">
+        <header class="panel__head"><h2 id="clockTitle" class="panel__title">Chronologie</h2><span class="panel__meta" id="clockZone"></span></header>
+        <div class="clock">
+          <div class="clock__dial" aria-hidden="true">
+            <svg class="clock__ring" viewBox="0 0 100 100"><g class="cr-ticks" id="clockTicks"></g><circle cx="50" cy="50" r="40" class="cr-track"/><circle cx="50" cy="50" r="40" class="cr-sec" id="clockSecRing"/></svg>
+            <span class="clock__sec" id="clockSec">--</span>
+          </div>
+          <div class="clock__text">
+            <p class="clock__time"><time id="clockTime">--:--</time></p>
+            <p class="clock__date" id="clockDate"></p>
+          </div>
+        </div>
+        <div class="weather" id="weather" aria-live="polite">
+          <svg class="weather__icon" viewBox="0 0 48 48" id="weatherIcon" aria-hidden="true"></svg>
+          <div class="weather__main"><span class="weather__temp" id="weatherTemp">--°</span><span class="weather__desc" id="weatherDesc">Météo en attente</span></div>
+          <span class="weather__city" id="weatherCity"></span>
+        </div>
+      </section>
+
+      <section class="panel panel--link" aria-labelledby="linkTitle">
+        <header class="panel__head"><h2 id="linkTitle" class="panel__title">Liaison</h2><span class="panel__meta" id="linkRole"></span></header>
+        <div class="link">
+          <div class="link__device">
+            <label class="field field--inline"><span>Cet appareil</span><input type="text" id="deviceName" maxlength="32" autocomplete="off" spellcheck="false"></label>
+          </div>
+          <p class="link__local" id="linkLocal"><span class="dot"></span>Fenêtres de ce navigateur : <strong id="linkLocalCount">0</strong></p>
+          <div class="link__net" id="linkNet">
+            <button type="button" class="btn btn--sm btn--block" id="btnNetStart" data-air><svg class="ic" aria-hidden="true"><use href="#i-qr"/></svg>Relier un autre appareil</button>
+            <div class="link__code" id="linkCode" hidden>
+              <button type="button" class="qr" id="qrBox" aria-label="Agrandir le QR code" data-air></button>
+              <div class="link__codeinfo">
+                <span class="eyebrow">Code de liaison</span>
+                <strong class="link__codeval" id="linkCodeVal">——-——</strong>
+                <span class="link__state" id="linkNetState">connexion…</span>
+              </div>
+            </div>
+            <form class="link__join" id="joinForm" hidden>
+              <label class="visually-hidden" for="joinCode">Code de l’autre appareil</label>
+              <input id="joinCode" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code de l’autre appareil" maxlength="9">
+              <button type="submit" class="btn btn--sm" data-air>Relier</button>
+            </form>
+          </div>
+          <ul class="peers" id="peers" aria-label="Appareils reliés"></ul>
+        </div>
+      </section>
+
+      <section class="panel panel--timers" aria-labelledby="timersTitle">
+        <header class="panel__head"><h2 id="timersTitle" class="panel__title">Minuteries</h2><span class="panel__meta" id="timersCount">0</span></header>
+        <ul class="timers" id="timers"></ul>
+        <p class="panel__empty" id="timersEmpty">Aucune. Dites « Jarvis, minuterie de 5 minutes ».</p>
+      </section>
+
+      <section class="panel panel--assistant" aria-labelledby="asstTitle">
+        <header class="panel__head"><h2 id="asstTitle" class="panel__title">Assistant</h2><span class="panel__meta" id="asstBrain">local</span></header>
+        <div class="assistant" id="assistant" aria-live="polite">
+          <p class="assistant__line assistant__line--you" id="asstYou"><span>Vous</span><q>…</q></p>
+          <p class="assistant__line assistant__line--jarvis" id="asstJarvis"><span>JARVIS</span><q>À votre service.</q></p>
+        </div>
+        <div class="voicewave" id="voiceWave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </section>
+    </aside>
+
+    <!-- Barre de commande -->
+    <footer class="cmdbar">
+      <form class="cmd" id="cmdForm" role="search" aria-label="Commande">
+        <button type="button" class="cmd__mic" id="btnMic" aria-pressed="false" aria-label="Écoute vocale" data-air><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span class="cmd__micring" aria-hidden="true"></span></button>
+        <label for="cmdInput" class="visually-hidden">Commande</label>
+        <span class="cmd__prompt" aria-hidden="true">&gt;</span>
+        <input id="cmdInput" class="cmd__input" type="text" autocomplete="off" spellcheck="false" enterkeyhint="send" placeholder="Parlez ou tapez une commande — ex. « météo à Toulouse »">
+        <button type="submit" class="btn btn--primary btn--sm cmd__send" data-air><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span>Exécuter</span></button>
+      </form>
+      <div class="cmdbar__tools">
+        <button type="button" class="btn btn--sm" id="btnSim" aria-expanded="false" aria-controls="simPanel" data-air><svg class="ic" aria-hidden="true"><use href="#i-flask"/></svg><span>Simulation</span></button>
+        <button type="button" class="btn btn--sm" id="btnMouseHand" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg><span>Main virtuelle</span></button>
+      </div>
+    </footer>
+
+    <!-- Banc de simulation -->
+    <section class="sim" id="simPanel" hidden aria-labelledby="simTitle">
+      <header class="panel__head"><h2 id="simTitle" class="panel__title">Banc de simulation</h2><button type="button" class="icon-btn icon-btn--sm" id="simClose" aria-label="Fermer le banc de simulation"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+      <p class="sim__intro">Rejoue des gestes à travers le même moteur que la caméra. La cible est la photo sélectionnée ou le centre.</p>
+      <div class="sim__grid" id="simScenarios"></div>
+      <h3 class="sim__sub">Gestes enregistrés</h3>
+      <ul class="sim__recs" id="simRecs"></ul>
+      <div class="sim__io">
+        <label class="btn btn--xs"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Importer JSON<input type="file" id="simImport" accept="application/json,.json" class="visually-hidden"></label>
+      </div>
+    </section>
+  </div>
+
+  <!-- Calques -->
+  <canvas id="fxCanvas" class="fx" aria-hidden="true"></canvas>
+  <div id="carry" class="carry" aria-hidden="true"><div class="carry__img" id="carryImg"></div><svg class="carry__ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56"/><circle cx="60" cy="60" r="56" class="carry__prog" id="carryRing"/></svg></div>
+  <div id="airCursor" class="air-cursor" aria-hidden="true">
+    <svg viewBox="0 0 80 80" class="air-cursor__svg">
+      <circle cx="40" cy="40" r="30" class="ac-ring"/>
+      <circle cx="40" cy="40" r="30" class="ac-press" id="acPress"/>
+      <g class="ac-ticks"><path d="M40 4v8M40 68v8M4 40h8M68 40h8"/></g>
+      <circle cx="40" cy="40" r="3.5" class="ac-dot"/>
+    </svg>
+    <span class="air-cursor__label" id="acLabel"></span>
+  </div>
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  <div id="sleep" class="sleep" hidden>
+    <div class="sleep__core" aria-hidden="true"><i></i><i></i><i></i></div>
+    <p class="sleep__title">Veille</p>
+    <p class="sleep__hint">Dites « Jarvis, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
+    <button type="button" class="btn" id="btnWake">Réveiller</button>
+  </div>
+  <div id="countdown" class="countdown" aria-hidden="true"></div>
+
+  <!-- Réglages -->
+  <dialog id="dlgSettings" class="dialog" aria-labelledby="setTitle">
+    <form method="dialog" class="dialog__inner" id="settingsForm">
+      <header class="dialog__head">
+        <h2 id="setTitle" class="dialog__title">Réglages</h2>
+        <button class="icon-btn" value="close" aria-label="Fermer les réglages"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="tabs" role="tablist" aria-label="Rubriques des réglages">
+        <button type="button" role="tab" class="tab" aria-selected="true" aria-controls="setGestes" id="tabGestes">Gestes</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setCamera" id="tabCamera" tabindex="-1">Caméra</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setVoix" id="tabVoix" tabindex="-1">Voix &amp; IA</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setLiaison" id="tabLiaison" tabindex="-1">Liaison</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setGeneral" id="tabGeneral" tabindex="-1">Général</button>
+      </div>
+      <div class="dialog__body">
+        <section role="tabpanel" id="setGestes" aria-labelledby="tabGestes" class="tabpanel">
+          <div class="calib" id="calib">
+            <div class="calib__text">
+              <h3>Calibration</h3>
+              <p id="calibMsg">Mesure votre pincement et votre poing pour ajuster les seuils (caméra requise, 10 secondes).</p>
+            </div>
+            <div class="calib__meter" aria-hidden="true"><i id="calibBar"></i></div>
+            <button type="button" class="btn btn--primary btn--sm" id="btnCalib">Lancer la calibration</button>
+          </div>
+          <div class="fields">
+            <label class="field"><span>Main dominante</span>
+              <select name="dominant"><option value="Right">Droite</option><option value="Left">Gauche</option></select></label>
+            <label class="field field--range"><span>Sensibilité du curseur <output name="sensitivityOut"></output></span>
+              <input type="range" name="sensitivity" min="0.6" max="2" step="0.05"></label>
+            <label class="field field--range"><span>Lissage <output name="smoothingOut"></output></span>
+              <input type="range" name="smoothing" min="0" max="1" step="0.05"></label>
+            <label class="field field--range"><span>Seuil de pincement <output name="pinchOnOut"></output></span>
+              <input type="range" name="pinchOn" min="0.12" max="0.45" step="0.01"></label>
+            <label class="field field--range"><span>Anti-rebond des poses <output name="debounceOut"></output></span>
+              <input type="range" name="debounce" min="30" max="250" step="10"></label>
+            <label class="field field--range"><span>Vitesse de swipe / lancer <output name="swipeSpeedOut"></output></span>
+              <input type="range" name="swipeSpeed" min="0.6" max="2.5" step="0.05"></label>
+            <label class="check"><input type="checkbox" name="ghost"><span>Squelette plein écran</span></label>
+            <label class="check"><input type="checkbox" name="magnet"><span>Aimantation du curseur sur les boutons</span></label>
+          </div>
+        </section>
+        <section role="tabpanel" id="setCamera" aria-labelledby="tabCamera" class="tabpanel" hidden>
+          <div class="fields">
+            <label class="field"><span>Caméra</span>
+              <select name="facing"><option value="user">Frontale (selfie)</option><option value="environment">Arrière</option></select></label>
+            <label class="field"><span>Qualité</span>
+              <select name="quality"><option value="auto">Automatique</option><option value="high">Haute (1280×720)</option><option value="light">Légère (640×480, mobile)</option></select></label>
+            <label class="field"><span>Modèle</span>
+              <select name="model"><option value="gesture">Complet : points + gestes du modèle</option><option value="landmarker">Points seuls (gestes géométriques)</option></select></label>
+            <label class="field"><span>Calcul</span>
+              <select name="delegate"><option value="GPU">Processeur graphique (GPU), repli CPU</option><option value="CPU">Processeur (CPU)</option></select></label>
+            <label class="check"><input type="checkbox" name="mirror"><span>Affichage miroir</span></label>
+            <label class="check"><input type="checkbox" name="bgVideo"><span>Vidéo en fond d’écran (atténuée)</span></label>
+          </div>
+        </section>
+        <section role="tabpanel" id="setVoix" aria-labelledby="tabVoix" class="tabpanel" hidden>
+          <div class="fields">
+            <label class="check"><input type="checkbox" name="wake"><span>Mot d’éveil « Jarvis » (sinon, chaque phrase est une commande)</span></label>
+            <label class="check"><input type="checkbox" name="speak"><span>Réponses parlées</span></label>
+            <label class="field"><span>Voix</span><select name="voice" id="voiceSelect"><option value="">Voix française par défaut</option></select></label>
+            <label class="field field--range"><span>Débit <output name="rateOut"></output></span><input type="range" name="rate" min="0.7" max="1.4" step="0.05"></label>
+            <label class="field"><span>Ville par défaut (météo)</span><input type="text" name="city" autocomplete="address-level2"></label>
+            <label class="field"><span>Votre prénom</span><input type="text" name="userName" autocomplete="given-name" maxlength="40"></label>
+          </div>
+          <div class="brain">
+            <h3>Cerveau IA <span class="badge" id="brainBadge">désactivé</span></h3>
+            <p class="brain__text">Pour les questions libres, JARVIS peut interroger un modèle via une API compatible OpenAI (Groq, OpenRouter, Mistral, Ollama ou LM Studio en local…). La clé reste dans ce navigateur et n’est envoyée qu’au point d’accès choisi.</p>
+            <div class="fields">
+              <label class="field"><span>Fournisseur</span>
+                <select name="aiProvider" id="aiProvider"></select></label>
+              <label class="field"><span>Adresse de l’API</span><input type="url" name="aiBase" placeholder="https://…/v1" spellcheck="false"></label>
+              <label class="field"><span>Modèle</span><input type="text" name="aiModel" spellcheck="false"></label>
+              <label class="field"><span>Clé API</span><input type="password" name="aiKey" autocomplete="off" spellcheck="false" placeholder="facultative en local"></label>
+              <label class="check"><input type="checkbox" name="aiRemember"><span>Mémoriser la clé sur cet appareil (sinon : jusqu’à la fermeture de l’onglet)</span></label>
+              <label class="field field--area"><span>Personnalité (invite système)</span><textarea name="aiSystem" rows="3"></textarea></label>
+            </div>
+            <div class="brain__actions">
+              <button type="button" class="btn btn--sm" id="btnAiTest">Tester la connexion</button>
+              <button type="button" class="btn btn--sm btn--danger" id="btnAiForget">Effacer la clé</button>
+              <span class="brain__status" id="aiStatus" role="status"></span>
+            </div>
+          </div>
+        </section>
+        <section role="tabpanel" id="setLiaison" aria-labelledby="tabLiaison" class="tabpanel" hidden>
+          <div class="fields">
+            <label class="field"><span>Rôle de cet appareil</span>
+              <select name="role"><option value="both">Émetteur et récepteur</option><option value="sender">Émetteur seulement</option><option value="receiver">Récepteur seulement</option></select></label>
+            <label class="check"><input type="checkbox" name="localLink"><span>Liaison locale entre fenêtres de ce navigateur</span></label>
+            <label class="check"><input type="checkbox" name="autoAccept"><span>Accepter automatiquement les photos lancées</span></label>
+          </div>
+          <h3 class="fields__title">Serveur de signalisation (PeerJS)</h3>
+          <p class="fields__hint">Il sert uniquement à mettre les appareils en relation ; les photos passent ensuite en direct (WebRTC). Laissez vide pour le serveur public PeerJS.</p>
+          <div class="fields">
+            <label class="field"><span>Hôte</span><input type="text" name="peerHost" placeholder="0.peerjs.com" spellcheck="false"></label>
+            <label class="field"><span>Port</span><input type="number" name="peerPort" placeholder="443" min="1" max="65535"></label>
+            <label class="field"><span>Chemin</span><input type="text" name="peerPath" placeholder="/" spellcheck="false"></label>
+            <label class="field"><span>Clé</span><input type="text" name="peerKey" placeholder="peerjs" spellcheck="false"></label>
+            <label class="check"><input type="checkbox" name="peerSecure"><span>Connexion chiffrée (wss)</span></label>
+            <label class="field field--area"><span>Serveurs ICE (JSON, facultatif)</span><textarea name="iceServers" rows="2" spellcheck="false" placeholder='[{"urls":"stun:stun.l.google.com:19302"}]'></textarea></label>
+          </div>
+        </section>
+        <section role="tabpanel" id="setGeneral" aria-labelledby="tabGeneral" class="tabpanel" hidden>
+          <div class="fields">
+            <label class="check"><input type="checkbox" name="sound"><span>Sons de l’interface</span></label>
+            <label class="field field--range"><span>Volume <output name="volumeOut"></output></span><input type="range" name="volume" min="0" max="1" step="0.05"></label>
+            <label class="field"><span>Animations</span>
+              <select name="motion"><option value="auto">Selon le système</option><option value="full">Complètes</option><option value="reduced">Réduites</option></select></label>
+            <label class="check"><input type="checkbox" name="bootSeq"><span>Séquence de démarrage</span></label>
+          </div>
+          <div class="danger-zone">
+            <button type="button" class="btn btn--sm" id="btnReplayTuto">Revoir le tutoriel</button>
+            <button type="button" class="btn btn--sm btn--danger" id="btnResetPhotos">Supprimer mes photos</button>
+            <button type="button" class="btn btn--sm btn--danger" id="btnResetAll">Tout réinitialiser</button>
+          </div>
+          <p class="fields__hint"><a href="confidentialite.html">Confidentialité et données</a></p>
+        </section>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Tutoriel -->
+  <dialog id="dlgTuto" class="dialog dialog--wide" aria-labelledby="tutoTitle">
+    <div class="dialog__inner">
+      <header class="dialog__head">
+        <h2 id="tutoTitle" class="dialog__title">Les gestes</h2>
+        <button type="button" class="icon-btn" id="tutoClose" aria-label="Fermer le tutoriel"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="dialog__body">
+        <ol class="share-steps" aria-label="Partager une photo en trois temps">
+          <li><span class="share-steps__n">1</span><strong>Visez</strong> la photo avec l’index sur l’appareil A.</li>
+          <li><span class="share-steps__n">2</span><strong>Fermez le poing</strong> : la photo est dans votre main.</li>
+          <li><span class="share-steps__n">3</span><strong>Ouvrez la main</strong> devant la caméra de l’appareil B — ou lancez-la.</li>
+        </ol>
+        <ul class="gesture-cards" id="gestureCards"></ul>
+      </div>
+      <footer class="dialog__foot">
+        <p class="fields__hint">Astuce : tenez la main à 40–80 cm de la caméra, paume vers l’écran, dans un endroit éclairé.</p>
+        <button type="button" class="btn btn--primary" id="tutoDone">C’est compris</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- QR agrandi -->
+  <dialog id="dlgQr" class="dialog dialog--qr" aria-labelledby="qrTitle">
+    <div class="dialog__inner">
+      <header class="dialog__head">
+        <h2 id="qrTitle" class="dialog__title">Relier un appareil</h2>
+        <button type="button" class="icon-btn" id="qrClose" aria-label="Fermer"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="dialog__body qr-big">
+        <div class="qr qr--big" id="qrBig"></div>
+        <p>Scannez avec l’appareil photo du téléphone, ou saisissez le code <strong id="qrCode"></strong> dans la liaison de l’autre appareil.</p>
+        <p class="fields__hint" id="qrUrl"></p>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/app/main.js"></script>
+</body>
+</html>
