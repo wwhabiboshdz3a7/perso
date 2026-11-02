@@ -29,8 +29,9 @@ export function openSettings(app, { tab = 'connexion', provider = null } = {}) {
     onClose: () => app.refreshChrome(),
   });
 
-  if (provider) {
-    settings.set('connection', { mode: 'browser', provider, baseUrl: '' });
+  if (provider && (settings.get().connection.provider !== provider || settings.get().connection.mode !== 'browser')) {
+    settings.set('connection', { mode: 'browser', provider, baseUrl: '', model: '' });
+    app.refreshStatus();
   }
 
   const panels = {
@@ -86,9 +87,8 @@ function renderConnection(root, app) {
   const draw = () => (settings.get().connection.mode === 'server' ? drawServer(panel, app) : drawBrowser(panel, app));
   $$('input[name="conn-mode"]', root).forEach((r) => r.addEventListener('change', () => {
     settings.set('connection', { mode: r.value });
-    app.setModels([]);
-    draw();
     app.refreshStatus();
+    draw();
   }));
   draw();
 }
@@ -143,9 +143,8 @@ function drawBrowser(panel, app) {
   $$('[data-provider]', panel).forEach((b) => b.addEventListener('click', () => {
     if (b.dataset.provider === settings.get().connection.provider) return;
     settings.set('connection', { provider: b.dataset.provider, baseUrl: '', model: '' });
-    app.setModels([]);
-    drawBrowser(panel, app);
     app.refreshStatus();
+    drawBrowser(panel, app);
     $(`[data-provider="${b.dataset.provider}"]`, panel)?.focus();
   }));
 
@@ -306,7 +305,7 @@ function drawServer(panel, app, { autoload = false } = {}) {
   const auth = $('[data-auth]', panel);
   if (s) {
     auth.innerHTML = `<div class="row-item" style="margin-bottom:12px"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span><div class="grow"><b>Connecté</b><div class="hint">Session valable jusqu'à ${formatTime(s.expiresAt)}</div></div><button class="btn btn-sm" type="button" data-logout>${icon('logout')}Se déconnecter</button></div>`;
-    $('[data-logout]', auth).addEventListener('click', () => { session.clear(); app.setModels([]); app.refreshStatus(); drawServer(panel, app); });
+    $('[data-logout]', auth).addEventListener('click', () => { session.clear(); app.refreshStatus(); drawServer(panel, app); });
   } else {
     auth.innerHTML = `<form class="field" data-login-form>
       <label for="srv-pass">Mot de passe d'accès</label>

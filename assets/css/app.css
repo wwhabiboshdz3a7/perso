@@ -189,6 +189,8 @@ kbd {
 }
 .app[data-sidebar="closed"] { grid-template-columns: 0 minmax(0, 1fr); }
 .app[data-sidebar="closed"] .sidebar { visibility: hidden; }
+/* Sur grand écran, le bouton de la barre latérale suffit tant qu'elle est ouverte. */
+@media (min-width: 901px) { .app[data-sidebar="open"] #sidebar-toggle { display: none; } }
 
 /* ---------- Barre latérale ---------- */
 .sidebar {
@@ -617,6 +619,7 @@ mark { background: var(--accent-soft); color: inherit; border-radius: 3px; paddi
 .status-line[data-kind="ok"] { color: var(--ok); }
 .status-line[data-kind="error"] { color: var(--danger); }
 .status-line .ico { width: 16px; height: 16px; }
+.status-line:empty { min-height: 0; margin: 0; }
 
 /* ---------- Boîtes de dialogue ---------- */
 dialog.modal {

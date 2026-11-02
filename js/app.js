@@ -119,10 +119,8 @@ function modelsCacheKey() {
 }
 function setModels(models) {
   state.models = models || [];
-  try {
-    if (models && models.length) localStorage.setItem(modelsCacheKey(), JSON.stringify(models.slice(0, 600)));
-    else localStorage.removeItem(modelsCacheKey());
-  } catch { /* stockage plein */ }
+  if (!state.models.length) return;
+  try { localStorage.setItem(modelsCacheKey(), JSON.stringify(state.models.slice(0, 600))); } catch { /* stockage plein */ }
 }
 function loadCachedModels() {
   try { state.models = JSON.parse(localStorage.getItem(modelsCacheKey()) || '[]'); } catch { state.models = []; }
@@ -199,7 +197,7 @@ function renderSidebar() {
   const curId = state.current?.id;
   const itemHTML = (c, snippet = '') => `<li class="conv-item" data-id="${esc(c.id)}">
       <a href="#/c/${encodeURIComponent(c.id)}" ${c.id === curId ? 'aria-current="page"' : ''}>
-        ${c.pinned ? `<svg class="ico pin" aria-label="Épinglée"><use href="#i-pin"/></svg>` : ''}
+        ${c.pinned ? `<svg class="ico pin" role="img" aria-label="Épinglée"><use href="#i-pin"/></svg>` : ''}
         ${snippet ? `<span class="stack"><span class="t">${highlight(c.title, q)}</span><span class="snippet">${highlight(snippet, q)}</span></span>` : `<span class="t">${q ? highlight(c.title, q) : esc(c.title)}</span>`}
       </a>
       <button class="item-menu-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Actions pour « ${esc(c.title)} »">${icon('dots')}</button>
@@ -329,13 +327,14 @@ function autoTitle(text, atts = []) {
 }
 
 async function saveConversation(conv) {
+  // Une conversation supprimée entre-temps (génération interrompue) n'est pas recréée.
+  if (!state.conversations.includes(conv)) return;
   try { await db.putConversation(conv); } catch (e) { toast('Enregistrement impossible : stockage plein ou indisponible.', { kind: 'error' }); }
 }
 
 function sortConversations() { state.conversations.sort((a, b) => b.updatedAt - a.updatedAt); }
 
 function newChat({ focus = true } = {}) {
-  if (state.gen) stopGeneration();
   state.current = null;
   state.draftPersona = settings.get().assistant.defaultPersona;
   state.attachments = [];
@@ -487,7 +486,7 @@ function scheduleStreamRender(msg) {
 }
 
 function snapshot(msg) {
-  return { content: msg.content, reasoning: msg.reasoning || '', model: msg.model || '', status: msg.status, createdAt: msg.createdAt, finish: msg.finish || null };
+  return { content: msg.content, reasoning: msg.reasoning || '', model: msg.model || '', status: msg.status, createdAt: msg.createdAt, finish: msg.finish || null, usage: msg.usage || null, error: msg.error || null };
 }
 
 async function generate(conv, msg) {
@@ -1106,6 +1105,7 @@ async function openModelQuick() {
 
 /* ---------- Barre latérale (ouverture) ---------- */
 function setSidebar(open) {
+  const hadFocus = document.activeElement === els.sidebarToggle;
   if (mobileMQ.matches) {
     els.app.dataset.sidebar = open ? 'open-mobile' : 'closed';
     els.scrim.hidden = !open;
@@ -1120,6 +1120,8 @@ function setSidebar(open) {
   els.sidebarToggle.setAttribute('aria-expanded', String(open));
   els.sidebarToggle.setAttribute('aria-label', open ? 'Masquer la barre latérale' : 'Afficher la barre latérale');
   els.sidebar.inert = !open;
+  // Sur grand écran, le bouton de la barre supérieure disparaît : le focus passe à celui de la barre latérale.
+  if (open && hadFocus && !mobileMQ.matches) $('.sidebar-top [data-action="toggle-sidebar"]', els.sidebar)?.focus();
 }
 function sidebarOpen() { return els.app.dataset.sidebar === 'open' || els.app.dataset.sidebar === 'open-mobile'; }
 function closeMobileSidebar() { if (mobileMQ.matches && sidebarOpen()) { setSidebar(false); } }
