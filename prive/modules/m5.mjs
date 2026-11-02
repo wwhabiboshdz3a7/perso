@@ -84,10 +84,10 @@ ${MAJ}`,
         explication: 'Budget calculé. Le coût de l\'IA est souvent minime par rapport à la valeur livrée : votre prix se fixe sur la valeur (module 7).'
       },
       quiz: [
-        q('Où créer une clé d\'API ?', ['Dans l\'application mobile', 'Dans la Claude Console', 'Dans Claude Code', 'Sur GitHub'], 1, 'La Console gère clés, espaces de travail, crédits et limites.'),
-        q('stop_reason vaut « max_tokens ». Que faire ?', ['Rien', 'Augmenter max_tokens : la réponse a été coupée', 'Changer de clé', 'Réessayer à l\'identique'], 1, 'La réponse a atteint la limite de jetons de sortie.'),
-        q('Avec la version d\'API 2026-10-21, que se passe-t-il si vous envoyez « temperature » ?', ['Elle est appliquée', 'La requête est refusée (erreur 400)', 'Elle est ignorée silencieusement', 'Le coût double'], 1, 'Les paramètres d\'échantillonnage ont été retirés dans cette version.'),
-        q('Où ne jamais placer une clé d\'API ?', ['Dans une variable d\'environnement', 'Dans le code d\'une page web publique', 'Dans un gestionnaire de secrets', 'Dans les identifiants de n8n'], 1, 'Tout visiteur pourrait la lire et l\'utiliser à vos frais.')
+        q('Où créer une clé d\'API ?', ['Dans les réglages de claude.ai', 'Dans Claude Code, avec /login', 'Dans la Claude Console', 'Dans l\'application mobile Claude'], 2, 'La Console gère clés, espaces de travail, crédits et limites.'),
+        q('stop_reason vaut « max_tokens ». Que faire ?', ['Changer de clé : le quota du compte est épuisé', 'Réessayer à l\'identique, c\'est une erreur passagère', 'Rien : la réponse est complète et terminée', 'Augmenter max_tokens : la réponse a été coupée'], 3, 'La réponse a atteint la limite de jetons de sortie.'),
+        q('Avec la version d\'API 2026-10-21, que se passe-t-il si vous envoyez « temperature » ?', ['La requête est refusée (erreur 400)', 'Le paramètre est ignoré sans message', 'Elle est appliquée comme avant', 'Elle est convertie en niveau d\'effort'], 0, 'Les paramètres d\'échantillonnage ont été retirés dans cette version.'),
+        q('Où ne jamais placer une clé d\'API ?', ['Dans une variable d\'environnement', 'Dans le code d\'une page web publique', 'Dans un gestionnaire de secrets', 'Dans les identifiants chiffrés de n8n'], 1, 'Tout visiteur pourrait la lire et l\'utiliser à vos frais.')
       ],
       script: script('8 min',
         'Votre première requête à l\'API, la lecture de la réponse et le calcul du coût de 1 000 exécutions. En huit minutes.',
@@ -191,10 +191,10 @@ ${MAJ}`,
         explication: 'Schéma exploitable : vos nœuds suivants peuvent s\'appuyer sur chaque champ sans surprise.'
       },
       quiz: [
-        q('Pourquoi utiliser le streaming dans un chatbot ?', ['Pour payer moins', 'Pour afficher la réponse au fil de l\'eau et éviter les attentes', 'Pour changer de modèle', 'C\'est obligatoire'], 1, 'Le confort de lecture et la robustesse sur les longues réponses.'),
-        q('Claude appelle deux outils en même temps. Comment renvoyer les résultats ?', ['Un message par résultat', 'Tous les résultats dans un seul message utilisateur', 'Ne pas les renvoyer', 'Dans le prompt système'], 1, 'Tous les tool_result ensemble, dans le même message.'),
-        q('Que garantissent les sorties structurées ?', ['Une réponse courte', 'Une réponse conforme au schéma JSON fourni', 'Une réponse gratuite', 'Une réponse en anglais'], 1, 'Indispensable pour enchaîner des étapes automatiques.'),
-        q('Que vérifier avant de lire le contenu d\'une réponse ?', ['La couleur', 'stop_reason', 'Le nom du modèle', 'La date'], 1, 'Une réponse coupée ou déclinée doit être traitée à part.')
+        q('Pourquoi utiliser le streaming dans un chatbot ?', ['Pour payer moins cher les jetons générés en sortie', 'Pour afficher la réponse au fil de l\'eau, sans attente', 'Pour contourner la limite fixée par max_tokens', 'Pour que le modèle réfléchisse plus avant de répondre'], 1, 'Le confort de lecture et la robustesse sur les longues réponses.'),
+        q('Claude appelle deux outils en même temps. Comment renvoyer les résultats ?', ['Un message utilisateur séparé par résultat d\'outil', 'Dans le prompt système de la requête suivante', 'Seulement le premier, Claude redemandera le second', 'Tous les résultats dans un seul message utilisateur'], 3, 'Tous les tool_result ensemble, dans le même message.'),
+        q('Que garantissent les sorties structurées ?', ['Une réponse conforme au schéma JSON fourni', 'Une réponse exacte, vérifiée par le modèle', 'Une réponse plus courte et donc moins chère', 'Une réponse sans aucun appel d\'outil'], 0, 'Indispensable pour enchaîner des étapes automatiques.'),
+        q('Que vérifier avant de lire le contenu d\'une réponse ?', ['Le champ usage', 'Le champ model', 'Le champ stop_reason', 'L\'en-tête request-id'], 2, 'Une réponse coupée ou déclinée doit être traitée à part.')
       ],
       script: script('9 min',
         'Un assistant qui consulte l\'agenda du salon avant de répondre, et un JSON parfait à chaque fois. Les deux briques de toute automatisation sérieuse.',
@@ -265,15 +265,15 @@ ${MAJ}`,
       exercice: {
         type: 'qcm', titre: 'Le cache qui ne marche pas',
         enonce: '<p>Votre chatbot met en cache sa base de connaissances, mais <code>cache_read_input_tokens</code> reste à zéro. Le prompt système commence par « Nous sommes le {{date et heure actuelles}}. » puis contient la base. Quelle est la cause la plus probable ?</p>',
-        options: ['Le modèle ne gère pas le cache', 'La date et l\'heure changent à chaque requête et invalident tout le préfixe', 'La base est trop courte', 'Il faut payer un supplément'],
-        bonne: 1,
+        options: ['La date et l\'heure changent à chaque requête et invalident tout le préfixe', 'Le modèle choisi ne prend pas en charge le cache de prompt sur l\'API', 'Le cache n\'est actif qu\'après 1 000 requêtes identiques par jour', 'Le cache est une option payante à activer d\'abord dans la Console'],
+        bonne: 0,
         explication: 'Le cache exige un début identique. Déplacez la date après le point de cache (par exemple dans le message utilisateur).'
       },
       quiz: [
-        q('Comment fonctionne le cache de prompt ?', ['Par mots-clés', 'Par correspondance exacte du début de la requête', 'Par client', 'Au hasard'], 1, 'Tout changement dans le préfixe invalide le cache après ce point.'),
-        q('Quelle réduction offre l\'API des lots ?', ['10 %', 'Moitié prix', 'Gratuit', 'Aucune'], 1, 'Les lots coûtent 50 % du prix standard.'),
-        q('Comment retrouver le résultat d\'une requête dans un lot ?', ['Par sa position', 'Par son custom_id', 'Par la date', 'Impossible'], 1, 'Les résultats arrivent dans un ordre quelconque.'),
-        q('Quelle stratégie pour un chatbot qui reçoit 1 000 messages par jour avec la même base ?', ['Lots', 'Cache', 'Aucune', 'Changer de modèle chaque jour'], 1, 'Le cache réduit fortement le coût du contexte répété.')
+        q('Comment fonctionne le cache de prompt ?', ['Par similarité de sens entre deux requêtes proches', 'Par mots-clés repérés dans le dernier message', 'Par correspondance exacte du début de la requête', 'Par réponse : il renvoie la même réponse sans appel'], 2, 'Tout changement dans le préfixe invalide le cache après ce point.'),
+        q('Quelle réduction offre l\'API des lots ?', ['50 % sur les jetons d\'entrée et de sortie', '10 % sur les jetons d\'entrée seulement', '90 % sur les jetons déjà mis en cache', '25 % au-delà de 10 000 requêtes'], 0, 'Les lots coûtent 50 % du prix standard.'),
+        q('Comment retrouver le résultat d\'une requête dans un lot ?', ['Par sa position dans le lot', 'Par l\'heure de la réponse', 'Par le texte de sa question', 'Par son custom_id'], 3, 'Les résultats arrivent dans un ordre quelconque.'),
+        q('Quelle stratégie pour un chatbot qui reçoit 1 000 messages par jour avec la même base ?', ['L\'API des lots, une fois par jour', 'Le cache de prompt sur la base', 'Un nouveau modèle chaque jour', 'Une base renvoyée en fin de prompt'], 1, 'Le cache réduit fortement le coût du contexte répété.')
       ],
       script: script('8 min',
         'Le même chatbot : 40 dollars par jour, ou 4. La différence tient en une ligne de code.',
@@ -321,15 +321,15 @@ ${MAJ}`,
       exercice: {
         type: 'qcm', titre: 'Le bon outil pour le client',
         enonce: '<p>Une clinique vétérinaire veut automatiser le tri de ses demandes de rendez-vous. Elle exige que les données restent hébergées en Europe et sous son contrôle, avec un volume de plusieurs milliers de demandes par mois. Que recommandez-vous ?</p>',
-        options: ['Zapier, le plus simple', 'n8n auto-hébergé sur un serveur en Europe', 'Un tableur partagé', 'Aucune automatisation'],
-        bonne: 1,
+        options: ['Zapier, le plus simple à mettre en place', 'Make, en offre gratuite, pour limiter le coût', 'Un tableur partagé, trié à la main chaque matin', 'n8n auto-hébergé sur un serveur en Europe'],
+        bonne: 3,
         explication: 'L\'auto-hébergement de n8n donne le contrôle des données et un coût maîtrisé à volume élevé.'
       },
       quiz: [
-        q('Quel avantage d\'une requête HTTP plutôt qu\'un module natif ?', ['Elle est plus jolie', 'L\'accès à toutes les fonctions récentes de l\'API', 'Elle est gratuite', 'Elle ne demande pas de clé'], 1, 'Les modules natifs peuvent avoir du retard sur l\'API.'),
-        q('Comment importer un workflow n8n ?', ['Par email', 'Menu du workflow, « Import from File »', 'En le recopiant à la main', 'Impossible'], 1, 'L\'import recrée tous les nœuds et connexions.'),
-        q('Quelle identification pour l\'API Claude dans un nœud HTTP de n8n ?', ['Basic Auth', 'Header Auth avec x-api-key', 'Aucune', 'OAuth Google'], 1, 'La clé passe dans l\'en-tête x-api-key.'),
-        q('Que faire avant d\'activer un workflow importé ?', ['Rien', 'Configurer les paramètres et le tester manuellement avec des données de test', 'Supprimer les notes', 'Changer son nom'], 1, 'Tester avant de mettre en production.')
+        q('Quel avantage d\'une requête HTTP plutôt qu\'un module natif ?', ['L\'accès à toutes les fonctions récentes de l\'API', 'Elle ne demande pas de clé d\'API pour fonctionner', 'Elle est facturée moins cher par Anthropic', 'Elle évite d\'avoir à lire la réponse JSON'], 0, 'Les modules natifs peuvent avoir du retard sur l\'API.'),
+        q('Comment importer un workflow n8n ?', ['En collant le lien du fichier dans un nœud', 'Par un nœud HTTP qui télécharge le fichier', 'Menu du workflow, « Import from File »', 'En le recréant nœud par nœud à la main'], 2, 'L\'import recrée tous les nœuds et connexions.'),
+        q('Quelle identification pour l\'API Claude dans un nœud HTTP de n8n ?', ['Basic Auth avec email et mot de passe', 'Header Auth avec l\'en-tête x-api-key', 'OAuth2 avec votre compte Google', 'La clé en paramètre d\'URL ?key='], 1, 'La clé passe dans l\'en-tête x-api-key.'),
+        q('Que faire avant d\'activer un workflow importé ?', ['Rien : un workflow importé est déjà configuré pour vous', 'Supprimer les notes adhésives, qui ralentissent l\'exécution', 'L\'activer d\'abord, puis surveiller les premières erreurs', 'Le configurer et le tester à la main avec des données de test'], 3, 'Tester avant de mettre en production.')
       ],
       script: script('7 min',
         'n8n, Make ou Zapier ? La réponse dépend moins de vous que de votre client. Voici comment choisir, et comment brancher Claude proprement.',
@@ -392,10 +392,10 @@ ${MAJ}`,
         explication: 'Automatisation prête pour la production.'
       },
       quiz: [
-        q('L\'API renvoie une erreur 429. Que faire ?', ['Abandonner', 'Attendre le délai indiqué puis réessayer', 'Changer de clé immédiatement', 'Envoyer la même requête en boucle sans attendre'], 1, 'C\'est une limite de débit temporaire.'),
-        q('L\'API renvoie une erreur 400. Faut-il réessayer à l\'identique ?', ['Oui, plusieurs fois', 'Non, la requête est invalide et doit être corrigée', 'Oui, avec un autre modèle', 'Seulement la nuit'], 1, 'Une requête invalide échouera toujours.'),
-        q('Pourquoi un champ piège dans un formulaire ?', ['Pour le design', 'Pour repérer les robots qui remplissent tous les champs', 'Pour collecter plus de données', 'C\'est obligatoire'], 1, 'Un humain ne voit pas ce champ.'),
-        q('Quand automatiser l\'envoi d\'une réponse au client final ?', ['Dès le premier jour', 'Après plusieurs semaines de validation sans correction, jamais pour les cas sensibles', 'Jamais', 'Seulement le week-end'], 1, 'La confiance se construit sur des données réelles.')
+        q('L\'API renvoie une erreur 429. Que faire ?', ['Réessayer aussitôt, en boucle, jusqu\'au succès', 'Créer une nouvelle clé d\'API et la remplacer', 'Corriger la requête, elle est mal formée', 'Attendre le délai indiqué, puis réessayer'], 3, 'C\'est une limite de débit temporaire.'),
+        q('L\'API renvoie une erreur 400. Faut-il réessayer à l\'identique ?', ['Oui, plusieurs fois, avec un délai croissant', 'Non : la requête est invalide et doit être corrigée', 'Oui, en passant à un autre modèle plus récent', 'Oui, dès que le service Anthropic est rétabli'], 1, 'Une requête invalide échouera toujours.'),
+        q('Pourquoi un champ piège dans un formulaire ?', ['Pour collecter discrètement des données en plus', 'Pour vérifier que l\'adresse email du visiteur existe', 'Pour repérer les robots qui remplissent tous les champs', 'Pour mesurer le temps passé sur le formulaire'], 2, 'Un humain ne voit pas ce champ.'),
+        q('Quand automatiser l\'envoi d\'une réponse au client final ?', ['Après des semaines de validation sans correction, hors cas sensibles', 'Dès le premier jour, pour montrer tout de suite le gain de temps', 'Jamais : une réponse doit toujours être relue par un humain', 'Dès que le taux d\'erreur passe sous 50 %, cas sensibles compris'], 0, 'La confiance se construit sur des données réelles.')
       ],
       script: script('8 min',
         'Une automatisation qui marche en démo et qui casse en production, c\'est un client perdu. Voici la checklist qui l\'évite.',
@@ -470,10 +470,10 @@ ${NOTE_WF}
         explication: 'Cas de test prêts. Rejouez-les après chaque modification du prompt.'
       },
       quiz: [
-        q('Pourquoi le nom et l\'email ne sont-ils pas envoyés à Claude ?', ['Pour gagner du temps', 'Minimisation : ils ne servent pas à qualifier', 'Claude ne lit pas les emails', 'C\'est interdit par n8n'], 1, 'On n\'envoie au modèle que ce qui est nécessaire.'),
-        q('Qui envoie la réponse au prospect ?', ['Le workflow, automatiquement', 'Un humain, à partir du brouillon reçu par email', 'Personne', 'Google Sheets'], 1, 'Le brouillon accélère, l\'humain valide.'),
-        q('Comment ajuster le seuil « chaud » ?', ['Au hasard', 'En comparant les scores aux vrais résultats commerciaux après quelques semaines', 'En le mettant à 100', 'Il ne s\'ajuste pas'], 1, 'Le seuil se calibre sur des données réelles.'),
-        q('À quoi sert le champ « site_web » caché ?', ['À collecter le site du prospect', 'Champ piège : un robot le remplit, la demande est écartée', 'À rien', 'Au référencement'], 1, 'Technique anti-robot simple.')
+        q('Pourquoi le nom et l\'email ne sont-ils pas envoyés à Claude ?', ['Claude refuse de traiter les adresses email', 'Minimisation : ils ne servent pas à qualifier', 'n8n interdit d\'envoyer ces champs à une API', 'Pour réduire le temps de réponse du modèle'], 1, 'On n\'envoie au modèle que ce qui est nécessaire.'),
+        q('Qui envoie la réponse au prospect ?', ['Un humain, à partir du brouillon reçu par email', 'Le workflow, automatiquement, dès le score calculé', 'Claude, directement depuis son propre compte email', 'Google Sheets, par une règle d\'envoi automatique'], 0, 'Le brouillon accélère, l\'humain valide.'),
+        q('Comment ajuster le seuil « chaud » ?', ['En le fixant à 100 pour ne garder que les tout meilleurs prospects', 'En demandant à Claude de choisir un nouveau seuil à chaque prospect', 'Il ne s\'ajuste pas : la valeur par défaut est optimale pour tous', 'En comparant les scores aux vrais résultats après quelques semaines'], 3, 'Le seuil se calibre sur des données réelles.'),
+        q('À quoi sert le champ « site_web » caché ?', ['À enregistrer l\'adresse du site du prospect pour Claude', 'À améliorer le référencement de la page du formulaire', 'Champ piège : un robot le remplit, la demande est écartée', 'À savoir depuis quel site le prospect est arrivé'], 2, 'Technique anti-robot simple.')
       ],
       script: script('9 min',
         'Le prospect idéal remplit votre formulaire à 22 h. À 22 h 01, vous avez son score, son besoin et une réponse prête à envoyer.',
@@ -531,10 +531,10 @@ ${encart('legal', 'Avis et pratiques commerciales', '<p>Répondre aux avis est a
         explication: 'Règles claires : elles rendront les réponses fidèles à la voix du commerce.'
       },
       quiz: [
-        q('Par défaut, que fait le workflow des brouillons ?', ['Il les publie tous', 'Il les envoie par email au gérant pour validation', 'Il les supprime', 'Il les publie sur Facebook'], 1, 'La publication automatique est désactivée par défaut.'),
-        q('Un avis évoque une allergie. Que se passe-t-il ?', ['Publication automatique', 'Il est marqué sensible et reste en validation humaine', 'Il est ignoré', 'Il est supprimé'], 1, 'Les sujets sensibles restent toujours humains.'),
-        q('Que faut-il pour utiliser l\'API Google Business Profile ?', ['Rien', 'Une demande d\'accès à Google, puis une identification OAuth2', 'Un abonnement Pro à Claude', 'Un compte Zapier'], 1, 'L\'accès aux API se demande à Google.'),
-        q('Quel service ne faut-il jamais proposer ?', ['Répondre aux avis', 'Rédiger de faux avis ou en acheter', 'Analyser les avis', 'Former le gérant'], 1, 'C\'est une pratique commerciale trompeuse.')
+        q('Par défaut, que fait le workflow des brouillons ?', ['Il les publie tous automatiquement sur la fiche', 'Il publie les avis positifs, garde les négatifs', 'Il les envoie par email au gérant pour validation', 'Il les enregistre sans prévenir personne'], 2, 'La publication automatique est désactivée par défaut.'),
+        q('Un avis évoque une allergie. Que se passe-t-il ?', ['Il reçoit une réponse d\'excuse publiée aussitôt', 'Il est signalé à Google pour être supprimé de la fiche', 'Il est ignoré, comme tous les avis négatifs', 'Il est marqué sensible et reste en validation humaine'], 3, 'Les sujets sensibles restent toujours humains.'),
+        q('Que faut-il pour utiliser l\'API Google Business Profile ?', ['Une demande d\'accès à Google, puis une identification OAuth2', 'Une simple clé d\'API Google créée en libre-service, sans demande', 'Un abonnement payant à Google Workspace pour le commerce', 'Rien : les avis publics se lisent sans identification'], 0, 'L\'accès aux API se demande à Google.'),
+        q('Quel service ne faut-il jamais proposer ?', ['Répondre aux avis au nom du gérant', 'Rédiger de faux avis ou en acheter', 'Analyser les avis pour en tirer des actions', 'Inviter les vrais clients à laisser un avis'], 1, 'C\'est une pratique commerciale trompeuse.')
       ],
       script: script('8 min',
         'Chaque matin, le gérant reçoit un email : « 4 réponses aux avis à valider ». Il clique, il relit, c\'est fait. Voici comment le construire.',
@@ -597,10 +597,10 @@ ${NOTE_WF}
         explication: 'Grille valide : collez-la dans le paramètre grille_json et testez.'
       },
       quiz: [
-        q('Qui calcule les montants du devis ?', ['Claude', 'Le code, à partir de la grille', 'Le client', 'Google'], 1, 'Les calculs sont faits de façon déterministe par le code.'),
-        q('Comment empêcher Claude d\'inventer une prestation ?', ['En le lui demandant poliment', 'Le schéma de sortie n\'accepte que les codes de la grille', 'Impossible', 'En changeant de modèle'], 1, 'Le schéma JSON limite les codes possibles.'),
-        q('Le devis est-il envoyé automatiquement au client ?', ['Oui', 'Non, l\'artisan reçoit un brouillon qu\'il vérifie et envoie', 'Seulement s\'il est cher', 'Seulement le lundi'], 1, 'Un devis engage l\'entreprise : validation humaine.'),
-        q('Qui valide les mentions spécifiques au métier ?', ['Personne', 'L\'artisan avec son comptable ou conseil', 'Claude', 'n8n'], 1, 'Les mentions obligatoires varient selon les métiers.')
+        q('Qui calcule les montants du devis ?', ['Claude, qui lit la grille et fait les calculs', 'Le code du workflow, à partir de la grille', 'Le client, dans le formulaire de demande', 'Google Sheets, avec une formule par ligne'], 1, 'Les calculs sont faits de façon déterministe par le code.'),
+        q('Comment empêcher Claude d\'inventer une prestation ?', ['En le lui interdisant poliment dans le prompt système', 'En baissant la température du modèle à zéro pour ce nœud', 'En passant au modèle le plus puissant de la gamme', 'Le schéma de sortie n\'accepte que les codes de la grille'], 3, 'Le schéma JSON limite les codes possibles.'),
+        q('Le devis est-il envoyé automatiquement au client ?', ['Non : l\'artisan reçoit un brouillon qu\'il vérifie et envoie', 'Oui, dès que Claude a fini de le rédiger et de le mettre en page', 'Oui, si son montant reste sous le seuil fixé dans les paramètres', 'Non : il est imprimé et envoyé par courrier postal au client'], 0, 'Un devis engage l\'entreprise : validation humaine.'),
+        q('Qui valide les mentions spécifiques au métier ?', ['Claude, qui connaît la réglementation du métier', 'Vous, le prestataire, une fois pour toutes', 'L\'artisan, avec son comptable ou son conseil', 'Personne : le modèle de devis est déjà conforme'], 2, 'Les mentions obligatoires varient selon les métiers.')
       ],
       script: script('8 min',
         'Le devis que l\'artisan repousse depuis trois soirs, prêt dans sa boîte mail cinq minutes après la demande. Avec une règle d\'or : l\'IA comprend, le code calcule.',
@@ -676,10 +676,10 @@ ${encart('legal', 'Transparence et données', '<p>L\'AI Act impose d\'informer l
         explication: 'Base solide. Complétez-la avec les vraies questions des premiers jours.'
       },
       quiz: [
-        q('Sur quoi le chatbot s\'appuie-t-il pour répondre ?', ['Sur internet', 'Uniquement sur la base de connaissances validée', 'Sur son imagination', 'Sur les concurrents'], 1, 'Une base validée limite les erreurs.'),
-        q('Pourquoi la base est-elle mise en cache ?', ['Pour la cacher', 'Pour réduire le coût des messages suivants', 'Pour la traduire', 'C\'est obligatoire'], 1, 'Le préfixe stable est relu à prix réduit.'),
-        q('Pourquoi insérer la réponse avec textContent ?', ['Pour la mise en forme', 'Pour éviter toute injection de code dans la page', 'Pour aller plus vite', 'C\'est plus joli'], 1, 'innerHTML exécuterait du HTML potentiellement malveillant.'),
-        q('Que doit indiquer le widget ?', ['Le prix de l\'API', 'Que le visiteur échange avec une IA', 'Le nom du modèle', 'Rien'], 1, 'Obligation de transparence de l\'AI Act.')
+        q('Sur quoi le chatbot s\'appuie-t-il pour répondre ?', ['Sur une recherche web lancée à chaque question', 'Sur les connaissances générales du modèle', 'Uniquement sur la base de connaissances validée', 'Sur les conversations des autres visiteurs'], 2, 'Une base validée limite les erreurs.'),
+        q('Pourquoi la base est-elle mise en cache ?', ['Pour réduire le coût et le délai des messages suivants', 'Pour que les visiteurs ne puissent pas la lire', 'Pour que le modèle la mémorise définitivement', 'Pour pouvoir la modifier sans redéployer le site'], 0, 'Le préfixe stable est relu à prix réduit.'),
+        q('Pourquoi insérer la réponse avec textContent ?', ['Pour conserver la mise en forme Markdown du modèle', 'Parce qu\'innerHTML n\'existe plus dans les navigateurs récents', 'Pour afficher la réponse plus vite qu\'avec innerHTML', 'Pour empêcher toute injection de code dans la page'], 3, 'innerHTML exécuterait du HTML potentiellement malveillant.'),
+        q('Que doit indiquer le widget ?', ['Le nom du modèle et de son éditeur', 'Que le visiteur échange avec une IA', 'Le coût de chaque réponse en euros', 'Le nombre de messages restants'], 1, 'Obligation de transparence de l\'AI Act.')
       ],
       script: script('9 min',
         'Un chatbot qui invente des horaires, c\'est pire que pas de chatbot. Voici comment en construire un qui ne répond que ce qu\'il sait.',
@@ -742,10 +742,10 @@ ${NOTE_WF}
         explication: 'Cahier des charges clair : votre veille sera utile, pas seulement informative.'
       },
       quiz: [
-        q('Que fait le workflow si un flux RSS est en panne ?', ['Il s\'arrête', 'Il continue avec les autres flux', 'Il envoie un email vide', 'Il supprime le flux'], 1, 'Le nœud RSS est réglé pour continuer en cas d\'erreur.'),
-        q('Comment respecter le droit d\'auteur des sources ?', ['Republier les articles en entier', 'Résumer et renvoyer vers la source', 'Ne pas citer la source', 'Traduire les articles'], 1, 'Résumé et lien, pas de reproduction intégrale.'),
-        q('Sur quoi la synthèse doit-elle s\'appuyer ?', ['Sur ce que sait le modèle', 'Uniquement sur les articles fournis', 'Sur les réseaux sociaux', 'Sur rien'], 1, 'C\'est ce qui évite les inventions.'),
-        q('Quelle variante crée le plus de valeur récurrente ?', ['Une veille sans usage', 'Veille + idées transformées en contenus chaque semaine', 'Une veille annuelle', 'Aucune'], 1, 'La veille devient un moteur de contenus.')
+        q('Que fait le workflow si un flux RSS est en panne ?', ['Il continue avec les autres flux', 'Il s\'arrête et n\'envoie rien ce jour-là', 'Il envoie un email vide au destinataire', 'Il supprime le flux de la liste'], 0, 'Le nœud RSS est réglé pour continuer en cas d\'erreur.'),
+        q('Comment respecter le droit d\'auteur des sources ?', ['Republier les articles en entier, avec le lien', 'Traduire les articles, ce qui crée une œuvre neuve', 'Résumer et renvoyer vers la source', 'Reprendre les articles courts sans les citer'], 2, 'Résumé et lien, pas de reproduction intégrale.'),
+        q('Sur quoi la synthèse doit-elle s\'appuyer ?', ['Sur ce que le modèle sait déjà du sujet', 'Uniquement sur les articles fournis', 'Sur une recherche web complémentaire', 'Sur les tendances des réseaux sociaux'], 1, 'C\'est ce qui évite les inventions.'),
+        q('Quelle variante crée le plus de valeur récurrente ?', ['Une veille plus large, sur deux cents sources chaque jour', 'Une veille annuelle, plus complète et détaillée', 'Une veille brute, sans tri, livrée en temps réel', 'Veille + idées transformées en contenus chaque semaine'], 3, 'La veille devient un moteur de contenus.')
       ],
       script: script('7 min',
         'Chaque lundi à 7 h, votre client reçoit l\'essentiel de son secteur et trois idées de publications. Vous, vous n\'avez rien fait.',

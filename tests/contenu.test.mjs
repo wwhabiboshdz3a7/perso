@@ -3,6 +3,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { verifierTout, verifierLecon, verifierWorkflow, racine } from '../outils/verifier-contenu.mjs';
@@ -57,6 +58,49 @@ describe('catalogue et modules', () => {
     const html = await readFile(path.join(racine, 'public', 'index.html'), 'utf8');
     assert.equal(mettreAJour(html), html, 'lancez node outils/generer-programme.mjs');
     for (const m of modules) assert.ok(html.includes(m.titre.replace(/'/g, '\'')), m.titre);
+  });
+});
+
+describe('quiz et QCM : aucune réponse devinable à sa position ou à sa longueur', () => {
+  const charger = async m => (await import(pathToFileURL(path.join(racine, m.offre === 'gratuit' ? `public/cours/content/${m.id}.js` : `prive/modules/${m.id}.mjs`)).href)).default;
+  let questions = [], qcm = [];
+  test('lecture des 9 modules', async () => {
+    for (const m of modules) {
+      const d = await charger(m);
+      for (const l of d.lecons) {
+        questions.push(...(l.quiz || []));
+        if (l.exercice?.type === 'qcm') qcm.push(l.exercice);
+      }
+    }
+    assert.ok(questions.length >= 200);
+  });
+  test('bonnes réponses réparties : aucune position ne dépasse 40 %', () => {
+    const pos = {};
+    for (const q of questions) pos[q.bonne] = (pos[q.bonne] || 0) + 1;
+    for (const [i, n] of Object.entries(pos)) assert.ok(n / questions.length <= 0.4, `position ${i} : ${n}/${questions.length}`);
+    const uniques = qcm.filter(e => !Array.isArray(e.bonne)).map(e => e.bonne);
+    const posQcm = {};
+    for (const b of uniques) posQcm[b] = (posQcm[b] || 0) + 1;
+    for (const [i, n] of Object.entries(posQcm)) assert.ok(n / uniques.length <= 0.4, `QCM, position ${i} : ${n}/${uniques.length}`);
+  });
+  test('longueurs comparables : la bonne réponse n\'est jamais nettement la plus longue', () => {
+    let plusLongue = 0;
+    const ecarts = [];
+    for (const q of [...questions, ...qcm.filter(e => !Array.isArray(e.bonne))]) {
+      const L = q.options.map(o => o.length);
+      const leurres = L.filter((_, i) => i !== q.bonne);
+      if (L[q.bonne] > Math.max(...leurres)) plusLongue++;
+      if (L[q.bonne] > 1.3 * Math.max(...leurres)) ecarts.push(q.q || q.options[q.bonne]);
+    }
+    assert.deepEqual(ecarts, [], 'bonne réponse plus de 1,3 fois plus longue que tous les leurres');
+    assert.ok(plusLongue / questions.length < 0.5, `bonne réponse la plus longue dans ${plusLongue} cas`);
+  });
+  test('options distinctes, quatre par question, explication fournie', () => {
+    for (const q of questions) {
+      assert.equal(new Set(q.options).size, q.options.length, q.q);
+      assert.equal(q.options.length, 4, q.q);
+      assert.ok(q.explication, q.q);
+    }
   });
 });
 

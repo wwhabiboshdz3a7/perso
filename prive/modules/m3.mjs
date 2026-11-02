@@ -56,10 +56,10 @@ Questions courtes, une idée par question.`)}
         explication: 'Brief solide : l\'article apportera une vraie valeur que des contenus génériques n\'ont pas.'
       },
       quiz: [
-        q('Google pénalise-t-il un contenu parce qu\'il a été écrit avec l\'IA ?', ['Oui, toujours', 'Non : il évalue l\'utilité, mais sanctionne le contenu de masse destiné à manipuler le classement', 'Seulement en français', 'Seulement les articles longs'], 1, 'La méthode importe moins que la valeur et l\'intention.'),
-        q('Qu\'est-ce qu\'une « page satellite » ?', ['Une page d\'accueil', 'Une page quasi identique dupliquée pour cibler des requêtes, par exemple une par ville', 'Une page de contact', 'Une page en anglais'], 1, 'Elles sont visées par les règles anti-spam de Google.'),
-        q('Quel est le meilleur moyen de rendre un article unique ?', ['Le rallonger', 'Y intégrer l\'expérience, les chiffres et les cas réels du client', 'Répéter le mot-clé', 'Le traduire'], 1, 'C\'est la matière unique qui crée la valeur.'),
-        q('Premier levier de visibilité pour un commerce local ?', ['Un blog de 100 articles', 'Une fiche Google Business Profile complète et active', 'Un compte X', 'Un logo animé'], 1, 'La fiche locale est souvent décisive pour les recherches de proximité.')
+        q('Google pénalise-t-il un contenu parce qu\'il a été écrit avec l\'IA ?', ['Oui : tout texte détecté comme généré par IA est déclassé d\'office', 'Non, à condition d\'ajouter la mention « texte rédigé avec l\'IA »', 'Oui, sauf si le texte passe un outil de reformulation anti-détection', 'Non : il juge l\'utilité, mais sanctionne le contenu de masse manipulateur'], 3, 'La méthode importe moins que la valeur et l\'intention.'),
+        q('Qu\'est-ce qu\'une « page satellite » ?', ['Une version traduite d\'une page, destinée à un autre pays', 'Une page quasi identique dupliquée par requête, par exemple par ville', 'Une page d\'atterrissage dédiée à une campagne publicitaire payante', 'Une sous-page du blog qui reprend un article en version courte'], 1, 'Elles sont visées par les règles anti-spam de Google.'),
+        q('Quel est le meilleur moyen de rendre un article unique ?', ['Le rallonger à plus de 3 000 mots pour couvrir tout le sujet', 'Répéter le mot-clé principal dans chaque titre et paragraphe', 'Y intégrer l\'expérience, les chiffres et les cas réels du client', 'Le reformuler avec un outil pour échapper aux détecteurs d\'IA'], 2, 'C\'est la matière unique qui crée la valeur.'),
+        q('Premier levier de visibilité pour un commerce local ?', ['Une fiche Google Business Profile complète et active', 'Un blog alimenté de cent articles générés en un mois', 'Une campagne d\'achat de liens sur des annuaires', 'Un compte sur chaque réseau social, même inactif'], 0, 'La fiche locale est souvent décisive pour les recherches de proximité.')
       ],
       script: script('7 min',
         'Deux cents articles générés par IA pour un client : c\'est la meilleure façon de perdre le client et le classement. Voici ce qui marche.',
@@ -120,10 +120,10 @@ ${encart('ok', 'Remise des clés', '<p>Le domaine et l\'hébergement au nom du c
         explication: 'Site prêt à livrer. Ajoutez-le à votre portfolio (avec l\'accord du client).'
       },
       quiz: [
-        q('Au nom de qui enregistrer le nom de domaine d\'un client ?', ['Au vôtre, pour le garder', 'Au nom du client', 'Au nom de l\'hébergeur', 'Peu importe'], 1, 'Le client doit rester propriétaire de son domaine.'),
-        q('Quelle information est obligatoire dans les mentions légales ?', ['La couleur du site', 'L\'identité de l\'éditeur et de l\'hébergeur', 'Le nombre de visiteurs', 'Le prix du site'], 1, 'La loi impose d\'identifier l\'éditeur et l\'hébergeur.'),
-        q('Peut-on déposer des cookies publicitaires sans consentement ?', ['Oui', 'Non, le consentement préalable est requis', 'Seulement le week-end', 'Seulement en HTTPS'], 1, 'Les traceurs non exemptés exigent un consentement préalable.'),
-        q('Quel outil gratuit permet un audit rapide performance et accessibilité ?', ['Lighthouse dans Chrome', 'Un antivirus', 'Un tableur', 'Aucun'], 0, 'Lighthouse donne des scores et des pistes de correction.')
+        q('Au nom de qui enregistrer le nom de domaine d\'un client ?', ['Au vôtre, pour garder la main', 'Au nom du client', 'Au nom de l\'hébergeur du site', 'Au vôtre, puis transféré en fin de contrat'], 1, 'Le client doit rester propriétaire de son domaine.'),
+        q('Quelle information est obligatoire dans les mentions légales ?', ['L\'identité de l\'éditeur et de l\'hébergeur', 'Le nom de l\'agence qui a créé le site', 'Le nombre de visiteurs et la date de création', 'Le prix payé pour la création du site'], 0, 'La loi impose d\'identifier l\'éditeur et l\'hébergeur.'),
+        q('Peut-on déposer des cookies publicitaires sans consentement ?', ['Oui, si le bandeau informe simplement le visiteur', 'Oui, tant que le site est en HTTPS', 'Oui, s\'ils sont déposés par Google lui-même', 'Non, le consentement préalable est requis'], 3, 'Les traceurs non exemptés exigent un consentement préalable.'),
+        q('Quel outil gratuit permet un audit rapide performance et accessibilité ?', ['La Search Console de Google', 'Le validateur HTML du W3C', 'Lighthouse, intégré à Chrome', 'Google Analytics 4'], 2, 'Lighthouse donne des scores et des pistes de correction.')
       ],
       script: script('8 min',
         'Un site vitrine en ligne, sur son propre domaine, en HTTPS, conforme. Pas en une semaine : en un après-midi.',
@@ -193,10 +193,10 @@ ${encart('info', 'Gain de temps réel', '<p>Un bilan mensuel client qui prenait 
         explication: 'Brief exploitable. Transformez-le en skill au module 4 pour ne plus jamais le réécrire.'
       },
       quiz: [
-        q('Comment Claude fabrique-t-il un fichier Excel ?', ['Il le dessine', 'Il écrit et exécute du code dans un environnement isolé', 'Il le télécharge sur internet', 'Il ne peut pas'], 1, 'La création de fichiers repose sur l\'exécution de code.'),
-        q('Que vérifier en priorité dans un classeur généré ?', ['La police', 'Les chiffres et les formules', 'Le nom du fichier', 'Rien'], 1, 'Une formule fausse décrédibilise tout le livrable.'),
-        q('Pour un gabarit réutilisé chaque mois, quelle solution ?', ['Le réécrire à chaque fois', 'En faire une skill avec vos règles et votre gabarit', 'L\'envoyer par fax', 'Abandonner'], 1, 'Les skills (module 4) rendent le livrable constant.'),
-        q('Pourquoi ouvrir le fichier dans le logiciel du client ?', ['Par politesse', 'La mise en page peut varier selon le logiciel', 'C\'est obligatoire légalement', 'Pour le compresser'], 1, 'Vérifiez le rendu là où il sera lu.')
+        q('Comment Claude fabrique-t-il un fichier Excel ?', ['Il convertit sa réponse en tableau, sans exécuter de code', 'Il télécharge un classeur modèle sur internet et le remplit', 'Il écrit et exécute du code dans un environnement isolé', 'Il passe obligatoirement par le connecteur Microsoft 365'], 2, 'La création de fichiers repose sur l\'exécution de code.'),
+        q('Que vérifier en priorité dans un classeur généré ?', ['La police et les couleurs', 'Le nom des onglets', 'La largeur des colonnes', 'Les chiffres et les formules'], 3, 'Une formule fausse décrédibilise tout le livrable.'),
+        q('Pour un gabarit réutilisé chaque mois, quelle solution ?', ['En faire une skill avec vos règles et votre gabarit', 'Le redécrire en détail dans chaque nouvelle conversation', 'Coller l\'ancien fichier et demander « pareil »', 'Activer la mémoire, qui le reproduira à l\'identique'], 0, 'Les skills (module 4) rendent le livrable constant.'),
+        q('Pourquoi ouvrir le fichier dans le logiciel du client ?', ['Pour retirer le filigrane ajouté par Claude', 'La mise en page peut varier selon le logiciel', 'Pour activer les macros, désactivées par défaut', 'Pour que le fichier perde ses métadonnées d\'IA'], 1, 'Vérifiez le rendu là où il sera lu.')
       ],
       script: script('6 min',
         'Votre client reçoit un vrai PowerPoint, à ses couleurs, avec ses chiffres du mois. Vous y avez passé vingt minutes.',
@@ -243,15 +243,15 @@ ${encart('legal', 'Données personnelles', '<p>Un fichier de clients (noms, emai
         type: 'qcm', titre: 'Le bon réflexe',
         enonce: '<p>Un fleuriste vous envoie l\'export de sa caisse. Claude annonce un chiffre d\'affaires de janvier deux fois supérieur à ce que le fleuriste a en tête. Quelles sont les causes probables à vérifier ? (plusieurs réponses)</p>',
         multiple: true,
-        options: ['Une ligne de total incluse dans les données', 'Des montants TTC pris pour du HT, ou l\'inverse', 'Des dates JJ/MM lues comme MM/JJ qui déplacent des ventes', 'Le fleuriste se trompe forcément', 'Le modèle est trop récent'],
-        bonne: [0, 1, 2],
+        options: ['Une ligne de total incluse dans les données', 'Le choix du modèle : un modèle récent double parfois les totaux', 'Des montants TTC pris pour du HT, ou l\'inverse', 'Le fleuriste a forcément tort : les calculs de Claude sont exacts', 'Des dates JJ/MM lues comme MM/JJ qui déplacent des ventes'],
+        bonne: [0, 2, 4],
         explication: 'Lignes de total, confusion HT/TTC et inversion des dates sont les erreurs les plus fréquentes. On vérifie avant de contredire le client.'
       },
       quiz: [
-        q('Première étape de toute analyse ?', ['Faire des graphiques', 'Décrire le fichier et signaler les anomalies', 'Envoyer le rapport', 'Supprimer des lignes'], 1, 'On valide la compréhension des données avant de calculer.'),
-        q('Dans un CSV français, quel piège concerne les nombres ?', ['Les majuscules', 'La virgule décimale et le séparateur point-virgule', 'Les accents', 'La couleur des cellules'], 1, 'Précisez les formats si les nombres sont mal interprétés.'),
-        q('Comment vérifier une analyse ?', ['Faire confiance', 'Recalculer un total et comparer avec un chiffre connu du client', 'Demander à un autre modèle', 'Ne rien faire'], 1, 'Un contrôle simple évite les erreurs embarrassantes.'),
-        q('Un fichier clients contient noms et téléphones inutiles à l\'analyse. Que faire ?', ['Les garder', 'Les retirer ou les pseudonymiser avant l\'analyse', 'Les publier', 'Les traduire'], 1, 'Minimisation des données : ne traitez que l\'utile.')
+        q('Première étape de toute analyse ?', ['Produire les graphiques demandés par le client', 'Décrire le fichier et signaler les anomalies', 'Supprimer les lignes incomplètes sans prévenir', 'Calculer directement les moyennes par colonne'], 1, 'On valide la compréhension des données avant de calculer.'),
+        q('Dans un CSV français, quel piège concerne les nombres ?', ['Les montants en euros toujours stockés en centimes', 'L\'arrondi automatique de tous les nombres à l\'entier', 'Les nombres négatifs, impossibles à lire en CSV', 'La virgule décimale et le séparateur point-virgule'], 3, 'Précisez les formats si les nombres sont mal interprétés.'),
+        q('Comment vérifier une analyse ?', ['Recalculer un total et le comparer à un chiffre connu du client', 'Demander à Claude s\'il est bien sûr de chacun de ses résultats', 'Relancer la même analyse et voir si le résultat change', 'Vérifier que les graphiques sont lisibles et bien titrés'], 0, 'Un contrôle simple évite les erreurs embarrassantes.'),
+        q('Un fichier clients contient noms et téléphones inutiles à l\'analyse. Que faire ?', ['Les garder, puisque Claude ne les mémorise pas', 'Les chiffrer dans le fichier avant de l\'envoyer', 'Les retirer ou les pseudonymiser avant l\'analyse', 'Demander l\'accord oral du client, puis les envoyer'], 2, 'Minimisation des données : ne traitez que l\'utile.')
       ],
       script: script('6 min',
         'Votre client a des données qu\'il ne regarde jamais. Vous allez lui montrer, en trois graphiques, où est son argent.',
@@ -312,10 +312,10 @@ ${encart('ok', 'Ce que vous vendez', '<p>« Service client assisté » : mise en
         explication: 'Règles d\'escalade claires : elles protègent votre client et votre responsabilité.'
       },
       quiz: [
-        q('Sur quoi les brouillons doivent-ils s\'appuyer ?', ['Sur l\'imagination du modèle', 'Uniquement sur la FAQ et les politiques validées', 'Sur les concurrents', 'Sur internet'], 1, 'Une base validée évite les promesses inventées.'),
-        q('Que faire si la réponse ne figure pas dans la base ?', ['Inventer une réponse plausible', 'Signaler l\'information manquante pour l\'équipe', 'Ignorer le message', 'Répondre au hasard'], 1, 'Le repère [À COMPLÉTER] évite les erreurs et enrichit la FAQ.'),
-        q('Un client mentionne une allergie après un repas. Traitement ?', ['Réponse automatique standard', 'Escalade vers un humain avec réponse d\'attente', 'Proposer un remboursement', 'Supprimer le message'], 1, 'Santé et sécurité sont toujours traitées par un humain.'),
-        q('Un visiteur discute avec un chatbot. Que doit-il savoir ?', ['Rien', 'Qu\'il échange avec une IA, sauf si c\'est évident', 'Le prix de l\'abonnement', 'Le nom du modèle'], 1, 'C\'est une obligation de transparence de l\'AI Act.')
+        q('Sur quoi les brouillons doivent-ils s\'appuyer ?', ['Sur les connaissances générales du modèle', 'Sur les réponses publiées par les concurrents', 'Uniquement sur la FAQ et les politiques validées', 'Sur une recherche web lancée à chaque message'], 2, 'Une base validée évite les promesses inventées.'),
+        q('Que faire si la réponse ne figure pas dans la base ?', ['Signaler l\'information manquante à l\'équipe', 'Rédiger la réponse la plus plausible possible', 'Renvoyer le client vers la page d\'accueil', 'Chercher la réponse sur le site d\'un concurrent'], 0, 'Le repère [À COMPLÉTER] évite les erreurs et enrichit la FAQ.'),
+        q('Un client mentionne une allergie après un repas. Traitement ?', ['Réponse automatique d\'excuse et bon de réduction', 'Brouillon standard validé plus tard dans la semaine', 'Classement en avis négatif, sans réponse', 'Escalade vers un humain avec réponse d\'attente'], 3, 'Santé et sécurité sont toujours traitées par un humain.'),
+        q('Un visiteur discute avec un chatbot. Que doit-il savoir ?', ['Le nom exact du modèle et de son éditeur', 'Qu\'il échange avec une IA, sauf si c\'est évident', 'Rien, tant que les réponses sont exactes', 'Que ses messages servent à entraîner le modèle'], 1, 'C\'est une obligation de transparence de l\'AI Act.')
       ],
       script: script('7 min',
         'Le chatbot qui promet un remboursement que le patron n\'a jamais accordé : voilà comment perdre un client en une phrase. Voici comment l\'éviter.',
@@ -375,10 +375,10 @@ ${encart('ok', 'Cinq prestations à fort potentiel avec ce module', '<ul><li>Pac
         explication: 'Prestation packagée. Le module 7 vous aidera à fixer son prix et à la vendre.'
       },
       quiz: [
-        q('Qu\'achète un client ?', ['Des heures d\'IA', 'Un résultat défini, dans un délai, pour un prix', 'Un abonnement à Claude', 'Des prompts'], 1, 'Le packaging transforme une compétence en offre lisible.'),
-        q('Pourquoi préciser ce qui n\'est pas inclus ?', ['Pour décourager le client', 'Pour éviter les malentendus et le travail non payé', 'C\'est interdit', 'Pour allonger le devis'], 1, 'Les exclusions protègent la relation et votre rentabilité.'),
-        q('À quoi sert le process documenté ?', ['À rien', 'Qualité constante, maîtrise du temps passé, délégation possible', 'À impressionner', 'À remplacer le contrat'], 1, 'Il rend la prestation reproductible et rentable.'),
-        q('Quand envoyer le questionnaire d\'accueil ?', ['Après la livraison', 'Avant de produire, pour tout récolter en une fois', 'Jamais', 'Au milieu du projet'], 1, 'Il évite les allers-retours et les oublis.')
+        q('Qu\'achète un client ?', ['Un résultat défini, dans un délai, pour un prix', 'Un nombre d\'heures de travail avec l\'IA', 'L\'accès à vos prompts et à vos outils', 'Un abonnement à Claude configuré pour lui'], 0, 'Le packaging transforme une compétence en offre lisible.'),
+        q('Pourquoi préciser ce qui n\'est pas inclus ?', ['Pour justifier un prix plus élevé que la concurrence', 'Parce que la loi impose une liste d\'exclusions', 'Pour éviter les malentendus et le travail non payé', 'Pour pouvoir facturer des options dès la signature'], 2, 'Les exclusions protègent la relation et votre rentabilité.'),
+        q('À quoi sert le process documenté ?', ['À remplacer le contrat signé avec le client', 'Qualité constante, temps maîtrisé, délégation possible', 'À prouver au client que vous utilisez bien l\'IA', 'À fixer le prix, calculé d\'après le nombre d\'étapes'], 1, 'Il rend la prestation reproductible et rentable.'),
+        q('Quand envoyer le questionnaire d\'accueil ?', ['Après la première version, pour l\'ajuster', 'Au moment de la livraison, pour l\'avis client', 'À mi-parcours, quand les questions apparaissent', 'Avant de produire, pour tout récolter en une fois'], 3, 'Il évite les allers-retours et les oublis.')
       ],
       script: script('6 min',
         '« Je fais des trucs avec l\'IA » ne se vend pas. « 8 vidéos prêtes à publier en 10 jours » se vend. Voici comment passer de l\'un à l\'autre.',

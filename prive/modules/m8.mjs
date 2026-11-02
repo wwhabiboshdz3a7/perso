@@ -55,15 +55,15 @@ ${MAJ}`,
   exercice: {
     type: 'qcm', titre: 'Le bon statut',
     enonce: '<p>Lina démarre une activité de création de sites et d\'automatisations pour des commerçants. Elle prévoit 25 000 € de chiffre d\'affaires la première année, avec environ 1 500 € de frais. Elle veut tester son offre sans formalités lourdes. Quel choix est le plus cohérent pour commencer ?</p>',
-    options: ['Une SAS avec levée de fonds', 'Une micro-entreprise, en activité libérale (BNC) si son activité le permet', 'Aucun statut : elle facture sans SIREN', 'Une association'],
-    bonne: 1,
+    options: ['Une SASU dès le départ, pour pouvoir déduire ses 1 500 € de frais réels', 'Aucun statut la première année, en facturant sans SIREN jusqu\'au seuil', 'Une association loi 1901, pour éviter les cotisations sociales', 'Une micro-entreprise, en activité libérale (BNC) si son activité le permet'],
+    bonne: 3,
     explication: 'Chiffre d\'affaires modeste, peu de frais, besoin de simplicité : la micro-entreprise est adaptée pour démarrer.'
   },
   quiz: [
-    q('Quel est le plafond de chiffre d\'affaires d\'une micro-entreprise de services en 2026 ?', ['37 500 €', '83 600 €', '203 100 €', 'Il n\'y en a pas'], 1, '83 600 € pour les prestations de services (2026 à 2028).'),
-    q('En micro-entreprise, vos abonnements IA réduisent-ils vos cotisations ?', ['Oui', 'Non, les cotisations portent sur le chiffre d\'affaires, sans déduction des frais', 'Oui, à moitié', 'Seulement en BIC'], 1, 'C\'est la principale limite du régime.'),
-    q('L\'ACRE est-elle automatique en 2026 ?', ['Oui', 'Non, elle se demande à l\'URSSAF et dépend de votre situation', 'Oui, pour tout le monde', 'Elle a disparu'], 1, 'Elle n\'est plus automatique depuis 2026.'),
-    q('En SASU, quel taux d\'impôt sur les sociétés s\'applique jusqu\'à 42 500 € de bénéfice (sous conditions) ?', ['0 %', '15 %', '25 %', '31,4 %'], 1, '15 %, puis 25 % au-delà.')
+    q('Quel est le plafond de chiffre d\'affaires d\'une micro-entreprise de services en 2026 ?', ['37 500 €', '77 700 €', '203 100 €', '83 600 €'], 3, '83 600 € pour les prestations de services (2026 à 2028).'),
+    q('En micro-entreprise, vos abonnements IA réduisent-ils vos cotisations ?', ['Oui, ils se déduisent du chiffre d\'affaires déclaré chaque mois', 'Non : les cotisations portent sur le chiffre d\'affaires, sans déduction', 'Oui, à moitié, grâce à l\'abattement forfaitaire pour frais', 'Seulement si vous avez opté pour le versement libératoire de l\'impôt'], 1, 'C\'est la principale limite du régime.'),
+    q('L\'ACRE est-elle automatique en 2026 ?', ['Oui, pour tout créateur d\'entreprise la première année', 'Oui, mais seulement pour les créateurs de moins de 26 ans', 'Non, elle se demande à l\'URSSAF et dépend de votre situation', 'Non : le dispositif a été supprimé au 1er janvier 2026'], 2, 'Elle n\'est plus automatique depuis 2026.'),
+    q('En SASU, quel taux d\'impôt sur les sociétés s\'applique jusqu\'à 42 500 € de bénéfice (sous conditions) ?', ['15 %', '25 %', '28 %', '0 %'], 0, '15 %, puis 25 % au-delà.')
   ],
   script: script('10 min',
     'Micro-entreprise ou SASU ? La bonne réponse n\'est pas la même pour tout le monde, et je vais vous montrer comment trouver la vôtre en une heure.',
@@ -140,10 +140,10 @@ ${MAJ}`,
     explication: 'Vos factures sont conformes et prêtes pour la réforme.'
   },
   quiz: [
-    q('Quel est le seuil de franchise de TVA pour les prestations de services en 2026 ?', ['10 000 €', '37 500 €', '83 600 €', '85 000 €'], 1, '37 500 €, avec un seuil majoré de 41 250 €.'),
-    q('Depuis le 1er septembre 2026, que doit pouvoir faire une micro-entreprise ?', ['Rien de nouveau', 'Recevoir des factures électroniques', 'Émettre toutes ses factures électroniques', 'Facturer en dollars'], 1, 'L\'émission arrive au 1er septembre 2027 pour les PME et micro-entreprises.'),
-    q('Qui gère la TVA de chaque pays quand vous vendez via Lemon Squeezy ?', ['Vous', 'La plateforme, en tant que revendeur officiel', 'Votre banque', 'Personne'], 1, 'Le revendeur officiel vend en son nom et gère la TVA.'),
-    q('Quelle mention pour une prestation à une entreprise allemande ?', ['TVA française à 20 %', '« Autoliquidation », avec les numéros de TVA des deux parties', 'Aucune', '« Exonération Allemagne »'], 1, 'Le client autoliquide la TVA dans son pays.')
+    q('Quel est le seuil de franchise de TVA pour les prestations de services en 2026 ?', ['25 000 €', '37 500 €', '36 800 €', '83 600 €'], 1, '37 500 €, avec un seuil majoré de 41 250 €.'),
+    q('Depuis le 1er septembre 2026, que doit pouvoir faire une micro-entreprise ?', ['Recevoir des factures électroniques', 'Émettre toutes ses factures électroniques', 'Déclarer sa TVA chaque mois en ligne', 'Rien de nouveau, la réforme est repoussée'], 0, 'L\'émission arrive au 1er septembre 2027 pour les PME et micro-entreprises.'),
+    q('Qui gère la TVA de chaque pays quand vous vendez via Lemon Squeezy ?', ['Vous, avec une déclaration par pays de l\'acheteur', 'Votre banque, au moment de chaque encaissement', 'Personne : les produits numériques sont exonérés', 'La plateforme, en tant que revendeur officiel'], 3, 'Le revendeur officiel vend en son nom et gère la TVA.'),
+    q('Quelle mention pour une prestation à une entreprise allemande ?', ['TVA française à 20 %, comme pour un client établi en France', '« Exonération Allemagne », sans numéro de TVA intracommunautaire', '« Autoliquidation », avec les numéros de TVA des deux parties', 'TVA allemande à 19 %, que vous déclarez vous-même en Allemagne'], 2, 'Le client autoliquide la TVA dans son pays.')
   ],
   script: script('10 min',
     'Votre facture est-elle encore valable en septembre 2027 ? Si vous l\'envoyez en PDF par email, bientôt non. Voici ce qui change, et ce qu\'il faut faire maintenant.',
@@ -223,10 +223,10 @@ ${encart('info', 'Ressources officielles', '<p>La CNIL publie des fiches pratiqu
     explication: 'Votre automatisation respecte le RGPD : c\'est un argument de vente auprès de vos clients.'
   },
   quiz: [
-    q('Vous installez un chatbot qui collecte les demandes des clients d\'un salon. Quel est votre rôle ?', ['Responsable de traitement', 'Sous-traitant du salon', 'Aucun rôle', 'Autorité de contrôle'], 1, 'Le salon décide de la finalité ; vous traitez pour son compte.'),
-    q('Quelle offre privilégier pour une automatisation qui traite des données de clients ?', ['Un compte gratuit partagé', 'L\'API, dont les données ne servent pas à l\'entraînement par défaut', 'N\'importe quel compte personnel', 'Aucune'], 1, 'L\'API relève des conditions commerciales.'),
-    q('Que faire avant d\'analyser un export de clients avec Claude ?', ['Rien', 'Pseudonymiser les données identifiantes', 'Ajouter les numéros de carte', 'Le publier'], 1, 'La pseudonymisation réduit le risque.'),
-    q('Combien de temps conserver les données d\'un prospect sans nouvelles ?', ['Indéfiniment', 'Trois ans au maximum après son dernier contact', 'Une semaine', 'Vingt ans'], 1, 'C\'est la recommandation de la CNIL pour la prospection.')
+    q('Vous installez un chatbot qui collecte les demandes des clients d\'un salon. Quel est votre rôle ?', ['Responsable de traitement', 'Coresponsable avec Anthropic', 'Sous-traitant du salon', 'Délégué à la protection des données'], 2, 'Le salon décide de la finalité ; vous traitez pour son compte.'),
+    q('Quelle offre privilégier pour une automatisation qui traite des données de clients ?', ['Un compte gratuit partagé, puisque les données y sont anonymisées', 'Votre compte Pro personnel, en désactivant simplement la mémoire', 'N\'importe quelle offre : le RGPD ne s\'applique pas aux outils d\'IA', 'L\'API, dont les données ne servent pas à l\'entraînement par défaut'], 3, 'L\'API relève des conditions commerciales.'),
+    q('Que faire avant d\'analyser un export de clients avec Claude ?', ['Pseudonymiser les données identifiantes', 'Le convertir en PDF pour le protéger', 'Prévenir les clients par SMS, un par un', 'Activer le mode incognito, qui suffit'], 0, 'La pseudonymisation réduit le risque.'),
+    q('Combien de temps conserver les données d\'un prospect sans nouvelles ?', ['Indéfiniment, tant qu\'il ne se désinscrit pas', 'Trois ans au maximum après son dernier contact', 'Dix ans, comme les factures et pièces comptables', 'Un an au maximum après la date de collecte'], 1, 'C\'est la recommandation de la CNIL pour la prospection.')
   ],
   script: script('10 min',
     'Votre client vous demande : « Mes données, elles vont où ? » Si vous savez répondre en trente secondes, vous signez. Voici la réponse.',
@@ -285,15 +285,15 @@ ${MAJ}`,
   exercice: {
     type: 'qcm', titre: 'Classer un usage',
     enonce: '<p>Un cabinet de recrutement vous demande une automatisation : Claude lit les CV reçus, attribue une note à chaque candidat et envoie automatiquement un refus à ceux qui ont moins de 60/100. Comment qualifier cette demande au regard de l\'AI Act ?</p>',
-    options: ['Usage courant sans obligation particulière', 'Usage à haut risque (recrutement) : à ne pas livrer tel quel ; proposer une aide à la décision avec décision humaine et un accompagnement juridique', 'Pratique interdite dans tous les cas', 'Simple obligation de mention « généré par IA »'],
-    bonne: 1,
+    options: ['Haut risque (recrutement) : aide à la décision, décision humaine et conseil juridique', 'Usage courant, sans obligation particulière, puisque les refus restent polis', 'Pratique interdite dans tous les cas, à refuser sans autre proposition', 'Simple obligation d\'ajouter la mention « généré par IA » aux emails de refus'],
+    bonne: 0,
     explication: 'Le tri de candidatures relève des usages à haut risque, et une décision automatique de refus pose aussi problème au regard du RGPD.'
   },
   quiz: [
-    q('Depuis quand l\'obligation de maîtrise de l\'IA (article 4) s\'applique-t-elle ?', ['2 février 2025', '2 août 2026', '2028', 'Elle n\'existe pas'], 0, 'Avec les pratiques interdites, en février 2025.'),
-    q('Quand vous utilisez Claude pour vos prestations, quel est en général votre rôle ?', ['Fournisseur de modèle', 'Déployeur', 'Autorité de contrôle', 'Aucun'], 1, 'Vous utilisez un système d\'IA dans votre activité professionnelle.'),
-    q('Un chatbot installé sur le site d\'un client doit :', ['Se faire passer pour un humain', 'Informer les visiteurs qu\'ils échangent avec une IA', 'Collecter un maximum de données', 'Rester anonyme'], 1, 'Obligation de transparence de l\'article 50.'),
-    q('Les obligations des systèmes à haut risque s\'appliquent-elles depuis août 2026 ?', ['Oui', 'Non, elles ont été reportées à décembre 2027 et août 2028', 'Elles ont été supprimées', 'Seulement en France'], 1, 'Le règlement de simplification de 2026 les a reportées ; la transparence, elle, s\'applique.')
+    q('Depuis quand l\'obligation de maîtrise de l\'IA (article 4) s\'applique-t-elle ?', ['2 août 2025', '2 février 2025', '2 août 2026', '2 août 2027'], 1, 'Avec les pratiques interdites, en février 2025.'),
+    q('Quand vous utilisez Claude pour vos prestations, quel est en général votre rôle ?', ['Fournisseur', 'Importateur', 'Distributeur', 'Déployeur'], 3, 'Vous utilisez un système d\'IA dans votre activité professionnelle.'),
+    q('Un chatbot installé sur le site d\'un client doit :', ['Informer les visiteurs qu\'ils échangent avec une IA', 'Se présenter sous un prénom humain pour rassurer', 'Être déclaré à la CNIL avant sa mise en ligne publique', 'Afficher le nom du modèle et la version utilisée'], 0, 'Obligation de transparence de l\'article 50.'),
+    q('Les obligations des systèmes à haut risque s\'appliquent-elles depuis août 2026 ?', ['Oui, pour tous les systèmes, depuis le 2 août 2026', 'Non, elles ont été supprimées du texte définitif', 'Non, elles ont été reportées à décembre 2027 et août 2028', 'Oui, mais seulement pour les entreprises françaises'], 2, 'Le règlement de simplification de 2026 les a reportées ; la transparence, elle, s\'applique.')
   ],
   script: script('9 min',
     'L\'AI Act fait peur à vos clients. En réalité, pour 95 % de ce que vous allez vendre, il tient en trois règles. Les voici, avec les deux pièges à éviter.',

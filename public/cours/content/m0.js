@@ -25,7 +25,7 @@ ${tableau(['Étage', 'Modules', 'Ce que vous saurez faire'], [
   <li><strong>Quiz</strong> : trois ou quatre questions pour ancrer les notions clés, avec l'explication de chaque réponse.</li>
   <li><strong>Script vidéo</strong> : le résumé de la leçon sous forme de script (accroche, plan, appel à l'action). Utile pour réviser, et c'est aussi un modèle pour vos propres vidéos.</li>
 </ul>
-<p>Une leçon se valide <strong>automatiquement</strong> quand l'exercice et le quiz sont faits. Vous pouvez aussi la marquer comme terminée à la main. Chaque module terminé débloque un certificat, et la formation complète un certificat de fin de formation.</p>
+<p>Une leçon se valide <strong>automatiquement</strong> quand l'exercice est réussi et que le quiz obtient au moins la moitié de bonnes réponses. Vous pouvez aussi la marquer comme terminée à la main pour suivre votre avancée ; le certificat d'un module, lui, demande que tous ses exercices et quiz soient réussis. La formation complète donne droit à un certificat de fin de formation.</p>
 <h2>Le rythme qui fonctionne</h2>
 <p>La régularité bat l'intensité. Le format conseillé : <strong>45 minutes par jour, 5 jours par semaine</strong>, pendant 30 jours (le plan est détaillé dans la leçon suivante). Une séance type :</p>
 <ol>
@@ -67,10 +67,10 @@ ${encart('info', 'La règle d\'or', '<p>Une leçon = une action concrète. Si vo
         explication: 'Point de départ enregistré. Recopiez-le dans votre carnet de bord : vous le relirez au jour 30.'
       },
       quiz: [
-        q('Quand une leçon est-elle validée automatiquement ?', ['Dès qu\'on l\'ouvre', 'Quand l\'exercice et le quiz sont faits', 'Au bout de 15 minutes', 'Uniquement à la main'], 1, 'La validation automatique demande l\'exercice (ou la checklist) et le quiz. Vous pouvez aussi la marquer comme terminée vous-même.'),
-        q('Quel rythme la formation recommande-t-elle ?', ['Tout lire en un week-end', '45 minutes par jour, 5 jours par semaine', 'Une leçon par mois', 'Seulement quand on a un client'], 1, 'La régularité ancre les compétences et laisse le temps de pratiquer sur un vrai projet.'),
-        q('Qu\'est-ce qui produit vos premiers clients ?', ['Lire tous les modules', 'Acheter tous les outils vidéo', 'La prospection régulière à partir de la semaine 4', 'Attendre que les clients vous trouvent'], 2, 'Les compétences sont nécessaires, mais ce sont les prises de contact qui créent les opportunités.'),
-        q('Que garantit la formation ?', ['Un revenu minimum', 'Une méthode, des outils et des modèles, sans garantie de résultat', 'Des clients fournis', 'Un remboursement si vous ne gagnez rien'], 1, 'Aucun revenu n\'est garanti : les résultats dépendent de votre travail et de votre marché.')
+        q('Quand une leçon est-elle validée automatiquement ?', ['Dès que vous avez lu la théorie jusqu\'au bout', 'Quand l\'exercice et le quiz sont réussis', 'Quand vous avez ouvert le script vidéo', 'Seulement quand le formateur la corrige'], 1, 'La validation automatique demande l\'exercice (ou la checklist) réussi et au moins la moitié de bonnes réponses au quiz. Vous pouvez aussi marquer la leçon comme terminée vous-même.'),
+        q('Quel rythme la formation recommande-t-elle ?', ['Tout le programme d\'un coup, en un week-end', 'Deux heures le dimanche, sans pratique entre', 'Une leçon dès que vous avez un client', '45 minutes par jour, 5 jours par semaine'], 3, 'La régularité ancre les compétences et laisse le temps de pratiquer sur un vrai projet.'),
+        q('Qu\'est-ce qui produit vos premiers clients ?', ['La prospection régulière à partir de la semaine 4', 'Terminer tous les modules avant d\'en parler', 'Un portfolio parfait avant le premier contact', 'Des publicités payantes dès le premier jour'], 0, 'Les compétences sont nécessaires, mais ce sont les prises de contact qui créent les opportunités.'),
+        q('Que garantit la formation ?', ['Un premier client trouvé dans les 30 jours', 'Un revenu minimum si vous suivez tout le plan', 'Une méthode et des outils, sans garantie de résultat', 'Un remboursement si vous ne signez aucun client'], 2, 'Aucun revenu n\'est garanti : les résultats dépendent de votre travail et de votre marché.')
       ],
       script: script('4 min',
         'Vous n\'avez pas besoin de connaître tous les outils d\'IA. Vous avez besoin d\'en maîtriser un, et de savoir le vendre.',
@@ -141,10 +141,10 @@ ${encart('warn', 'Le piège n°1', '<p>Rester en mode « j\'apprends encore » a
         explication: 'Feuille de route complète. Faites votre bilan et fixez le prochain cycle de 30 jours.'
       },
       quiz: [
-        q('Quel est le livrable de la semaine 2 ?', ['Un site complet', 'Une offre, une cible et un prix en une phrase', '100 prospects contactés', 'Une chaîne YouTube'], 1, 'Une offre claire est la base de tout le reste : démonstrations, prospection, prix.'),
-        q('Comment présenter une réalisation faite pour un commerce sans son accord ?', ['Comme un vrai client', 'Comme un exemple fictif clairement indiqué', 'Ne rien préciser', 'Avec un faux témoignage'], 1, 'Présenter une démo comme une vraie mission serait trompeur. Indiquez « exemple » ou demandez l\'accord du commerce.'),
-        q('Que faire à partir du jour 22 si vous n\'avez pas fini tous les modules ?', ['Repousser la prospection', 'Prospecter quand même, la lecture passe après', 'Recommencer depuis le début', 'Acheter un nouvel outil'], 1, 'Les vrais échanges avec des prospects font progresser plus vite que la lecture.'),
-        q('Pourquoi relever ses indicateurs chaque semaine ?', ['Pour les publier', 'Pour identifier où se situe le blocage', 'C\'est obligatoire légalement', 'Pour débloquer des modules'], 1, 'Les chiffres montrent si le problème vient de la compétence, de l\'offre, du message ou du volume.')
+        q('Quel est le livrable de la semaine 2 ?', ['Un site vitrine complet, en ligne et indexé', 'Une liste de 100 prospects déjà contactés', 'Une offre, une cible et un prix en une phrase', 'Un compte TikTok avec dix vidéos publiées'], 2, 'Une offre claire est la base de tout le reste : démonstrations, prospection, prix.'),
+        q('Comment présenter une réalisation faite pour un commerce sans son accord ?', ['Comme un exemple fictif, clairement indiqué', 'Comme une mission réelle, sans citer le nom', 'Avec son logo, puisque le travail est à vous', 'Comme un projet en cours de négociation'], 0, 'Présenter une démo comme une vraie mission serait trompeur. Indiquez « exemple » ou demandez l\'accord du commerce.'),
+        q('Que faire à partir du jour 22 si vous n\'avez pas fini tous les modules ?', ['Repousser la prospection d\'une à deux semaines', 'Reprendre le module 1 pour bien consolider', 'Finir d\'abord le module vidéo, le plus vendeur', 'Prospecter quand même, la lecture passe après'], 3, 'Les vrais échanges avec des prospects font progresser plus vite que la lecture.'),
+        q('Pourquoi relever ses indicateurs chaque semaine ?', ['Pour les publier comme preuve sur LinkedIn', 'Pour repérer à quelle étape vous bloquez', 'Pour débloquer les modules suivants', 'Pour calculer votre chiffre d\'affaires fiscal'], 1, 'Les chiffres montrent si le problème vient de la compétence, de l\'offre, du message ou du volume.')
       ],
       script: script('5 min',
         'Dans 30 jours, vous pouvez avoir une offre, des réalisations à montrer et vos premiers rendez-vous. Voici le plan, semaine par semaine.',

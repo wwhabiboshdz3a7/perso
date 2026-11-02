@@ -59,10 +59,10 @@ ${encart('info', 'Longueur d\'un bon prompt', '<p>Un prompt professionnel fait s
         explication: 'Fiche de mission complète. Gardez-la comme modèle : vous l\'adapterez à chaque nouvelle tâche.'
       },
       quiz: [
-        q('Pourquoi expliquer la raison d\'une contrainte ?', ['Pour allonger le prompt', 'Le modèle généralise la raison à des cas non prévus', 'C\'est obligatoire', 'Pour payer moins'], 1, 'Comprendre l\'intention permet d\'appliquer la règle avec discernement.'),
-        q('Quelle formulation fonctionne le mieux ?', ['« N\'utilise pas de listes »', '« Écris en paragraphes courts et fluides »', '« Pas de puces, pas de listes, rien de tout ça »', 'Aucune différence'], 1, 'Dire ce qu\'on veut obtenir est plus efficace que d\'énumérer les interdits.'),
-        q('Que signifie « les modèles récents suivent les consignes avec précision » ?', ['Ils ignorent les consignes', 'Ils font ce que vous demandez, il faut donc demander explicitement ce que vous voulez', 'Ils devinent toujours votre intention', 'Ils refusent les consignes longues'], 1, 'Soyez explicite, y compris sur le niveau d\'ambition attendu.'),
-        q('Un prompt dépasse une page et mélange cinq tâches. Que faire ?', ['L\'envoyer tel quel', 'Le découper en étapes successives', 'Le traduire en anglais', 'Supprimer les données'], 1, 'Les chaînes de prompts (leçon 4) rendent chaque étape plus fiable.')
+        q('Pourquoi expliquer la raison d\'une contrainte ?', ['Une contrainte sans raison est ignorée par le modèle', 'Cela rend la contrainte prioritaire sur toutes les autres', 'Les modèles récents refusent les consignes non justifiées', 'Le modèle généralise la raison à des cas non prévus'], 3, 'Comprendre l\'intention permet d\'appliquer la règle avec discernement.'),
+        q('Quelle formulation fonctionne le mieux ?', ['« N\'utilise surtout aucune liste à puces »', '« Écris en paragraphes courts et fluides »', '« Pas de puces, pas de listes, rien de tout ça »', '« ÉVITE ABSOLUMENT LES LISTES ! »'], 1, 'Dire ce qu\'on veut obtenir est plus efficace que d\'énumérer les interdits.'),
+        q('Que signifie « les modèles récents suivent les consignes avec précision » ?', ['Ils devinent votre intention, même si la consigne est vague', 'Ils suivent le prompt système et ignorent les consignes du message', 'Ils font ce que vous demandez : demandez explicitement ce que vous voulez', 'Ils ajoutent d\'eux-mêmes tout ce qui pourrait vous être utile'], 2, 'Soyez explicite, y compris sur le niveau d\'ambition attendu.'),
+        q('Un prompt dépasse une page et mélange cinq tâches. Que faire ?', ['Le découper en étapes successives', 'Le passer en majuscules pour insister', 'Le traduire en anglais pour plus de précision', 'L\'envoyer tel quel à un modèle plus puissant'], 0, 'Les chaînes de prompts (leçon 4) rendent chaque étape plus fiable.')
       ],
       script: script('6 min',
         'Le problème n\'est presque jamais l\'IA. C\'est le brief. Voici les six briques d\'un brief professionnel.',
@@ -153,10 +153,10 @@ Tu prépares ma proposition commerciale pour cette boulangerie.
         explication: 'Prompt structuré et vérifiable. Testez-le sur un vrai document et contrôlez les citations.'
       },
       quiz: [
-        q('Existe-t-il une liste officielle de balises à utiliser ?', ['Oui, il faut les apprendre', 'Non : des noms explicites et cohérents suffisent', 'Seulement en anglais', 'Seulement <prompt>'], 1, 'Les balises servent à structurer ; leur nom doit simplement être clair.'),
-        q('Où placer un long document dans le prompt ?', ['À la fin, après la question', 'En haut, avec les consignes et la question à la fin', 'Au milieu des consignes', 'Dans un autre message'], 1, 'Documents en haut, question en bas : la disposition la plus efficace sur les contextes longs.'),
-        q('Pourquoi demander des citations avant la réponse ?', ['Pour allonger la réponse', 'Pour réduire les affirmations inventées et pouvoir vérifier', 'Pour traduire le document', 'Parce que c\'est plus joli'], 1, 'Les citations ancrent la réponse dans le texte source.'),
-        q('Pourquoi baliser la sortie dans une automatisation ?', ['Pour l\'esthétique', 'Pour pouvoir extraire chaque partie facilement', 'Pour réduire le prix', 'C\'est interdit'], 1, 'Une sortie balisée se découpe sans ambiguïté par un nœud de code.')
+        q('Existe-t-il une liste officielle de balises à utiliser ?', ['Oui, Claude ne reconnaît que les balises documentées', 'Non : des noms explicites et cohérents suffisent', 'Oui, mais seulement pour les prompts en anglais', 'Non, et il vaut mieux changer de noms à chaque prompt'], 1, 'Les balises servent à structurer ; leur nom doit simplement être clair.'),
+        q('Où placer un long document dans le prompt ?', ['En haut, avec les consignes et la question à la fin', 'À la fin, après la question, pour qu\'il soit lu en dernier', 'Au milieu des consignes, là où il est utilisé', 'Dans un message séparé, envoyé après la question'], 0, 'Documents en haut, question en bas : la disposition la plus efficace sur les contextes longs.'),
+        q('Pourquoi demander des citations avant la réponse ?', ['Pour que la réponse finale soit plus longue et plus détaillée', 'Pour que le modèle traduise d\'abord le document en anglais', 'Pour respecter le droit d\'auteur du document fourni', 'Pour réduire les affirmations inventées et pouvoir vérifier'], 3, 'Les citations ancrent la réponse dans le texte source.'),
+        q('Pourquoi baliser la sortie dans une automatisation ?', ['Pour réduire le nombre de jetons facturés en sortie', 'Pour que la réponse s\'affiche joliment dans l\'email', 'Pour extraire chaque partie facilement dans l\'étape suivante', 'Parce que l\'API refuse les réponses non balisées'], 2, 'Une sortie balisée se découpe sans ambiguïté par un nœud de code.')
       ],
       script: script('6 min',
         'Quand Claude mélange vos consignes et vos documents, ce n\'est pas un bug. C\'est que vous ne lui avez pas montré où était la frontière.',
@@ -232,10 +232,10 @@ ${encart('info', 'Astuce : faire évoluer ses exemples', '<p>Chaque fois qu\'un 
         explication: 'Prompt complet. Vérifiez la diversité des résultats et enrichissez les exemples au fil des validations.'
       },
       quiz: [
-        q('Combien d\'exemples utiliser en général ?', ['Un seul', 'Deux à cinq, variés', 'Au moins cinquante', 'Aucun'], 1, 'Quelques exemples variés suffisent à fixer style et format.'),
-        q('Vos 10 résultats commencent tous par la même tournure. Pourquoi ?', ['Le modèle est cassé', 'Vos exemples se ressemblent trop', 'Il faut changer de compte', 'C\'est aléatoire'], 1, 'Des exemples trop homogènes enferment les résultats dans un seul motif.'),
-        q('Où placer le rôle dans l\'API ?', ['Dans le titre', 'Dans le prompt système', 'Dans une image', 'Dans la clé d\'API'], 1, 'Le prompt système porte le rôle et les règles stables.'),
-        q('Quel rôle est le plus utile ?', ['« Tu es un expert. »', 'Un rôle avec métier, contexte, priorité et critère de jugement', '« Tu es une IA. »', 'Aucun rôle n\'est utile'], 1, 'La précision du rôle oriente les choix concrets du modèle.')
+        q('Combien d\'exemples utiliser en général ?', ['Un seul, très détaillé', 'Au moins vingt, tous similaires', 'Deux à cinq, variés', 'Aucun, ils biaisent toujours'], 2, 'Quelques exemples variés suffisent à fixer style et format.'),
+        q('Vos 10 résultats commencent tous par la même tournure. Pourquoi ?', ['La température est réglée trop haut', 'Le modèle a atteint sa limite d\'usage', 'Le prompt est trop court pour varier', 'Vos exemples se ressemblent trop'], 3, 'Des exemples trop homogènes enferment les résultats dans un seul motif.'),
+        q('Où placer le rôle dans l\'API ?', ['Dans le prompt système', 'Dans le paramètre metadata', 'Dans le premier message assistant', 'Dans l\'en-tête de la requête HTTP'], 0, 'Le prompt système porte le rôle et les règles stables.'),
+        q('Quel rôle est le plus utile ?', ['« Tu es le meilleur expert du monde dans tous les domaines »', 'Un rôle avec métier, contexte, priorité et critère de jugement', '« Tu es une IA neutre, sans opinion ni préférence de style »', 'Aucun rôle : les modèles récents n\'en tiennent plus compte'], 1, 'La précision du rôle oriente les choix concrets du modèle.')
       ],
       script: script('6 min',
         'Arrêtez de décrire le style que vous voulez. Montrez-le. Trois exemples valent trois paragraphes d\'explications.',
@@ -293,10 +293,10 @@ ${encart('ok', 'Ce que vous vendez vraiment', '<p>Un client n\'achète pas « un
         explication: 'Chaîne bien conçue. Testez-la dans un Projet, puis gardez-la pour l\'automatiser.'
       },
       quiz: [
-        q('Principal avantage d\'une chaîne de prompts ?', ['Elle coûte toujours moins cher', 'Chaque étape est plus simple, plus fiable et contrôlable', 'Elle évite de relire', 'Elle supprime les erreurs'], 1, 'La décomposition rend chaque étape plus fiable et permet des points de contrôle.'),
-        q('Où placer un point de contrôle ?', ['Après la version finale seulement', 'Là où une erreur coûterait cher à corriger plus tard', 'Nulle part', 'Avant le brief'], 1, 'Valider le plan avant la rédaction évite de tout réécrire.'),
-        q('Que transmettre d\'une étape à l\'autre ?', ['Toute la conversation', 'Seulement les sorties utiles, balisées', 'Rien', 'Les captures d\'écran'], 1, 'Moins de bruit, meilleure qualité.'),
-        q('Pour un email de 100 mots, faut-il une chaîne ?', ['Oui, toujours', 'Non, un bon prompt suffit', 'Oui, de 10 étapes', 'Uniquement avec l\'API'], 1, 'La chaîne se justifie pour les livrables longs, combinés ou produits en série.')
+        q('Principal avantage d\'une chaîne de prompts ?', ['Elle coûte toujours moins cher qu\'un prompt unique', 'Chaque étape est plus simple, plus fiable et contrôlable', 'Elle dispense de relire, chaque étape corrigeant la précédente', 'Elle répond plus vite, les étapes s\'exécutant en parallèle'], 1, 'La décomposition rend chaque étape plus fiable et permet des points de contrôle.'),
+        q('Où placer un point de contrôle ?', ['Après la version finale seulement, pour tout relire', 'Entre chaque étape sans exception, même mineure', 'Avant le brief, pour valider le modèle choisi', 'Là où une erreur coûterait cher à corriger plus tard'], 3, 'Valider le plan avant la rédaction évite de tout réécrire.'),
+        q('Que transmettre d\'une étape à l\'autre ?', ['Seulement les sorties utiles, balisées', 'Toute la conversation précédente, mot pour mot', 'Uniquement le prompt de l\'étape précédente', 'Un résumé libre rédigé par vous à chaque fois'], 0, 'Moins de bruit, meilleure qualité.'),
+        q('Pour un email de 100 mots, faut-il une chaîne ?', ['Oui, toujours, c\'est plus fiable', 'Oui, avec une étape par paragraphe', 'Non, un bon prompt suffit', 'Seulement si l\'email part via l\'API'], 2, 'La chaîne se justifie pour les livrables longs, combinés ou produits en série.')
       ],
       script: script('7 min',
         'Huit articles par mois, tous du même niveau, pour un client. Le secret n\'est pas un prompt parfait. C\'est une chaîne.',
@@ -358,10 +358,10 @@ ${encart('info', 'Donnez la permission de dire « je ne sais pas »', '<p>« Si 
         explication: 'Grille et cas de test prêts. Vous les réutiliserez pour tester l\'automatisation des avis au module 5.'
       },
       quiz: [
-        q('Pourquoi une grille de critères améliore-t-elle les résultats ?', ['Elle rallonge le prompt', 'Elle transforme une exigence vague en points vérifiables', 'Elle remplace les données', 'Elle est obligatoire'], 1, 'Des critères explicites permettent une critique et une réécriture ciblées.'),
-        q('Entre deux versions d\'un prompt, combien de changements faire ?', ['Le plus possible', 'Un seul, pour savoir ce qui a eu un effet', 'Aucun', 'Changer de modèle à chaque fois'], 1, 'Un changement à la fois rend les tests interprétables.'),
-        q('Un chatbot invente des horaires. Correction prioritaire ?', ['Changer de couleur', 'Fournir les horaires et autoriser « information non disponible »', 'Allonger les réponses', 'Supprimer le chatbot'], 1, 'Sources fournies + permission de ne pas savoir = moins d\'inventions.'),
-        q('Qu\'est-ce qu\'un cas limite ?', ['Un cas très facile', 'Une situation inhabituelle qui met le prompt à l\'épreuve', 'Le premier cas', 'Un cas sans réponse'], 1, 'Les cas limites révèlent les faiblesses avant vos clients.')
+        q('Pourquoi une grille de critères améliore-t-elle les résultats ?', ['Elle rallonge le prompt, ce qui augmente l\'effort du modèle', 'Elle remplace les exemples, qui deviennent alors inutiles', 'Elle transforme une exigence vague en points vérifiables', 'Elle active le mode de réflexion étendue du modèle'], 2, 'Des critères explicites permettent une critique et une réécriture ciblées.'),
+        q('Entre deux versions d\'un prompt, combien de changements faire ?', ['Un seul, pour savoir ce qui a eu un effet', 'Le plus possible, pour gagner du temps', 'Aucun : changer de modèle suffit', 'Trois ou quatre, regroupés par thème'], 0, 'Un changement à la fois rend les tests interprétables.'),
+        q('Un chatbot invente des horaires. Correction prioritaire ?', ['Passer à un modèle plus puissant, qui se trompe moins souvent', 'Allonger les réponses pour qu\'il justifie chaque horaire', 'Lui demander d\'être plus prudent, sans autre information', 'Fournir les horaires et autoriser « information non disponible »'], 3, 'Sources fournies + permission de ne pas savoir = moins d\'inventions.'),
+        q('Qu\'est-ce qu\'un cas limite ?', ['Le cas le plus fréquent, qui sert de référence aux tests', 'Une situation inhabituelle qui met le prompt à l\'épreuve', 'Une demande que le modèle refuse pour raisons de sécurité', 'Le dernier exemple du prompt, placé juste avant la question'], 1, 'Les cas limites révèlent les faiblesses avant vos clients.')
       ],
       script: script('7 min',
         'Le jour où un client vous montre une réponse absurde de votre chatbot, il est trop tard. Les tests, c\'est avant.',
@@ -422,10 +422,10 @@ ${encart('warn', 'Propriété et confidentialité', '<p>Les prompts que vous cr�
         explication: 'Bibliothèque en place. Elle grandira à chaque mission.'
       },
       quiz: [
-        q('Quel est le premier geste pour adapter un prompt de la bibliothèque ?', ['Le traduire', 'Remplacer les variables par les informations du client', 'Le publier', 'Le raccourcir'], 1, 'Puis on ajoute contexte, exemples et tests.'),
-        q('Pourquoi versionner ses prompts ?', ['Pour faire joli', 'Pour savoir ce qui a changé et revenir en arrière si besoin', 'C\'est obligatoire', 'Pour payer moins'], 1, 'Le versionnage rend vos améliorations traçables.'),
-        q('Quelle progression permet de vendre plus sans travailler proportionnellement plus ?', ['Prompt → Projet → skill ou automatisation', 'Automatisation → prompt', 'Aucune', 'Changer de modèle'], 0, 'Un prompt stable devient un cadre permanent, puis une automatisation.'),
-        q('Que séparer dans votre bibliothèque ?', ['Les prompts courts et longs', 'Vos modèles génériques et les versions remplies avec les données d\'un client', 'Les prompts en français et en anglais', 'Rien'], 1, 'Votre savoir-faire d\'un côté, le contexte client de l\'autre.')
+        q('Quel est le premier geste pour adapter un prompt de la bibliothèque ?', ['Remplacer les variables par les informations du client', 'Le traduire en anglais pour de meilleurs résultats', 'Le raccourcir au maximum avant de l\'essayer', 'Le tester tel quel, variables {{…}} comprises'], 0, 'Puis on ajoute contexte, exemples et tests.'),
+        q('Pourquoi versionner ses prompts ?', ['Parce que Claude refuse un prompt déjà utilisé', 'Pour que le cache de prompt réduise le coût de l\'API', 'Pour savoir ce qui a changé et revenir en arrière', 'Pour les déposer et les protéger juridiquement'], 2, 'Le versionnage rend vos améliorations traçables.'),
+        q('Quelle progression permet de vendre plus sans travailler proportionnellement plus ?', ['Automatisation → Projet → prompt', 'Prompt → Projet → skill ou automatisation', 'Prompt → prompt plus long → modèle plus cher', 'Projet → nouveau compte par client → prompt'], 1, 'Un prompt stable devient un cadre permanent, puis une automatisation.'),
+        q('Que séparer dans votre bibliothèque ?', ['Les prompts courts et les prompts longs, rangés à part', 'Les prompts en français et leur traduction en anglais', 'Les prompts écrits par vous et ceux écrits par Claude', 'Les modèles génériques et les versions remplies pour un client'], 3, 'Votre savoir-faire d\'un côté, le contexte client de l\'autre.')
       ],
       script: script('5 min',
         'Vos meilleurs prompts valent de l\'argent. Pourtant, la plupart des gens les perdent dans leur historique.',

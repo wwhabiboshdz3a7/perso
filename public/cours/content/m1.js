@@ -46,15 +46,15 @@ ${MAJ}`,
       exercice: {
         type: 'qcm', titre: 'Le bon choix d\'offre',
         enonce: '<p>Karim lance une activité de création de contenus pour des commerçants. Il veut utiliser Claude tous les jours, accéder à Claude Code pour créer de petites pages web, et automatiser plus tard des réponses aux avis Google via n8n. De quoi a-t-il besoin ?</p>',
-        options: ['De l\'offre Free uniquement', 'D\'un abonnement Pro, puis d\'un compte API séparé pour les automatisations', 'D\'une offre Enterprise', 'D\'un abonnement Pro, qui inclut des crédits API illimités'],
-        bonne: 1,
+        options: ['D\'un abonnement Pro, dont les crédits couvrent aussi l\'API pour n8n', 'De l\'offre Free pour Claude Code, puis d\'un compte API pour n8n', 'D\'un abonnement Pro, puis d\'un compte API séparé pour les automatisations', 'D\'une offre Team, seule à donner accès à Claude Code et à l\'API'],
+        bonne: 2,
         explication: 'Pro couvre l\'usage quotidien et Claude Code ; l\'automatisation via n8n passe par l\'API, facturée à l\'usage sur un compte Console distinct.'
       },
       quiz: [
-        q('Votre abonnement Pro donne-t-il des crédits pour l\'API ?', ['Oui, illimités', 'Oui, 20 $ par mois', 'Non, l\'API se paie à part, à l\'usage', 'Seulement en annuel'], 2, 'L\'abonnement et l\'API sont deux comptes de facturation distincts.'),
-        q('Qu\'est-ce qui consomme le plus vite votre quota d\'usage ?', ['Les conversations courtes', 'Les longues conversations avec de gros fichiers et les modèles les plus puissants', 'Le mode sombre', 'Les Projets vides'], 1, 'Chaque message relit l\'historique : une conversation longue et chargée coûte plus cher à chaque échange.'),
-        q('Pour une agence de 6 personnes qui manipule des données clients, quelle offre privilégier ?', ['6 comptes Free', 'Un compte Pro partagé', 'Team', 'Aucune'], 2, 'Team apporte administration, facturation centralisée, et les données ne servent pas à l\'entraînement par défaut.'),
-        q('Où vérifier les prix actuels ?', ['Sur un forum', 'Sur la page officielle des offres', 'Dans cette leçon uniquement', 'Auprès d\'un concurrent'], 1, 'Les prix évoluent : la page officielle fait foi.')
+        q('Votre abonnement Pro donne-t-il des crédits pour l\'API ?', ['Non, l\'API se paie à part, à l\'usage', 'Oui, l\'usage de l\'API est inclus dans le quota', 'Oui, 20 $ de crédits API chaque mois', 'Seulement si vous payez à l\'année'], 0, 'L\'abonnement et l\'API sont deux comptes de facturation distincts.'),
+        q('Qu\'est-ce qui consomme le plus vite votre quota d\'usage ?', ['Les nombreuses conversations courtes ouvertes chaque jour', 'Le nombre de Projets créés, même s\'ils restent inutilisés', 'Les longs échanges avec de gros fichiers, sur un modèle puissant', 'Les styles personnalisés et la mémoire activés en permanence'], 2, 'Chaque message relit l\'historique : une conversation longue et chargée coûte plus cher à chaque échange.'),
+        q('Pour une agence de 6 personnes qui manipule des données clients, quelle offre privilégier ?', ['Un compte Max partagé entre les six', 'L\'offre Team, avec des comptes administrés', 'Six comptes Free, un par personne', 'Un compte Pro par personne, sans espace commun'], 1, 'Team apporte administration, facturation centralisée, et les données ne servent pas à l\'entraînement par défaut.'),
+        q('Où vérifier les prix actuels ?', ['Dans les tableaux de cette leçon, à jour à vie', 'Sur un comparatif publié par un blog tech', 'Dans la FAQ de l\'application mobile', 'Sur la page officielle des offres d\'Anthropic'], 3, 'Les prix évoluent : la page officielle fait foi.')
       ],
       script: script('5 min',
         'Free, Pro, Max, Team, API : la moitié des débutants paient pour la mauvaise offre. En cinq minutes, vous saurez laquelle prendre.',
@@ -112,10 +112,10 @@ ${MAJ}`,
         explication: 'Votre demande contient les éléments clés. Comparez la réponse obtenue à celle d\'une demande en une seule phrase : la différence est souvent nette.'
       },
       quiz: [
-        q('Que se passe-t-il quand vous modifiez un message déjà envoyé ?', ['La conversation est supprimée', 'Claude repart de ce point et crée une branche', 'Rien', 'Le message est envoyé deux fois'], 1, 'Les branches permettent de comparer plusieurs versions d\'une même demande.'),
-        q('Une conversation devient très longue et change de sujet. Que faire ?', ['Continuer indéfiniment', 'Demander un résumé et repartir dans une nouvelle conversation', 'Supprimer son compte', 'Passer en mode sombre'], 1, 'Le résumé de passation garde l\'essentiel et allège le contexte.'),
-        q('Quelle information devez-vous toujours vérifier vous-même ?', ['La mise en forme', 'Les chiffres, les dates, les mentions légales et les prix', 'Le nombre de paragraphes', 'Aucune'], 1, 'Claude peut se tromper avec assurance sur des faits précis.'),
-        q('Quel réflexe évite le plus de réponses génériques ?', ['Écrire en majuscules', 'Donner le contexte et inviter Claude à poser ses questions', 'Envoyer dix messages courts', 'Utiliser uniquement des mots-clés'], 1, 'Le contexte et les questions préalables orientent Claude vers votre vrai besoin.')
+        q('Que se passe-t-il quand vous modifiez un message déjà envoyé ?', ['La suite de la conversation est définitivement effacée', 'Claude corrige sa réponse sans tenir compte du reste', 'Le message corrigé s\'ajoute à la fin de l\'échange', 'Claude repart de ce point et crée une branche'], 3, 'Les branches permettent de comparer plusieurs versions d\'une même demande.'),
+        q('Une conversation devient très longue et change de sujet. Que faire ?', ['Continuer : plus il y a de contexte, meilleure est la réponse', 'Demander un résumé et repartir dans une nouvelle conversation', 'Supprimer les premiers messages pour alléger l\'échange', 'Passer à un modèle plus puissant dans la même conversation'], 1, 'Le résumé de passation garde l\'essentiel et allège le contexte.'),
+        q('Quelle information devez-vous toujours vérifier vous-même ?', ['Uniquement l\'orthographe, le fond est toujours fiable', 'Rien, dès lors que la recherche web était activée', 'Les chiffres, les dates, les mentions légales et les prix', 'Seulement la mise en forme et la longueur du texte'], 2, 'Claude peut se tromper avec assurance sur des faits précis.'),
+        q('Quel réflexe évite le plus de réponses génériques ?', ['Donner le contexte et inviter Claude à poser ses questions', 'Écrire la demande la plus courte possible, en mots-clés', 'Ajouter « réponds comme un expert » au début du message', 'Envoyer la même demande plusieurs fois de suite'], 0, 'Le contexte et les questions préalables orientent Claude vers votre vrai besoin.')
       ],
       script: script('6 min',
         'Le même outil, deux personnes, deux résultats complètement différents. La différence tient en cinq réflexes.',
@@ -177,10 +177,10 @@ ${MAJ}`,
         explication: 'Instructions complètes. Collez-les dans votre Projet client et testez avec une demande de contenu.'
       },
       quiz: [
-        q('Que partagent les conversations d\'un même Projet ?', ['Rien', 'Les instructions et la base de connaissances', 'Uniquement le titre', 'Le mot de passe'], 1, 'C\'est tout l\'intérêt : chaque conversation démarre avec le contexte du client.'),
-        q('Pourquoi un Projet par client ?', ['C\'est obligatoire', 'Pour que les instructions, documents et mémoires ne se mélangent pas', 'Pour payer moins cher', 'Pour aller plus vite à taper'], 1, 'L\'isolement par client évite les erreurs de ton ou d\'informations et protège la confidentialité.'),
-        q('Quelle base de connaissances donne les meilleurs résultats ?', ['Un seul énorme fichier non structuré', 'Des documents bien nommés et structurés par sections', 'Aucun document', 'Uniquement des images'], 1, 'Sur une base volumineuse, Claude recherche les passages utiles : la structure l\'aide à trouver le bon.'),
-        q('Que doivent contenir de bonnes instructions de projet ?', ['Uniquement le nom du client', 'Contexte, cible, ton, interdits, format et consigne de vérification', 'Une liste de mots-clés', 'Le prix de l\'abonnement'], 1, 'Ce sont les éléments qu\'on donnerait à un nouveau collaborateur.')
+        q('Que partagent les conversations d\'un même Projet ?', ['Uniquement le titre et la couleur du Projet', 'Les instructions et la base de connaissances', 'Le choix du modèle, imposé à toutes les conversations', 'Les fichiers créés par Claude, sans les instructions'], 1, 'C\'est tout l\'intérêt : chaque conversation démarre avec le contexte du client.'),
+        q('Pourquoi un Projet par client ?', ['Pour que les instructions, documents et mémoires ne se mélangent pas', 'Parce qu\'un Projet ne peut contenir qu\'un seul fichier de référence', 'Pour réduire le prix de l\'abonnement à chaque nouveau client', 'Parce que les conditions d\'utilisation l\'imposent aux agences'], 0, 'L\'isolement par client évite les erreurs de ton ou d\'informations et protège la confidentialité.'),
+        q('Quelle base de connaissances donne les meilleurs résultats ?', ['Un seul gros fichier qui regroupe absolument tout', 'Le plus de documents possible, même anciens ou en double', 'Des captures d\'écran plutôt que des fichiers texte', 'Des documents bien nommés et structurés par sections'], 3, 'Sur une base volumineuse, Claude recherche les passages utiles : la structure l\'aide à trouver le bon.'),
+        q('Que doivent contenir de bonnes instructions de projet ?', ['Le nom du client et une liste de mots-clés à placer', 'Une consigne unique : « sois créatif et professionnel »', 'Contexte, cible, ton, interdits, format et vérification', 'Toutes les réponses déjà rédigées, à recopier mot à mot'], 2, 'Ce sont les éléments qu\'on donnerait à un nouveau collaborateur.')
       ],
       script: script('6 min',
         'Si vous avez trois clients et une seule conversation, vous allez finir par écrire au fleuriste avec le ton du garagiste.',
@@ -237,10 +237,10 @@ ${MAJ}`,
         explication: 'Cahier des charges solide. Gardez cet Artifact : il rejoindra votre portfolio de démonstrations.'
       },
       quiz: [
-        q('Pourquoi un Artifact ne remplace-t-il pas un site client ?', ['Il est trop lent', 'Ce n\'est pas un hébergement professionnel : pas de domaine du client, pas de mentions légales, pas de maîtrise de l\'hébergement', 'Il ne gère pas le HTML', 'Il est payant'], 1, 'Pour livrer, on exporte et on met en ligne sur un hébergeur (module 3).'),
-        q('Comment itérer efficacement sur un Artifact complexe ?', ['Tout redemander d\'un coup', 'Des demandes ciblées, une à la fois, en vérifiant chaque version', 'Ne jamais le modifier', 'Recommencer une conversation à chaque fois'], 1, 'Les modifications ciblées évitent de casser ce qui fonctionnait.'),
-        q('Un Artifact qui intègre l\'IA est utilisé par un visiteur. Sur quel compte l\'usage est-il décompté ?', ['Sur le vôtre', 'Sur celui de la personne qui l\'utilise', 'Sur personne', 'Sur celui d\'Anthropic'], 1, 'L\'usage est décompté sur le compte de l\'utilisateur de l\'application.'),
-        q('Que ne faut-il jamais mettre dans un Artifact publié par lien ?', ['Des couleurs', 'Des données confidentielles', 'Un titre', 'Des boutons'], 1, 'Toute personne disposant du lien peut l\'ouvrir.')
+        q('Pourquoi un Artifact ne remplace-t-il pas un site client ?', ['Il ne sait produire que du texte mis en forme, pas une vraie page HTML', 'Il s\'efface automatiquement 24 heures après sa création', 'Pas de domaine du client, ni de mentions légales, ni d\'hébergement maîtrisé', 'Il est réservé aux comptes Enterprise et ne peut pas être partagé'], 2, 'Pour livrer, on exporte et on met en ligne sur un hébergeur (module 3).'),
+        q('Comment itérer efficacement sur un Artifact complexe ?', ['Tout redemander en un seul message très long à chaque fois', 'Recommencer une conversation neuve à chaque modification', 'Modifier le code à la main, Claude ne sait pas le reprendre', 'Des demandes ciblées, une à la fois, en vérifiant chaque version'], 3, 'Les modifications ciblées évitent de casser ce qui fonctionnait.'),
+        q('Un Artifact qui intègre l\'IA est utilisé par un visiteur. Sur quel compte l\'usage est-il décompté ?', ['Sur celui de la personne qui l\'utilise', 'Sur le vôtre, puisque vous l\'avez créé', 'Sur un crédit API facturé à l\'auteur', 'Sur aucun : l\'usage des Artifacts est gratuit'], 0, 'L\'usage est décompté sur le compte de l\'utilisateur de l\'application.'),
+        q('Que ne faut-il jamais mettre dans un Artifact publié par lien ?', ['Un formulaire de contact pour les visiteurs', 'Des données confidentielles ou personnelles', 'Le nom de votre agence ou votre logo', 'Des animations ou un mode sombre automatique'], 1, 'Toute personne disposant du lien peut l\'ouvrir.')
       ],
       script: script('7 min',
         'Ce simulateur de devis, je l\'ai créé en quatre messages. C\'est le genre d\'outil qui fait signer un artisan en rendez-vous.',
@@ -298,10 +298,10 @@ ${MAJ}`,
         explication: 'Brief précis : vous obtiendrez un rapport exploitable. Vérifiez les chiffres clés sur les sources avant de vous en servir.'
       },
       quiz: [
-        q('Pourquoi ouvrir les sources citées par Claude ?', ['Par politesse', 'Une source peut être ancienne, partiale ou mal résumée', 'Pour payer moins', 'Ce n\'est jamais utile'], 1, 'La citation n\'est pas une garantie : vérifiez les informations importantes.'),
-        q('Sur quel standard reposent les connecteurs ?', ['Le Bluetooth', 'Le Model Context Protocol (MCP)', 'Le format PDF', 'Le protocole FTP'], 1, 'MCP est un standard ouvert qui permet de brancher des outils à Claude.'),
-        q('Qu\'est-ce qu\'une injection de prompt ?', ['Une erreur de frappe', 'Des instructions cachées dans un contenu externe qui tentent de détourner l\'IA', 'Un type d\'abonnement', 'Une mise à jour'], 1, 'Un email ou une page peut contenir des consignes malveillantes : relisez avant toute action.'),
-        q('Quelle bonne pratique pour les connecteurs ?', ['Tout activer en permanence', 'N\'activer que ce qui sert et relire avant toute action d\'écriture', 'Partager ses accès', 'Ne jamais lire les autorisations'], 1, 'Le principe du moindre privilège limite les risques.')
+        q('Pourquoi ouvrir les sources citées par Claude ?', ['Pour que Claude enregistre que vous les avez lues', 'Une source peut être ancienne, partiale ou mal résumée', 'Pour que la recherche soit facturée au bon compte', 'Inutile : les sources citées sont vérifiées par Anthropic'], 1, 'La citation n\'est pas une garantie : vérifiez les informations importantes.'),
+        q('Sur quel standard reposent les connecteurs ?', ['L\'API REST propre à chaque éditeur', 'Le protocole OAuth, sans autre couche', 'Le format OpenAPI des anciens plugins', 'Le Model Context Protocol (MCP)'], 3, 'MCP est un standard ouvert qui permet de brancher des outils à Claude.'),
+        q('Qu\'est-ce qu\'une injection de prompt ?', ['Des instructions cachées dans un contenu externe pour détourner l\'IA', 'Un prompt trop long qui dépasse la fenêtre de contexte du modèle', 'L\'ajout automatique de vos instructions de Projet à chaque message', 'Une technique qui insère des exemples dans le prompt pour l\'améliorer'], 0, 'Un email ou une page peut contenir des consignes malveillantes : relisez avant toute action.'),
+        q('Quelle bonne pratique pour les connecteurs ?', ['Tout activer en permanence pour que Claude ait le plus de contexte', 'Accorder l\'écriture partout, la lecture seule bloque les tâches', 'N\'activer que ce qui sert et relire avant toute action d\'écriture', 'Partager ses identifiants avec Claude pour éviter les autorisations'], 2, 'Le principe du moindre privilège limite les risques.')
       ],
       script: script('6 min',
         'Claude peut lire votre agenda, vos emails et le web. C\'est puissant, et c\'est précisément pour ça qu\'il faut trois règles de sécurité.',
@@ -352,10 +352,10 @@ ${MAJ}`,
         explication: 'Politique claire. Vous la reprendrez dans vos contrats au module 7 et dans votre registre RGPD au module 8.'
       },
       quiz: [
-        q('Que se passe-t-il pour une conversation en mode incognito ?', ['Elle est publiée', 'Elle n\'est pas enregistrée dans l\'historique ni utilisée pour la mémoire', 'Elle est plus rapide', 'Elle est partagée avec l\'équipe'], 1, 'Le mode incognito sert aux échanges ponctuels que vous ne voulez pas conserver.'),
-        q('Comment créer un style personnalisé efficace ?', ['Avec un seul mot-clé', 'À partir de plusieurs exemples de textes représentatifs', 'En changeant la police', 'Impossible'], 1, 'Les exemples permettent à Claude d\'imiter un ton et une structure.'),
-        q('Quelles offres ne servent pas à l\'entraînement des modèles par défaut ?', ['Free uniquement', 'Team, Enterprise et l\'API', 'Pro uniquement', 'Aucune'], 1, 'Pour les offres individuelles, c\'est un réglage à choisir vous-même.'),
-        q('Avant d\'analyser des avis clients contenant des noms et téléphones, que faire ?', ['Rien', 'Retirer ou pseudonymiser les données personnelles inutiles', 'Les publier', 'Les envoyer par email à Claude'], 1, 'Minimisation des données : ne traitez que ce qui est nécessaire.')
+        q('Que se passe-t-il pour une conversation en mode incognito ?', ['Elle est chiffrée de bout en bout et invisible pour Anthropic', 'Elle utilise un modèle plus rapide, sans réflexion étendue', 'Elle n\'apparaît pas dans l\'historique et ne nourrit pas la mémoire', 'Elle est partagée avec les admins de l\'équipe pour contrôle'], 2, 'Le mode incognito sert aux échanges ponctuels que vous ne voulez pas conserver.'),
+        q('Comment créer un style personnalisé efficace ?', ['À partir de plusieurs textes représentatifs de votre ton', 'Avec un seul adjectif, par exemple « professionnel »', 'En choisissant une police et des couleurs dans les réglages', 'En copiant le style d\'un auteur célèbre, nommé dans le prompt'], 0, 'Les exemples permettent à Claude d\'imiter un ton et une structure.'),
+        q('Quelles offres ne servent pas à l\'entraînement des modèles par défaut ?', ['Pro et Max, contrairement au Free', 'Toutes, dès que la mémoire est coupée', 'Aucune, sauf contrat Enterprise signé', 'Team, Enterprise et l\'API'], 3, 'Pour les offres individuelles, c\'est un réglage à choisir vous-même.'),
+        q('Avant d\'analyser des avis clients contenant des noms et téléphones, que faire ?', ['Rien, puisque ces avis sont déjà publics sur Google', 'Retirer ou pseudonymiser les données personnelles inutiles', 'Activer le mode incognito, qui suffit à rester conforme', 'Demander à Claude d\'oublier les noms après l\'analyse'], 1, 'Minimisation des données : ne traitez que ce qui est nécessaire.')
       ],
       script: script('6 min',
         'Avant votre premier client, il y a un réglage que vous devez absolument vérifier. Et un autre qui va vous faire gagner des heures.',
@@ -415,10 +415,10 @@ ${MAJ}`,
         explication: 'Décision argumentée. Refaites ce test à chaque nouvelle génération de modèles.'
       },
       quiz: [
-        q('Quel modèle pour classer des milliers d\'avis clients via l\'API au moindre coût ?', ['Fable', 'Opus', 'Haiku', 'Aucun'], 2, 'Haiku est conçu pour les tâches simples en grand volume.'),
-        q('Que fait la réflexion étendue ?', ['Elle traduit', 'Elle laisse Claude réfléchir plus longtemps avant de répondre', 'Elle supprime les limites', 'Elle publie la réponse'], 1, 'Utile sur les problèmes complexes, superflue sur les tâches simples.'),
-        q('Comment choisir entre deux modèles pour votre offre ?', ['Prendre toujours le plus cher', 'Tester la même tâche et garder le moins coûteux qui atteint votre exigence', 'Tirer au sort', 'Prendre le plus récent sans tester'], 1, 'Le test sur votre propre tâche est le seul critère fiable.'),
-        q('À peu près combien de jetons pour 1 000 mots en français ?', ['10', '150', '1 500', '100 000'], 2, 'C\'est un ordre de grandeur utile pour estimer les coûts de l\'API.')
+        q('Quel modèle pour classer des milliers d\'avis clients via l\'API au moindre coût ?', ['Haiku', 'Opus', 'Fable', 'Sonnet'], 0, 'Haiku est conçu pour les tâches simples en grand volume.'),
+        q('Que fait la réflexion étendue ?', ['Elle agrandit la fenêtre de contexte pour les longs documents', 'Elle lance automatiquement une recherche web avant de répondre', 'Elle laisse Claude réfléchir plus longtemps avant de répondre', 'Elle relit et corrige la réponse une fois qu\'elle est écrite'], 2, 'Utile sur les problèmes complexes, superflue sur les tâches simples.'),
+        q('Comment choisir entre deux modèles pour votre offre ?', ['Prendre toujours le plus puissant, la qualité n\'a pas de prix', 'Tester la même tâche et garder le moins coûteux qui suffit', 'Prendre le plus récent, il est forcément meilleur partout', 'Prendre le moins cher, l\'écart de qualité est négligeable'], 1, 'Le test sur votre propre tâche est le seul critère fiable.'),
+        q('À peu près combien de jetons pour 1 000 mots en français ?', ['750', '1 000', '4 000', '1 500'], 3, 'C\'est un ordre de grandeur utile pour estimer les coûts de l\'API.')
       ],
       script: script('6 min',
         'Utiliser le modèle le plus puissant pour tout, c\'est comme livrer une pizza en camion. Voici comment choisir.',

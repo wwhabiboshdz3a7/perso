@@ -53,10 +53,10 @@ ${encart('info', 'Le test des trois conversations', '<p>Avant de construire quoi
     explication: 'Offre claire : un client comprend immédiatement s\'il est concerné.'
   },
   quiz: [
-    q('Quels modèles rapportent le plus vite au démarrage ?', ['Micro-SaaS et produits numériques', 'Agence, freelance et création de contenus', 'Formation en ligne uniquement', 'Aucun'], 1, 'Ils ne demandent pas d\'audience, seulement des clients.'),
-    q('Qu\'est-ce qu\'un « service produit » ?', ['Un logiciel', 'Un service au périmètre, délai et prix fixes', 'Un service gratuit', 'Un abonnement à Claude'], 1, 'Même livrable, même délai, même prix.'),
-    q('Que vendez-vous vraiment à un restaurant ?', ['De l\'intelligence artificielle', 'Un résultat concret : des avis répondus chaque matin', 'Des jetons d\'API', 'Un abonnement Claude'], 1, 'Le client achète un résultat, pas une technologie.'),
-    q('Personne ne pose de question après votre présentation. Que faire ?', ['Baisser le prix', 'Reformuler l\'offre ou changer de cible', 'Ajouter des fonctionnalités', 'Insister'], 1, 'Le test des trois conversations sert à ajuster avant de construire.')
+    q('Quels modèles rapportent le plus vite au démarrage ?', ['Agence, freelance et création de contenus', 'Micro-SaaS et produits numériques', 'Formation en ligne et communauté payante', 'Chaîne faceless monétisée par la publicité'], 0, 'Ils ne demandent pas d\'audience, seulement des clients.'),
+    q('Qu\'est-ce qu\'un « service produit » ?', ['Un logiciel vendu en abonnement mensuel', 'Une prestation facturée au temps passé', 'Un service au périmètre, délai et prix fixes', 'Un service gratuit offert avec un produit'], 2, 'Même livrable, même délai, même prix.'),
+    q('Que vendez-vous vraiment à un restaurant ?', ['Un accès à l\'intelligence artificielle pour son équipe', 'Un résultat concret : des avis répondus chaque matin', 'Un nombre d\'heures de travail assisté par Claude', 'Un abonnement Claude configuré à son nom'], 1, 'Le client achète un résultat, pas une technologie.'),
+    q('Personne ne pose de question après votre présentation. Que faire ?', ['Baisser le prix de moitié dès le lendemain', 'Ajouter des fonctionnalités à l\'offre', 'Relancer chaque personne jusqu\'à une réponse', 'Reformuler l\'offre ou changer de cible'], 3, 'Le test des trois conversations sert à ajuster avant de construire.')
   ],
   script: script('8 min',
     '« Je fais de l\'IA » ne vend rien. « Je réponds à vos avis Google chaque matin » vend. Voici comment passer de l\'un à l\'autre.',
@@ -125,10 +125,10 @@ ${encart('warn', 'Sans promesse de résultat', '<p>Fondez le prix sur la valeur 
     explication: 'Vous connaissez votre plancher : vous ne vendrez plus à perte.'
   },
   quiz: [
-    q('Pourquoi éviter de facturer à l\'heure quand on travaille avec Claude ?', ['C\'est interdit', 'Votre gain de temps ferait baisser votre chiffre d\'affaires', 'Les clients refusent', 'Pour payer moins de cotisations'], 1, 'Facturez le livrable ou la valeur.'),
-    q('Un client trouve le prix trop élevé. Que faire en premier ?', ['Baisser le prix', 'Réduire le périmètre en gardant la cohérence prix/contenu', 'Ajouter des options gratuites', 'Abandonner'], 1, 'Jamais de baisse de prix sans baisse de périmètre.'),
-    q('À quoi sert le niveau premium d\'une grille ?', ['À rien', 'À servir d\'ancre et à accueillir les clients exigeants', 'À être vendu à tous', 'À cacher le prix'], 1, 'Il rend le niveau recommandé raisonnable, et doit rester livrable.'),
-    q('Que couvre l\'abonnement d\'une automatisation ?', ['Rien', 'Hébergement, coûts d\'API, surveillance, ajustements', 'Uniquement la facture', 'La formation initiale'], 1, 'C\'est ce qui justifie un revenu récurrent.')
+    q('Pourquoi éviter de facturer à l\'heure quand on travaille avec Claude ?', ['La facturation horaire est interdite en micro-entreprise', 'Les clients refusent de payer le temps passé avec une IA', 'Pour payer moins de cotisations sur chaque facture', 'Votre gain de temps ferait baisser votre chiffre d\'affaires'], 3, 'Facturez le livrable ou la valeur.'),
+    q('Un client trouve le prix trop élevé. Que faire en premier ?', ['Baisser le prix sans changer le contenu de l\'offre', 'Réduire le périmètre en gardant la cohérence prix/contenu', 'Ajouter des options gratuites pour justifier le tarif', 'Proposer un paiement en dix fois sans frais pour convaincre'], 1, 'Jamais de baisse de prix sans baisse de périmètre.'),
+    q('À quoi sert le niveau premium d\'une grille ?', ['À être vendu à tous les clients dès le premier rendez-vous', 'À masquer le vrai prix, qui se négocie ensuite', 'À servir d\'ancre et à accueillir les clients exigeants', 'À couvrir les impayés des niveaux inférieurs'], 2, 'Il rend le niveau recommandé raisonnable, et doit rester livrable.'),
+    q('Que couvre l\'abonnement d\'une automatisation ?', ['Hébergement, coûts d\'API, surveillance, ajustements', 'Uniquement la licence d\'utilisation de vos prompts', 'La création initiale, payée en douze mensualités', 'La formation du client, renouvelée chaque mois'], 0, 'C\'est ce qui justifie un revenu récurrent.')
   ],
   script: script('9 min',
     'Si vous facturez à l\'heure et que Claude vous fait gagner la moitié de votre temps, vous venez de diviser votre revenu par deux. Voici comment fixer vos prix autrement.',
@@ -200,10 +200,10 @@ ${encart('legal', 'Prospection et RGPD', '<p>Les coordonnées d\'un commerçant 
     explication: 'Message personnalisé, utile et conforme : il donne envie de répondre.'
   },
   quiz: [
-    q('Quel est souvent le meilleur canal pour un commerce de quartier ?', ['Un email automatique en masse', 'Le passage en personne, en dehors des heures d\'affluence', 'Un appel à midi', 'Un SMS le dimanche'], 1, 'La relation de proximité compte beaucoup.'),
-    q('Sur quelles informations fonder l\'audit express ?', ['Des chiffres inventés', 'Des informations publiques observées', 'Les données personnelles des clients', 'Les avis d\'un concurrent'], 1, 'On reste factuel, à partir de ce que chacun peut voir.'),
-    q('Peut-on prospecter un commerçant par email sans son consentement préalable ?', ['Jamais', 'Oui, à son adresse professionnelle, pour un message lié à son activité, avec information et possibilité de s\'opposer', 'Oui, sans aucune condition', 'Seulement le dimanche'], 1, 'C\'est le régime de la prospection entre professionnels.'),
-    q('Que doit apporter une relance ?', ['Une nouvelle pression', 'Un élément nouveau : exemple, démonstration', 'Rien de plus', 'Une remise automatique'], 1, 'Chaque contact doit être utile au prospect.')
+    q('Quel est souvent le meilleur canal pour un commerce de quartier ?', ['Un email automatique envoyé à toute la rue en une fois', 'Le passage en personne, en dehors des heures d\'affluence', 'Un appel téléphonique pendant le coup de feu de midi', 'Un message privé sur Instagram, relancé chaque jour'], 1, 'La relation de proximité compte beaucoup.'),
+    q('Sur quelles informations fonder l\'audit express ?', ['Des informations publiques observées', 'Des estimations de chiffre d\'affaires', 'Les fichiers clients du commerçant', 'Les avis laissés chez ses concurrents'], 0, 'On reste factuel, à partir de ce que chacun peut voir.'),
+    q('Peut-on prospecter un commerçant par email sans son consentement préalable ?', ['Non, jamais : le consentement préalable est exigé, même entre pros', 'Oui, sans aucune condition, dès lors que son adresse est publique', 'Oui, mais seulement à son adresse personnelle, plus souvent lue', 'Oui, à son adresse pro, pour son activité, avec droit de s\'opposer'], 3, 'C\'est le régime de la prospection entre professionnels.'),
+    q('Que doit apporter une relance ?', ['Un rappel plus ferme de l\'offre initiale', 'Une remise automatique pour décider vite', 'Un élément nouveau : exemple, démonstration', 'La même proposition, envoyée à nouveau'], 2, 'Chaque contact doit être utile au prospect.')
   ],
   script: script('11 min',
     'Je prends une rue de Toulouse, dix commerces, et je vous montre comment j\'en fais une liste, dix audits express et une tournée en une semaine.',
@@ -278,10 +278,10 @@ ${encart('info', 'Le modèle dans les bonus', '<p>Un modèle de proposition comm
     explication: 'Section claire : le client peut choisir sans vous rappeler.'
   },
   quiz: [
-    q('Où se gagne une proposition commerciale ?', ['Dans la mise en page', 'Pendant l\'appel de découverte', 'Dans le prix le plus bas', 'Dans le nombre de pages'], 1, 'L\'appel fournit les mots et les enjeux du client.'),
-    q('Peut-on enregistrer l\'appel pour le faire transcrire ?', ['Oui, toujours', 'Oui, avec l\'accord explicite de l\'interlocuteur', 'Non, jamais', 'Seulement en visio'], 1, 'L\'accord explicite est indispensable.'),
-    q('Quelle longueur viser ?', ['Vingt pages', 'Deux pages au maximum', 'Une ligne', 'Aucune importance'], 1, 'Le client doit pouvoir décider vite.'),
-    q('Quand envoyer la proposition ?', ['Un mois après', 'Dans les 24 heures qui suivent l\'appel', 'Le jour de la signature', 'Jamais par écrit'], 1, 'L\'élan de l\'appel retombe vite.')
+    q('Où se gagne une proposition commerciale ?', ['Dans une mise en page soignée', 'Dans le prix, le plus bas possible', 'Pendant l\'appel de découverte', 'Dans le nombre d\'options proposées'], 2, 'L\'appel fournit les mots et les enjeux du client.'),
+    q('Peut-on enregistrer l\'appel pour le faire transcrire ?', ['Oui, toujours, c\'est un échange professionnel', 'Non, l\'enregistrement est interdit même avec accord', 'Oui, si l\'appel a lieu en visioconférence', 'Oui, avec l\'accord explicite de l\'interlocuteur'], 3, 'L\'accord explicite est indispensable.'),
+    q('Quelle longueur viser ?', ['Deux pages au maximum', 'Une vingtaine de pages', 'Une ligne dans un email', 'Dix pages, annexes comprises'], 0, 'Le client doit pouvoir décider vite.'),
+    q('Quand envoyer la proposition ?', ['Une semaine après, pour paraître posé', 'Dans les 24 heures qui suivent l\'appel', 'Le jour où le client relance lui-même', 'Juste avant l\'appel, pour le préparer'], 1, 'L\'élan de l\'appel retombe vite.')
   ],
   script: script('9 min',
     'Ma proposition tient sur deux pages, et le client peut dire oui en lisant seulement la dernière. Voici sa structure, et comment Claude la rédige à partir de mes notes.',
@@ -357,10 +357,10 @@ contenus réalistes générés par IA) sont mises en œuvre d'un commun accord l
     explication: 'Vos documents vous protègent et rassurent vos clients.'
   },
   quiz: [
-    q('Quelle indemnité forfaitaire doit figurer sur une facture entre professionnels ?', ['10 €', '40 € pour frais de recouvrement', '100 €', 'Aucune'], 1, 'L\'indemnité forfaitaire de recouvrement est de 40 €.'),
-    q('Que doit préciser une cession de droits d\'auteur ?', ['Rien', 'Les droits cédés, leur étendue, le territoire et la durée', 'Seulement le prix', 'La couleur du logo'], 1, 'Une cession imprécise est fragile.'),
-    q('Vous gérez le chatbot d\'un client, qui collecte des données de ses visiteurs. Quel contrat ajouter ?', ['Aucun', 'Un contrat de sous-traitance RGPD (article 28)', 'Un bail', 'Un contrat de travail'], 1, 'Vous traitez des données pour le compte du client.'),
-    q('Un particulier commande en ligne une prestation qui démarre tout de suite. Que faut-il ?', ['Rien', 'Sa demande expresse de commencer avant la fin du délai de rétractation', 'L\'accord de la CNIL', 'Une signature manuscrite'], 1, 'Le délai de rétractation de 14 jours s\'applique à la vente à distance.')
+    q('Quelle indemnité forfaitaire doit figurer sur une facture entre professionnels ?', ['10 € pour frais de relance postale', '40 € pour frais de recouvrement', '100 € pour frais de contentieux', '5 % du montant pour frais de retard'], 1, 'L\'indemnité forfaitaire de recouvrement est de 40 €.'),
+    q('Que doit préciser une cession de droits d\'auteur ?', ['Seulement le prix : le reste est implicite entre professionnels', 'La liste des outils d\'IA utilisés pour créer l\'œuvre', 'Rien : la remise des fichiers suffit à céder les droits', 'Les droits cédés, leur étendue, le territoire et la durée'], 3, 'Une cession imprécise est fragile.'),
+    q('Vous gérez le chatbot d\'un client, qui collecte des données de ses visiteurs. Quel contrat ajouter ?', ['Un contrat de sous-traitance RGPD (article 28)', 'Une déclaration préalable du chatbot à la CNIL', 'Aucun : les CGV du client couvrent déjà ce traitement', 'Un contrat de licence signé avec Anthropic'], 0, 'Vous traitez des données pour le compte du client.'),
+    q('Un particulier commande en ligne une prestation qui démarre tout de suite. Que faut-il ?', ['Rien : le délai de rétractation ne vaut pas pour les services', 'Une signature manuscrite sur un devis imprimé, scanné et renvoyé', 'Sa demande expresse de commencer avant la fin du délai de rétractation', 'L\'accord de la CNIL avant de démarrer toute prestation en ligne'], 2, 'Le délai de rétractation de 14 jours s\'applique à la vente à distance.')
   ],
   script: script('9 min',
     'Un client qui ne paie pas, une vidéo contestée, un chatbot qui collecte des données : trois situations, trois clauses qui vous sauvent.',
@@ -420,10 +420,10 @@ ${encart('legal', 'Ce qui est interdit', '<p>Rédiger ou acheter de faux avis, p
     explication: 'Des preuves solides et honnêtes : elles rassurent sans risque.'
   },
   quiz: [
-    q('Peut-on publier un témoignage rédigé par vous « au nom » d\'un client satisfait ?', ['Oui', 'Non, un témoignage doit être réel et publié avec l\'accord de son auteur', 'Oui, sans le nom', 'Oui, si le client a payé'], 1, 'Un faux témoignage est une pratique commerciale trompeuse.'),
-    q('Comment présenter un projet réalisé pour une entreprise fictive ?', ['Comme un vrai client', 'Avec la mention claire « projet de démonstration »', 'Sans rien dire', 'Avec un faux logo'], 1, 'La démonstration est une preuve de compétence, à condition d\'être signalée.'),
-    q('Que faire avant de publier une étude de cas ?', ['Rien', 'La faire valider par le client', 'Arrondir les chiffres', 'Ajouter des résultats'], 1, 'Le client valide son histoire et ses chiffres.'),
-    q('Quelle preuve rassure souvent le plus un client hésitant ?', ['Un logo célèbre', 'Une façon de travailler claire : étapes, délais, livrables', 'Un faux classement', 'Un compte à rebours'], 1, 'La clarté du processus réduit le risque perçu.')
+    q('Peut-on publier un témoignage rédigé par vous « au nom » d\'un client satisfait ?', ['Oui, si le client est réellement satisfait du travail rendu', 'Oui, à condition de ne mettre que ses initiales et sa ville', 'Non : un témoignage doit être réel et publié avec l\'accord de son auteur', 'Oui, s\'il a payé la prestation, ce qui prouve sa satisfaction'], 2, 'Un faux témoignage est une pratique commerciale trompeuse.'),
+    q('Comment présenter un projet réalisé pour une entreprise fictive ?', ['Avec la mention claire « projet de démonstration »', 'Comme un vrai client, sans préciser le contexte', 'Avec le logo d\'une vraie marque pour plus d\'impact', 'En petits caractères en bas de la dernière page'], 0, 'La démonstration est une preuve de compétence, à condition d\'être signalée.'),
+    q('Que faire avant de publier une étude de cas ?', ['Arrondir les chiffres à la hausse', 'Ajouter des résultats probables', 'Retirer son nom, sans lui en parler', 'La faire valider par le client'], 3, 'Le client valide son histoire et ses chiffres.'),
+    q('Quelle preuve rassure souvent le plus un client hésitant ?', ['Le logo d\'une grande marque, même pour un petit projet', 'Une façon de travailler claire : étapes, délais, livrables', 'Un classement « meilleur prestataire IA » acheté en ligne', 'Un compte à rebours qui limite l\'offre à 48 heures'], 1, 'La clarté du processus réduit le risque perçu.')
   ],
   script: script('8 min',
     'Je n\'ai jamais acheté un avis, et je ne le ferai jamais. Voici comment se construire des preuves solides quand on démarre, sans tricher.',
@@ -490,10 +490,10 @@ ${encart('warn', 'Pas d\'automatisation agressive', '<p>Les outils qui envoient 
     explication: 'Formulaire conforme : vos inscriptions sont solides juridiquement.'
   },
   quiz: [
-    q('Peut-on envoyer des emails de prospection à des particuliers sans leur consentement préalable ?', ['Oui', 'Non, il faut leur consentement préalable', 'Oui, avec un lien de désinscription', 'Oui, le week-end'], 1, 'Pour les particuliers, le consentement préalable est la règle.'),
-    q('Le double opt-in est-il obligatoire ?', ['Oui, en France', 'Non, mais il est recommandé pour prouver le consentement', 'Seulement pour les professionnels', 'Il est interdit'], 1, 'Il n\'est pas imposé, mais c\'est une bonne pratique.'),
-    q('Que privilégier sur LinkedIn ?', ['Des messages commerciaux automatiques', 'Des publications sur votre vrai travail et des commentaires utiles', 'Acheter des abonnés', 'Publier une fois par an'], 1, 'L\'automatisation agressive enfreint les conditions de LinkedIn.'),
-    q('Quel canal garder ?', ['Celui qui apporte le plus de likes', 'Celui qui apporte des clients', 'Tous', 'Le plus récent'], 1, 'Mesurez les rendez-vous et les clients, pas l\'audience.')
+    q('Peut-on envoyer des emails de prospection à des particuliers sans leur consentement préalable ?', ['Non, il faut leur consentement préalable', 'Oui, avec un lien de désinscription en bas', 'Oui, si leur adresse est publique en ligne', 'Oui, une seule fois, sans relance ensuite'], 0, 'Pour les particuliers, le consentement préalable est la règle.'),
+    q('Le double opt-in est-il obligatoire ?', ['Oui, le RGPD l\'impose en France depuis mai 2018', 'Oui, mais seulement pour les listes de plus de 1 000 contacts', 'Non, mais il est recommandé pour prouver le consentement', 'Non, et la CNIL le déconseille, car il fait perdre des inscrits'], 2, 'Il n\'est pas imposé, mais c\'est une bonne pratique.'),
+    q('Que privilégier sur LinkedIn ?', ['Des messages commerciaux automatiques à tous vos contacts', 'Des publications sur votre vrai travail et des commentaires utiles', 'L\'achat d\'abonnés pour paraître plus crédible dès le départ', 'Des publications virales génériques, sans lien avec votre offre'], 1, 'L\'automatisation agressive enfreint les conditions de LinkedIn.'),
+    q('Quel canal garder ?', ['Celui qui apporte le plus de likes', 'Tous, pour être présent partout', 'Le plus récent, moins concurrentiel', 'Celui qui apporte des clients'], 3, 'Mesurez les rendez-vous et les clients, pas l\'audience.')
   ],
   script: script('9 min',
     'Je n\'ai pas besoin d\'être partout. J\'ai besoin d\'un canal, tenu régulièrement, et d\'une liste email qui m\'appartient. Voici comment.',
