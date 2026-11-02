@@ -842,6 +842,14 @@ ${v.points.map(x => `<h3 style="margin-bottom:4px">${esc(x.titre)}</h3><p style=
         courant.fin = a.character_end_times_seconds[k];
       });
       if (courant) motsH.push(courant);
+      // La ponctuation isolée par une espace (« dort ? ») reste avec le mot qui précède.
+      for (let k = motsH.length - 1; k > 0; k--) {
+        if (/^[.,;:!?…»)]+$/.test(motsH[k].texte)) {
+          motsH[k - 1].texte += '\u00a0' + motsH[k].texte;
+          motsH[k - 1].fin = motsH[k].fin;
+          motsH.splice(k, 1);
+        }
+      }
       const duree = motsH.length ? motsH[motsH.length - 1].fin : 0;
       // 2. Sous-titres : 3 mots ou 1,2 s maximum, coupure après la ponctuation
       const blocs = [];

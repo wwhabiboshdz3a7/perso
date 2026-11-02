@@ -599,6 +599,14 @@ a.characters.forEach((c, i) => {
   m.fin = a.character_end_times_seconds[i];
 });
 if (m) mots.push(m);
+// La ponctuation séparée par une espace (« dort ? ») reste attachée au mot précédent.
+for (let i = mots.length - 1; i > 0; i--) {
+  if (/^[.,;:!?…»)]+$/.test(mots[i].texte)) {
+    mots[i - 1].texte += '\\u00a0' + mots[i].texte;
+    mots[i - 1].fin = mots[i].fin;
+    mots.splice(i, 1);
+  }
+}
 
 // 2. Blocs de 3 mots ou 1,2 s maximum, coupés après la ponctuation
 const blocs = [];

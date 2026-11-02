@@ -45,7 +45,7 @@ ${encart('info', 'Le test des trois conversations', '<p>Avant de construire quoi
     criteres: [
       mots(25),
       crit('Nomme une cible', /j'aide|pour les|destin[ée]|aux? (restaurants?|artisans?|commer|agences?|ind[ée]pendants?|tpe|pme)/i),
-      crit('Annonce un délai', /\d+\s*(jours?|semaines?|h|heures?|mois)\b/i),
+      crit('Annonce un délai', /(\d+|une?|deux|trois|quatre|cinq|six|sept|huit|dix|quinze)\s*(jours?|semaines?|h|heures?|mois)\b/i),
       crit('Indique un prix', /\d+\s*(€|euros?)|prix|tarif/i),
       crit('Décrit un livrable', /gr[aâ]ce [àa]|avec|via|livr|automatisation|site|vid[ée]os?|chatbot/i)
     ],
@@ -118,7 +118,7 @@ ${encart('warn', 'Sans promesse de résultat', '<p>Fondez le prix sur la valeur 
       crit('Fixe un objectif de revenu', /objectif|revenu|net|gagner/i),
       crit('Prend en compte les cotisations', /cotisations?|charges sociales|urssaf|%/i),
       crit('Prend en compte les frais', /frais|abonnements?|logiciels?|d[ée]penses/i),
-      crit('Compte les jours facturables', /\d+\s*jours?/i),
+      crit('Compte les jours facturables', /\d+\s*jours?|jours?[^.\d]{0,25}\d+/i),
       crit('Donne un tarif journalier', /\d+\s*€\s*(ht)?\s*(par|\/)\s*(jour|j)\b|tjm/i)
     ],
     solution: '<p>« Objectif : 30 000 € nets par an. Cotisations micro BNC d\'environ 25,6 % : il faut environ 40 300 € de chiffre d\'affaires. Frais : 3 500 € (Claude Max, n8n, ElevenLabs, comptable, matériel). Total : 43 800 €. Jours facturables : 110. Tarif minimum : environ 400 € HT par jour. »</p>',
