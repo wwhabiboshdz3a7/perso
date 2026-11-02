@@ -261,6 +261,9 @@ test('set(), get() et remove()', () => {
   assert.equal(el.style.transform, 'translateX(40px)');
   assert.equal(el.style.opacity, '0.3');
   assert.equal(get(el, 'x'), '40px');
+  set(el, { rotate: '0.5turn', width: '32px' });
+  assert.equal(get(el, 'rotate', 'deg'), '180deg');
+  assert.equal(get(el, 'width', 'rem'), '2rem');
   const a = animate(el, { x: 400, duration: 1000 });
   engine.tick(10);
   remove(el);

@@ -12,6 +12,7 @@ import { onScroll, ScrollObserver } from './scroll.js';
 import { drawable, motionPath } from './svg.js';
 import { resolveTargets } from './targets.js';
 import { propKind, normalizeProp, readValue } from './props.js';
+import { parseValue, convertUnit } from './values.js';
 import * as u from './utils.js';
 
 /** Arrête les animations en cours sur ces cibles (et seulement ces propriétés si précisées). */
@@ -26,15 +27,18 @@ export function remove(targets, props) {
   return list;
 }
 
-/** Lit la valeur actuelle d'une propriété (avec conversion d'unité facultative). */
+/** Lit la valeur actuelle d'une propriété, convertie dans `unit` si précisée (px, rem, %, deg…). */
 export function get(target, prop, unit) {
   const el = resolveTargets(target)[0];
   if (!el) return undefined;
   const p = normalizeProp(prop);
-  const v = readValue(el, p, propKind(el, p));
+  const kind = propKind(el, p);
+  const v = readValue(el, p, kind);
   if (!unit) return v;
-  const n = parseFloat(v);
-  return Number.isNaN(n) ? v : `${n}${unit}`;
+  const parsed = parseValue(v);
+  if (parsed.type !== 'num') return v;
+  const c = convertUnit(parsed, unit, el, p, kind === 'transform');
+  return `${u.fmt(c.n)}${unit}`;
 }
 
 export const utils = {

@@ -2865,10 +2865,13 @@ function get(target, prop, unit) {
   const el = resolveTargets(target)[0];
   if (!el) return void 0;
   const p = normalizeProp(prop);
-  const v = readValue(el, p, propKind(el, p));
+  const kind = propKind(el, p);
+  const v = readValue(el, p, kind);
   if (!unit) return v;
-  const n = parseFloat(v);
-  return Number.isNaN(n) ? v : `${n}${unit}`;
+  const parsed = parseValue(v);
+  if (parsed.type !== "num") return v;
+  const c = convertUnit(parsed, unit, el, p, kind === "transform");
+  return `${fmt(c.n)}${unit}`;
 }
 var utils = {
   clamp,

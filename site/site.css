@@ -45,7 +45,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--volt); outline-offset: 3px; border-radius: 4px; }
 h1, h2, h3, h4 { margin: 0; font-weight: 700; line-height: 1.1; }
 p { margin: 0 0 1em; }
-code, kbd, pre { font-family: var(--f-mono); }
+code, kbd, pre { font-family: var(--f-mono); font-variant-ligatures: none; }
 :not(pre) > code { font-size: .88em; padding: .1em .4em; border-radius: 6px; background: var(--ink-3); border: 1px solid var(--line); color: var(--paper); white-space: nowrap; }
 kbd { font-size: .8em; padding: .1em .45em; border-radius: 5px; border: 1px solid var(--line-2); border-bottom-width: 2px; background: var(--ink-3); }
 

@@ -51,7 +51,7 @@
 }
 
 /* —— Thème CodeMirror —— */
-.cm-s-kt.CodeMirror { background: var(--ink-2); color: var(--paper-2); font-family: var(--f-mono); font-size: 13.5px; line-height: 1.65; }
+.cm-s-kt.CodeMirror { background: var(--ink-2); color: var(--paper-2); font-family: var(--f-mono); font-variant-ligatures: none; font-size: 13.5px; line-height: 1.65; }
 .cm-s-kt .CodeMirror-gutters { background: var(--ink-2); border-right: 1px solid var(--line); }
 .cm-s-kt .CodeMirror-linenumber { color: #5f5a52; padding: 0 10px 0 6px; }
 .cm-s-kt .CodeMirror-cursor { border-left: 2px solid var(--volt); }
