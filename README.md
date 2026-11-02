@@ -160,15 +160,16 @@ Après une mise à jour du code, augmentez `VERSION` dans `sw.js` : les visiteur
 └── tests/
     ├── mock-openai.mjs         faux serveur compatible OpenAI (streaming, erreurs 401/429/500)
     ├── serveur-local.mjs       site + fonction sur /api/* avec les en-têtes de production
-    ├── chat-function.test.mjs  tests unitaires de la fonction
-    └── sse.test.mjs            tests de l'analyseur SSE
+    ├── chat-function.test.mjs  tests unitaires de la fonction (amont simulé)
+    ├── sse.test.mjs            tests de l'analyseur SSE
+    └── e2e.cjs                 tests de bout en bout Playwright (desktop 1440 px + mobile 390 px)
 ```
 
 ---
 
 ## Développer et tester en local
 
-Aucune dépendance à installer (Node 20+ pour les outils).
+Aucune dépendance pour le site ni pour la fonction (Node 20+ pour les outils ; Playwright uniquement pour les tests de bout en bout).
 
 ```bash
 # Site seul (mode « clé locale »)
@@ -186,6 +187,19 @@ ACCESS_PASSWORD_HASH='…' TOKEN_SECRET='…' node tests/serveur-local.mjs 9303
 # Tests unitaires (fonction Netlify, analyseur SSE)
 node --test tests/*.test.mjs
 ```
+
+### Tests de bout en bout (Playwright)
+
+Les API d'IA ne sont jamais appelées : le script démarre lui-même le site, le faux fournisseur et la fonction serveur, puis pilote Chromium.
+
+```bash
+npm install --no-save playwright && npx playwright install chromium
+node tests/e2e.cjs              # 21 scénarios, captures d'écran dans un dossier temporaire
+node tests/e2e.cjs mémoire      # filtre sur le nom du scénario
+E2E_PORT=9400 E2E_SHOTS=./captures node tests/e2e.cjs   # autres ports / dossier de captures
+```
+
+Scénarios couverts : configuration du fournisseur, envoi et rendu progressif, arrêt, régénération et versions, modification d'un message, persistance après rechargement, recherche, épingles / renommage / suppression, Markdown + code + KaTeX, charge XSS neutralisée, raisonnement, mémoire et souvenirs proposés, pièces jointes (texte et image), export / import, messages d'erreur (clé refusée, quota, panne, modèle inconnu, flux coupé), coffre chiffré, voix (API simulées), modèles « / », réglages, hors ligne via le service worker, mode serveur (mot de passe faux puis juste, flux relayé, session expirée), mobile 390 px sans défilement horizontal, thème clair. Le script échoue aussi à la moindre erreur dans la console.
 
 ---
 
