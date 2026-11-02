@@ -71,6 +71,8 @@ function track(page, label) {
   page.on('console', (m) => {
     if (m.type() !== 'error' && m.type() !== 'warning') return;
     const t = m.text();
+    // Avertissement émis par Playwright lui-même quand un test bloque le service worker.
+    if (/Service Worker registration blocked by Playwright/.test(t)) return;
     if (expectNetErrors && /Failed to load resource|ERR_INTERNET_DISCONNECTED|net::ERR/.test(t)) return;
     consoleErrors.push(`[${label}] ${m.type()}: ${t}`);
   });
@@ -519,11 +521,15 @@ async function noHorizontalScroll(page) {
     await page.setInputFiles('[data-import-file]', jsonPath);
     await page.waitForSelector('.toast >> text=Import terminé');
     // La notification est lisible au-dessus de la fenêtre modale (couche supérieure).
+    // Le corps du toast laisse passer les clics (pointer-events: none) : on le rend « touchable »
+    // le temps de la mesure pour vérifier qu'il est bien empilé au-dessus du dialogue.
     const onTop = await page.evaluate(() => {
       const t = [...document.querySelectorAll('.toast')].find((x) => /Import terminé/.test(x.textContent));
       const r = t.getBoundingClientRect();
+      t.style.pointerEvents = 'auto';
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      return !!hit && t.contains(hit);
+      t.style.pointerEvents = '';
+      return !!hit && t.contains(hit) && document.getElementById('toasts').matches(':popover-open');
     });
     assert.ok(onTop, 'toast visible au-dessus de la fenêtre des réglages');
     // Le fichier contient aussi des réglages : restauration proposée.
@@ -533,6 +539,13 @@ async function noHorizontalScroll(page) {
     assert.equal(await page.locator('.conv-item').count(), 2);
     await page.waitForSelector('#dlg-settings[open]');
     assert.match(await page.locator('[data-import-status]').innerText().catch(() => ''), /^$|Import/);
+    // Le bouton d'action d'une notification reste cliquable pendant qu'une fenêtre est ouverte.
+    await page.evaluate(async () => {
+      const { toast } = await import('./js/ui/dialogs.js');
+      toast('Essai d’action', { action: { label: 'Agir', fn: () => { window.__acted = true; } } });
+    });
+    await page.click('.toast button:has-text("Agir")', { timeout: 3000 });
+    assert.ok(await page.evaluate(() => window.__acted), 'action de notification cliquable au-dessus d’une fenêtre');
     // Import du Markdown exporté plus haut : conversation recréée avec les bons rôles.
     await page.click('#tab-donnees');
     await page.setInputFiles('[data-import-file]', mdPath);

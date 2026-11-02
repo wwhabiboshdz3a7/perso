@@ -7,7 +7,8 @@ import { esc, icon, html } from '../util.js';
  * body/foot : chaînes HTML (déjà échappées) ; renvoie l'élément <dialog>.
  */
 export function openDialog({ id, title, sub = '', body = '', foot = '', size = '', label, onClose, tabs = '' }) {
-  document.getElementById(id)?.remove();
+  const old = document.getElementById(id);
+  if (old) { rescueToasts(old); old.remove(); }
   const titleId = `${id}-title`;
   const d = html(`<dialog class="modal ${size}" id="${id}" aria-labelledby="${titleId}">
     <div class="modal-head">
@@ -31,8 +32,10 @@ export function openDialog({ id, title, sub = '', body = '', foot = '', size = '
     }
   });
   d.addEventListener('close', () => {
+    // Les notifications hébergées par cette fenêtre passent à la suivante (ou au document).
+    raiseToasts(d);
     onClose?.(d.returnValue);
-    setTimeout(() => d.remove(), 0);
+    setTimeout(() => { rescueToasts(d); d.remove(); }, 0);
   });
   d.showModal();
   raiseToasts();
@@ -73,19 +76,47 @@ export function promptDialog({ title, label, value = '', confirm = 'Enregistrer'
 }
 
 /* ---------- Notifications ----------
-   Le conteneur est un « popover » : il passe dans la couche supérieure (top layer), donc
-   au-dessus des fenêtres modales ouvertes, au lieu d'être masqué par leur fond. */
+   Le conteneur est un « popover » : il passe dans la couche supérieure (top layer), au-dessus
+   des fenêtres modales ouvertes. Une fenêtre modale rend inerte tout ce qui est hors d'elle
+   (ni clic, ni lecteur d'écran) : le conteneur est donc déplacé dans la fenêtre ouverte la plus
+   haute, puis rendu au document à sa fermeture. */
 const popoverOK = typeof HTMLElement !== 'undefined' && 'showPopover' in HTMLElement.prototype;
 
 function toastBox() { return document.getElementById('toasts'); }
 
-/** Remet les notifications au premier plan (après l'ouverture d'une fenêtre modale). */
-export function raiseToasts() {
+function isOpenPopover(box) {
+  try { return box.matches(':popover-open'); } catch { return false; }
+}
+
+/** Fenêtre modale ouverte la plus récente (hors `exclude`, en cours de fermeture). */
+function topDialog(exclude) {
+  const open = Array.from(document.querySelectorAll('dialog[open]')).filter((d) => d !== exclude);
+  return open[open.length - 1] || null;
+}
+
+/** Sort le conteneur d'une fenêtre sur le point d'être retirée du document. */
+function rescueToasts(dialog) {
   const box = toastBox();
-  if (!box || !popoverOK || !box.children.length) return;
+  if (box && dialog.contains(box)) {
+    if (popoverOK && isOpenPopover(box)) box.hidePopover();
+    document.body.appendChild(box);
+    raiseToasts(dialog);
+  }
+}
+
+/** Place les notifications au premier plan, dans la fenêtre modale active s'il y en a une. */
+export function raiseToasts(exclude = null) {
+  const box = toastBox();
+  if (!box) return;
+  const host = topDialog(exclude) || document.body;
   try {
-    if (box.matches(':popover-open')) box.hidePopover();
-    box.showPopover();
+    if (box.parentElement !== host) {
+      if (popoverOK && isOpenPopover(box)) box.hidePopover();
+      host.appendChild(box);
+    } else if (!box.children.length || isOpenPopover(box)) {
+      return; // déjà au bon endroit
+    }
+    if (popoverOK && box.children.length && !isOpenPopover(box)) box.showPopover();
   } catch { /* popover indisponible */ }
 }
 
@@ -93,7 +124,7 @@ function syncToastBox() {
   const box = toastBox();
   if (!box || !popoverOK) return;
   try {
-    if (!box.children.length && box.matches(':popover-open')) box.hidePopover();
+    if (!box.children.length && isOpenPopover(box)) box.hidePopover();
   } catch { /* ignoré */ }
 }
 

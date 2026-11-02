@@ -9,16 +9,19 @@ Application web progressive (PWA) installable, 100 % statique, publiable telle q
 ## Fonctionnalités
 
 **Conversation**
-- Réponses en streaming (SSE) avec bouton **Arrêter** (ou Échap), **Régénérer** (les versions précédentes restent consultables : ‹ 1/2 ›), **Modifier** un message et repartir de là, **Copier**, **Lire à voix haute**.
-- Rendu Markdown sûr : titres, listes, tableaux, citations, blocs de code colorés avec bouton « Copier », formules mathématiques (KaTeX, `$…$`, `$$…$$`, `\(…\)`, `\[…\]`).
+- Réponses en streaming (SSE) avec bouton **Arrêter** (ou Échap ; un double-clic sur Envoyer n'arrête pas la réponse), **Régénérer** (les versions précédentes restent consultables : ‹ 1/2 ›), **Modifier** un message et repartir de là, **Copier**, **Lire à voix haute**.
+- Rendu incrémental pendant le streaming : seuls les blocs encore ouverts sont recalculés, le code n'est coloré qu'une fois son bloc fermé ; les longues conversations n'affichent que les 40 derniers messages (« Afficher les messages précédents »).
+- Une réponse coupée (flux fermé sans `[DONE]` ni `finish_reason`, longueur maximale atteinte) est signalée « réponse incomplète », avec **Continuer** et **Réessayer**. Un fournisseur muet déclenche une erreur claire après un délai d'inactivité réglable (60 s par défaut, 3 min pour le premier mot d'un modèle local).
+- Rendu Markdown sûr : titres, listes, tableaux (alignement des colonnes respecté), citations, blocs de code colorés avec bouton « Copier », formules mathématiques (KaTeX, `$…$`, `$$…$$`, `\(…\)`, `\[…\]`).
 - Modèles « qui réfléchissent » (DeepSeek R1, Qwen 3, gpt-oss…) : le raisonnement (`reasoning_content` ou balises `<think>`) est rangé dans un bloc « Réflexion » repliable.
 - Pièces jointes : fichiers texte et code (contenu injecté dans le message), images (envoyées en data URL aux modèles « vision », redimensionnées à 1 600 px). Glisser-déposer et collage acceptés.
 - Dictée vocale (Web Speech API, fr-FR) et lecture (speechSynthesis, voix et vitesse réglables).
 
 **Organisation**
 - Conversations enregistrées localement (IndexedDB) : barre latérale groupée par date, recherche plein texte, renommage, épingles, suppression.
-- Export / import : JSON complet (conversations, mémoire, bibliothèque, réglages — **jamais les clés**) et Markdown lisible.
-- Bibliothèque de **modèles de requêtes** appelés avec `/` (`/resumer`, `/email`, `/plan`, `/script`, `/seo`…), modifiables, avec champs `{{à compléter}}`.
+- Export / import : JSON complet (conversations, mémoire, bibliothèque, réglages — **jamais les clés**, et les messages d'erreur repassent au masquage) et Markdown lisible. Les deux formats se réimportent : un fichier `.md` exporté recrée ses conversations (rôles, titres, modes) ; à l'import d'un JSON, la restauration des réglages (profil, assistant, préférences) est proposée, la connexion n'étant jamais modifiée. Les données importées sont validées (textes, images en base64 vérifiées en entier).
+- Plusieurs onglets ouverts : chaque écriture est signalée aux autres onglets (BroadcastChannel) et porte un numéro de révision ; deux onglets qui écrivent la même conversation voient leurs messages fusionnés, et une conversation supprimée ailleurs n'est jamais recréée.
+- Bibliothèque de **requêtes enregistrées** appelées avec `/` (`/resumer`, `/email`, `/plan`, `/script`, `/seo`…), modifiables, avec champs `{{à compléter}}` ; un brouillon déjà saisi est placé dans le premier champ au lieu d'être écrasé.
 
 **Personnalité et mémoire**
 - Nom, avatar (5 glyphes lumineux, initiale ou image), ton (chaleureux, professionnel, direct, pédagogue, enjoué, concis).
@@ -28,7 +31,7 @@ Application web progressive (PWA) installable, 100 % statique, publiable telle q
 **Confort**
 - Température, longueur maximale, limite de contexte (les plus anciens échanges sont retirés au-delà), estimation des jetons en direct.
 - Thème clair / sombre / système, police de lecture sans ou serif, trois tailles de texte.
-- Raccourcis clavier (`Ctrl/⌘ + /` pour la liste), responsive jusqu'à 390 px, accessibilité AA, `prefers-reduced-motion` respecté.
+- Raccourcis clavier (`Ctrl/⌘ + /` pour la liste), responsive jusqu'à 390 px, accessibilité AA, `prefers-reduced-motion` respecté, textes arabes ou hébreux affichés de droite à gauche (`dir="auto"` sur la saisie, les bulles et chaque bloc de réponse).
 - PWA installable ; le service worker met l'interface en cache : **les conversations restent consultables hors ligne**.
 
 ---
@@ -98,20 +101,24 @@ node scripts/hash-password.mjs "votre mot de passe d'accès"
 
 Puis dans Nour : **Réglages → Connexion → Serveur sécurisé**, saisissez le mot de passe et choisissez un modèle (ou laissez vide pour `PROVIDER_DEFAULT_MODEL`).
 
+**Révocation des sessions.** La clé de signature des jetons est dérivée de `TOKEN_SECRET` *et* de `ACCESS_PASSWORD_HASH` : changer le mot de passe d'accès (nouvelle empreinte) ou `TOKEN_SECRET`, puis redéployer, **déconnecte immédiatement tous les appareils**. « Se déconnecter » dans Nour n'efface que le jeton de l'appareil en cours. Un jeton refusé par le serveur est oublié et le formulaire de connexion réapparaît.
+
+**Durée des réponses.** Une fonction Netlify a une durée d'exécution limitée (de l'ordre de quelques dizaines de secondes selon l'offre, davantage pour le streaming mais pas illimitée). Une très longue génération (modèle de raisonnement, réponse de plusieurs milliers de mots) peut donc être coupée : Nour l'indique (« réponse incomplète ») et propose **Continuer**. Pour ces usages, préférez le mode « Clé locale », qui appelle le fournisseur directement depuis le navigateur.
+
 > La limitation de débit intégrée est conservée en mémoire par instance de fonction : simple et efficace contre les abus courants. Pour une limite stricte et globale, ajoutez une règle de *rate limiting* Netlify (configuration `rateLimit` de la fonction ou règle de trafic du site).
 
 ---
 
 ## Déploiement sur Netlify
 
-1. **Add new site → Import an existing project** → ce dépôt, branche `assistant`.
+1. Dans Netlify, ajoutez un nouveau projet importé depuis Git (*Add new project → Import an existing project*) → ce dépôt, branche `assistant`.
 2. Build command : *(vide)* · Publish directory : `.` · Functions directory : `netlify/functions` (déjà définis dans `netlify.toml`).
-3. *(Mode serveur uniquement)* Site configuration → **Environment variables** : ajoutez les variables ci-dessus, puis redéployez.
+3. *(Mode serveur uniquement)* Dans les **variables d'environnement du projet** (*Project configuration → Environment variables*) : ajoutez les variables ci-dessus, puis redéployez.
 4. Ouvrez le site, choisissez un fournisseur, collez votre clé (ou connectez-vous au serveur), testez la connexion : c'est prêt. Sur mobile, « Ajouter à l'écran d'accueil » installe l'application.
 
 `netlify.toml` fixe aussi les en-têtes de sécurité (CSP stricte avec `connect-src 'self' https: http://localhost:* http://127.0.0.1:*` pour joindre les fournisseurs et les serveurs locaux, `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy: no-referrer`) et masque `tests/`, `scripts/` et `netlify/`.
 
-Après une mise à jour du code, augmentez `VERSION` dans `sw.js` : les visiteurs verront « Nouvelle version disponible — Mettre à jour ».
+Mises à jour : le service worker sert la page, les scripts et les styles depuis son cache (démarrage instantané, hors ligne), puis les revalide en arrière-plan à chaque visite (*stale-while-revalidate*). Un déploiement n'exige donc aucune étape manuelle : HTML et JS d'une même visite viennent toujours du même instantané, et dès qu'un fichier a changé, les visiteurs voient « Une nouvelle version de Nour est disponible — Recharger ». `VERSION` dans `sw.js` ne sert qu'à renouveler entièrement le cache (par exemple si la liste des fichiers pré-cachés change). Seule une réponse HTML 200 de la page d'accueil remplace la copie hors ligne d'`index.html`.
 
 ---
 
@@ -121,7 +128,7 @@ Après une mise à jour du code, augmentez `VERSION` dans `sw.js` : les visiteur
 - Liens : uniquement `http(s)`, `mailto`, `tel` et ancres, ouverts avec `rel="noopener noreferrer nofollow"`.
 - **Les images distantes ne sont jamais chargées automatiquement** (elles apparaissent comme des liens) : pas de pixel espion ni d'exfiltration par URL d'image.
 - CSP sans script en ligne ni `eval` ; toutes les bibliothèques sont servies depuis le site (`vendor/`).
-- La clé n'apparaît jamais dans la console, les messages d'erreur (masquage systématique), les exports ni les journaux de la fonction.
+- La clé n'apparaît jamais dans la console, les messages d'erreur, les exports ni les journaux de la fonction : les valeurs exactes des clés enregistrées (quel que soit leur format) et les formats usuels (`sk-…`, `gsk_…`, `hf_…`, `Bearer …`) sont masqués, y compris quand le fournisseur recopie la clé dans sa réponse d'erreur.
 
 ---
 
@@ -152,7 +159,8 @@ Après une mise à jour du code, augmentez `VERSION` dans `sw.js` : les visiteur
 │   ├── voice.js                dictée et lecture
 │   ├── exporter.js             export/import JSON & Markdown, estimation des jetons
 │   ├── keystore.js, crypto.js  coffre des clés (clair ou AES-GCM/PBKDF2)
-│   ├── db.js, settings.js      IndexedDB, réglages
+│   ├── db.js, settings.js      IndexedDB (écritures atomiques avec révision), réglages
+│   ├── bus.js, sync.js         synchronisation entre onglets (BroadcastChannel, fusion)
 │   └── ui/                     dialogues, réglages, panneaux, fil, sélecteur de modèle, erreurs
 ├── vendor/                     marked 18.1.2, DOMPurify 3.4.17, highlight.js 11.12.0, KaTeX 0.19.1 (+ licences)
 ├── netlify/functions/chat.mjs  proxy sécurisé (Functions v2, streaming)
@@ -162,6 +170,8 @@ Après une mise à jour du code, augmentez `VERSION` dans `sw.js` : les visiteur
     ├── serveur-local.mjs       site + fonction sur /api/* avec les en-têtes de production
     ├── chat-function.test.mjs  tests unitaires de la fonction (amont simulé)
     ├── sse.test.mjs            tests de l'analyseur SSE
+    ├── sync.test.mjs           tests de la fusion entre onglets
+    ├── markdown-import.test.mjs tests de l'import Markdown
     └── e2e.cjs                 tests de bout en bout Playwright (desktop 1440 px + mobile 390 px)
 ```
 
@@ -184,7 +194,7 @@ node tests/mock-openai.mjs 9302
 PROVIDER_BASE_URL=http://127.0.0.1:9302/v1 PROVIDER_API_KEY=cle-valide \
 ACCESS_PASSWORD_HASH='…' TOKEN_SECRET='…' node tests/serveur-local.mjs 9303
 
-# Tests unitaires (fonction Netlify, analyseur SSE)
+# Tests unitaires (fonction Netlify, analyseur SSE, fusion entre onglets, import Markdown)
 node --test tests/*.test.mjs
 ```
 
@@ -194,12 +204,12 @@ Les API d'IA ne sont jamais appelées : le script démarre lui-même le site, le
 
 ```bash
 npm install --no-save playwright && npx playwright install chromium
-node tests/e2e.cjs              # 21 scénarios, captures d'écran dans un dossier temporaire
+node tests/e2e.cjs              # 34 scénarios, captures d'écran dans un dossier temporaire
 node tests/e2e.cjs mémoire      # filtre sur le nom du scénario
 E2E_PORT=9400 E2E_SHOTS=./captures node tests/e2e.cjs   # autres ports / dossier de captures
 ```
 
-Scénarios couverts : configuration du fournisseur, envoi et rendu progressif, arrêt, régénération et versions, modification d'un message, persistance après rechargement, recherche, épingles / renommage / suppression, Markdown + code + KaTeX, charge XSS neutralisée, raisonnement, mémoire et souvenirs proposés, pièces jointes (texte et image), export / import, messages d'erreur (clé refusée, quota, panne, modèle inconnu, flux coupé), coffre chiffré, voix (API simulées), modèles « / », réglages, hors ligne via le service worker, mode serveur (mot de passe faux puis juste, flux relayé, session expirée), mobile 390 px sans défilement horizontal, thème clair. Le script échoue aussi à la moindre erreur dans la console.
+Scénarios couverts : configuration du fournisseur, envoi et rendu progressif, arrêt, régénération et versions, modification d'un message, persistance après rechargement, recherche, épingles / renommage / suppression, Markdown + code + KaTeX, charge XSS neutralisée, raisonnement, mémoire et souvenirs proposés, pièces jointes (texte et image), export / import, messages d'erreur (clé refusée, quota, panne, modèle inconnu, flux coupé), coffre chiffré, voix (API simulées), modèles « / », réglages, hors ligne via le service worker (et copie hors ligne qui reste la page de l'application), KaTeX rechargé après un échec, mode serveur (mot de passe faux puis juste, flux relayé, session refusée, fonction non configurée), longue réponse (rendu incrémental, fil réactif), flux coupé sans fin, délai d'attente, clé sans préfixe masquée, plusieurs onglets, ancre malformée, double-clic, collage texte + image, notifications au-dessus des fenêtres et de la zone de saisie, mobile 390 px sans défilement horizontal, thème clair. Le script échoue aussi à la moindre erreur dans la console.
 
 ---
 
@@ -216,7 +226,7 @@ Scénarios couverts : configuration du fournisseur, envoi et rendu progressif, a
 | Exporter la conversation | Ctrl/⌘ + Maj + E |
 | Arrêter la génération | Échap |
 | Modifier le dernier message | ↑ (zone de saisie vide) |
-| Modèles de requêtes | `/` en début de message |
+| Requêtes enregistrées | `/` en début de message |
 | Aide | Ctrl/⌘ + / |
 
 ---
