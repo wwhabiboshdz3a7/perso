@@ -13,7 +13,7 @@ window.LEVIER_CONFIG = {
     nom: 'Levier',
     // Sous-titre descriptif : l'usage du nom « Claude » est purement descriptif.
     sousTitre: 'La formation complète pour gagner de l\'argent avec Claude et l\'automatisation vidéo',
-    url: '',                      // À COMPLÉTER : https://votre-domaine.fr (balises de partage, certificats)
+    url: '',                      // À COMPLÉTER : https://votre-domaine.fr (adresse publique du site, utilisée dans vos liens de paiement et emails)
     langue: 'fr',
     devise: 'EUR',
     dureeAcces: 'Accès à vie à la formation et à ses mises à jour', // ou « Accès 12 mois », etc.

@@ -10,6 +10,8 @@
     "serveur": "node outils/serveur-local.mjs",
     "codes": "node outils/generer-codes.mjs",
     "verifier": "node outils/verifier-contenu.mjs",
-    "e2e": "node tests/e2e.mjs"
+    "e2e": "node tests/e2e.mjs",
+    "programme": "node outils/generer-programme.mjs",
+    "n8n": "node outils/n8n/generer.mjs"
   }
 }
