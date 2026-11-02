@@ -44,6 +44,10 @@ for (const d of defis) {
     validation: d.validation
   };
   if (d.format) pub.format = d.format;
+  // vignette de la carte de l'arène : celle de la première image de scène du défi, si elle existe
+  const img0 = (d.ressources || []).find(r => (r.type === 'scene' || r.type === 'image') && typeof r.src === 'string' && r.src.startsWith('assets/ctf/scenes/'));
+  const mini = d.miniature || (img0 && ['geoint', 'inverse'].includes(d.categorie) && 'assets/ctf/scenes/mini/' + path.basename(img0.src).replace(/\.\w+$/, '.jpg'));
+  if (mini && await stat(path.join(RACINE, mini)).catch(() => null)) pub.miniature = mini;
   const wu = { html: d.writeup, retenir: d.retenir || '' };
   if (d.validation === 'flag') {
     if (!d.flags || !d.flags.length) erreurs.push(`${ou} aucun flag`);

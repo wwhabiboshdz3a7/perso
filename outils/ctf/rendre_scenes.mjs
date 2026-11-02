@@ -60,6 +60,16 @@ for (const s of scenes) {
     await writeFile(path.join(SORTIE, `${nom}.${fmt}`), octets);
     console.log(`✓ ${nom}.${fmt} (${(octets.length / 1024).toFixed(0)} Ko)`);
     n++;
+    if (v.miniature) {
+      // vignette légère pour les cartes de l'arène (480 px de large)
+      const lm = 480, hm = Math.round(480 * (v.cadre ? v.cadre[3] / v.cadre[2] : h / l));
+      await page.setViewportSize({ width: lm, height: hm });
+      await page.setContent(`<!doctype html><html><body style="margin:0"><img id="i" src="data:image/${fmt === 'png' ? 'png' : 'jpeg'};base64,${octets.toString('base64')}" style="display:block;width:${lm}px;height:${hm}px;object-fit:cover"></body></html>`);
+      await page.waitForFunction(() => document.getElementById('i').complete);
+      const mini = await page.screenshot({ type: 'jpeg', quality: 74 });
+      await mkdir(path.join(SORTIE, 'mini'), { recursive: true });
+      await writeFile(path.join(SORTIE, 'mini', `${nom}.jpg`), mini);
+    }
   }
 }
 await navigateur.close();

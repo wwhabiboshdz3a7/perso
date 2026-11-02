@@ -140,7 +140,7 @@ Capture : 2026-03-04_chirp_ines_vldr.png · SHA-256 : 9f2c…`)}
               { label: 'Une URL complète', re: /url\s*:[^\n]*https?:\/\/\S+/i },
               { label: 'La méthode ou l\'outil utilisé', re: /m[ée]thode\s*:[^\n]{8,}/i },
               { label: 'Un fait observé', re: /fait\s*:[^\n]{8,}/i },
-              { label: 'Une interprétation avec une cote (ex. B2)', re: /interpr[ée]tation\s*:[^\n]*\b[A-F][1-6]\b/ },
+              { label: 'Une interprétation avec une cote (ex. B2)', re: /[Ii]nterpr[ée]tation\s*:[^\n]*\b[A-F][1-6]\b/ },
               { label: 'La capture est référencée (nom de fichier ou empreinte)', re: /capture\s*:[^\n]*(\.png|\.jpg|\.pdf|sha|hash|empreinte)/i },
               motsMin(35)
             ],
@@ -544,7 +544,7 @@ out body;`)}
               { label: 'Tu supprimes ou ne conserves pas l\'information', re: /(supprim|efface|ne (la )?(garde|conserve)|pas (la )?(garder|conserver))/i },
               motsMin(50)
             ],
-            solution: '<p>Je fais : je réponds au défi sans mentionner l\'adresse, je préviens mon ami que la photo révèle l\'adresse d\'une famille et lui conseille de la retirer ou de la flouter, puis je supprime mes notes à ce sujet. Je ne fais pas : publier, partager ou rechercher davantage cette famille. Principes : minimisation (l\'adresse ne sert pas la question), ne pas nuire (des tiers non consentants), proportionnalité (un jeu ne justifie aucune intrusion) et transparence envers mon ami sur ce que j\'ai vu.</p>'
+            solution: '<p>Je fais : je réponds au défi sans mentionner l\'adresse (je ne la publie pas et je ne la partage avec personne), je préviens mon ami que la photo révèle l\'adresse d\'une famille et lui conseille de la retirer ou de la flouter, puis je supprime mes notes à ce sujet. Je ne fais pas : publier, partager ou rechercher davantage cette famille. Principes : minimisation (l\'adresse ne sert pas la question), ne pas nuire (des tiers non consentants), proportionnalité (un jeu ne justifie aucune intrusion) et transparence envers mon ami sur ce que j\'ai vu.</p>'
           },
           quiz: [
             { q: 'Pourquoi ne pas « aimer » une publication de la cible ?', options: ['C\'est impoli', 'Cela l\'alerte et laisse une trace', 'Cela coûte de l\'argent'], bonne: 1, explication: 'Ne jamais interagir : c\'est la base de l\'OPSEC.' },

@@ -124,10 +124,10 @@ function generee() {
 
 export default [
   { nom: 'inv-orage', l: L, h: H, svg: () => orage(), qualite: 88,
-    variantes: [{ suffixe: '-viral', svg: () => orage({ legende: true }), qualite: 45 }, { suffixe: '-filigrane', svg: () => orage({ filigrane: true }), qualite: 70 }] },
-  { nom: 'inv-rue', l: L, h: H, svg: rue, variantes: [{ suffixe: '-miroir', miroir: true, qualite: 78 }] },
-  { nom: 'inv-foule', l: L, h: H, svg: foule, variantes: [{ suffixe: '-recadree', cadre: [548, 606, 500, 360], qualite: 80 }] },
-  { nom: 'inv-montage', l: L, h: H, svg: montage },
-  { nom: 'inv-generee', l: 1024, h: 1024, svg: generee, format: 'png',
+    variantes: [{ suffixe: '-viral', svg: () => orage({ legende: true }), qualite: 45, miniature: true }, { suffixe: '-filigrane', svg: () => orage({ filigrane: true }), qualite: 70 }] },
+  { nom: 'inv-rue', l: L, h: H, svg: rue, variantes: [{ suffixe: '-miroir', miroir: true, qualite: 78, miniature: true }] },
+  { nom: 'inv-foule', l: L, h: H, svg: foule, variantes: [{ suffixe: '-recadree', cadre: [548, 606, 500, 360], qualite: 80, miniature: true }] },
+  { nom: 'inv-montage', l: L, h: H, svg: montage, miniature: true },
+  { nom: 'inv-generee', l: 1024, h: 1024, svg: generee, format: 'png', miniature: true,
     textesPNG: [['Software', 'PixelReve 3 (generateur d\'images)'], ['Description', 'prompt: mascotte qui salue devant une banderole de festival, photo realiste, 35 mm'], ['Comment', 'IPTC DigitalSourceType: http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia']] }
 ];

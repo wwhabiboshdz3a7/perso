@@ -159,6 +159,7 @@ function carte(x) {
   const c = CAT[x.categorie], st = statut(x.id), r = progression.ctfResolu(x.id);
   const etat = st === 'resolu' ? `<span class="ctf-etat ok">✓ ${r.points} pts</span>` : st === 'abandon' ? '<span class="ctf-etat ab">Writeup lu</span>' : st === 'encours' ? '<span class="ctf-etat ec">En cours</span>' : `<span class="ctf-etat">${x.validation === 'carte' ? 'Carte' : 'Flag'}</span>`;
   return `<a class="ctf-card st-${st}" href="#/ctf/${x.id}" style="--c:${c.couleur}">
+    ${x.miniature ? `<span class="ctf-card-img"><img src="${esc(url(x.miniature))}" alt="" loading="lazy" decoding="async"></span>` : ''}
     <div class="ctf-card-top"><span class="ctf-tag">${esc(x.pack ? x.pack.titre : c.court)}</span><span class="ctf-pts">${x.points} pts</span></div>
     <h3>${esc(x.titre)}</h3>
     <p>${esc(x.accroche || '')}</p>

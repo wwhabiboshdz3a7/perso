@@ -31,6 +31,7 @@ export function normaliserPack(p, origine) {
       briefing: String(d.briefing || '').slice(0, 6000), texte: true,
       ressources: imageSure(d.image) ? [{ type: 'image', titre: 'Image du défi', src: d.image, alt: String(d.alt || 'Image du défi').slice(0, 200), outils: ['image', 'exif'] }] : [],
       outils: imageSure(d.image) ? ['image', 'exif', 'boite'] : ['boite'],
+      miniature: imageSure(d.image) ? d.image : undefined,
       indices: (Array.isArray(d.indices) ? d.indices : []).slice(0, 3).map(i => ({ cout: Math.max(0, Math.min(500, Math.round(+i.cout || 0))), texte: enveloppe(i.texte) })),
       validation: carte ? 'carte' : 'flag', h: carte ? [] : (d.h || []).filter(x => /^[0-9a-f]{64}$/.test(x)).slice(0, 10), zones, vue, fond: 'osm',
       wu: d.wu, format: 'Format : LUMIO{…}'

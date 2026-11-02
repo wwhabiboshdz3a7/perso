@@ -373,14 +373,14 @@ function cadran() {
 }
 
 export default [
-  { nom: 'geo-capitole', l: L, h: H, svg: capitole },
-  { nom: 'geo-pont-neuf', l: L, h: H, svg: pontNeuf },
-  { nom: 'geo-cite-espace', l: L, h: H, svg: citeEspace },
-  { nom: 'geo-abbesses', l: L, h: H, svg: abbesses },
-  { nom: 'geo-carcassonne', l: L, h: H, svg: carcassonne },
-  { nom: 'geo-alger', l: L, h: H, svg: alger },
-  { nom: 'geo-kabylie', l: L, h: H, svg: kabylie },
-  { nom: 'geo-le-cap', l: L, h: H, svg: leCap },
-  { nom: 'geo-montreal', l: L, h: H, svg: montreal },
-  { nom: 'geo-cadran', l: L, h: H, svg: cadran }
+  { nom: 'geo-capitole', l: L, h: H, svg: capitole, miniature: true },
+  { nom: 'geo-pont-neuf', l: L, h: H, svg: pontNeuf, miniature: true },
+  { nom: 'geo-cite-espace', l: L, h: H, svg: citeEspace, miniature: true },
+  { nom: 'geo-abbesses', l: L, h: H, svg: abbesses, miniature: true },
+  { nom: 'geo-carcassonne', l: L, h: H, svg: carcassonne, miniature: true },
+  { nom: 'geo-alger', l: L, h: H, svg: alger, miniature: true },
+  { nom: 'geo-kabylie', l: L, h: H, svg: kabylie, miniature: true },
+  { nom: 'geo-le-cap', l: L, h: H, svg: leCap, miniature: true },
+  { nom: 'geo-montreal', l: L, h: H, svg: montreal, miniature: true },
+  { nom: 'geo-cadran', l: L, h: H, svg: cadran, miniature: true }
 ];
