@@ -54,7 +54,7 @@ export class HUD {
     this.el = {
       fps: $('#sFps'), hands: $('#sHands'), handsIcons: [...$('#sHandsIcons').children], latency: $('#sLatency'),
       pose: $('#sPose'), model: $('#sModel'), pinch: $('#sPinch'), source: $('#sensSource'), spark: $('#sFpsSpark'),
-      tag: $('#opticTag'), meta: $('#optMeta'),
+      tag: $('#opticTag'), meta: $('#optMeta'), optic: $('#optic'),
     };
     this.sparkCtx = this.el.spark.getContext('2d');
     this._lastSensors = 0;
@@ -135,6 +135,8 @@ export class HUD {
     this.el.hands.textContent = String(n);
     this.el.handsIcons.forEach((icon, i) => icon.classList.toggle('on', i < n));
     const src = frame?.source || 'camera';
+    // Source simulée sans caméra : l'aperçu montre la main, les boutons passent en haut.
+    this.el.optic.classList.toggle('is-sim', src !== 'camera' && !cam?.active && n > 0);
     if (src === 'camera' && cam?.active) {
       this.el.latency.textContent = cam.stats.latency ? cam.stats.latency.toFixed(1).replace('.', ',') : '—';
       this.el.source.textContent = `caméra · ${cam.stats.delegate}`;

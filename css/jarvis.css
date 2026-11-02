@@ -281,6 +281,8 @@ body.cam-on .optic__video { opacity: .85; }
 .optic__corners i:nth-child(3) { left: 6px; bottom: 6px; border-right: 0; border-top: 0; }
 .optic__corners i:nth-child(4) { right: 6px; bottom: 6px; border-left: 0; border-top: 0; }
 .optic__idle { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 16px; text-align: center; background: radial-gradient(70% 70% at 50% 50%, rgba(110, 231, 255, .06), transparent); }
+.optic.is-sim .optic__idle { place-content: start center; padding-top: 22px; background: linear-gradient(180deg, rgba(2, 6, 9, .9) 30%, transparent 60%); }
+.optic.is-sim .optic__msg { display: none; }
 .optic__msg { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
 .optic__btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .optic__progress { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 220px; }
