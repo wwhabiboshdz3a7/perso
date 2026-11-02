@@ -145,7 +145,7 @@ kbd { font-size: .8em; padding: .1em .45em; border-radius: 5px; border: 1px soli
 @media (max-width: 860px) { .sec__head { grid-template-columns: 1fr; } }
 
 .page-hero { position: relative; z-index: 2; padding: clamp(56px, 9vw, 120px) 0 clamp(36px, 5vw, 64px); }
-.page-hero h1 { font-family: var(--f-display); font-weight: 850; font-size: clamp(48px, 9vw, 132px); line-height: .88; letter-spacing: -.03em; text-transform: uppercase; font-stretch: 115%; margin: 18px 0 22px; }
+.page-hero h1 { font-family: var(--f-display); font-weight: 850; font-size: clamp(40px, 7.6vw, 116px); line-height: .88; letter-spacing: -.03em; text-transform: uppercase; font-stretch: 115%; margin: 18px 0 22px; }
 .page-hero h1 em { font-family: var(--f-serif); font-weight: 300; font-style: italic; text-transform: none; color: var(--flare); font-stretch: 100%; letter-spacing: -.02em; }
 .page-hero p { max-width: 62ch; color: var(--paper-2); font-size: clamp(17px, 1.4vw, 21px); }
 
