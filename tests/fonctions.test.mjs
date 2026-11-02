@@ -287,6 +287,23 @@ describe('paiements Stripe (liens de paiement)', () => {
     simulerFetch(() => ({ corps: session({ payment_link: 'plink_AUTRE' }) }));
     assert.equal(await refus(post({ cle: SESSION })), true);
   });
+  test('identifiant de session au format réel (66 caractères) : référence complète, révocable sous les deux formes', async () => {
+    const LONGUE = 'cs_live_a1' + 'B2c3D4e5F6'.repeat(5) + 'g7H8i9';
+    assert.equal(LONGUE.length, 66);
+    simulerFetch(() => ({ corps: session({ id: LONGUE }) }));
+    const d = await (await access(post({ cle: LONGUE }), ctx())).json();
+    assert.equal(d.valide, true);
+    assert.equal(verifierJeton(d.jeton, SECRET).r, LONGUE, 'référence non tronquée');
+    assert.equal((await content(get('module=m4', d.jeton))).status, 200);
+    for (const revocation of ['stripe:' + LONGUE, LONGUE, `  STRIPE:${LONGUE}  `]) {
+      process.env.REVOKED_KEYS = revocation;
+      const r = await content(get('module=m4', d.jeton));
+      assert.equal(r.status, 401, revocation);
+      assert.equal((await r.json()).code, 'revoque');
+    }
+    process.env.REVOKED_KEYS = 'stripe:' + LONGUE.slice(0, 64);
+    assert.equal((await content(get('module=m4', d.jeton))).status, 200, 'un préfixe ne révoque pas une autre session');
+  });
 });
 
 describe('révocation des accès', () => {
@@ -297,6 +314,13 @@ describe('révocation des accès', () => {
     assert.ok(r.has('k:' + empreinteCle('lev-aaaaa-bbbbb-ccccc')));
     assert.ok(r.has('gumroad:vente=='));
     assert.ok(r.has('stripe:cs_live_x'));
+  });
+  test('références longues conservées entières dans le jeton', () => {
+    const ref = 'r'.repeat(200);
+    const { jeton } = creerJeton({ offre: 'pro', source: 'stripe', ref, instance: 'i'.repeat(100), empreinte: empreinteCle('X') }, SECRET, 3600);
+    const c = verifierJeton(jeton, SECRET);
+    assert.equal(c.r, ref);
+    assert.equal(c.i.length, 100);
   });
   test('code retiré de ACCESS_CODE_HASHES : le jeton déjà émis est refusé aussitôt', async () => {
     const jeton = await jetonCode(CODE_PRO);

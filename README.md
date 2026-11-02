@@ -101,7 +101,7 @@ Les tests de bout en bout démarrent le serveur local (Stripe et l'envoi d'email
 | `GUMROAD_PRODUCT_IDS` | `essentiel:ID,pro:ID,vip:ID` (identifiant produit Gumroad, licences activées). |
 | `LEMONSQUEEZY_STORE_ID` et `LEMONSQUEEZY_PRODUITS` | Identifiant de la boutique, puis `essentiel:ID,pro:ID,vip:ID` (variante ou produit, licences activées). |
 | `STRIPE_SECRET_KEY` et `STRIPE_LIENS` | Clé **restreinte**, en lecture seule sur *Checkout Sessions*, *PaymentIntents* et *Charges* (ces deux derniers servent à détecter un remboursement ou un litige), puis `essentiel:plink_…,pro:plink_…,vip:plink_…`. |
-| `REVOKED_KEYS` | Accès coupés immédiatement : clés (code `LEV-…`, licence, `cs_…`) ou références de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`), séparées par des virgules. Pour une longue liste : `prive/revocations.txt` (une par ligne). |
+| `REVOKED_KEYS` | Accès coupés immédiatement : clés (code `LEV-…`, licence, `cs_…`) ou références de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`, `stripe:cs_…` avec l'identifiant complet), séparées par des virgules. Pour une longue liste : `prive/revocations.txt` (une par ligne). |
 | `LICENCE_MAX_ACTIVATIONS` | Facultatif : nombre d'activations d'une licence Gumroad sur de nouveaux appareils (5 par défaut). |
 | `EMAIL_FOURNISSEUR`, `EMAIL_API_KEY`, `EMAIL_EXPEDITEUR` | Facultatif mais conseillé : `brevo` ou `resend`, la clé d'API, et l'expéditeur `Levier <bonjour@votre-domaine.fr>` (domaine vérifié chez le prestataire). Servent à envoyer le lien du mini-guide aux inscrits et le lien d'activation d'une clé Stripe perdue. Sans ces variables, le guide s'affiche seulement sur `/merci/` après l'inscription, et l'élève qui a perdu sa clé est invité à écrire au support. |
 | `SITE_URL` | Facultatif : adresse publique du site dans les emails (sinon l'adresse Netlify du site). |
@@ -120,7 +120,7 @@ Les tests de bout en bout démarrent le serveur local (Stripe et l'envoi d'email
 ### Rembourser ou couper un accès
 
 1. Remboursez chez le prestataire (Stripe, Gumroad, Lemon Squeezy).
-2. Ajoutez la clé de l'acheteur à `REVOKED_KEYS` (ou à `prive/revocations.txt`) : sa session `cs_…`, sa clé de licence, ou la référence de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`). Pour un code `LEV-…`, retirez simplement son hachage de `ACCESS_CODE_HASHES` (ou de `prive/codes-acces.txt`).
+2. Ajoutez la clé de l'acheteur à `REVOKED_KEYS` (ou à `prive/revocations.txt`) : sa session `cs_…`, sa clé de licence, ou la référence de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`, `stripe:cs_…`). Pour un code `LEV-…`, retirez simplement son hachage de `ACCESS_CODE_HASHES` (ou de `prive/codes-acces.txt`).
 3. Redéployez (Deploys → Trigger deploy) : les variables d'environnement sont lues au déploiement. L'accès est coupé à la requête suivante, sur tous les appareils.
 
 Sans l'étape 2, l'accès s'arrête de lui-même au prochain renouvellement (le remboursement est détecté chez le fournisseur), donc au plus tard à l'expiration du jeton en cours (30 jours).

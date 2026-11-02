@@ -2,7 +2,8 @@
 // REVOKED_KEYS (variable d'environnement) et prive/revocations.txt acceptent, séparés par des
 // virgules ou des retours à la ligne :
 //   - la clé elle-même : code LEV-…, clé de licence Gumroad ou Lemon Squeezy, session Stripe cs_… ;
-//   - ou une référence de vente : « gumroad:<sale_id> », « lemonsqueezy:<n° de commande> », « stripe:cs_… ».
+//   - ou une référence de vente : « gumroad:<sale_id> », « lemonsqueezy:<n° de commande> », « stripe:cs_… »
+//     (identifiant complet, comparé tel quel à la référence conservée sans troncature dans le jeton).
 // Un code retiré de ACCESS_CODE_HASHES (ou de prive/codes-acces.txt) est aussi coupé aussitôt.
 import { empreinteCle, codeToujoursActif } from './verificateurs.mjs';
 

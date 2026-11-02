@@ -6,6 +6,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 export const VERSION_JETON = 2;
+/** Longueur maximale d'une référence de vente ou d'une instance conservée dans le jeton (non tronquée en pratique). */
+export const LONGUEUR_REF_MAX = 255;
 const b64url = buf => Buffer.from(buf).toString('base64url');
 
 function signer(donnees, secret) {
@@ -21,8 +23,8 @@ function signer(donnees, secret) {
 export function creerJeton({ offre, source, ref = '', empreinte = '', instance = '' }, secret, dureeSecondes, maintenant = Date.now()) {
   if (!secret || secret.length < 32) throw new Error('TOKEN_SECRET absent ou trop court (32 caractères minimum).');
   const iat = Math.floor(maintenant / 1000);
-  const charge = { v: VERSION_JETON, o: offre, s: source, r: String(ref).slice(0, 64), k: String(empreinte), iat, exp: iat + dureeSecondes };
-  if (instance) charge.i = String(instance).slice(0, 64);
+  const charge = { v: VERSION_JETON, o: offre, s: source, r: String(ref).slice(0, LONGUEUR_REF_MAX), k: String(empreinte), iat, exp: iat + dureeSecondes };
+  if (instance) charge.i = String(instance).slice(0, LONGUEUR_REF_MAX);
   const corps = b64url(JSON.stringify(charge));
   return { jeton: `${corps}.${b64url(signer(corps, secret))}`, charge };
 }

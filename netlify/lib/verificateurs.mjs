@@ -5,6 +5,7 @@
 // RefusCle pour un refus explicite (achat remboursé, limite d'appareils atteinte).
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { RANGS } from '../../public/cours/content/catalogue.js';
+import { LONGUEUR_REF_MAX } from './jeton.mjs';
 
 const OFFRES_PAYANTES = ['essentiel', 'pro', 'vip'];
 const DELAI_RESEAU_MS = 8000;
@@ -116,7 +117,7 @@ export async function verifierGumroad(cle, env, fetchImpl, { renouvellement = fa
       const max = maxActivations(env);
       if (typeof c.uses === 'number' && c.uses > max) throw refusLimite(max);
     }
-    return { offre, source: 'gumroad', ref: String(p.sale_id || p.id || '').slice(0, 40) };
+    return { offre, source: 'gumroad', ref: String(p.sale_id || p.id || '').slice(0, LONGUEUR_REF_MAX) };
   }
   if (erreurReseau) throw new ErreurFournisseur('Gumroad injoignable');
   return null;
@@ -160,7 +161,7 @@ export async function verifierLemonSqueezy(cle, env, fetchImpl, { instance = '' 
     if (c.valid !== true || c.instance?.id !== String(instance)) return null;
   }
   if (c.license_key.status !== 'active') return null;
-  return { offre, source: 'lemonsqueezy', ref: String(c.meta.order_id || '').slice(0, 40), instance: activation ? c.instance.id : String(instance) };
+  return { offre, source: 'lemonsqueezy', ref: String(c.meta.order_id || '').slice(0, LONGUEUR_REF_MAX), instance: activation ? c.instance.id : String(instance) };
 }
 
 /* ---------- 4. Stripe (session issue d'un lien de paiement) ---------- */
@@ -199,7 +200,7 @@ export async function verifierStripe(cle, env, fetchImpl) {
     if (!charge || typeof charge !== 'object') throw new ErreurFournisseur('Stripe : paiement illisible (droits de la clé restreinte ?)');
     if (charge.refunded || charge.amount_refunded > 0 || charge.disputed) throw refusRembourse();
   }
-  return { offre, source: 'stripe', ref: String(s.id).slice(0, 64) };
+  return { offre, source: 'stripe', ref: String(s.id).slice(0, LONGUEUR_REF_MAX) };
 }
 
 /**
