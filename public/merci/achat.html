@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Merci pour votre achat · Levier</title>
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <script src="../config.js"></script>
+  <script type="module" src="../assets/js/merci.js"></script>
+</head>
+<body>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="entete">
+    <div class="entete-in">
+      <a class="logo" href="../"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="currentColor"/><path d="M8 25.5 32 15" stroke="var(--citron)" stroke-width="3.4" stroke-linecap="round"/><path d="m16 31 4.6-8.4 4.6 8.4z" fill="var(--citron)"/></svg><span data-cfg="produit.nom">Levier</span></a>
+      <nav aria-label="Liens principaux"><a href="../cours/">Espace membre</a></nav>
+    </div>
+  </header>
+  <main id="contenu" tabindex="-1">
+    <article class="doc">
+      <p class="surtitre">Paiement reçu</p>
+      <h1>Merci, <em>et bienvenue.</em></h1>
+      <p class="chapo">Il reste une étape : activer votre accès sur cet appareil. Votre clé est pré-remplie si vous arrivez directement de la page de paiement.</p>
+      <form class="encadre" id="formActivation" novalidate>
+        <div class="champ">
+          <label for="cle">Code d'accès ou clé de licence</label>
+          <input id="cle" name="cle" type="text" autocomplete="off" spellcheck="false" placeholder="LEV-XXXXX-XXXXX-XXXXX, clé de licence ou cs_…" aria-describedby="activationMsg">
+        </div>
+        <button class="bouton encre" type="submit">Activer mon accès</button>
+        <p class="form-msg" id="activationMsg" role="status" aria-live="polite"></p>
+      </form>
+      <h2>Où trouver ma clé ?</h2>
+      <ul>
+        <li><b>Paiement par Stripe</b> : la clé commence par <code>cs_</code> ; elle est ajoutée automatiquement à l'adresse de cette page. Copiez-la et conservez-la : elle vous servira à vous reconnecter sur un autre appareil.</li>
+        <li><b>Achat sur Gumroad ou Lemon Squeezy</b> : la clé de licence figure dans l'email de confirmation de la plateforme et dans votre espace client.</li>
+        <li><b>Code reçu par email</b> : il a la forme <code>LEV-XXXXX-XXXXX-XXXXX</code>.</li>
+      </ul>
+      <p class="note" id="supportAchat">Un problème d'activation ? Répondez à l'email de confirmation de votre achat : nous vous aidons rapidement.</p>
+      <p class="note">Rappel : les contenus étant accessibles immédiatement, vous avez renoncé à votre droit de rétractation lors de l'achat (voir les <a href="../legal/cgv.html">CGV</a>).</p>
+    </article>
+  </main>
+  <footer class="pied"><div class="pied-in"><span>Formation indépendante, non affiliée à Anthropic. Claude est une marque d'Anthropic.</span><span><a href="../legal/cgv.html">CGV</a> · <a href="../legal/confidentialite.html">Confidentialité</a></span></div></footer>
+</body>
+</html>

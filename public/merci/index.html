@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Votre mini-guide · Levier</title>
+  <meta name="description" content="Le mini-guide : 7 services IA à proposer ce mois-ci, et l'accès au module gratuit de la formation Levier.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <script src="../config.js"></script>
+  <script type="module" src="../assets/js/merci.js"></script>
+</head>
+<body>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="entete">
+    <div class="entete-in">
+      <a class="logo" href="../"><svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="currentColor"/><path d="M8 25.5 32 15" stroke="var(--citron)" stroke-width="3.4" stroke-linecap="round"/><path d="m16 31 4.6-8.4 4.6 8.4z" fill="var(--citron)"/></svg><span data-cfg="produit.nom">Levier</span></a>
+      <nav aria-label="Liens principaux"><a href="../cours/">Espace membre</a><a href="../#offres">Offres</a></nav>
+    </div>
+  </header>
+  <main id="contenu" tabindex="-1">
+    <article class="doc large">
+      <div class="merci-hero">
+        <div>
+          <p class="surtitre">Inscription confirmée</p>
+          <h1>C'est noté<span data-prenom></span>. <em>Votre guide est ici.</em></h1>
+          <p class="chapo">Gardez cette page dans vos favoris : elle contient le mini-guide complet. Le module gratuit vous attend dans l'espace membre, sans autre inscription.</p>
+          <div class="actions">
+            <a class="bouton citron" href="../cours/#/module/m0">Commencer le module gratuit</a>
+            <button class="bouton contour" type="button" id="imprimer">Imprimer le guide</button>
+          </div>
+        </div>
+        <div class="tampon" aria-hidden="true">7</div>
+      </div>
+
+      <section aria-labelledby="titreGuide">
+        <h2 id="titreGuide">7 services IA <em>à proposer ce mois-ci</em></h2>
+        <p>Sept prestations concrètes, que des entreprises de votre ville paient déjà, et que Claude vous permet de livrer vite et bien. Pour chacune : à qui la proposer, le livrable, les outils, la façon de la livrer, et le point de vigilance. Les modules de la formation indiqués entre parenthèses détaillent chaque étape.</p>
+        <ol class="services">
+          <li class="service">
+            <h3>Les réponses aux avis Google, chaque matin</h3>
+            <p class="pourqui">Pour les restaurants, salons, garages, hôtels, commerces qui reçoivent des avis sans avoir le temps d'y répondre.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Chaque matin, un email au gérant avec des réponses prêtes, personnalisées, qu'il valide en deux minutes.</dd>
+              <dt>Les outils</dt><dd>Claude (règles de réponse dans un Projet), puis une automatisation n8n et l'API Google Business Profile.</dd>
+              <dt>La livraison</dt><dd>Semaine 1 : règles de ton avec le gérant et réponses aux avis en retard. Semaine 2 : automatisation en validation par email. Ensuite : abonnement mensuel. (Modules 2 et 5)</dd>
+            </dl>
+            <p class="attention">Ne rédigez jamais de faux avis et ne promettez pas d'améliorer la note : c'est interdit et ce n'est pas le service. Les avis sensibles (santé, litige) restent traités par le gérant.</p>
+          </li>
+          <li class="service">
+            <h3>Huit vidéos courtes par mois pour un commerce</h3>
+            <p class="pourqui">Pour les commerces de proximité qui savent qu'ils devraient publier sur Instagram et TikTok, sans jamais le faire.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Huit vidéos verticales sous-titrées, programmées sur les réseaux, à partir d'une demi-journée de tournage mensuelle sur place.</dd>
+              <dt>Les outils</dt><dd>Claude pour les idées et les scripts, ElevenLabs pour la voix off, CapCut ou HyperFrames pour le montage, un planificateur de publications.</dd>
+              <dt>La livraison</dt><dd>Calendrier du mois validé, tournage, montage sur un modèle aux couleurs du commerce, validation, programmation. (Module 6)</dd>
+            </dl>
+            <p class="attention">Autorisation écrite de chaque personne filmée, et mention « contenu généré par IA » pour tout plan réaliste généré.</p>
+          </li>
+          <li class="service">
+            <h3>Un site vitrine en ligne en dix jours</h3>
+            <p class="pourqui">Pour les indépendants et petites entreprises sans site, ou avec un site daté qui ne donne ni horaires ni moyen de contact.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Un site rapide, lisible sur téléphone, avec les pages essentielles, un formulaire de contact, les mentions légales, et la fiche Google à jour.</dd>
+              <dt>Les outils</dt><dd>Claude (Artifacts pour la maquette), Claude Code pour le site final, un hébergeur comme Netlify.</dd>
+              <dt>La livraison</dt><dd>Questionnaire, maquette validée, rédaction des textes avec le client, mise en ligne, documentation et formation de 30 minutes. (Modules 3 et 4)</dd>
+            </dl>
+            <p class="attention">Mentions légales et politique de confidentialité complètes, accessibilité vérifiée, accès et nom de domaine au nom du client.</p>
+          </li>
+          <li class="service">
+            <h3>Un assistant de questions sur le site</h3>
+            <p class="pourqui">Pour les entreprises qui répondent toute la journée aux mêmes questions : horaires, tarifs, réservations, délais.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Un assistant qui répond uniquement à partir des informations de l'entreprise, et oriente vers un humain pour le reste.</dd>
+              <dt>Les outils</dt><dd>L'API Claude avec cache de prompt, un workflow n8n, un petit widget sur le site.</dd>
+              <dt>La livraison</dt><dd>Base de connaissances rédigée avec le client, tests sur 30 questions réelles, mise en ligne, relecture des échanges le premier mois. (Module 5)</dd>
+            </dl>
+            <p class="attention">Le visiteur doit savoir qu'il échange avec une IA (AI Act). Contrat de sous-traitance RGPD avec le client.</p>
+          </li>
+          <li class="service">
+            <h3>Le référencement local clé en main</h3>
+            <p class="pourqui">Pour les artisans et prestataires qui veulent être trouvés sur « leur métier + leur ville ».</p>
+            <dl>
+              <dt>Le livrable</dt><dd>La fiche Google Business Profile optimisée, une page par service et par zone, quatre articles utiles, des balises title et descriptions propres.</dd>
+              <dt>Les outils</dt><dd>Claude (plans d'articles, pages locales, réécriture), la Search Console du client.</dd>
+              <dt>La livraison</dt><dd>Audit des recherches et des concurrents, plan de contenus, rédaction relue avec le client, mise en ligne, point mensuel. (Module 3)</dd>
+            </dl>
+            <p class="attention">Aucun contenu creux ni bourrage de mots-clés : chaque page doit répondre à une vraie question, avec des informations vérifiées par le client.</p>
+          </li>
+          <li class="service">
+            <h3>Le tri automatique des demandes entrantes</h3>
+            <p class="pourqui">Pour les entreprises de services qui reçoivent beaucoup de demandes par formulaire et perdent du temps sur les moins sérieuses.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Chaque demande notée, classée et résumée dans un tableau, avec un brouillon de réponse ; les demandes prioritaires déclenchent une alerte immédiate.</dd>
+              <dt>Les outils</dt><dd>Un workflow n8n, l'API Claude en sortie structurée, Google Sheets et l'email.</dd>
+              <dt>La livraison</dt><dd>Critères de qualification définis avec le client, branchement du formulaire, tests, mise en production avec surveillance. (Module 5)</dd>
+            </dl>
+            <p class="attention">Minimisez les données envoyées à l'IA et ne laissez pas l'automatisation refuser seule un client : elle aide à décider, l'humain décide.</p>
+          </li>
+          <li class="service">
+            <h3>L'atelier « Claude pour votre équipe »</h3>
+            <p class="pourqui">Pour les PME, cabinets et associations dont les salariés utilisent l'IA sans méthode ni règles.</p>
+            <dl>
+              <dt>Le livrable</dt><dd>Une demi-journée de formation pratique sur leurs propres tâches, une charte d'usage (données, confidentialité, relecture) et une bibliothèque de prompts adaptée à leur métier.</dd>
+              <dt>Les outils</dt><dd>Claude (offre Team de préférence pour les données de l'entreprise), la bibliothèque de prompts de la formation comme base.</dd>
+              <dt>La livraison</dt><dd>Entretien préalable, programme sur mesure, atelier, support récapitulatif, point de suivi à un mois. (Modules 1, 2 et 8)</dd>
+            </dl>
+            <p class="attention">L'AI Act demande déjà aux entreprises que leurs équipes aient une maîtrise suffisante des outils d'IA : c'est un argument, pas une menace à brandir.</p>
+          </li>
+        </ol>
+      </section>
+
+      <div class="encadre citron">
+        <h2 style="margin-top:0">Et maintenant ?</h2>
+        <p>Choisissez <strong>un seul</strong> de ces services, celui qui correspond le mieux à ce que vous savez déjà faire et aux entreprises que vous connaissez. Puis suivez le plan d'action 30 jours du module 0 : il vous mène jusqu'à votre première proposition commerciale.</p>
+        <div class="actions" style="margin-bottom:0">
+          <a class="bouton encre" href="../cours/#/module/m0">Ouvrir le plan d'action 30 jours</a>
+          <a class="bouton contour" href="../#offres">Voir la formation complète</a>
+        </div>
+      </div>
+      <p class="note">Aucun résultat financier n'est garanti : ces services demandent du travail, de la prospection et de la rigueur. Formation indépendante, non affiliée à Anthropic. Claude est une marque d'Anthropic.</p>
+    </article>
+  </main>
+  <footer class="pied">
+    <div class="pied-in">
+      <span>Formation indépendante, non affiliée à Anthropic. Claude est une marque d'Anthropic.</span>
+      <span><a href="../legal/mentions-legales.html">Mentions légales</a> · <a href="../legal/cgv.html">CGV</a> · <a href="../legal/confidentialite.html">Confidentialité</a></span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* ===== Levier — pages secondaires (merci, guide, pages légales, 404) ===== */
+:root { color-scheme: light; --trait: #d3cfc1; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--f-texte); font-size: 17px; line-height: 1.65; color: var(--encre); background: var(--papier); -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+a { color: var(--cobalt-2); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 6px; }
+main { flex: 1; }
+main:focus { outline: none; }
+h1, h2, h3 { font-family: var(--f-display); letter-spacing: -.03em; line-height: 1.1; margin: 0 0 .5em; font-weight: 750; }
+h1 { font-size: clamp(2.3rem, 6vw, 4rem); letter-spacing: -.05em; line-height: 1; }
+h1 em, h2 em { font-family: var(--f-serif); font-weight: 400; font-style: italic; color: var(--cobalt); letter-spacing: -.01em; }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 1.8em; }
+h3 { font-size: 1.2rem; margin-top: 1.4em; }
+p { margin: 0 0 1em; }
+ul, ol { padding-left: 1.3em; margin: 0 0 1.1em; }
+li { margin-bottom: .35em; }
+table { width: 100%; border-collapse: collapse; margin: 0 0 1.2em; font-size: .95rem; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--trait); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; background: var(--papier-2); }
+.entete { border-bottom: 1px solid var(--trait); background: color-mix(in srgb, var(--papier) 90%, transparent); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); }
+.entete-in { max-width: 1080px; margin: 0 auto; padding: 0 24px; height: 68px; display: flex; align-items: center; gap: 16px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--encre); font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; letter-spacing: -.04em; }
+.entete nav { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.entete nav a { color: var(--encre-2); text-decoration: none; font-weight: 550; padding: 8px 10px; border-radius: 8px; font-size: .95rem; }
+.entete nav a:hover { background: var(--papier-2); color: var(--encre); }
+.doc { max-width: 780px; margin: 0 auto; padding: 56px 24px 96px; }
+.doc.large { max-width: 1080px; }
+.surtitre { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--encre-2); margin-bottom: 16px; }
+.chapo { font-size: 1.18rem; color: var(--encre-2); max-width: 60ch; }
+.bouton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 12px 24px; border-radius: 999px; font-weight: 650; text-decoration: none; border: 2px solid var(--encre); cursor: pointer; font-size: 1rem; transition: transform .15s var(--ease), box-shadow .15s; font-family: var(--f-texte); }
+.bouton:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--encre); }
+.bouton.encre { background: var(--encre); color: var(--papier); }
+.bouton.encre:hover { box-shadow: 4px 4px 0 var(--citron); }
+.bouton.citron { background: var(--citron); color: var(--encre); }
+.bouton.contour { background: transparent; color: var(--encre); }
+.bouton[disabled] { opacity: .6; cursor: wait; transform: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0; }
+.encadre { border: 2px solid var(--encre); border-radius: 22px; background: #fbfaf6; padding: 26px 28px; margin: 28px 0; box-shadow: 8px 8px 0 var(--encre); }
+.encadre.citron { background: var(--citron); }
+.note { font-size: .9rem; color: var(--encre-3); }
+.maj { font-family: var(--f-mono); font-size: .78rem; color: var(--encre-3); margin-top: 40px; }
+.a-completer { background: #ffe86b; color: var(--encre); padding: 0 .3em; border-radius: 4px; font-weight: 600; outline: 1px dashed #b38f00; }
+.pied { border-top: 1px solid var(--trait); background: var(--papier-2); padding: 28px 24px; font-size: .88rem; color: var(--encre-2); }
+.pied-in { max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.pied a { color: var(--encre); }
+
+/* ----- guide (page merci) ----- */
+.merci-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; padding-bottom: 36px; border-bottom: 2px solid var(--encre); }
+.tampon { width: 150px; height: 150px; border-radius: 50%; background: var(--citron); border: 3px solid var(--encre); display: grid; place-items: center; box-shadow: 6px 6px 0 var(--encre); font-family: var(--f-display); font-weight: 800; font-size: 3.6rem; transform: rotate(-8deg); }
+.services { list-style: none; padding: 0; display: grid; gap: 22px; counter-reset: service; margin-top: 30px; }
+.service { counter-increment: service; border: 1px solid var(--trait); background: #fbfaf6; border-radius: 22px; padding: 28px 30px; position: relative; break-inside: avoid; }
+.service::before { content: counter(service, decimal-leading-zero); position: absolute; top: 24px; right: 26px; font-family: var(--f-mono); font-weight: 700; font-size: .9rem; color: var(--encre); background: var(--citron); border: 2px solid var(--encre); border-radius: 8px; padding: 2px 8px; }
+.service h3 { margin-top: 0; font-size: 1.45rem; padding-right: 60px; }
+.service .pourqui { color: var(--encre-2); margin-bottom: 14px; }
+.service dl { display: grid; grid-template-columns: 150px 1fr; gap: 8px 18px; margin: 0 0 12px; }
+.service dt { font-family: var(--f-mono); font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--encre-3); padding-top: 3px; }
+.service dd { margin: 0; }
+.service .attention { font-size: .92rem; border-left: 3px solid var(--rouge); padding: 8px 12px; background: rgb(180 45 23 / .06); border-radius: 0 8px 8px 0; margin: 12px 0 0; }
+
+/* ----- activation (achat) ----- */
+.champ { display: grid; gap: 6px; margin-bottom: 14px; }
+.champ label { font-weight: 650; }
+.champ input { min-height: 52px; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--trait); background: #fbfaf6; font-family: var(--f-mono); font-size: .95rem; }
+.champ input:focus { outline: none; border-color: var(--cobalt); box-shadow: 0 0 0 4px rgb(40 54 245 / .14); }
+.form-msg { min-height: 1.4em; font-weight: 600; margin: 10px 0 0; }
+.form-msg.ok { color: var(--vert); }
+.form-msg.ko { color: var(--rouge); }
+
+/* ----- 404 ----- */
+.erreur { text-align: center; padding: 96px 24px; }
+.erreur .code { font-family: var(--f-display); font-weight: 800; font-size: clamp(6rem, 22vw, 12rem); letter-spacing: -.07em; line-height: .9; margin: 0; }
+.erreur .actions { justify-content: center; }
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .entete-in { padding: 0 16px; height: 62px; }
+  .entete nav a { padding: 6px 6px; font-size: .88rem; }
+  .doc { padding: 36px 16px 72px; }
+  .merci-hero { grid-template-columns: minmax(0, 1fr); }
+  .tampon { width: 110px; height: 110px; font-size: 2.6rem; order: -1; }
+  .service { padding: 22px 18px; }
+  .service dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .service dd { margin-bottom: 8px; }
+  .encadre { padding: 22px 18px; box-shadow: 6px 6px 0 var(--encre); }
+  .actions .bouton { width: 100%; }
+}
+@media print {
+  .entete, .pied, .actions, .noprint { display: none !important; }
+  body { background: #fff; font-size: 11pt; }
+  .doc { padding: 0; max-width: none; }
+  .service { border: 1px solid #999; box-shadow: none; }
+  .encadre { box-shadow: none; }
+}

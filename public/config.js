@@ -73,7 +73,7 @@ window.LEVIER_CONFIG = {
         'Tout l\'Essentiel',
         'Module 4 : Claude Code et agents',
         'Module 5 : API et automatisations + 5 workflows n8n à importer',
-        'Module 6 : automatisation vidéo IA (le module le plus complet)',
+        'Module 6 : automatisation vidéo IA (le plus complet), avec le workflow de la chaîne vidéo',
         'Scripts vidéo de chaque leçon',
         'Certificat de fin de formation'
       ],
@@ -138,11 +138,13 @@ window.LEVIER_CONFIG = {
     },
     hebergeur: {                  // vérifiez l'adresse en vigueur sur netlify.com
       nom: 'Netlify, Inc.',
-      adresse: '101 2nd Street, San Francisco, CA 94105, États-Unis',
+      adresse: '101 2nd Street, Suite 575, San Francisco, CA 94105, États-Unis',
       site: 'https://www.netlify.com'
     },
     outilEmailing: '',            // ex. 'Brevo (Sendinblue SAS, France)' si vous exportez les contacts vers un outil
     prestatairesPaiement: 'Stripe, Lemon Squeezy ou Gumroad selon l\'offre choisie',
-    villeTribunal: ''             // facultatif : ville du tribunal compétent pour les litiges entre professionnels
+    villeTribunal: '',            // facultatif : ville du tribunal compétent pour les litiges entre professionnels
+    // À AJUSTER : conditions de l'accompagnement VIP (réservation, délai, annulation).
+    conditionsAccompagnement: 'Les séances individuelles de l\'offre VIP se réservent par email et doivent être utilisées dans les 6 mois suivant l\'achat. Une séance annulée moins de 24 h à l\'avance est due.'
   }
 };

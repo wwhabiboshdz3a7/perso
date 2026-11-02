@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /cours/
+Disallow: /merci/
+Disallow: /.netlify/
