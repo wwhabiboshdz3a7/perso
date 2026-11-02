@@ -35,7 +35,7 @@
 </div>
 <!--/ex-->
 <script type="module" data-ex>
-import { odometer, utils } from 'kinetika';
+import { odometer, utils, engine } from 'kinetika';
 
 const fr = (n, d = 0) => n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const values = () => [
@@ -52,11 +52,13 @@ const counters = [
 ];
 
 const roll = () => values().forEach((v, i) => counters[i].set(v));
-let timer = setInterval(roll, 4200);
+// défilement automatique, sauf en mouvement réduit (le bouton reste disponible)
+const auto = !engine.prefersReducedMotion;
+let timer = auto ? setInterval(roll, 4200) : 0;
 document.querySelector('.btn').addEventListener('click', () => {
   clearInterval(timer);
   roll();
-  timer = setInterval(roll, 4200);
+  if (auto) timer = setInterval(roll, 4200);
 });
 </script>
 </body>

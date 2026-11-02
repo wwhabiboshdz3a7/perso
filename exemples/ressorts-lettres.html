@@ -32,7 +32,8 @@ const state = split.chars.map((el) => ({ el, tx: 0, ty: 0 }));
 let px = -1e4, py = -1e4, lastMove = -1e4;
 addEventListener('pointermove', (e) => { px = e.clientX; py = e.clientY; lastMove = performance.now(); });
 
-engine.onFrame((dt, t) => {
+// en mouvement réduit, les lettres restent en place
+if (!engine.prefersReducedMotion) engine.onFrame((dt, t) => {
   // sans pointeur (mobile, vignette) : une trajectoire automatique
   if (performance.now() - lastMove > 2000) {
     px = innerWidth / 2 + Math.sin(t / 900) * innerWidth * 0.38;

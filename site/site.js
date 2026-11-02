@@ -24,6 +24,23 @@ if (burger && nav) {
 
 highlightAll();
 
+// Les blocs de code qui défilent horizontalement doivent être atteignables au clavier.
+export function scrollableCode(root = document) {
+  root.querySelectorAll('pre').forEach((pre) => {
+    if (pre.scrollWidth > pre.clientWidth + 1) {
+      pre.tabIndex = 0;
+      if (!pre.hasAttribute('aria-label')) pre.setAttribute('aria-label', 'Bloc de code (défilement horizontal)');
+    } else if (pre.getAttribute('aria-label') === 'Bloc de code (défilement horizontal)') {
+      pre.removeAttribute('tabindex');
+      pre.removeAttribute('aria-label');
+    }
+  });
+}
+let scrollTimer = 0;
+addEventListener('resize', () => { clearTimeout(scrollTimer); scrollTimer = setTimeout(() => scrollableCode(), 150); });
+addEventListener('load', () => scrollableCode());
+document.fonts?.ready.then(() => scrollableCode());
+
 // Notification brève
 let toastEl = null;
 let toastTimer = 0;

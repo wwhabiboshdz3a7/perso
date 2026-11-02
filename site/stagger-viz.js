@@ -1,6 +1,7 @@
 // Visualiseur de stagger : valeurs par point, origine au clic, code à copier.
 import { animate, stagger, engine } from '../dist/kinetika.esm.js';
 import { highlight } from './highlight.js';
+import { scrollableCode } from './site.js';
 
 const $ = (id) => document.getElementById(id);
 const S = { mode: 'grid', cols: 12, rows: 7, count: 18, each: 50, from: 'center', index: 0, axis: '', ease: '', start: 0, seed: 1, reversed: false };
@@ -115,6 +116,7 @@ function sync() {
   const el = $('st-code');
   el.textContent = code;
   el.innerHTML = highlight(code, 'js');
+  scrollableCode();
   play();
 }
 

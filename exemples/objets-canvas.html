@@ -70,7 +70,8 @@ const morph = () => {
     delay: stagger(5, { from: 'center' }),
     duration: 1400,
     ease: 'inOutExpo',
-    onComplete: () => setTimeout(morph, 900),
+    // en mouvement réduit, une seule forme : pas de changements brusques en boucle
+    onComplete: () => { if (!engine.prefersReducedMotion) setTimeout(morph, 900); },
   });
 };
 morph();

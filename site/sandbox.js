@@ -66,6 +66,7 @@ const cm = CM(els.editor, {
 });
 cm.on('keydown', (ed, e) => { if (e.key !== 'Escape' && e.key !== 'Tab') escaped = false; });
 const input = cm.getInputField();
+input.setAttribute('role', 'textbox');
 input.setAttribute('aria-label', LABELS.js);
 input.setAttribute('aria-multiline', 'true');
 

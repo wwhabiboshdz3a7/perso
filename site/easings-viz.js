@@ -1,6 +1,7 @@
 // Visualiseur d'easings : courbe, balle, paramètres, code à copier.
 import { animate, eases, cubicBezier, steps, spring, linear, utils } from '../dist/kinetika.esm.js';
 import { highlight } from './highlight.js';
+import { scrollableCode } from './site.js';
 
 const $ = (id) => document.getElementById(id);
 const FAMILIES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Back', 'Elastic', 'Bounce'];
@@ -117,6 +118,7 @@ animate('.balle', {
   const el = $('ez-code');
   el.textContent = code;
   el.innerHTML = highlight(code, 'js');
+  scrollableCode();
   markMini();
   if (replay) restart(); else render();
 }

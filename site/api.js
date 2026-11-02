@@ -1,6 +1,7 @@
 // Référence de l'API : rendu à partir de api/donnees.js, sommaire, filtre et section active.
 import { sections } from '../api/donnees.js';
 import { highlightAll } from './highlight.js';
+import { scrollableCode } from './site.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // `code` et **gras** dans les textes
@@ -35,6 +36,7 @@ main.insertAdjacentHTML('beforeend', sections.map((s) => `<section class="api-se
 </section>`).join('\n') + '<p class="api__noresult" id="api-none" hidden>Rien ne correspond à ce filtre.</p>');
 toc.innerHTML = sections.map((s) => `<li><a href="#${s.id}" data-sec="${s.id}">${esc(s.title)}</a><ul>${s.items.map((it) => `<li><a href="#${it.id}">${esc(it.name.replace(/\(.*$/, '()').replace(/ ·.*$/, ''))}</a></li>`).join('')}</ul></li>`).join('');
 highlightAll(main);
+scrollableCode(main);
 
 // Filtre plein texte (sans accents)
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
