@@ -1,0 +1,13 @@
+{
+  "name": "jarvis-nexora",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JARVIS — interface HUD pilotée à la main et à la voix (site statique).",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "serve": "python3 -m http.server 9120"
+  },
+  "license": "UNLICENSED"
+}
