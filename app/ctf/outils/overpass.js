@@ -68,10 +68,10 @@ export async function monter(el, opts = {}) {
     <p class="op-info muted"></p>
     <div class="op-grille">
       <div class="op-ed"><label for="opQ" class="bx-lab">Requête Overpass QL</label><textarea id="opQ" class="op-q" spellcheck="false" rows="7"></textarea>
-        <div class="row"><button type="button" class="btn primary small" data-exec>▶ Exécuter</button><span class="muted op-stat" role="status"></span></div>
-        <div class="op-res table-scroll"></div></div>
+        <div class="row"><button type="button" class="btn primary small" data-exec>▶ Exécuter</button><span class="muted op-stat" role="status"></span><span class="muted op-raccourci">Ctrl + Entrée</span></div></div>
       <div class="op-carte"></div>
-    </div></div>`;
+    </div>
+    <div class="op-res table-scroll" aria-live="polite"></div></div>`;
   const ta = $('#opQ', el), stat = $('.op-stat', el), resZ = $('.op-res', el), info = $('.op-info', el);
   let mode = 'local', textes = { local: exemple, ligne: enLigne };
   ta.value = textes.local;
@@ -94,14 +94,15 @@ export async function monter(el, opts = {}) {
   }));
   ta.addEventListener('input', majInfo);
   ta.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); executer(); } });
-  const tableau = lignes => `<table class="ctf-table op-table"><caption class="sr">Résultats</caption><thead><tr><th scope="col">Objet</th><th scope="col">Nom</th><th scope="col">Tags</th></tr></thead><tbody>${lignes.slice(0, 300).map(l => `<tr><td><code>${esc(l.id)}</code></td><td>${esc(l.nom || '—')}</td><td class="op-tags">${esc(l.tags)}</td></tr>`).join('')}</tbody></table>`;
+  const pos = p => p ? `${p[0].toFixed(6)}, ${p[1].toFixed(6)}` : '—';
+  const tableau = lignes => `<table class="ctf-table op-table"><caption class="sr">Résultats</caption><thead><tr><th scope="col">Objet</th><th scope="col">Nom</th><th scope="col">Position (lat, lon)</th><th scope="col">Tags</th></tr></thead><tbody>${lignes.slice(0, 300).map(l => `<tr><td><code>${esc(l.id)}</code></td><td>${esc(l.nom || '—')}</td><td><code class="op-pos">${esc(pos(l.pos))}</code></td><td class="op-tags">${esc(l.tags)}</td></tr>`).join('')}</tbody></table>`;
   async function executer() {
     textes[mode] = ta.value;
     if (mode === 'local') {
       try {
         const r = executerLocal(ta.value, fc);
         stat.textContent = `${r.length} résultat${r.length > 1 ? 's' : ''}`;
-        resZ.innerHTML = r.length ? tableau(r.map(f => ({ id: f.properties['@id'], nom: f.properties.name, tags: tagsTexte(f.properties) }))) : '<p class="muted">Aucun objet ne correspond.</p>';
+        resZ.innerHTML = r.length ? tableau(r.map(f => ({ id: f.properties['@id'], nom: f.properties.name, pos: centre(f), tags: tagsTexte(f.properties) }))) : '<p class="muted">Aucun objet ne correspond.</p>';
         carte.map.removeLayer(calque);
         calque = dessinerDonnees(carte, fc, { etiquettes: true, surbrillance: new Set(r.map(f => f.properties['@id'])) });
         if (r.length) carte.map.fitBounds(window.L.latLngBounds(r.map(centre)).pad(0.5), { maxZoom: 18 });
@@ -117,7 +118,7 @@ export async function monter(el, opts = {}) {
       const json = await rep.json();
       const els = json.elements || [];
       stat.textContent = `${els.length} élément${els.length > 1 ? 's' : ''} reçu${els.length > 1 ? 's' : ''} d'OpenStreetMap`;
-      resZ.innerHTML = els.length ? tableau(els.map(x => ({ id: `${x.type}/${x.id}`, nom: x.tags && x.tags.name, tags: tagsTexte(x.tags || {}) }))) : '<p class="muted">Aucun résultat.</p>';
+      resZ.innerHTML = els.length ? tableau(els.map(x => ({ id: `${x.type}/${x.id}`, nom: x.tags && x.tags.name, pos: x.lat !== undefined ? [x.lat, x.lon] : x.center ? [x.center.lat, x.center.lon] : null, tags: tagsTexte(x.tags || {}) }))) : '<p class="muted">Aucun résultat.</p>';
       if (!carteLigne) {
         const z = document.createElement('div'); z.className = 'op-carte'; $('.op-grille', el).appendChild(z);
         carteLigne = await creerCarte(z, { vue: [43.6045, 1.444, 14], fond: 'osm', interactif: false }); carteLigne.el = z;

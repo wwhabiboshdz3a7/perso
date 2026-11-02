@@ -1,5 +1,6 @@
 /* ===== Lumio — Arène CTF (s'appuie sur les jetons de app/style.css) ===== */
 :root { --ctf-vert: #3ddc97; --ctf-mono: var(--font-mono); }
+.ctf code, .ctf pre, .ctf textarea, .ctf input, .ctf-pre { font-variant-ligatures: none; }
 :root[data-theme="light"] { --ctf-vert: #13895c; }
 .sr { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .ctf .h3, .h3 { font-size: 1.15rem; }
@@ -347,7 +348,10 @@
 .op-carte { height: 420px; }
 .op-carte[hidden] { display: none; }
 .op-stat { font-size: .85rem; }
-.op-res { margin-top: 10px; max-height: 300px; overflow: auto; }
+.op-res { margin-top: 12px; max-height: 340px; overflow: auto; }
+.op-res:empty { display: none; }
+.op-raccourci { font-size: .75rem; margin-left: auto; }
+.op-ed .bx-in, .op-q { margin-bottom: 8px; }
 .op-table { font-size: .8rem; }
 .op-tags { font-family: var(--ctf-mono); font-size: .74rem; color: var(--text-2); overflow-wrap: anywhere; }
 /* navigateur simulé */
@@ -438,3 +442,4 @@
   .ctf-card:hover, .ctf-banniere:hover { transform: none; }
 }
 @media print { .ctf-side, .ctf-etabli { display: none !important; } }
+.op-pos { white-space: nowrap; font-size: .74rem; }

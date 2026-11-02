@@ -28,21 +28,26 @@ export function dessinerDonnees(api, fc, { etiquettes = false, surbrillance = nu
   const L = api.L;
   const style = f => {
     const t = f.properties, on = surbrillance && surbrillance.has(t['@id']);
-    let c = '#64748b', w = 2, fill = 0.15;
+    let c = '#64748b', w = 2, fill = 0.15, fc = null;
+    if (t.place === 'island') { c = '#c2a873'; w = 1.5; fill = 0.9; fc = '#f1e7cf'; }
+    if (t.leisure === 'marina') { c = '#0284c7'; fill = 0.25; }
+    if (t.natural === 'beach') { c = '#d9b25f'; fill = 0.5; fc = '#f6dc9b'; }
+    if (t.man_made === 'pier') { c = '#78716c'; w = 5; }
     if (t.highway) { c = '#94a3b8'; w = t.highway === 'footway' || t.highway === 'path' ? 1.5 : 4; }
     if (t.waterway || t.natural === 'water') { c = '#0ea5e9'; w = 5; fill = 0.35; }
     if (t.leisure === 'park' || t.landuse === 'grass') { c = '#22c55e'; fill = 0.25; }
     if (t.building) { c = '#b45309'; fill = 0.25; }
     if (t.railway) { c = '#475569'; w = 3; }
     if (on) { c = '#f97316'; w += 2; fill = 0.45; }
-    return { color: c, weight: w, fillOpacity: fill, opacity: surbrillance && !on ? 0.45 : 1 };
+    return { color: c, weight: w, fillOpacity: fill, fillColor: fc || c, opacity: surbrillance && !on && !t.place ? 0.45 : 1 };
   };
   return L.geoJSON(fc, {
     style,
     pointToLayer: (f, ll) => L.circleMarker(ll, { radius: surbrillance && surbrillance.has(f.properties['@id']) ? 8 : 5, ...style(f), fillOpacity: 0.85 }),
     onEachFeature: (f, couche) => {
       const t = f.properties;
-      couche.bindPopup(`<b>${esc(t.name || t['@id'])}</b><br><code>${esc(t['@id'])}</code><br>${Object.entries(t).filter(([k]) => !k.startsWith('@')).map(([k, v]) => `${esc(k)}=${esc(v)}`).join('<br>')}`);
+      const pt = f.geometry.type === 'Point' ? `<br><code>${f.geometry.coordinates[1].toFixed(6)}, ${f.geometry.coordinates[0].toFixed(6)}</code>` : '';
+      couche.bindPopup(`<b>${esc(t.name || t['@id'])}</b><br><code>${esc(t['@id'])}</code>${pt}<br>${Object.entries(t).filter(([k]) => !k.startsWith('@')).map(([k, v]) => `${esc(k)}=${esc(v)}`).join('<br>')}`);
       if (etiquettes && t.name && f.geometry.type === 'Point') couche.bindTooltip(esc(t.name), { direction: 'top', offset: [0, -4], className: 'ctf-etiq' });
     }
   }).addTo(api.map);
@@ -55,7 +60,7 @@ export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix 
   if (hauteur) el.style.height = hauteur;
   el.innerHTML = `<div class="ctf-map-in"></div><div class="ctf-map-info" aria-live="polite"></div>`;
   const zone = el.querySelector('.ctf-map-in'), info = el.querySelector('.ctf-map-info');
-  const map = L.map(zone, { worldCopyJump: true, zoomControl: true, attributionControl: true, minZoom: 1 }).setView([vue[0], vue[1]], vue[2]);
+  const map = L.map(zone, { worldCopyJump: true, zoomControl: true, attributionControl: true, minZoom: 1, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([vue[0], vue[1]], vue[2]);
   map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   L.control.scale({ metric: true, imperial: false }).addTo(map);
   let repli = false;

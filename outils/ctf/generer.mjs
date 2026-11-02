@@ -83,7 +83,8 @@ ${publics.map(p => '    ' + JSON.stringify(p)).join(',\n')}
 // Contrôle anti-fuite : aucun flag (ni son contenu s'il est assez long) ne doit apparaître dans les fichiers publiés.
 const secrets = [];
 for (const d of defis) for (const f of d.flags || []) { secrets.push(f, f.toLowerCase()); const inner = f.slice(6, -1); if (inner.length >= 10) secrets.push(inner); }
-for (const d of defis) if (d.cible) for (const p of d.cible.points) { secrets.push(p.lat.toFixed(4), p.lon.toFixed(4)); }
+// (sauf si la cible est un objet parmi d'autres dans un jeu de données fourni : trouver lequel est le défi)
+for (const d of defis) if (d.cible && !d.cible.dansLesDonnees) for (const p of d.cible.points) { secrets.push(p.lat.toFixed(4), p.lon.toFixed(4)); }
 const fuite = (texte, ou) => { for (const s of secrets) if (texte.toLowerCase().includes(s.toLowerCase())) erreurs.push(`FUITE : « ${s} » apparaît dans ${ou}`); };
 fuite(sortie, 'content/ctf/defis.js');
 async function parcourir(dossier) {

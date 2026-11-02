@@ -1,4 +1,98 @@
 {
+ "geo-capitole": {
+  "type": "carte",
+  "lat": 43.6044,
+  "lon": 1.4436,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-pont-neuf": {
+  "type": "carte",
+  "lat": 43.5997,
+  "lon": 1.4372,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-cite-espace": {
+  "type": "carte",
+  "lat": 43.5866,
+  "lon": 1.4932,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-abbesses": {
+  "type": "carte",
+  "lat": 48.8844,
+  "lon": 2.3386,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-carcassonne": {
+  "type": "carte",
+  "lat": 43.2063,
+  "lon": 2.3637,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-alger": {
+  "type": "carte",
+  "lat": 36.7456,
+  "lon": 3.0697,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-kabylie": {
+  "type": "carte",
+  "lat": 36.7169,
+  "lon": 4.0497,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-le-cap": {
+  "type": "carte",
+  "lat": -33.9249,
+  "lon": 18.4241,
+  "faux": {
+   "lat": 48.85,
+   "lon": 2.35
+  }
+ },
+ "geo-montreal": {
+  "type": "carte",
+  "lat": 45.524,
+  "lon": -73.579,
+  "faux": {
+   "lat": -38.5,
+   "lon": 145
+  }
+ },
+ "geo-cadran": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{16h00}",
+   "LUMIO{16h}",
+   "LUMIO{16}",
+   "LUMIO{16:00}",
+   "LUMIO{16_h}",
+   "LUMIO{16_h_00}",
+   "LUMIO{15h58}",
+   "LUMIO{15h59}"
+  ]
+ },
  "exif-appareil": {
   "type": "flag",
   "flags": [
@@ -39,6 +133,123 @@
   "type": "flag",
   "flags": [
    "LUMIO{mathis_roques}"
+  ]
+ },
+ "osm-tags": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{fontaine_des_sauniers}",
+   "LUMIO{la_fontaine_des_sauniers}"
+  ]
+ },
+ "osm-cafe": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{la_vague}"
+  ]
+ },
+ "osm-around": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{au_fournil_des_embruns}",
+   "LUMIO{fournil_des_embruns}"
+  ]
+ },
+ "osm-ligne": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{halle_aux_poissons}",
+   "LUMIO{la_halle_aux_poissons}"
+  ]
+ },
+ "osm-banc": {
+  "type": "carte",
+  "lat": 45.196928,
+  "lon": -3.497195,
+  "faux": {
+   "lat": 45.198628,
+   "lon": -3.500255
+  }
+ },
+ "osint-pseudo": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{pistache}"
+  ]
+ },
+ "osint-reflet": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{cafe_zephyr}",
+   "LUMIO{zephyr}",
+   "LUMIO{le_cafe_zephyr}"
+  ]
+ },
+ "osint-archive": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{operation_cassoulet}",
+   "LUMIO{cassoulet}"
+  ]
+ },
+ "osint-fuite": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{garonne_velo}"
+  ]
+ },
+ "osint-geo": {
+  "type": "carte",
+  "lat": 43.6084,
+  "lon": 1.4421,
+  "faux": {
+   "lat": 46.6084,
+   "lon": 4.4421
+  }
+ },
+ "inv-premiere": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{maelle_kerbrat}",
+   "LUMIO{kerbrat}",
+   "LUMIO{m_kerbrat}",
+   "LUMIO{kerbrat_maelle}"
+  ]
+ },
+ "inv-miroir": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{valdorne}",
+   "LUMIO{mairie_de_valdorne}"
+  ]
+ },
+ "inv-recadrage": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{fete_des_lanternes}",
+   "LUMIO{la_fete_des_lanternes}"
+  ]
+ },
+ "inv-ombres": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{b_d}",
+   "LUMIO{bd}",
+   "LUMIO{b-d}",
+   "LUMIO{b,d}",
+   "LUMIO{b_et_d}",
+   "LUMIO{b_,_d}",
+   "LUMIO{b,_d}"
+  ]
+ },
+ "inv-ia": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{pixelreve}",
+   "LUMIO{pixelreve_3}",
+   "LUMIO{pixelreve3}",
+   "LUMIO{pixel_reve}",
+   "LUMIO{pixel_reve_3}"
   ]
  },
  "crypto-cesar": {
