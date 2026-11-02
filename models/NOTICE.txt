@@ -1,0 +1,9 @@
+Modèles MediaPipe (Google LLC), distribués sous licence Apache 2.0
+(texte complet : ../vendor/mediapipe/LICENSE).
+
+gesture_recognizer.task
+  https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task
+hand_landmarker.task
+  https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+
+Fichiers servis tels quels par le site (aucun appel à un service tiers).
