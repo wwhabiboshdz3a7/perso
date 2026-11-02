@@ -10,7 +10,18 @@ const defaut = () => ({
   quiz: {},        // { "slug/3": { score: 2, total: 3 } }
   jours: [],       // dates ISO (AAAA-MM-JJ) d'activité
   badges: [],      // identifiants des badges obtenus
-  certificats: {}  // { slug: dateISO }
+  certificats: {}, // { slug: dateISO }
+  ctf: ctfDefaut()  // arène CTF : défis résolus, indices achetés, abandons, classement
+});
+const ctfDefaut = () => ({
+  pseudo: '',
+  resolus: {},   // { id: { points, xp, date, duree, indices, essais, anneau } }
+  abandons: {},  // { id: date }
+  indices: {},   // { id: [index des indices achetés] }
+  ouverts: {},   // { id: timestamp de première ouverture }
+  essais: {},    // { id: nombre de mauvaises réponses }
+  archives: [],  // parties précédentes : { pseudo, points, flags, temps, date }
+  amis: []       // cartes de score importées : { pseudo, points, flags, temps, date, ami: true }
 });
 
 let etat = charger();
@@ -20,8 +31,12 @@ function charger() {
     const brut = localStorage.getItem(KEY);
     if (!brut) return defaut();
     const obj = JSON.parse(brut);
-    return Object.assign(defaut(), obj);
+    return normaliser(Object.assign(defaut(), obj));
   } catch { return defaut(); }
+}
+function normaliser(e) {
+  e.ctf = Object.assign(ctfDefaut(), e.ctf && typeof e.ctf === 'object' ? e.ctf : {});
+  return e;
 }
 function sauver() {
   try { localStorage.setItem(KEY, JSON.stringify(etat)); } catch { /* stockage indisponible */ }
@@ -38,6 +53,17 @@ export const BADGES = [
   { id: 'xp-1000', e: '💎', nom: '1000 XP', desc: 'Mille points d\'expérience' },
   { id: 'polyglotte', e: '🌍', nom: 'Polyglotte', desc: '3 parcours commencés' },
   { id: 'parcours', e: '🏆', nom: 'Parcours complet', desc: 'Un parcours terminé à 100 %' },
+  { id: 'ctf-premier', e: '🚩', nom: 'Premier flag', desc: 'Un défi CTF résolu', ctf: true },
+  { id: 'ctf-10', e: '🗝️', nom: 'Chasseur de flags', desc: '10 défis CTF résolus', ctf: true },
+  { id: 'ctf-25', e: '🛰️', nom: 'Analyste', desc: '25 défis CTF résolus', ctf: true },
+  { id: 'ctf-autonome', e: '🧠', nom: 'Autonome', desc: '5 défis résolus sans indice', ctf: true },
+  { id: 'ctf-oeil', e: '🎯', nom: 'Œil de lynx', desc: 'Une géolocalisation au mètre près, du premier coup', ctf: true },
+  { id: 'ctf-touche-a-tout', e: '🧭', nom: 'Touche-à-tout', desc: 'Un défi dans chaque catégorie', ctf: true },
+  { id: 'ctf-geoint', e: '🗺️', nom: 'Géolocalisateur', desc: 'Toute la catégorie géolocalisation', ctf: true },
+  { id: 'ctf-crypto', e: '🔐', nom: 'Cryptanalyste', desc: 'Toute la catégorie crypto', ctf: true },
+  { id: 'ctf-osint', e: '🔎', nom: 'Enquêteur', desc: 'Toute la catégorie OSINT', ctf: true },
+  { id: 'ctf-1000', e: '🏅', nom: '1000 points CTF', desc: 'Mille points dans l\'arène', ctf: true },
+  { id: 'ctf-tout', e: '👑', nom: 'Maître de l\'arène', desc: 'Tous les défis de l\'arène résolus', ctf: true },
 ];
 
 export const progression = {
@@ -115,15 +141,84 @@ export const progression = {
     test('xp-1000', etat.xp >= 1000);
     test('polyglotte', Object.keys(etat.lecons).length >= 3);
     test('parcours', nbParcoursTermines >= 1 || Object.keys(etat.certificats).length >= 1);
+    // Badges de l'arène CTF (le contexte des catégories est fourni par l'arène quand elle est chargée).
+    const r = etat.ctf.resolus, ids = Object.keys(r);
+    test('ctf-premier', ids.length >= 1);
+    test('ctf-10', ids.length >= 10);
+    test('ctf-25', ids.length >= 25);
+    test('ctf-autonome', ids.filter(id => !r[id].indices).length >= 5);
+    test('ctf-oeil', ids.some(id => r[id].anneau === 0 && r[id].essais === 0 && r[id].carte));
+    test('ctf-1000', this.ctfPoints() >= 1000);
+    const cx = this.contexteCTF;
+    if (cx) {
+      const fini = cat => (cx.categories[cat] || []).length > 0 && cx.categories[cat].every(id => r[id]);
+      test('ctf-touche-a-tout', Object.keys(cx.categories).every(cat => cx.categories[cat].some(id => r[id])));
+      test('ctf-geoint', fini('geoint'));
+      test('ctf-crypto', fini('crypto'));
+      test('ctf-osint', fini('osint'));
+      test('ctf-tout', cx.tous.length > 0 && cx.tous.every(id => r[id]));
+    }
     if (gagnes.length) sauver();
     return gagnes;
+  },
+
+  /* ----- arène CTF ----- */
+  contexteCTF: null,
+  get ctf() { return etat.ctf; },
+  ctfPoints() { return Object.values(etat.ctf.resolus).reduce((a, x) => a + (x.points || 0), 0); },
+  ctfTemps() { return Object.values(etat.ctf.resolus).reduce((a, x) => a + (x.duree || 0), 0); },
+  ctfResolu(id) { return etat.ctf.resolus[id] || null; },
+  ctfAbandonne(id) { return !!etat.ctf.abandons[id]; },
+  ctfOuvrir(id) {
+    if (!etat.ctf.ouverts[id] && !etat.ctf.resolus[id]) { etat.ctf.ouverts[id] = Date.now(); sauver(); }
+  },
+  ctfIndices(id) { return etat.ctf.indices[id] || []; },
+  ctfAcheterIndice(id, n) {
+    const l = etat.ctf.indices[id] = etat.ctf.indices[id] || [];
+    if (!l.includes(n)) { l.push(n); l.sort(); sauver(); }
+  },
+  ctfEssais(id) { return etat.ctf.essais[id] || 0; },
+  ctfMauvaiseReponse(id) { etat.ctf.essais[id] = (etat.ctf.essais[id] || 0) + 1; this.activite(); sauver(); return etat.ctf.essais[id]; },
+  ctfAbandonner(id) {
+    if (!etat.ctf.abandons[id] && !etat.ctf.resolus[id]) { etat.ctf.abandons[id] = new Date().toISOString(); sauver(); }
+  },
+  // Enregistre une réussite. Un défi abandonné peut être résolu ensuite, mais ne rapporte plus de points.
+  ctfResoudre(id, { points, anneau = null, carte = false }) {
+    if (etat.ctf.resolus[id]) return null;
+    const abandon = !!etat.ctf.abandons[id];
+    const pts = abandon ? 0 : Math.max(0, Math.round(points));
+    const xp = Math.round(pts / 2);
+    const debut = etat.ctf.ouverts[id] || Date.now();
+    etat.ctf.resolus[id] = { points: pts, xp, date: new Date().toISOString(), duree: Math.max(1, Math.round((Date.now() - debut) / 1000)), indices: this.ctfIndices(id).length, essais: this.ctfEssais(id), anneau, carte, abandon };
+    etat.xp += xp;
+    this.activite(); sauver();
+    return etat.ctf.resolus[id];
+  },
+  ctfPseudo(v) { if (v !== undefined) { etat.ctf.pseudo = String(v).slice(0, 32); sauver(); } return etat.ctf.pseudo; },
+  ctfCarteScore() {
+    return { format: 'lumio-ctf-score', version: 1, pseudo: etat.ctf.pseudo || etat.nom || 'Anonyme', points: this.ctfPoints(), flags: Object.keys(etat.ctf.resolus).length, temps: this.ctfTemps(), date: new Date().toISOString() };
+  },
+  ctfAjouterAmi(carte) {
+    if (!carte || carte.format !== 'lumio-ctf-score') throw new Error('Ce fichier n\'est pas une carte de score Lumio CTF');
+    const e = { pseudo: String(carte.pseudo || 'Anonyme').slice(0, 32), points: Math.max(0, +carte.points || 0), flags: Math.max(0, +carte.flags || 0), temps: Math.max(0, +carte.temps || 0), date: String(carte.date || ''), ami: true };
+    etat.ctf.amis = etat.ctf.amis.filter(a => a.pseudo !== e.pseudo);
+    etat.ctf.amis.push(e); sauver();
+    return e;
+  },
+  ctfRetirerAmi(pseudo) { etat.ctf.amis = etat.ctf.amis.filter(a => a.pseudo !== pseudo); sauver(); },
+  // Archive la partie en cours dans le classement local et repart de zéro (les XP déjà gagnés restent).
+  ctfNouvellePartie() {
+    const c = this.ctfCarteScore();
+    if (c.flags) etat.ctf.archives.push({ pseudo: c.pseudo, points: c.points, flags: c.flags, temps: c.temps, date: c.date });
+    etat.ctf = Object.assign(ctfDefaut(), { pseudo: etat.ctf.pseudo, archives: etat.ctf.archives, amis: etat.ctf.amis });
+    sauver();
   },
 
   exporter() { return JSON.stringify(etat, null, 2); },
   importer(json) {
     const obj = JSON.parse(json);
     if (!obj || typeof obj !== 'object' || !('lecons' in obj)) throw new Error('Fichier de progression invalide');
-    etat = Object.assign(defaut(), obj); sauver();
+    etat = normaliser(Object.assign(defaut(), obj)); sauver();
   },
   reinitialiser() { etat = defaut(); sauver(); }
 };

@@ -1,0 +1,52 @@
+{
+ "crypto-cesar": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{veni_vidi_vici}"
+  ]
+ },
+ "crypto-rot13": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{rot13_cache_mais_ne_protege_pas}"
+  ]
+ },
+ "crypto-base64": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{base64_est_un_encodage}"
+  ]
+ },
+ "crypto-oignon": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{trois_couches_comme_un_oignon}"
+  ]
+ },
+ "crypto-morse": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{phare_cordouan}"
+  ]
+ },
+ "crypto-vigenere": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{vigenere_resiste_a_cesar}"
+  ]
+ },
+ "crypto-xor": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{xor_et_texte_connu}"
+  ]
+ },
+ "crypto-substitution": {
+  "type": "flag",
+  "flags": [
+   "LUMIO{kindi}",
+   "LUMIO{al_kindi}",
+   "LUMIO{alkindi}"
+  ]
+ }
+}

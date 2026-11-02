@@ -10,6 +10,7 @@ const svg = {
   ia: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M7 12h3M14 11l3-4M14 13l3 4"/></svg>',
   git: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M12 15h5"/></svg>',
   video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/><path d="M6 3h4M8 3v3"/></svg>',
+  osint: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2"/><path d="M11 7.5v.01M8 11h6M11 11v3"/></svg>',
   business: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg>'
 };
 
@@ -32,6 +33,8 @@ export const parcours = [
     description: 'Des maths au modèle : régression, perceptron, k-means codés à la main, puis LLM, prompts, RAG et agents.', charger: () => import('./ia.js') },
   { slug: 'git', titre: 'Git & ligne de commande', categorie: 'code', niveau: 'Débutant', couleur: '#f97316', icone: svg.git,
     description: 'Le terminal sans peur, puis Git : commits, branches, fusions, GitHub et travail en équipe.', charger: () => import('./git.js') },
+  { slug: 'osint', titre: 'Méthodo OSINT', categorie: 'enquete', niveau: 'Débutant → intermédiaire', couleur: '#0891b2', icone: svg.osint,
+    description: 'Enquêter en sources ouvertes avec méthode : géolocalisation, métadonnées, cartes et OpenStreetMap, outils, éthique et cadre légal.', charger: () => import('./osint.js') },
   { slug: 'video-ia', titre: 'Vidéo IA & création de contenu', categorie: 'creation', niveau: 'Débutant → avancé', couleur: '#d946ef', icone: svg.video,
     description: 'Images et vidéos générées par IA, voix, montage, formats courts, publicité, UGC, workflow complet et éthique.', charger: () => import('./video-ia.js') },
   { slug: 'business', titre: 'Créer son business digital', categorie: 'business', niveau: 'Débutant', couleur: '#14b8a6', icone: svg.business,
@@ -40,6 +43,7 @@ export const parcours = [
 
 export const categories = [
   { id: 'code', titre: 'Programmation & informatique', sous: 'Du premier programme au projet avancé' },
+  { id: 'enquete', titre: 'Cyber, enquête & CTF', sous: 'Méthodologie OSINT et arène de défis' },
   { id: 'creation', titre: 'Création de contenu avec l\'IA', sous: 'Vidéo, image, voix, montage et diffusion' },
   { id: 'business', titre: 'Business digital', sous: 'Lancer et faire connaître son activité' }
 ];

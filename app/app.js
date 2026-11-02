@@ -90,7 +90,10 @@ const routes = [
   [/^\/glossaire$/, vueGlossaire],
   [/^\/recherche(?:\?q=(.*))?$/, vueRecherche],
   [/^\/certificat\/([\w-]+)$/, vueCertificat],
+  [/^\/ctf(?:\/([\w-]+))?\/?$/, async (sous, id) => (await import('./ctf/ctf.js')).vueCTF(sous, null, id, contexteCTF())],
 ];
+// Contexte transmis à l'arène CTF (chargée à la demande).
+const contexteCTF = () => ({ main, toast, setTitre, colorer, router: () => router(), courant: id => id === navId });
 let navId = 0;
 async function router() {
   const hash = location.hash.replace(/^#/, '') || '/';
@@ -122,6 +125,18 @@ function carteParcours(p) {
     <div class="meta"><span class="pill ${niveauClasse(p.niveau)}">${esc(p.niveau)}</span><span>${nb ? nb + ' leçon' + (nb > 1 ? 's' : '') + ' faite' + (nb > 1 ? 's' : '') : 'Commencer'}</span></div>
   </a>`;
 }
+function banniereCTF() {
+  const r = progression.ctf.resolus, n = Object.keys(r).length;
+  return `<a class="ctf-banniere fade" href="#/ctf">
+    <div class="ctf-banniere-txt">
+      <span class="ctf-kicker"><span class="ctf-blink" aria-hidden="true"></span> Nouveau · Arène CTF</span>
+      <h3>Géolocalise, décode, enquête : trouve le flag.</h3>
+      <p>Défis pour grands débutants : géolocalisation sur carte OpenStreetMap, EXIF, Overpass, OSINT sur un personnage fictif, vérification d'images, crypto, stéganographie, web et forensique. Writeup pédagogique après chaque défi.</p>
+      <span class="btn primary">${n ? `Reprendre · ${progression.ctfPoints()} pts, ${n} flag${n > 1 ? 's' : ''}` : 'Entrer dans l\'arène'}</span>
+    </div>
+    <svg class="ctf-banniere-art" viewBox="0 0 220 160" aria-hidden="true"><defs><pattern id="gB" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".18"/></pattern></defs><rect width="220" height="160" fill="url(#gB)"/><circle cx="110" cy="80" r="62" fill="none" stroke="currentColor" stroke-opacity=".35"/><circle cx="110" cy="80" r="38" fill="none" stroke="currentColor" stroke-opacity=".5"/><path d="M110 80 L160 42" stroke="#3ddc97" stroke-width="2"/><circle cx="148" cy="52" r="5" fill="#f97316"/><path d="M148 52v-16h18l-4 5 4 5h-18" fill="#f97316"/><text x="22" y="148" font-family="JetBrains Mono, monospace" font-size="12" fill="currentColor" fill-opacity=".8">LUMIO{…}</text></svg>
+  </a>`;
+}
 async function vueAccueil() {
   setTitre('');
   const st = progression.etat;
@@ -143,6 +158,7 @@ async function vueAccueil() {
     </section>
     ${categories.map(c => `
       <div class="section-title"><h2>${esc(c.titre)}</h2><span class="muted">${esc(c.sous)}</span></div>
+      ${c.id === 'enquete' ? banniereCTF() : ''}
       <div class="grid">${parcours.filter(p => p.categorie === c.id).map(carteParcours).join('')}</div>`).join('')}
     <div class="section-title"><h2>Comment ça marche</h2></div>
     <div class="features">
@@ -493,6 +509,8 @@ async function vueProfil(id) {
         <div class="row"><button class="btn" id="exportBtn" type="button">⬇ Exporter (JSON)</button><label class="btn" for="importFile">⬆ Importer</label><input type="file" id="importFile" accept="application/json" hidden><button class="btn ghost" id="resetBtn" type="button" style="color:var(--err)">Réinitialiser</button></div>
       </div>
     </div>
+    <div class="section-title"><h2>Arène CTF</h2><a href="#/ctf/classement" class="muted">Classement →</a></div>
+    <div class="stats ctf-profil-stats"><div class="stat"><b>${progression.ctfPoints()}</b><small>points CTF</small></div><div class="stat"><b>${Object.keys(st.ctf.resolus).length}</b><small>flags trouvés</small></div><div class="stat"><b>${Object.values(st.ctf.resolus).filter(x => !x.indices).length}</b><small>sans indice</small></div></div>
     <div class="section-title"><h2>Badges</h2><span class="muted">${st.badges.length}/${BADGES.length}</span></div>
     <div class="badges">${BADGES.map(b => `<div class="badge ${st.badges.includes(b.id) ? 'won' : ''}"><div class="e">${b.e}</div><b>${b.nom}</b><small>${b.desc}</small></div>`).join('')}</div>
     <div class="section-title"><h2>Parcours</h2></div>
@@ -547,7 +565,11 @@ async function vueRecherche(q = '', id) {
     res.sort((a, b) => b.score - a.score);
   }
   const surligner = s => { let out = esc(s); mots.forEach(m => { out = out.replace(new RegExp(m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), x => `<mark>${x}</mark>`); }); return out; };
-  main.innerHTML = `<div class="wrap"><h1>Recherche</h1><p class="muted">${mots.length ? `${res.length} résultat(s) pour « ${esc(q)} »` : 'Tape un mot-clé dans la barre de recherche.'}</p>
+  let defis = [];
+  if (mots.length) { try { defis = await (await import('./ctf/ctf.js')).rechercherDefis(mots); } catch { defis = []; } }
+  if (id !== navId) return;
+  main.innerHTML = `<div class="wrap"><h1>Recherche</h1><p class="muted">${mots.length ? `${res.length + defis.length} résultat(s) pour « ${esc(q)} »` : 'Tape un mot-clé dans la barre de recherche.'}</p>
+    ${defis.length ? `<h2 class="h3">Défis de l'arène CTF</h2><ul class="results" style="margin-bottom:24px">${defis.slice(0, 10).map(r => `<li><a href="#/ctf/${r.x.id}"><div class="path">Arène CTF › ${esc(r.cat.titre)} · ${r.x.points} pts</div><b>${surligner(r.x.titre)}</b><div class="muted" style="font-size:.9rem">${surligner(r.x.accroche || '')}</div></a></li>`).join('')}</ul>${res.length ? '<h2 class="h3">Leçons</h2>' : ''}` : ''}
     <ul class="results">${res.slice(0, 40).map(r => `<li><a href="#/cours/${r.p.slug}/${r.l.index}"><div class="path">${esc(r.p.titre)} › ${esc(r.p.modules[r.l.module].titre)}</div><b>${surligner(r.l.titre)}</b><div class="muted" style="font-size:.9rem">…${surligner(r.extrait)}…</div></a></li>`).join('')}</ul></div>`;
 }
 
