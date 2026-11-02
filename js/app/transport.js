@@ -283,6 +283,7 @@ export class Link extends Emitter {
     }
     this.app.settings.on('change', (c) => {
       if ('localLink' in c) { if (c.localLink) this.local.start(); else this.local.stop(); this.render(); }
+      if ('deviceName' in c && document.activeElement !== $('#deviceName')) $('#deviceName').value = c.deviceName;
       if ('deviceName' in c || 'role' in c) { this.local.announce(); this.net.announce(); this.render(); }
     });
   }

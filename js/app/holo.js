@@ -35,7 +35,9 @@ export class Holo {
       const THREE = await import('../../vendor/three/three.module.js');
       this.THREE = THREE;
       const renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      this.maxRatio = Math.min(2, window.devicePixelRatio || 1);
+      this.ratio = this.maxRatio;
+      renderer.setPixelRatio(this.ratio);
       renderer.setClearColor(0x000000, 0);
       this.renderer = renderer;
       this.scene = new THREE.Scene();
@@ -225,6 +227,8 @@ export class Holo {
     this.setObject(this.object);
     this._resize();
     this._t = performance.now();
+    this._adaptAt = this._t;
+    this._ema = 0;
     requestAnimationFrame(this._loop);
   }
 
@@ -234,8 +238,10 @@ export class Holo {
     if (!this.running) return;
     requestAnimationFrame(this._loop);
     if (document.hidden) return;
-    const dt = Math.min(0.05, (now - this._t) / 1000);
+    const raw = now - this._t;
+    const dt = Math.min(0.05, raw / 1000);
     this._t = now;
+    this._adapt(raw, now);
     const T = this.THREE;
     const idle = now - this.lastInteract > 2500 && !this.drag;
     if (!this.drag) {
@@ -268,6 +274,20 @@ export class Holo {
     this.renderer.render(this.scene, this.camera);
     const deg = (v) => Math.round(((v * 180) / Math.PI) % 360 + 360) % 360;
     this.readout.textContent = `${this.object === 'globe' ? 'GLOBE · 15 VILLES · ORIGINE TOULOUSE' : 'RÉACTEUR · 5 ANNEAUX'}\nROT ${String(deg(this.yaw)).padStart(3, '0')}° · INCL ${Math.round((this.pitch * 180) / Math.PI)}°\nZOOM ${this.zoom.toFixed(2).replace('.', ',')}×`;
+  }
+
+  /** Résolution dynamique : on baisse la définition si l'affichage rame. */
+  _adapt(frameMs, now) {
+    this._ema = this._ema ? this._ema * 0.92 + frameMs * 0.08 : frameMs;
+    if (now - (this._adaptAt || 0) < 1500) return;
+    let next = this.ratio;
+    if (this._ema > 34 && this.ratio > 0.5) next = Math.max(0.5, this.ratio - 0.25);
+    else if (this._ema < 19 && this.ratio < this.maxRatio) next = Math.min(this.maxRatio, this.ratio + 0.25);
+    if (next === this.ratio) return;
+    this._adaptAt = now;
+    this.ratio = next;
+    this.renderer.setPixelRatio(next);
+    this._resize();
   }
 
   _labels() {

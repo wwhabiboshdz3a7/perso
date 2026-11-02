@@ -16,6 +16,9 @@ export class Draw {
     this.brush = $('#drawBrush');
     this.strokes = [];
     this.current = null;
+    this.layer = document.createElement('canvas'); // traits terminés
+    this.layerCtx = this.layer.getContext('2d');
+    this._raf = 0;
     this.colorIndex = 0;
     this.size = 8;
     this.eraser = false;
@@ -95,7 +98,7 @@ export class Draw {
   _begin(p, eraser, src = 'pointer') {
     this.current = { color: this.color, size: eraser ? Math.max(28, this.size * 3) : this.size, eraser, points: [p], src };
     this.strokes.push(this.current);
-    this.redraw();
+    this._schedule();
   }
 
   _add(p) {
@@ -104,62 +107,91 @@ export class Draw {
     const last = s.points[s.points.length - 1];
     if (Math.hypot(p.x - last.x, p.y - last.y) < 0.0015) return;
     s.points.push(p);
-    this._drawStroke(this.ctx, s, this._dims(), s.points.length - 2);
+    this._schedule();
   }
 
   _end() {
-    if (this.current && this.current.points.length === 1) this.current.points.push({ ...this.current.points[0], x: this.current.points[0].x + 0.0005 });
+    const s = this.current;
+    if (!s) return;
+    if (s.points.length === 1) s.points.push({ ...s.points[0], x: s.points[0].x + 0.0005 });
     this.current = null;
-    this.redraw();
+    this._drawStroke(this.layerCtx, s, this._dims());
+    this._compose();
   }
 
   _dims() {
     return { w: this.canvas.width, h: this.canvas.height, dpr: Math.min(2, window.devicePixelRatio || 1) };
   }
 
-  redraw() {
-    const { w, h } = fitCanvas(this.canvas);
-    const ctx = this.ctx;
-    ctx.clearRect(0, 0, w, h);
-    const d = this._dims();
-    for (const s of this.strokes) this._drawStroke(ctx, s, d, 0);
+  /** Recomposition au plus une fois par image affichée. */
+  _schedule() {
+    if (!this._raf) this._raf = requestAnimationFrame(() => { this._raf = 0; this._compose(); });
   }
 
-  _drawStroke(ctx, s, { w, h, dpr }, from) {
+  /** Reconstruit le calque des traits terminés (redimensionnement, annulation, effacement). */
+  redraw() {
+    const { w, h } = fitCanvas(this.canvas);
+    if (this.layer.width !== w || this.layer.height !== h) { this.layer.width = w; this.layer.height = h; }
+    this.layerCtx.clearRect(0, 0, w, h);
+    const d = this._dims();
+    for (const s of this.strokes) if (s !== this.current) this._drawStroke(this.layerCtx, s, d);
+    this._compose();
+  }
+
+  /** Calque des traits terminés + trait en cours (gomme comprise). */
+  _compose() {
+    const { w, h } = this._dims();
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(this.layer, 0, 0);
+    if (this.current) this._drawStroke(ctx, this.current, this._dims());
+  }
+
+  _path(s, w, h) {
     const pts = s.points;
-    if (pts.length < 2) return;
+    const path = new Path2D();
+    const P = (p) => [p.x * w, p.y * h];
+    let [x0, y0] = P(pts[0]);
+    path.moveTo(x0, y0);
+    for (let i = 1; i < pts.length; i++) {
+      const [x1, y1] = P(pts[i]);
+      path.quadraticCurveTo(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+      x0 = x1; y0 = y1;
+    }
+    path.lineTo(x0, y0);
+    return path;
+  }
+
+  /**
+   * Trait néon : halo en couches translucides (pas de shadowBlur, coûteux à
+   * chaque image) puis cœur clair.
+   */
+  _drawStroke(ctx, s, { w, h, dpr }) {
+    if (s.points.length < 2) return;
+    const path = this._path(s, w, h);
+    const lw = s.size * dpr;
     ctx.save();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = s.size * dpr;
     if (s.eraser) {
       ctx.globalCompositeOperation = 'destination-out';
       ctx.strokeStyle = '#000';
+      ctx.lineWidth = lw;
+      ctx.stroke(path);
     } else {
       ctx.strokeStyle = s.color;
-      ctx.shadowColor = s.color;
-      ctx.shadowBlur = s.size * 1.6 * dpr;
-    }
-    ctx.beginPath();
-    const P = (p) => [p.x * w, p.y * h];
-    const start = Math.max(0, from);
-    let [x0, y0] = P(pts[start]);
-    if (start === 0) ctx.moveTo(x0, y0);
-    else { const [px, py] = P(pts[start - 1] || pts[start]); ctx.moveTo((px + x0) / 2, (py + y0) / 2); }
-    for (let i = start + 1; i < pts.length; i++) {
-      const [x1, y1] = P(pts[i]);
-      ctx.quadraticCurveTo(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
-      x0 = x1; y0 = y1;
-    }
-    ctx.lineTo(x0, y0);
-    ctx.stroke();
-    if (!s.eraser) {
-      // Cœur lumineux plus fin.
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.65;
-      ctx.lineWidth = Math.max(1, s.size * 0.35) * dpr;
+      for (const [k, a] of [[3.2, 0.07], [2.1, 0.13], [1.45, 0.28]]) {
+        ctx.globalAlpha = a;
+        ctx.lineWidth = lw * k;
+        ctx.stroke(path);
+      }
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = lw;
+      ctx.stroke(path);
+      ctx.globalAlpha = 0.7;
+      ctx.lineWidth = Math.max(1, lw * 0.35);
       ctx.strokeStyle = '#ffffff';
-      ctx.stroke();
+      ctx.stroke(path);
     }
     ctx.restore();
   }
@@ -209,7 +241,9 @@ export class Draw {
     if (!this.active) return;
     const p = result.primary;
     const s = this.app.cursor.screen;
-    if (!p || !s) { this._endGesture(); this.brush.classList.remove('is-on'); return; }
+    // Deux index levés : geste « tout effacer » en cours, on ne trace pas.
+    const twoIndex = result.hands.filter((h) => h.pose === 'point').length >= 2;
+    if (!p || !s || twoIndex) { this._endGesture(); this.brush.classList.remove('is-on'); return; }
     const inside = this._inside(s);
     const r = this.wrap.getBoundingClientRect();
     this.brush.classList.toggle('is-on', inside);
