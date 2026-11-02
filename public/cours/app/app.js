@@ -187,7 +187,7 @@ async function vueAccueil() {
         <p class="eyebrow">Votre accès</p>
         <p class="acces-offre">${o === 'gratuit' ? 'Gratuit' : esc(NOMS_OFFRES[o])}</p>
         <p class="muted">${o === 'gratuit' ? 'Modules 0 et 1 ouverts. Les modules 2 à 8 et les bonus se débloquent avec une offre.' : o === 'essentiel' ? 'Modules 0 à 3, 7, 8 et bonus. Les modules 4, 5 et 6 sont inclus dans l\'offre Pro.' : 'Toute la formation et les bonus sont ouverts.'}</p>
-        <div class="progress big" aria-label="Progression sur les leçons accessibles"><span style="width:${pct(faitesAcc, totalAcc)}%"></span></div>
+        <div class="progress big" role="progressbar" aria-label="Progression sur les leçons accessibles" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct(faitesAcc, totalAcc)}"><span style="width:${pct(faitesAcc, totalAcc)}%"></span></div>
         <div class="row">
           ${RANGS[o] < RANGS.pro ? `<a class="btn small primary" href="../#offres">Voir les offres</a>` : ''}
           <a class="btn small ghost" href="#/acces">${o === 'gratuit' ? 'J\'ai un code ou une licence' : 'Gérer mon accès'}</a>
@@ -297,7 +297,7 @@ async function vueModule(id, nav) {
   const faites = progression.nbLecons(id), total = m.lecons.length;
   const suivante = m.lecons.find(l => !progression.leconFaite(id, l.index)) || m.lecons[0];
   main.innerHTML = `<div class="wrap narrow">${entete}
-    <div class="progress big" aria-label="Progression du module"><span style="width:${pct(faites, total)}%"></span></div>
+    <div class="progress big" role="progressbar" aria-label="Progression du module" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct(faites, total)}"><span style="width:${pct(faites, total)}%"></span></div>
     <div class="row" style="margin:16px 0 26px">
       <a class="btn primary" href="#/lecon/${id}/${suivante.index}">${faites ? 'Continuer' : 'Commencer'} : ${esc(suivante.titre)}</a>
       ${faites >= total ? `<a class="btn ok" href="#/certificat/${id}">Certificat du module</a>` : `<span class="muted">${faites}/${total} leçons terminées</span>`}

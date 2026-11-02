@@ -30,6 +30,20 @@ const TYPES = {
 
 export const formulaires = [];
 
+// En-têtes déclarés dans netlify.toml ([[headers]]), appliqués comme en production (dont la CSP).
+const reglesEntetes = [];
+try {
+  const toml = readFileSync(path.join(racine, 'netlify.toml'), 'utf8');
+  for (const bloc of toml.split('[[headers]]').slice(1)) {
+    const motif = (bloc.match(/for\s*=\s*"([^"]+)"/) || [])[1];
+    if (!motif) continue;
+    const valeurs = {};
+    for (const m of bloc.matchAll(/^\s*([A-Za-z-]+)\s*=\s*"([^"]*)"\s*$/gm)) if (m[1] !== 'for') valeurs[m[1]] = m[2];
+    reglesEntetes.push({ prefixe: motif.replace(/\*$/, ''), valeurs });
+  }
+} catch { /* netlify.toml absent */ }
+const entetesPour = chemin => Object.assign({}, ...reglesEntetes.filter(r => chemin.startsWith(r.prefixe)).map(r => r.valeurs));
+
 async function fonction(nom, req, res, corps) {
   const fichier = path.join(racine, 'netlify', 'functions', `${nom}.mjs`);
   if (!/^[a-z0-9-]+$/.test(nom) || !existsSync(fichier)) { res.writeHead(404); return res.end('Fonction introuvable'); }
@@ -54,7 +68,7 @@ async function fichierStatique(urlPath, res) {
       s = await stat(complet);
     }
     const type = TYPES[path.extname(complet).toLowerCase()] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
+    res.writeHead(200, { ...entetesPour(p), 'Content-Type': type, 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
     res.end(await readFile(complet));
   } catch {
     const page404 = path.join(publicDir, '404.html');
