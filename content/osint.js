@@ -16,12 +16,12 @@ export default {
 <h2>Qui fait de l'OSINT ?</h2>
 <ul><li><strong>Journalistes et vérificateurs</strong> : géolocaliser une vidéo, dater une photo, démonter une fausse information.</li><li><strong>Équipes de cybersécurité</strong> : mesurer la surface d'exposition d'une entreprise (sous-domaines, fuites, informations publiées par les salariés), avec l'accord de l'entreprise.</li><li><strong>Chercheurs et ONG</strong> : documenter des conflits ou des atteintes à l'environnement à partir d'images satellites.</li><li><strong>Bénévoles encadrés</strong> : aide à la recherche de personnes disparues lors d'événements organisés avec les autorités.</li></ul>
 <h2>Les sources ouvertes</h2>
-<table><tr><th>Type</th><th>Exemples</th></tr>
+<div class="table-scroll"><table><tr><th>Type</th><th>Exemples</th></tr>
 <tr><td>Web et réseaux sociaux</td><td>pages publiques, profils, commentaires, forums</td></tr>
 <tr><td>Images et vidéos</td><td>photos publiées, métadonnées, vues de rue, satellites</td></tr>
 <tr><td>Données publiques</td><td>registres d'entreprises, publications légales, cadastre, open data</td></tr>
 <tr><td>Données techniques</td><td>DNS, certificats, archives du Web</td></tr>
-<tr><td>Cartes</td><td>OpenStreetMap, cartes en ligne, plans de transports</td></tr></table>
+<tr><td>Cartes</td><td>OpenStreetMap, cartes en ligne, plans de transports</td></tr></table></div>
 <h2>Le cycle du renseignement</h2>
 <ol><li><strong>Besoin</strong> : quelle question précise ? pour qui ? dans quel cadre ?</li><li><strong>Planification et collecte</strong> : quelles sources, quels outils, dans quel ordre.</li><li><strong>Traitement</strong> : trier, traduire, extraire (métadonnées, texte d'une image).</li><li><strong>Analyse</strong> : recouper, évaluer la fiabilité, formuler des hypothèses.</li><li><strong>Diffusion</strong> : un rapport clair, sourcé, avec ses limites.</li></ol>
 <p>Le cycle tourne : une réponse fait souvent naître une nouvelle question.</p>
@@ -43,10 +43,10 @@ export default {
           titre: 'Poser la question et planifier',
           theorie: `<p>Une enquête qui commence par « trouver tout sur… » finit noyée sous les informations. Une bonne enquête commence par une <strong>question fermée et vérifiable</strong>.</p>
 <h2>Formuler la question</h2>
-<table><tr><th>Trop vague</th><th>Précise</th></tr>
+<div class="table-scroll"><table><tr><th>Trop vague</th><th>Précise</th></tr>
 <tr><td>Où est prise cette photo ?</td><td>Dans quelle ville, et depuis quelle rue, cette photo publiée le 3 mars a-t-elle été prise ?</td></tr>
 <tr><td>Que sait-on de cette entreprise ?</td><td>Quels sous-domaines et quelles adresses e-mail de l'entreprise sont publiquement exposés (audit autorisé) ?</td></tr>
-<tr><td>Cette image est-elle vraie ?</td><td>Quand et par qui cette image a-t-elle été publiée pour la première fois ?</td></tr></table>
+<tr><td>Cette image est-elle vraie ?</td><td>Quand et par qui cette image a-t-elle été publiée pour la première fois ?</td></tr></table></div>
 <h2>Le plan d'enquête</h2>
 <ol><li><strong>Cadre</strong> : qui demande, pourquoi, quelle base légale (mission, consentement, intérêt légitime documenté) ?</li><li><strong>Point de départ</strong> : ce que l'on a déjà (une image, un pseudo, une adresse e-mail, un nom de domaine).</li><li><strong>Hypothèses</strong> : ce que l'on pense trouver, pour pouvoir le confirmer… ou l'infirmer.</li><li><strong>Sources et outils</strong> dans l'ordre : du plus simple (lire l'image) au plus long (requêtes cartographiques).</li><li><strong>Critère d'arrêt</strong> : quand la réponse est-elle suffisante ? Combien de temps au maximum ?</li><li><strong>Limites</strong> : ce que l'on s'interdit (contacter la personne, créer de faux comptes, publier des données).</li></ol>
 <h2>Biais à surveiller</h2>
@@ -77,12 +77,12 @@ export default {
           titre: 'Pivoter et recouper',
           theorie: `<p>Un <strong>pivot</strong> est une donnée qui permet de passer d'une source à une autre : un pseudo, une adresse e-mail, un numéro, une photo de profil, un nom de domaine, un lieu, un objet visible. L'enquête avance de pivot en pivot, comme sur un graphe.</p>
 <h2>Les pivots classiques</h2>
-<table><tr><th>Pivot</th><th>Où il mène</th></tr>
+<div class="table-scroll"><table><tr><th>Pivot</th><th>Où il mène</th></tr>
 <tr><td>Pseudo</td><td>d'autres réseaux (souvent avec une variante : point, tiret bas, chiffres)</td></tr>
 <tr><td>Adresse e-mail</td><td>moteurs (entre guillemets), sites de partage de texte, avis, comptes associés</td></tr>
 <tr><td>Photo de profil</td><td>recherche inversée : la même photo ailleurs</td></tr>
 <tr><td>Nom de domaine</td><td>archives du Web, enregistrements DNS, certificats</td></tr>
-<tr><td>Lieu, objet, enseigne</td><td>cartes, vues de rue, OpenStreetMap</td></tr></table>
+<tr><td>Lieu, objet, enseigne</td><td>cartes, vues de rue, OpenStreetMap</td></tr></table></div>
 <h2>Les variantes de pseudo</h2>
 <p>Beaucoup de plateformes interdisent certains caractères. <code>ines.vldr</code> devient <code>ines_vldr</code>, <code>ines-vldr</code> ou <code>inesvldr</code>. Des outils comme <strong>Sherlock</strong> testent un pseudo sur des centaines de sites ; à toi de leur donner les bonnes variantes.</p>
 ${code('javascript', `"ines.vldr".replace(/[._-]+/g, "_"); // "ines_vldr"`)}
@@ -121,11 +121,12 @@ console.log(variantesPseudo("ines.vldr"));`,
           theorie: `<p>Une découverte non documentée n'existe pas : la page peut être supprimée dans l'heure, le compte rendu privé, la photo remplacée. Documenter, c'est permettre à quelqu'un d'autre de <strong>refaire ton raisonnement</strong>.</p>
 <h2>Le journal d'enquête</h2>
 <p>Pour chaque élément : <strong>date et heure</strong> (avec fuseau), <strong>adresse exacte</strong> (URL), ce que tu as cherché et comment (requête, outil), ce que tu as trouvé, et ton interprétation, séparée des faits.</p>
-${code('text', `2026-03-04 14:12 (UTC+1) · https://chirp.example/ines_vldr
+${code('text', `2026-03-04 14:12 (UTC+1) · https://chirp.example/malo_frd
 Méthode : variante du pseudo (point → tiret bas) testée sur PseudoScan
-Fait : message du 26/02 « voici Pistache 🐈 »
-Interprétation : le chat s'appelle probablement Pistache (B2)
-Capture : 2026-03-04_chirp_ines_vldr.png · SHA-256 : 9f2c…`)}
+Fait : message du 11/01 « Biscotte a encore mangé un chausson 🐕 »
+Interprétation : le chien de Malo s'appelle probablement Biscotte (B2)
+Capture : 2026-03-04_chirp_malo_frd.png · SHA-256 : 9f2c…`)}
+<p class="muted">Malo Ferrand est un personnage fictif, comme Inès Valadier dans les défis de l'arène.</p>
 <h2>Capturer et archiver</h2>
 <ul><li><strong>Capture d'écran complète</strong> avec l'URL et l'heure visibles (ou extension de capture pleine page).</li><li><strong>Archive publique</strong> : « Save Page Now » de la Wayback Machine ou archive.today, quand c'est approprié (attention : archiver publiquement une donnée personnelle la rend plus visible).</li><li><strong>Empreinte (hash)</strong> SHA-256 de chaque fichier conservé : elle prouve qu'il n'a pas été modifié depuis.</li><li>Des outils dédiés enregistrent automatiquement tout cela (par exemple Hunchly), mais un tableur rigoureux suffit pour débuter.</li></ul>
 <h2>Faits, déductions, hypothèses</h2>
@@ -144,7 +145,7 @@ Capture : 2026-03-04_chirp_ines_vldr.png · SHA-256 : 9f2c…`)}
               { label: 'La capture est référencée (nom de fichier ou empreinte)', re: /capture\s*:[^\n]*(\.png|\.jpg|\.pdf|sha|hash|empreinte)/i },
               motsMin(35)
             ],
-            solution: '<p>Date : 2026-03-04 14:12 (UTC+1). URL : https://chirp.example/ines_vldr. Méthode : variante du pseudo ines.vldr avec un tiret bas, testée sur PseudoScan puis ouverte directement. Fait : un message du 26 février présente « Pistache 🐈 ». Interprétation : le chat d\'Inès s\'appelle très probablement Pistache, cohérent avec son commentaire sur Pixelgram (B2). Capture : 2026-03-04_chirp_ines_vldr.png, SHA-256 consigné dans le tableur.</p>'
+            solution: '<p>Exemple sur un autre personnage fictif (pour ne pas donner la réponse du défi) : Date : 2026-03-04 14:12 (UTC+1). URL : https://chirp.example/malo_frd. Méthode : variante du pseudo malo.frd avec un tiret bas, testée sur PseudoScan puis ouverte directement. Fait : un message du 11 janvier présente « Biscotte 🐕 ». Interprétation : le chien de Malo s\'appelle très probablement Biscotte, cohérent avec un commentaire sur son blog (B2). Capture : 2026-03-04_chirp_malo_frd.png, SHA-256 consigné dans le tableur.</p>'
           },
           quiz: [
             { q: 'Pourquoi calculer l\'empreinte SHA-256 d\'une capture ?', options: ['Pour la compresser', 'Pour prouver qu\'elle n\'a pas été modifiée depuis', 'Pour la chiffrer'], bonne: 1, explication: 'Le moindre changement donne une empreinte totalement différente.' },
@@ -164,11 +165,11 @@ Capture : 2026-03-04_chirp_ines_vldr.png · SHA-256 : 9f2c…`)}
 <h2>L'inventaire systématique</h2>
 <ol><li><strong>Texte</strong> : langue, alphabet, enseignes, numéros de téléphone (indicatif), noms de domaine (.fr, .dz, .co.za), plaques de rue.</li><li><strong>Route</strong> : sens de circulation, marquages (couleur des lignes), panneaux, bornes, poteaux, plaques d'immatriculation.</li><li><strong>Architecture</strong> : matériaux (brique rose de Toulouse, pierre de taille parisienne), toits (tuiles canal, ardoise), balcons, escaliers extérieurs.</li><li><strong>Nature</strong> : végétation (palmiers, oliviers, érables), relief, couleur de la terre, neige.</li><li><strong>Lumière</strong> : position du soleil, longueur et direction des ombres.</li><li><strong>Contexte</strong> : vêtements, véhicules, transports en commun, logos de métro ou de tram.</li></ol>
 <h2>Indices forts et indices faibles</h2>
-<table><tr><th>Indice fort</th><th>Indice faible (à confirmer)</th></tr>
+<div class="table-scroll"><table><tr><th>Indice fort</th><th>Indice faible (à confirmer)</th></tr>
 <tr><td>Nom de rue lisible, monument unique</td><td>Type de végétation</td></tr>
 <tr><td>Indicatif téléphonique, domaine national</td><td>Couleur des voitures, marques</td></tr>
 <tr><td>Style de plaque d'immatriculation</td><td>Météo, nuages</td></tr>
-<tr><td>Alphabet rare (tifinagh, géorgien…)</td><td>Style « méditerranéen »</td></tr></table>
+<tr><td>Alphabet rare (tifinagh, géorgien…)</td><td>Style « méditerranéen »</td></tr></table></div>
 <h2>Vérifier</h2>
 <p>Une hypothèse se confirme en retrouvant le <strong>même point de vue</strong> : vue de rue (Street View, Mapillary), vue satellite, photos d'autres personnes au même endroit. On aligne au moins deux éléments fixes (un angle de bâtiment, un poteau, une silhouette de colline).</p>
 <div class="callout info"><b>Dans l'arène</b>Commence par <a href="#/ctf/geo-capitole">La place aux huit colonnes</a> (texte visible), puis <a href="#/ctf/geo-kabylie">Trois écritures sur un panneau</a> (indices faibles combinés).</div>`,
@@ -193,11 +194,11 @@ Capture : 2026-03-04_chirp_ines_vldr.png · SHA-256 : 9f2c…`)}
 <h2>Algérie</h2>
 <p>Plaques à chiffres noirs sur fond blanc, au format <code>NNNNN CAA WW</code> : un numéro d'ordre à cinq chiffres, un groupe de trois chiffres (le premier indique la <strong>catégorie</strong> du véhicule, 1 pour une voiture particulière, les deux suivants l'<strong>année</strong> de mise en circulation), puis le code de la <strong>wilaya</strong> (16 = Alger, 15 = Tizi Ouzou, 31 = Oran, 25 = Constantine). Panneaux en arabe et en français, parfois en tifinagh (tamazight), surtout en Kabylie.</p>
 <h2>Ailleurs</h2>
-<table><tr><th>Indice</th><th>Où</th></tr>
+<div class="table-scroll"><table><tr><th>Indice</th><th>Où</th></tr>
 <tr><td>Panneau stop « ARRÊT », plaque « Je me souviens » (arrière seulement)</td><td>Québec</td></tr>
 <tr><td>Plaque arrière jaune, circulation à gauche</td><td>Royaume-Uni</td></tr>
 <tr><td>Plaques « CA … » (Cape Town), circulation à gauche, afrikaans</td><td>Le Cap, Afrique du Sud</td></tr>
-<tr><td>Lignes centrales jaunes</td><td>Amériques (États-Unis, Canada…), entre autres</td></tr></table>
+<tr><td>Lignes centrales jaunes</td><td>Amériques (États-Unis, Canada…), entre autres</td></tr></table></div>
 <h2>Le sens de circulation</h2>
 <p>Environ un tiers de la population mondiale roule à gauche (Royaume-Uni, Irlande, Japon, Inde, Australie, Afrique australe…). Attention : une image <strong>retournée en miroir</strong> inverse aussi le sens de circulation. Vérifie que le texte se lit à l'endroit.</p>`,
           exercice: {
@@ -285,9 +286,9 @@ console.log(heureLegale("14:00", 1.444, -4.1, 2));`,
           titre: 'Coordonnées, distances et précision',
           theorie: `<p>Une géolocalisation se termine par des <strong>coordonnées</strong>, et souvent par une question de distance : « à combien de mètres de la cible suis-je ? »</p>
 <h2>Deux écritures</h2>
-<ul><li><strong>Décimale (DD)</strong> : <code>43.6044, 1.4439</code> (latitude puis longitude ; sud et ouest en négatif).</li><li><strong>Degrés, minutes, secondes (DMS)</strong> : <code>43°36'16"N 1°26'38"E</code>.</li></ul>
+<ul><li><strong>Décimale (DD)</strong> : <code>44.8411, -0.5694</code> (place de la Bourse à Bordeaux : latitude puis longitude ; sud et ouest en négatif).</li><li><strong>Degrés, minutes, secondes (DMS)</strong> : <code>44°50'28"N 0°34'10"W</code>.</li></ul>
 ${code('text', `décimal = degrés + minutes / 60 + secondes / 3600   (négatif si S ou O/W)
-43°36'16"N  →  43 + 36/60 + 16/3600 = 43.6044`)}
+44°50'28"N  →  44 + 50/60 + 28/3600 = 44.8411`)}
 <p>Ordre de grandeur : 1° de latitude ≈ 111 km ; 0,001° ≈ 111 m ; la 4<sup>e</sup> décimale ≈ 11 m. Donner 8 décimales pour un point estimé « à la rue près » est une fausse précision.</p>
 <h2>La distance à vol d'oiseau</h2>
 <p>La <strong>formule de haversine</strong> donne la distance sur une sphère de rayon R ≈ 6 371 km :</p>
@@ -300,7 +301,7 @@ const d = 2 * 6371 * Math.asin(Math.sqrt(a)); // en km (dLat et dLon en radians)
 <p>Dans un rapport, on indique la précision : « photo prise sur le quai de la Daurade, à ± 50 m, angle de vue vers l'ouest ». Une zone (cercle, rue, quartier) honnête vaut mieux qu'un point faussement exact.</p>`,
           exercice: {
             type: 'code', langage: 'javascript', titre: 'Convertir et mesurer',
-            enonce: `<p>Écris <code>dmsVersDecimal(texte)</code> qui convertit une coordonnée DMS comme <code>43°36'16"N</code> en nombre décimal <strong>arrondi à 4 décimales</strong> (négatif pour S, O ou W ; renvoie <code>null</code> si le texte n'est pas reconnu), et <code>distanceKm(lat1, lon1, lat2, lon2)</code> qui renvoie la distance haversine en km (R = 6371) <strong>arrondie au dixième</strong>.</p>`,
+            enonce: `<p>Écris <code>dmsVersDecimal(texte)</code> qui convertit une coordonnée DMS comme <code>44°50'28"N</code> en nombre décimal <strong>arrondi à 4 décimales</strong> (négatif pour S, O ou W ; renvoie <code>null</code> si le texte n'est pas reconnu), et <code>distanceKm(lat1, lon1, lat2, lon2)</code> qui renvoie la distance haversine en km (R = 6371) <strong>arrondie au dixième</strong>.</p>`,
             depart: `function dmsVersDecimal(texte) {
   // ...
 }
@@ -309,7 +310,7 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   // ...
 }
 
-console.log(dmsVersDecimal("43°36'16\\"N"), distanceKm(43.6044, 1.4439, 48.8566, 2.3522));
+console.log(dmsVersDecimal("44°50'28\\"N"), distanceKm(44.8411, -0.5694, 48.8566, 2.3522));
 `,
             solution: `function dmsVersDecimal(texte) {
   const m = texte.match(/(\\d+(?:\\.\\d+)?)°\\s*(\\d+(?:\\.\\d+)?)'\\s*(\\d+(?:\\.\\d+)?)"\\s*([NSEOW])/i);
@@ -326,8 +327,8 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   return Math.round(2 * R * Math.asin(Math.sqrt(a)) * 10) / 10;
 }
 
-console.log(dmsVersDecimal("43°36'16\\"N"), distanceKm(43.6044, 1.4439, 48.8566, 2.3522));`,
-            tests: [sansErreur(), expr('dmsVersDecimal("43°36\'16\\"N")', 43.6044), expr('dmsVersDecimal("1°26\'38\\"E")', 1.4439), expr('dmsVersDecimal("33°55\'30\\"S")', -33.925, 'Sud et ouest sont négatifs.'), expr('dmsVersDecimal("73°34\'48\\"O")', -73.58, 'O (ouest en français) est négatif, comme W.'), expr('dmsVersDecimal("Toulouse")', null), expr('distanceKm(0, 0, 0, 1)', 111.2), expr('distanceKm(43.6044, 1.4439, 48.8566, 2.3522)', 588.2, 'Toulouse–Paris : environ 588 km à vol d\'oiseau.'), exprVerif('distanceKm(36.7538, 3.0588, 43.6044, 1.4439)', 'Alger–Toulouse ≈ 774 km', v => Math.abs(v - 774) < 0.2)]
+console.log(dmsVersDecimal("44°50'28\\"N"), distanceKm(44.8411, -0.5694, 48.8566, 2.3522));`,
+            tests: [sansErreur(), expr('dmsVersDecimal("44°50\'28\\"N")', 44.8411), expr('dmsVersDecimal("0°34\'10\\"W")', -0.5694, 'Sud et ouest sont négatifs.'), expr('dmsVersDecimal("34°36\'12\\"S")', -34.6033, 'Sud et ouest sont négatifs.'), expr('dmsVersDecimal("58°22\'53\\"O")', -58.3814, 'O (ouest en français) est négatif, comme W.'), expr('dmsVersDecimal("Toulouse")', null), expr('distanceKm(0, 0, 0, 1)', 111.2), expr('distanceKm(44.8411, -0.5694, 48.8566, 2.3522)', 498.6, 'Bordeaux–Paris : environ 499 km à vol d\'oiseau.'), exprVerif('distanceKm(33.5731, -7.5898, 44.8411, -0.5694)', 'Casablanca–Bordeaux ≈ 1 390 km', v => Math.abs(v - 1390) < 0.2)]
           },
           quiz: [
             { q: 'Que vaut 0,001° de latitude ?', options: ['Environ 1 m', 'Environ 111 m', 'Environ 11 km'], bonne: 1, explication: '1° ≈ 111 km.' },
@@ -344,14 +345,14 @@ console.log(dmsVersDecimal("43°36'16\\"N"), distanceKm(43.6044, 1.4439, 48.8566
         {
           titre: 'Les cartes de l\'enquêteur',
           theorie: `<p>Aucune carte ne suffit seule : chacune a ses forces, ses dates de mise à jour et ses zones blanches.</p>
-<table><tr><th>Outil</th><th>Atout</th><th>Limite</th></tr>
+<div class="table-scroll"><table><tr><th>Outil</th><th>Atout</th><th>Limite</th></tr>
 <tr><td><strong>OpenStreetMap</strong></td><td>données libres, très détaillées (bancs, fontaines, arrêts), interrogeables avec Overpass</td><td>couverture inégale selon les contributeurs</td></tr>
 <tr><td><strong>Google Maps / Street View</strong></td><td>couverture des vues de rue, photos des lieux</td><td>données non libres, vues parfois anciennes</td></tr>
 <tr><td><strong>Google Earth Pro</strong></td><td>historique des images satellites, 3D, mesure</td><td>logiciel à installer</td></tr>
 <tr><td><strong>Mapillary</strong></td><td>photos de rue participatives et libres, souvent récentes, y compris hors des grands axes</td><td>couverture variable</td></tr>
 <tr><td><strong>Bing, Yandex, Apple Plans</strong></td><td>autres images satellites et vues de rue (utile pour comparer les dates)</td><td>couverture variable</td></tr>
 <tr><td><strong>Géoportail (IGN)</strong></td><td>cartes et photos aériennes françaises, historiques depuis les années 1950, cadastre</td><td>France uniquement</td></tr>
-<tr><td><strong>Sentinel (Copernicus)</strong></td><td>images satellites libres tous les quelques jours</td><td>résolution de 10 m</td></tr></table>
+<tr><td><strong>Sentinel (Copernicus)</strong></td><td>images satellites libres tous les quelques jours</td><td>résolution de 10 m</td></tr></table></div>
 <h2>Les bons réflexes</h2>
 <ul><li><strong>Dater</strong> chaque image (satellite ou vue de rue) : un bâtiment peut avoir été construit ou démoli depuis.</li><li><strong>Comparer</strong> plusieurs fournisseurs : l'un a peut-être une vue plus récente ou sous un meilleur angle.</li><li><strong>Mesurer</strong> : la règle des outils cartographiques permet de vérifier une distance ou une hauteur estimée.</li><li><strong>Créditer</strong> : OpenStreetMap exige la mention « © contributeurs OpenStreetMap » sur toute carte réutilisée.</li></ul>
 <div class="callout info"><b>Dans l'arène</b>La carte des défis utilise Leaflet et les tuiles OpenStreetMap, avec un fond simplifié Natural Earth si elles ne se chargent pas.</div>`,
@@ -411,16 +412,16 @@ Un phare :                        man_made=___`,
 ${code('text', `[out:json][timeout:25];          // format de sortie et délai maximal
 node["amenity"="cafe"]            // type d'objet + filtres sur les tags
     ["outdoor_seating"="yes"]     // filtres cumulés (ET logique)
-    (around:300,43.6044,1.4436);  // à moins de 300 m de ce point
+    (around:300,44.8411,-0.5694); // à moins de 300 m de ce point
 out body;                          // afficher les résultats`)}
 <h2>Les filtres</h2>
-<table><tr><th>Filtre</th><th>Sens</th></tr>
+<div class="table-scroll"><table><tr><th>Filtre</th><th>Sens</th></tr>
 <tr><td><code>["clé"="valeur"]</code></td><td>égalité exacte</td></tr>
 <tr><td><code>["clé"~"regex"]</code> / <code>["clé"~"regex",i]</code></td><td>expression régulière (insensible à la casse avec <code>,i</code>)</td></tr>
 <tr><td><code>["clé"]</code> / <code>[!"clé"]</code></td><td>le tag existe / n'existe pas</td></tr>
 <tr><td><code>(around:R,lat,lon)</code></td><td>à moins de R mètres d'un point</td></tr>
 <tr><td><code>(around.ensemble:R)</code></td><td>à moins de R mètres d'objets trouvés avant</td></tr>
-<tr><td><code>(area.zone)</code></td><td>à l'intérieur d'une zone (commune, quartier)</td></tr></table>
+<tr><td><code>(area.zone)</code></td><td>à l'intérieur d'une zone (commune, quartier)</td></tr></table></div>
 <h2>Chercher dans une commune</h2>
 ${code('text', `[out:json][timeout:25];
 area["name"="Toulouse"]["admin_level"="8"]->.ville;   // 8 = commune en France
@@ -435,9 +436,9 @@ out body;`)}
 <div class="callout warn"><b>Ménager le service</b>Overpass est gratuit et partagé : des zones raisonnables, un <code>timeout</code>, et pas de requêtes en boucle. L'éditeur de l'arène interroge <code>overpass-api.de</code> en ligne, ou le jeu de données local de l'île fictive.</div>`,
           exercice: {
             type: 'trous', langage: 'text', titre: 'Compléter des requêtes Overpass',
-            enonce: '<p>Complète les deux requêtes : la première cherche les pharmacies à moins de 300 m de la place du Capitole (résultats en JSON), la seconde les musées de la commune de Toulouse.</p>',
+            enonce: '<p>Complète les deux requêtes : la première cherche les pharmacies à moins de 300 m de la place de la Bourse, à Bordeaux (résultats en JSON), la seconde les musées de la commune de Toulouse.</p>',
             code: `[out:___][timeout:25];
-node["amenity"="___"](___:300,43.6044,1.4436);
+node["amenity"="___"](___:300,44.8411,-0.5694);
 out body;
 
 area["name"="Toulouse"]["admin_level"="___"]->.ville;
@@ -501,13 +502,13 @@ out body;`)}
 <h2>Le RGPD et la loi Informatique et libertés</h2>
 <ul><li>Une donnée <strong>personnelle</strong> (nom, photo, pseudo, adresse, plaque…) reste protégée même si elle est <strong>publique</strong>.</li><li>Collecter et compiler des données sur une personne est un <strong>traitement</strong> : il faut une <strong>base légale</strong> (consentement, contrat, obligation légale, mission d'intérêt public, intérêt légitime documenté), un objectif précis, une collecte minimale et une durée de conservation limitée.</li><li>La personne a des droits (accès, effacement, opposition). La CNIL contrôle et sanctionne.</li></ul>
 <h2>Le Code pénal</h2>
-<table><tr><th>Article</th><th>Ce qu'il interdit</th></tr>
+<div class="table-scroll"><table><tr><th>Article</th><th>Ce qu'il interdit</th></tr>
 <tr><td><strong>323-1 et suivants</strong></td><td>Accéder ou se maintenir frauduleusement dans un système informatique (jusqu'à 3 ans et 100 000 € d'amende, davantage si des données sont modifiées ou s'il s'agit d'un système de l'État). Se connecter avec des identifiants trouvés dans une fuite en fait partie.</td></tr>
 <tr><td><strong>226-1</strong> et suivants</td><td>Atteintes à la vie privée : capter ou diffuser sans consentement l'image ou les paroles d'une personne dans un lieu privé.</td></tr>
 <tr><td><strong>226-18</strong></td><td>Collecter des données personnelles par un moyen frauduleux, déloyal ou illicite.</td></tr>
 <tr><td><strong>223-1-1</strong></td><td>Révéler des informations sur la vie privée, familiale ou professionnelle d'une personne permettant de la localiser, pour l'exposer à un risque (le « doxing »).</td></tr>
 <tr><td><strong>222-33-2-2</strong></td><td>Harcèlement moral, y compris en ligne et en meute.</td></tr>
-<tr><td><strong>226-4-1</strong></td><td>Usurpation d'identité.</td></tr></table>
+<tr><td><strong>226-4-1</strong></td><td>Usurpation d'identité.</td></tr></table></div>
 <h2>Les cadres autorisés</h2>
 <p>Journalisme (avec ses règles déontologiques), mission d'audit avec contrat et périmètre écrits, enquête interne encadrée, recherche académique, compétitions et plateformes d'entraînement, et bien sûr les cas <strong>fictifs</strong> comme ceux de l'arène.</p>
 <div class="callout warn"><b>Ceci n'est pas un avis juridique</b>Les textes évoluent : consulte legifrance.gouv.fr et cnil.fr, et en cas de doute, un juriste.</div>`,
@@ -555,7 +556,7 @@ out body;`)}
         {
           titre: 'La boîte à outils de référence',
           theorie: `<p>Les outils changent vite ; la méthode reste. Voici les classiques, à connaître et à essayer sur des cas autorisés.</p>
-<table><tr><th>Besoin</th><th>Outils</th></tr>
+<div class="table-scroll"><table><tr><th>Besoin</th><th>Outils</th></tr>
 <tr><td>S'orienter</td><td><strong>OSINT Framework</strong> (osintframework.com) : arbre d'outils classés par type de recherche</td></tr>
 <tr><td>Pseudos</td><td><strong>Sherlock</strong> (ligne de commande, libre) : teste un pseudo sur des centaines de sites ; WhatsMyName</td></tr>
 <tr><td>Métadonnées</td><td><strong>exiftool</strong> (Phil Harvey) : <code>exiftool photo.jpg</code> affiche EXIF, GPS, appareil, logiciel, miniature</td></tr>
@@ -564,7 +565,7 @@ out body;`)}
 <tr><td>Soleil</td><td><strong>SunCalc</strong> : direction et hauteur du soleil, heure par heure</td></tr>
 <tr><td>Cartes</td><td><strong>Google Earth Pro</strong> (historique), <strong>Mapillary</strong>, OpenStreetMap et <strong>overpass-turbo</strong>, Géoportail</td></tr>
 <tr><td>Archives</td><td><strong>Wayback Machine</strong> d'Internet Archive, archive.today</td></tr>
-<tr><td>Domaines</td><td>WHOIS/RDAP, historique DNS, journaux de certificats (crt.sh)</td></tr></table>
+<tr><td>Domaines</td><td>WHOIS/RDAP, historique DNS, journaux de certificats (crt.sh)</td></tr></table></div>
 ${code('bash', `# Sherlock : tester un pseudo et ses variantes
 sherlock ines_vldr ines.vldr
 
@@ -600,11 +601,11 @@ Photos de rue participatives et libres :                     ___`,
 <h2>La structure</h2>
 <ol><li><strong>Question et cadre</strong> : qui demande, pourquoi, avec quelle autorisation.</li><li><strong>Synthèse</strong> : la réponse en trois lignes, avec le <strong>niveau de confiance</strong> (élevé, moyen, faible).</li><li><strong>Méthode</strong> : sources et outils utilisés, dans l'ordre.</li><li><strong>Constatations</strong> : chaque fait avec sa source (URL, date de consultation, capture, empreinte).</li><li><strong>Analyse</strong> : les déductions, les hypothèses écartées et pourquoi.</li><li><strong>Limites</strong> : ce qui n'a pas pu être vérifié, ce qui pourrait changer la conclusion.</li><li><strong>Recommandations</strong> (pour un audit) : quoi corriger, par ordre de priorité.</li></ol>
 <h2>Le vocabulaire de la confiance</h2>
-<table><tr><th>Formulation</th><th>Quand l'utiliser</th></tr>
+<div class="table-scroll"><table><tr><th>Formulation</th><th>Quand l'utiliser</th></tr>
 <tr><td>« Nous avons établi que… »</td><td>plusieurs sources indépendantes concordantes</td></tr>
 <tr><td>« Il est probable que… »</td><td>indices concordants mais une seule source forte</td></tr>
 <tr><td>« Il est possible que… »</td><td>hypothèse plausible, non vérifiée</td></tr>
-<tr><td>« Nous n'avons pas pu déterminer… »</td><td>pas assez d'éléments : c'est une conclusion honorable</td></tr></table>
+<tr><td>« Nous n'avons pas pu déterminer… »</td><td>pas assez d'éléments : c'est une conclusion honorable</td></tr></table></div>
 <h2>Pour l'audit d'une personne (avec son accord)</h2>
 <p>Le rapport s'adresse à elle : ce qu'un inconnu peut apprendre, comment, et comment s'en protéger (paramètres de confidentialité, pseudos distincts, suppression de métadonnées, demandes de retrait aux archives et aux moteurs, changement des réponses aux « questions secrètes »).</p>
 <div class="callout info"><b>Mise en pratique</b>Termine les cinq défis OSINT de l'arène (enquête sur Inès Valadier, personnage fictif) puis rédige le rapport ci-dessous.</div>`,
@@ -621,7 +622,7 @@ Photos de rue participatives et libres :                     ___`,
               { label: 'Au moins trois recommandations numérotées', verif: t => ((t.split(/recommandations?\s*:/i)[1] || '').match(/\d[.)]/g) || []).length >= 3 },
               motsMin(120)
             ],
-            solution: '<p>Cadre : audit d\'exposition en ligne demandé par Inès Valadier, avec son accord écrit, sur sources ouvertes simulées uniquement. Synthèse : un inconnu peut établir avec un niveau de confiance élevé le nom de son chat, le café qu\'elle fréquente, le quartier de son bureau, un ancien projet confidentiel et une note de travail publique. Constatations : 1. Pseudo réutilisé (ines.vldr / ines_vldr) reliant Pixelgram et Chirp, où le nom du chat « Pistache » est publié (chirp.example/ines_vldr). 2. Le reflet de ses lunettes révèle le Café Zéphyr (pixelgram.example/p/lunettes). 3. L\'ancienne page À propos archivée mentionne l\'« Opération Cassoulet » (archive-du-web.example, capture de 2021). 4. Une note publique contient le nom du projet client et l\'existence d\'un mot de passe provisoire (collepad.example/n8Qe2). 5. La vue depuis son bureau montre le clocher de Saint-Sernin à Toulouse (chirp.example). Limites : sites simulés ; pas de vérification sur le terrain ; d\'autres comptes peuvent exister sous des pseudos non testés. Recommandations : 1. Supprimer la note publique et changer le mot de passe mentionné. 2. Utiliser des pseudos différents et ne jamais répondre honnêtement aux questions secrètes. 3. Demander le retrait des captures archivées. 4. Vérifier reflets et vues avant de publier, et publier en différé.</p>'
+            solution: '<p>Les réponses des défis sont remplacées ici par [entre crochets] : retrouve-les dans l\'arène. Cadre : audit d\'exposition en ligne demandé par Inès Valadier, avec son accord écrit, sur sources ouvertes simulées uniquement. Synthèse : un inconnu peut établir avec un niveau de confiance élevé le nom de son animal, le café qu\'elle fréquente, le quartier de son bureau, un ancien projet confidentiel et une note de travail publique. Constatations : 1. Pseudo réutilisé (point sur un réseau, tiret bas sur l\'autre) reliant Pixelgram et Chirp, où le nom de l\'animal [défi « Le pseudo voyageur »] est publié (chirp.example). 2. Le reflet de ses lunettes révèle l\'enseigne d\'un café [défi « Dans les verres fumés »] (pixelgram.example). 3. L\'ancienne page À propos archivée mentionne le nom de code d\'un projet client [défi « Ce que la page disait avant »] (archive-du-web.example, capture de 2021). 4. Une note publique contient le nom du projet client et l\'existence d\'un mot de passe provisoire (collepad.example). 5. La vue depuis son bureau montre un monument reconnaissable qui situe le quartier [défi « La pause café avec vue »] (chirp.example). Limites : sites simulés ; pas de vérification sur le terrain ; d\'autres comptes peuvent exister sous des pseudos non testés. Recommandations : 1. Supprimer la note publique et changer le mot de passe mentionné. 2. Utiliser des pseudos différents et ne jamais répondre honnêtement aux questions secrètes. 3. Demander le retrait des captures archivées. 4. Vérifier reflets et vues avant de publier, et publier en différé.</p>'
           },
           quiz: [
             { q: 'Que met-on dans la synthèse ?', options: ['Tout le détail des recherches', 'La réponse courte avec son niveau de confiance', 'La liste des outils'], bonne: 1, explication: 'Le lecteur pressé doit tout comprendre en trois lignes.' },

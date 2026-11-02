@@ -74,12 +74,19 @@ const valeur = (l, t) => (l.find(x => x.tag === t) || {}).val;
 // Analyse un fichier (octets) et renvoie un rapport de métadonnées.
 export function analyser(b) {
   const rapport = { format: '?', groupes: [], gps: null, miniature: null, commentaires: [] };
+  try { lireFormat(b, rapport); }
+  catch (err) { rapport.commentaires.push(`Fichier tronqué ou mal formé : lecture interrompue (${err.message}). Les informations déjà lues sont affichées.`); }
+  return rapport;
+}
+function lireFormat(b, rapport) {
+  if (b.length < 4) { rapport.format = 'inconnu'; rapport.commentaires.push('Fichier vide ou trop court.'); return; }
   if (b[0] === 0xFF && b[1] === 0xD8) {
     rapport.format = 'JPEG';
     let o = 2;
     while (o + 4 <= b.length && b[o] === 0xFF) {
       const m = b[o + 1], len = (b[o + 2] << 8) | b[o + 3];
       if (m === 0xDA || m === 0xD9) break;
+      if (o + 2 + len > b.length) rapport.commentaires.push('Fichier JPEG tronqué : un segment de métadonnées dépasse la fin du fichier.');
       if (m === 0xE1 && latin1(b.slice(o + 4, o + 10)) === 'Exif\0\0') {
         try {
           const t = lireTIFF(b.subarray(0, o + 2 + len), o + 10);
@@ -104,6 +111,7 @@ export function analyser(b) {
     let o = 8; const lignes = [];
     while (o + 8 <= b.length) {
       const len = v.getUint32(o), type = latin1(b.slice(o + 4, o + 8));
+      if (o + 12 + len > b.length) { rapport.commentaires.push(`Fichier PNG tronqué : le bloc « ${type.replace(/[^\x20-\x7e]/g, '?')} » annonce ${len} octets mais le fichier s'arrête avant.`); break; }
       if (type === 'IHDR') lignes.push({ nom: 'Dimensions', valeur: `${v.getUint32(o + 8)} × ${v.getUint32(o + 12)} px` });
       if (type === 'tEXt' || type === 'iTXt') { const d = b.slice(o + 8, o + 8 + len); const z = d.indexOf(0); lignes.push({ nom: `Texte « ${latin1(d.slice(0, z))} »`, valeur: new TextDecoder().decode(d.slice(type === 'iTXt' ? d.indexOf(0, d.indexOf(0, z + 3) + 1) + 1 : z + 1)) }); }
       if (type === 'tIME') lignes.push({ nom: 'Date de modification', valeur: `${v.getUint16(o + 8)}-${String(b[o + 10]).padStart(2, '0')}-${String(b[o + 11]).padStart(2, '0')} ${b[o + 12]}:${String(b[o + 13]).padStart(2, '0')}` });
@@ -116,7 +124,6 @@ export function analyser(b) {
     const fin = (() => { for (let i = b.length - 2; i > 2; i--) if (b[i] === 0xFF && b[i + 1] === 0xD9) return i; return -1; })();
     if (fin > 0 && fin + 2 < b.length) rapport.commentaires.push(`${b.length - fin - 2} octet(s) après le marqueur de fin JPEG (FF D9) : à examiner avec l'outil Hex.`);
   }
-  return rapport;
 }
 
 export function monter(el) {
@@ -142,7 +149,10 @@ export function monter(el) {
     $('[data-copier-gps]', corps)?.addEventListener('click', () => copier(`${r.gps.lat}, ${r.gps.lon}`));
     return r;
   };
-  $('#exFile', el).addEventListener('change', async e => { const f = e.target.files[0]; if (f) afficher(await lireFichier(f), f.name); });
+  $('#exFile', el).addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { afficher(await lireFichier(f), f.name); } catch (err) { corps.innerHTML = `<p class="callout warn">Impossible de lire ce fichier : ${esc(err.message)}</p>`; }
+  });
   return {
     async charger({ src, octets, nom }) {
       corps.innerHTML = '<p class="muted"><span class="spinner"></span> Lecture du fichier…</p>';

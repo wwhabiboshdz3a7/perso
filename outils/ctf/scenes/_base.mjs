@@ -73,9 +73,12 @@ export function fenetre(x, y, l, h, { volets = '#5b7f6e', cadre = '#efe6d6', ouv
 }
 
 // Personnage stylisé (vu de face ou de dos) et son ombre portée (dx, dy = direction de l'ombre au sol)
-export function personne(x, y, h = 120, { haut = '#334155', bas = '#1f2937', peau = '#d6a77a', cheveux = '#2a1d16', ombre = null, sac = false } = {}) {
+export function personne(x, y, h = 120, { haut = '#334155', bas = '#1f2937', peau = '#d6a77a', cheveux = '#2a1d16', ombre = null, sac = false, ombreNette = false } = {}) {
   const k = h / 120;
-  const om = ombre ? `<path d="M${x - 12 * k} ${y} L${x + 12 * k} ${y} L${x + 12 * k + ombre[0] * k} ${y + ombre[1] * k} L${x - 12 * k + ombre[0] * k} ${y + ombre[1] * k} Z" fill="#000" opacity=".28" filter="url(#flou2)"/>` : '';
+  // ombre nette : silhouette allongée (jambes, corps, tête) projetée au sol dans la direction donnée
+  const om = !ombre ? '' : !ombreNette ? `<path d="M${x - 12 * k} ${y} L${x + 12 * k} ${y} L${x + 12 * k + ombre[0] * k} ${y + ombre[1] * k} L${x - 12 * k + ombre[0] * k} ${y + ombre[1] * k} Z" fill="#000" opacity=".28" filter="url(#flou2)"/>`
+    : (() => { const ex = x + ombre[0] * k, ey = y + ombre[1] * k, n = Math.hypot(ombre[0], ombre[1]) || 1, px = -ombre[1] / n, py = ombre[0] / n, w = 11 * k;
+      return `<path d="M${f(x + px * w)} ${f(y + py * w)} L${f(ex + px * w * 1.2)} ${f(ey + py * w * 1.2)} L${f(ex - px * w * 1.2)} ${f(ey - py * w * 1.2)} L${f(x - px * w)} ${f(y - py * w)} Z" fill="#111827" opacity=".5"/><ellipse cx="${f(ex + (ombre[0] / n) * 8 * k)}" cy="${f(ey + (ombre[1] / n) * 8 * k)}" rx="${f(10 * k)}" ry="${f(6 * k)}" fill="#111827" opacity=".5" transform="rotate(${f(Math.atan2(ombre[1], ombre[0]) * 180 / Math.PI)} ${f(ex + (ombre[0] / n) * 8 * k)} ${f(ey + (ombre[1] / n) * 8 * k)})"/>`; })();
   return `${om}<g transform="translate(${x} ${y}) scale(${k})">
     <rect x="-11" y="-58" width="9" height="58" rx="4" fill="${bas}"/><rect x="2" y="-58" width="9" height="58" rx="4" fill="${bas}"/>
     <path d="M-17 -60 Q-18 -100 0 -102 Q18 -100 17 -60 Z" fill="${haut}"/>

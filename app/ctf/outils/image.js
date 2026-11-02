@@ -1,5 +1,5 @@
 // Labo image : miroir, rotation, inversion, contraste, amplification des écarts, plans de bits,
-// extraction de texte caché dans les bits de poids faible (LSB) et inspection des pixels.
+// extraction de texte caché dans le bit de poids faible (LSB) et inspection des pixels.
 import { $, $$, url, lireFichier, telecharger, versHex } from '../commun.js';
 
 // Extrait des octets depuis les bits choisis des pixels (parcours ligne par ligne, bit de poids fort d'abord).
@@ -19,11 +19,11 @@ export function monter(el) {
   el.innerHTML = `<div class="lab">
     <div class="row lab-tete"><label class="btn small" for="labFile">Ouvrir une image…</label><input type="file" id="labFile" accept="image/*" hidden><span class="muted lab-nom">Aucune image chargée.</span></div>
     <div class="lab-grille">
-      <div class="lab-vue"><div class="lab-cadre"><canvas class="lab-canvas" aria-label="Image transformée"></canvas></div><p class="lab-pixel muted" aria-live="off">Survole l'image pour lire la valeur des pixels.</p></div>
+      <div class="lab-vue"><div class="lab-cadre"><canvas class="lab-canvas" role="img" aria-label="Image transformée"></canvas></div><p class="lab-pixel muted" aria-live="off">Survole l'image pour lire la valeur des pixels.</p></div>
       <div class="lab-ctrl">
         <fieldset><legend>Géométrie</legend><div class="row">
           <button type="button" class="btn small" data-t="miroirH" aria-pressed="false">Miroir ↔</button><button type="button" class="btn small" data-t="miroirV" aria-pressed="false">Miroir ↕</button><button type="button" class="btn small" data-t="rot">Rotation 90°</button></div>
-          <label class="lab-range"><span>Zoom <output data-o="zoom">100 %</output></span><input type="range" min="0.1" max="8" step="0.05" value="1" data-r="zoom"></label></fieldset>
+          <label class="lab-range"><span>Zoom <output data-o="zoom">100 %</output></span><input type="range" min="0.05" max="8" step="0.01" value="1" data-r="zoom"></label></fieldset>
         <fieldset><legend>Couleurs</legend>
           <label class="lab-range"><span>Luminosité <output data-o="lum">0</output></span><input type="range" min="-100" max="100" value="0" data-r="lum"></label>
           <label class="lab-range"><span>Contraste <output data-o="con">0</output></span><input type="range" min="-100" max="100" value="0" data-r="con"></label>
@@ -34,7 +34,7 @@ export function monter(el) {
           <label>Bit <select data-s="bit">${[0, 1, 2, 3, 4, 5, 6, 7].map(b => `<option value="${b}">${b}${b === 0 ? ' (LSB)' : b === 7 ? ' (MSB)' : ''}</option>`).join('')}</select></label></div></fieldset>
         <fieldset><legend>Extraire un texte caché (LSB)</legend>
           <div class="row"><label>Canaux <select data-x="canaux"><option>R</option><option>G</option><option>B</option><option selected>RGB</option><option>RGBA</option></select></label><label>Bit <select data-x="bit">${[0, 1, 2].map(b => `<option value="${b}">${b}</option>`).join('')}</select></label><button type="button" class="btn small primary" data-extraire>Extraire</button></div>
-          <pre class="lab-sortie" tabindex="0" aria-label="Texte extrait"></pre></fieldset>
+          <pre class="lab-sortie" tabindex="0" role="region" aria-label="Texte extrait"></pre></fieldset>
         <div class="row"><button type="button" class="btn small ghost" data-t="reset">Réinitialiser</button><button type="button" class="btn small ghost" data-dl>Télécharger la vue (PNG)</button></div>
       </div>
     </div></div>`;
@@ -114,7 +114,7 @@ export function monter(el) {
     const largeur = $('.lab-cadre', el).clientWidth;
     if (largeur > 0) {
       const z = $('[data-r="zoom"]', el);
-      z.value = Math.max(0.1, Math.min(1, Math.floor((largeur - 4) / img.width * 20) / 20));
+      z.value = Math.max(0.05, Math.min(1, Math.floor((largeur - 2) / img.width * 100) / 100));
       z.dispatchEvent(new Event('input'));
     }
     dessiner();

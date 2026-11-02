@@ -24,6 +24,11 @@ const ctfDefaut = () => ({
   amis: []       // cartes de score importées : { pseudo, points, flags, temps, date, ami: true }
 });
 
+// (aides déclarées avant le premier chargement, qui les utilise)
+const fini = (v, max, min = 0) => { const n = +v; return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min; };
+const cleOk = k => /^[\w-]{1,100}$/.test(k);
+const objet = v => v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+
 let etat = charger();
 
 function charger() {
@@ -34,8 +39,26 @@ function charger() {
     return normaliser(Object.assign(defaut(), obj));
   } catch { return defaut(); }
 }
+// Une progression importée vient d'un fichier : chaque champ de l'arène est contrôlé (types, bornes).
+export function normaliserCarte(c) {
+  return { pseudo: String((c && c.pseudo) || 'Anonyme').slice(0, 32), points: Math.round(fini(c && c.points, 1e6)), flags: Math.round(fini(c && c.flags, 1e4)), temps: Math.round(fini(c && c.temps, 1e9)), date: String((c && c.date) || '').slice(0, 40) };
+}
 function normaliser(e) {
-  e.ctf = Object.assign(ctfDefaut(), e.ctf && typeof e.ctf === 'object' ? e.ctf : {});
+  const c = objet(e.ctf), n = ctfDefaut();
+  n.pseudo = String(c.pseudo || '').slice(0, 32);
+  for (const [id, r] of Object.entries(objet(c.resolus))) if (cleOk(id) && r && typeof r === 'object') {
+    n.resolus[id] = { points: Math.round(fini(r.points, 10000)), xp: Math.round(fini(r.xp, 5000)), date: String(r.date || '').slice(0, 40), duree: Math.round(fini(r.duree, 1e8)), indices: Math.round(fini(r.indices, 3)), essais: Math.round(fini(r.essais, 1e6)), anneau: r.anneau === null || r.anneau === undefined ? null : Math.round(fini(r.anneau, 10)), carte: !!r.carte, abandon: !!r.abandon };
+    if (typeof r.k === 'string' && /^[A-Za-z0-9+/=]{40,48}$/.test(r.k)) n.resolus[id].k = r.k;
+  }
+  for (const [id, v] of Object.entries(objet(c.abandons))) if (cleOk(id)) n.abandons[id] = String(v || '1').slice(0, 40);
+  for (const [id, v] of Object.entries(objet(c.indices))) if (cleOk(id) && Array.isArray(v)) n.indices[id] = [...new Set(v.map(x => Math.round(fini(x, 2))))].sort();
+  for (const [id, v] of Object.entries(objet(c.ouverts))) if (cleOk(id)) n.ouverts[id] = fini(v, 1e14);
+  for (const [id, v] of Object.entries(objet(c.essais))) if (cleOk(id)) n.essais[id] = Math.round(fini(v, 1e6));
+  n.archives = (Array.isArray(c.archives) ? c.archives : []).slice(0, 200).map(normaliserCarte);
+  n.amis = (Array.isArray(c.amis) ? c.amis : []).slice(0, 500).map(a => ({ ...normaliserCarte(a), ami: true }));
+  e.ctf = n;
+  if (!Array.isArray(e.badges)) e.badges = [];
+  e.badges = e.badges.filter(b => typeof b === 'string');
   return e;
 }
 function sauver() {
@@ -57,7 +80,7 @@ export const BADGES = [
   { id: 'ctf-10', e: '🗝️', nom: 'Chasseur de flags', desc: '10 défis CTF résolus', ctf: true },
   { id: 'ctf-25', e: '🛰️', nom: 'Analyste', desc: '25 défis CTF résolus', ctf: true },
   { id: 'ctf-autonome', e: '🧠', nom: 'Autonome', desc: '5 défis résolus sans indice', ctf: true },
-  { id: 'ctf-oeil', e: '🎯', nom: 'Œil de lynx', desc: 'Une géolocalisation au mètre près, du premier coup', ctf: true },
+  { id: 'ctf-oeil', e: '🎯', nom: 'Œil de lynx', desc: 'Plein score du premier coup sur une géolocalisation', ctf: true },
   { id: 'ctf-touche-a-tout', e: '🧭', nom: 'Touche-à-tout', desc: 'Un défi dans chaque catégorie', ctf: true },
   { id: 'ctf-geoint', e: '🗺️', nom: 'Géolocalisateur', desc: 'Toute la catégorie géolocalisation', ctf: true },
   { id: 'ctf-crypto', e: '🔐', nom: 'Cryptanalyste', desc: 'Toute la catégorie crypto', ctf: true },
@@ -141,13 +164,14 @@ export const progression = {
     test('xp-1000', etat.xp >= 1000);
     test('polyglotte', Object.keys(etat.lecons).length >= 3);
     test('parcours', nbParcoursTermines >= 1 || Object.keys(etat.certificats).length >= 1);
-    // Badges de l'arène CTF (le contexte des catégories est fourni par l'arène quand elle est chargée).
-    const r = etat.ctf.resolus, ids = Object.keys(r);
+    // Badges de l'arène CTF : seuls comptent les défis officiels (et ceux du propriétaire du site)
+    // résolus sans avoir lu le writeup avant ; un pack créé soi-même ne rapporte aucun badge.
+    const r = this.ctfMerites(), ids = Object.keys(r);
     test('ctf-premier', ids.length >= 1);
     test('ctf-10', ids.length >= 10);
     test('ctf-25', ids.length >= 25);
     test('ctf-autonome', ids.filter(id => !r[id].indices).length >= 5);
-    test('ctf-oeil', ids.some(id => r[id].anneau === 0 && r[id].essais === 0 && r[id].carte));
+    test('ctf-oeil', ids.some(id => r[id].anneau === 0 && r[id].essais === 0 && r[id].carte && !r[id].indices));
     test('ctf-1000', this.ctfPoints() >= 1000);
     const cx = this.contexteCTF;
     if (cx) {
@@ -165,8 +189,10 @@ export const progression = {
   /* ----- arène CTF ----- */
   contexteCTF: null,
   get ctf() { return etat.ctf; },
-  ctfPoints() { return Object.values(etat.ctf.resolus).reduce((a, x) => a + (x.points || 0), 0); },
-  ctfTemps() { return Object.values(etat.ctf.resolus).reduce((a, x) => a + (x.duree || 0), 0); },
+  // résolutions qui comptent pour le score et les badges : hors packs d'amis (identifiants « p-… ») et hors abandons
+  ctfMerites() { return Object.fromEntries(Object.entries(etat.ctf.resolus).filter(([id, x]) => !id.startsWith('p-') && !x.abandon)); },
+  ctfPoints() { return Object.values(this.ctfMerites()).reduce((a, x) => a + (x.points || 0), 0); },
+  ctfTemps() { return Object.values(this.ctfMerites()).reduce((a, x) => a + (x.duree || 0), 0); },
   ctfResolu(id) { return etat.ctf.resolus[id] || null; },
   ctfAbandonne(id) { return !!etat.ctf.abandons[id]; },
   ctfOuvrir(id) {
@@ -194,13 +220,20 @@ export const progression = {
     this.activite(); sauver();
     return etat.ctf.resolus[id];
   },
+  ctfCle(id, cle) { if (etat.ctf.resolus[id] && typeof cle === 'string') { etat.ctf.resolus[id].k = cle; sauver(); } },
+  // Oublie tout ce qui concerne ces défis (pack supprimé).
+  ctfOublier(ids) {
+    for (const id of ids) for (const k of ['resolus', 'abandons', 'indices', 'ouverts', 'essais']) delete etat.ctf[k][id];
+    sauver();
+  },
   ctfPseudo(v) { if (v !== undefined) { etat.ctf.pseudo = String(v).slice(0, 32); sauver(); } return etat.ctf.pseudo; },
   ctfCarteScore() {
-    return { format: 'lumio-ctf-score', version: 1, pseudo: etat.ctf.pseudo || etat.nom || 'Anonyme', points: this.ctfPoints(), flags: Object.keys(etat.ctf.resolus).length, temps: this.ctfTemps(), date: new Date().toISOString() };
+    return { format: 'lumio-ctf-score', version: 1, pseudo: etat.ctf.pseudo || etat.nom || 'Anonyme', points: this.ctfPoints(), flags: Object.keys(this.ctfMerites()).length, temps: this.ctfTemps(), date: new Date().toISOString() };
   },
   ctfAjouterAmi(carte) {
     if (!carte || carte.format !== 'lumio-ctf-score') throw new Error('Ce fichier n\'est pas une carte de score Lumio CTF');
-    const e = { pseudo: String(carte.pseudo || 'Anonyme').slice(0, 32), points: Math.max(0, +carte.points || 0), flags: Math.max(0, +carte.flags || 0), temps: Math.max(0, +carte.temps || 0), date: String(carte.date || ''), ami: true };
+    for (const k of ['points', 'flags', 'temps']) if (carte[k] !== undefined && !Number.isFinite(+carte[k])) throw new Error(`valeur « ${k} » invalide`);
+    const e = { ...normaliserCarte(carte), ami: true };
     etat.ctf.amis = etat.ctf.amis.filter(a => a.pseudo !== e.pseudo);
     etat.ctf.amis.push(e); sauver();
     return e;

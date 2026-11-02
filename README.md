@@ -39,50 +39,70 @@ Au total : 44 modules, 176 leçons, 176 exercices, 528 questions de quiz, et 54 
 | OSINT (personnage fictif) | 5 | Faux réseaux sociaux, blog, archive du Web, pseudo réutilisé, reflet dans des lunettes, fuite sur un site de partage, avec bandeau éthique et légal |
 | Image inversée & vérification | 5 | Résultats Google Lens, Yandex, Bing et TinEye simulés : première publication, image retournée, recadrage, photomontage, image générée |
 | Crypto débutant | 8 | César, ROT13, Base64/32, hexadécimal, Morse, Vigenère, XOR, substitution, avec une boîte à outils à recettes enchaînables |
-| Stéganographie | 5 | `strings`, texte presque invisible, LSB, ZIP collé après la fin d'un JPEG, message dans le spectrogramme d'un WAV |
+| Stéganographie | 5 | `strings`, texte à peine visible, LSB, ZIP collé après la fin d'un JPEG, message dans le spectrogramme d'un WAV |
 | Web débutant | 6 | Mini-sites vulnérables simulés dans une iframe isolée : code source, robots.txt, en-têtes, cookie modifiable, champ caché, JavaScript obscurci |
 | Forensique & terminal | 5 | Journaux (IP de l'attaquant, chronologie), signatures de fichiers, terminal Linux simulé (`ls cd cat grep file strings base64 head tail find`) |
 
-**Aucun flag ni aucune coordonnée cible en clair dans le site publié.** Les flags (format `LUMIO{...}` ; casse, accents et espaces normalisés) sont vérifiés par empreinte SHA-256 (Web Crypto). Un clic sur la carte est converti en geohash, dont l'empreinte est comparée à l'ensemble des cellules acceptées (cible et voisines, avec des anneaux de distance pour un score dégressif). Writeups et indices sont stockés masqués et révélés par l'application.
+**Aucun flag ni aucune coordonnée cible en clair dans le site publié.** Les flags (format `LUMIO{...}` ; casse, accents et espaces normalisés) sont vérifiés par empreinte SHA-256 (Web Crypto). Un clic sur la carte est converti en geohash (longitude ramenée dans [-180, 180] même sur une copie du monde), dont l'empreinte est comparée à l'ensemble des cellules acceptées (cible et voisines, avec des anneaux de distance pour un score dégressif).
+
+Ce qui est protégé, et ce qui ne l'est pas (site statique, sans serveur) :
+
+| Contenu | Protection | Lisible depuis la console ? |
+|---|---|---|
+| Flag | empreinte SHA-256 seulement | non (il faut le trouver) |
+| Writeup complet, avec le flag | chiffré en AES-GCM, clé dérivée (HKDF) du flag ; ouvert après une réussite, puis gardé dans la progression | non sans le flag |
+| Writeup « abandon » (la méthode, flag masqué) | masqué (XOR) | oui, en une ligne |
+| Indices payants, lieu et position des défis de carte | masqués (XOR) | oui, en une ligne |
+
+Le masquage évite seulement de lire une réponse par inadvertance dans le code ; quelqu'un qui veut tricher en ouvrant la console le peut, comme sur tout CTF sans serveur. Le score et les badges n'ont de valeur que si l'on joue le jeu (voir la charte, `#/ctf/charte`).
 
 Autour des défis :
 
 - carte Leaflet (servie localement) sur tuiles OpenStreetMap avec attribution, et repli automatique sur un fond Natural Earth simplifié si les tuiles ne chargent pas ;
 - établi d'analyse : boîte à outils, inspecteur EXIF, hex & signatures, labo image, spectrogramme (aussi utilisable sur ses propres fichiers, sans rien envoyer) ;
-- **classement local** (pseudo, points, temps, parties archivées, cartes de score à échanger), badges CTF, progression par catégorie ;
-- **packs de défis** JSON à créer et partager entre amis (flags et cibles exportés sous forme d'empreintes) ;
+- **classement local** (pseudo, points, temps, parties archivées, cartes de score à échanger), badges CTF, progression par catégorie : seuls comptent les défis officiels et ceux du propriétaire du site, résolus sans avoir lu le writeup avant ;
+- **packs de défis** JSON à créer et partager entre amis (flags et cibles exportés sous forme d'empreintes, writeup complet chiffré par le flag) ; un pack importé est entièrement contrôlé et échappé, et le supprimer efface aussi sa progression ;
 - charte éthique (RGPD, Code pénal art. 323-1 et suivants).
 
 ## Ajouter ses propres photos de défis
 
-1. Dépose tes images dans `assets/ctf/photos/` (de préférence tes propres photos ; retire les métadonnées GPS si tu ne veux pas les donner : `exiftool -all= photo.jpg`).
-2. Décris tes défis dans `outils/ctf/mes-photos.json` (réponses en clair : ce fichier n'est jamais publié). Pour une géolocalisation : `validation: "carte"`, `lat`, `lon`, `rayon` (mètres, plein score), `lieu`, `vue` ; pour un flag : `validation: "flag"` et `flag: "LUMIO{...}"`. Champs communs : `titre`, `accroche`, `briefing`, `image`, `alt`, `difficulte` (1 à 3), `points`, `indices` (`[{ "cout": 20, "texte": "…" }]`, 3 au plus), `writeup`.
-3. Lance `node outils/ctf/photos.mjs` : il écrit `assets/ctf/photos/defis.json` (empreintes uniquement) et la catégorie « Mes photos » apparaît dans l'arène.
+Le site est livré avec un pack « Mes photos » vide (`assets/ctf/photos/defis.json`) : la catégorie n'apparaît dans l'arène qu'une fois tes défis ajoutés.
 
-Sans Node : dans l'arène, onglet **Packs**, coche « Pack Mes photos du propriétaire », crée les défis avec le formulaire, puis « Générer le pack » télécharge un `defis.json` à placer dans `assets/ctf/photos/`.
+1. Dépose tes images dans `assets/ctf/photos/` (de préférence tes propres photos, sans visage ni plaque reconnaissable).
+2. Décris tes défis dans `outils/ctf/mes-photos.json` en t'inspirant de `outils/ctf/mes-photos.exemple.json` (réponses en clair : ces fichiers ne sont jamais publiés). Pour une géolocalisation : `validation: "carte"`, `lat`, `lon`, `rayon` (mètres, plein score), `lieu`, `vue` ; pour un flag : `validation: "flag"` et `flag: "LUMIO{...}"`. Champs communs : `titre`, `accroche`, `briefing`, `image`, `alt`, `difficulte` (1 à 3), `points`, `indices` (`[{ "cout": 20, "texte": "…" }]`, 3 au plus), `writeup`.
+3. Lance `node outils/ctf/photos.mjs --nettoyer` : il retire les métadonnées des images, puis écrit `assets/ctf/photos/defis.json` (empreintes uniquement).
+
+**Retirer les métadonnées est obligatoire.** Une photo de téléphone contient presque toujours sa position GPS exacte, la date et le modèle, parfois le nom du propriétaire. Publiée telle quelle, elle donne la réponse du défi (l'inspecteur EXIF de l'arène la lit en un clic) et ta position à tous les visiteurs. Sans `--nettoyer`, le script refuse toute image qui contient encore des métadonnées (EXIF, XMP, IPTC, commentaires, blocs texte PNG) ; avec `--nettoyer`, il les supprime (le profil couleur est gardé). Seule exception : `"garderMetadonnees": true` sur un défi de type EXIF, et jamais si l'image contient une position GPS.
+
+Sans Node : dans l'arène, onglet **Packs**, coche « Pack Mes photos du propriétaire », crée les défis avec le formulaire (l'image choisie est réencodée, donc sans métadonnées), puis « Générer le pack » télécharge un `defis.json` à placer dans `assets/ctf/photos/`.
 
 ## Structure
 
 ```
 index.html            page unique (SPA, routage par hash : #/parcours/python, #/cours/python/3, #/ctf, #/ctf/geo-capitole, #/ctf/classement…)
 404.html              page d'erreur (servie notamment pour /outils/*)
-app/                  application : app.js (vues, routage), runner.js, editor.js, progress.js (XP, badges, arène), style.css
-app/ctf/              arène : ctf.js (vues), securite.js (empreintes, geohash, masquage), carte.js (Leaflet + repli), packs.js,
+app/                  application : app.js (vues, routage), runner.js, editor.js (CodeMirror chargé à la demande),
+                      progress.js (XP, badges, arène), typo.js (espaces insécables à l'affichage), style.css
+app/ctf/              arène : ctf.js (vues), securite.js (empreintes, geohash, AES-GCM, masquage), coords.js (lecture des
+                      coordonnées saisies), carte.js (Leaflet + repli), packs.js,
                       commun.js, ctf.css, outils/ (boîte à outils, EXIF, hex, labo image, spectrogramme, Overpass, terminal,
                       navigateur web simulé, recherche inversée simulée)
 content/              un module JavaScript par parcours (python.js, …, osint.js), index.js (registre), glossaire.js, _outils.js
-content/ctf/          categories.js et defis.js (généré, sans aucune solution en clair)
+content/ctf/          categories.js, index.js (index léger de l'arène, généré) et defis/<id>.json (un fichier par défi,
+                      chargé à son ouverture, sans aucune solution en clair)
 assets/ctf/           scenes/ (images des défis), fichiers/ (JPEG EXIF, PNG LSB, WAV, PDF…), donnees/ (GeoJSON), photos/
 vendor/               CodeMirror 5, Pyodide, Leaflet 1.9.4, topojson-client, world-atlas (fond hors ligne), avec leurs licences
 outils/               jamais publié (404 forcé par netlify.toml) :
   stats.mjs                 vérifie parcours et défis (chargement, comptes, fichiers référencés)
   ctf/source/*.mjs          sources des défis (flags, cibles, writeups en clair)
-  ctf/generer.mjs           produit content/ctf/defis.js et solutions.json, et vérifie qu'aucun secret ne fuit
+  ctf/generer.mjs           produit content/ctf/index.js, content/ctf/defis/*.json et solutions.json, et vérifie
+                            qu'aucun secret ne fuit
   ctf/scenes/               scènes de géolocalisation et de vérification dessinées en SVG
   ctf/rendre_scenes.mjs     rend les scènes en JPEG/PNG (Playwright)
   ctf/generer_fichiers.py   fichiers EXIF, stéganographie et son (Pillow, piexif, numpy)
   ctf/generer_donnees.mjs   jeu de données OSM fictif de Saint-Lumin-sur-Mer
-  ctf/photos.mjs            pack « Mes photos » à partir de ctf/mes-photos.json
+  ctf/photos.mjs            pack « Mes photos » à partir de ctf/mes-photos.json (contrôle et retrait des métadonnées)
+  ctf/mes-photos.exemple.json  modèle de défi personnel
 netlify.toml          publication (dossier racine), en-têtes, 404 forcé sur /outils/*
 ```
 
@@ -103,7 +123,7 @@ python3 outils/ctf/generer_fichiers.py                            # fichiers bin
 node outils/ctf/generer_donnees.mjs                               # données OSM fictives
 ```
 
-Le générateur refuse de produire `defis.js` si un flag est mal formé, si une cible n'est pas acceptée par ses propres zones, ou si un flag ou une coordonnée cible apparaît en clair dans un fichier publié.
+Le générateur refuse de publier si un flag est mal formé, si une cible n'est pas acceptée par ses propres zones (y compris sur une copie du monde), si un flag ou son contenu (même sans `LUMIO{}`, quel que soit le séparateur) ou une coordonnée cible apparaît en clair dans un fichier publié (code, leçons, README, données), si des coordonnées écrites dans l'interface ou dans un indice tombent dans une zone acceptée, ou si le writeup « abandon » contient encore un flag.
 
 ## Déploiement sur Netlify
 

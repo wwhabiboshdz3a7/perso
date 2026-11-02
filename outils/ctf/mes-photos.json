@@ -1,27 +1,5 @@
 {
   "titre": "Mes photos",
-  "auteur": "Le propriétaire du site",
-  "defis": [
-    {
-      "titre": "La dame de fer au crépuscule",
-      "accroche": "Exemple de défi personnel : remplace-le par tes propres photos.",
-      "categorie": "geoint",
-      "difficulte": 1,
-      "points": 100,
-      "image": "assets/ctf/photos/exemple-crepuscule.jpg",
-      "alt": "Silhouette sombre d'une tour métallique très célèbre sur un ciel de crépuscule, au-dessus d'une rangée d'arbres.",
-      "briefing": "Une silhouette que tout le monde connaît, au crépuscule. Place ton repère au pied de la tour.\n\nCe défi est un exemple : le propriétaire du site peut le remplacer par ses propres photos (voir le README).",
-      "validation": "carte",
-      "lat": 48.8584,
-      "lon": 2.2945,
-      "rayon": 300,
-      "vue": [46.6, 2.4, 5],
-      "lieu": "Tour Eiffel, Paris",
-      "indices": [
-        { "cout": 20, "texte": "Une tour en treillis de fer de plus de 300 m, construite pour l'Exposition universelle de 1889." },
-        { "cout": 30, "texte": "Elle se dresse au bord de la Seine, au bout du Champ-de-Mars, à Paris." }
-      ],
-      "writeup": "La silhouette (quatre piliers réunis par un grand arc, deux plateformes, une flèche) est celle de la tour Eiffel, au Champ-de-Mars, dans le 7e arrondissement de Paris.\n\nPour tes propres défis : choisis des photos dont tu es l'auteur, retire les métadonnées GPS si tu ne veux pas les donner (exiftool -all= photo.jpg), et évite les visages et plaques reconnaissables."
-    }
-  ]
+  "auteur": "",
+  "defis": []
 }

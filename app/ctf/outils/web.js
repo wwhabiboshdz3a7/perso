@@ -53,7 +53,7 @@ export async function monter(el, opts) {
     let x; try { x = new URL(u); } catch { return { statut: 400, titre: 'Adresse invalide', html: `<main class="wb-erreur"><h1>Adresse invalide</h1><p>${esc(u)}</p></main>` }; }
     const site = sites[x.hostname];
     if (!site) return { statut: 0, titre: 'Site introuvable', html: `<main style="font-family:system-ui;padding:40px;color:#334"><h1>Ce site est introuvable</h1><p>Dans cette simulation, seuls ces sites existent : ${Object.keys(sites).map(d => `<a href="https://${d}/">${d}</a>`).join(', ')}.</p></main>` };
-    const chemin = decodeURIComponent(x.pathname) || '/';
+    let chemin; try { chemin = decodeURIComponent(x.pathname) || '/'; } catch { chemin = x.pathname || '/'; }
     const params = Object.fromEntries(x.searchParams);
     const ctx = { cookie: jar[x.hostname], champ: { ...params, ...donnees }, requete: params };
     let page = null;
@@ -88,8 +88,10 @@ export async function monter(el, opts) {
     $('.wb-source', el).textContent = r.type === 'text/plain' ? (r.corps || '') : documentHTML(r, false).replace(r.site && r.site.style ? `<style>${r.site.style}</style>\n` : '\0', '<link rel="stylesheet" href="/style.css">\n');
     rendreCookies(); rendreReseau(donnees);
   }
+  const hote = u => { try { return new URL(u).hostname; } catch { return ''; } };
   function rendreCookies() {
-    const d = courant ? new URL(courant.url).hostname : '';
+    const d = courant ? hote(courant.url) : '';
+    if (!d || !jar[d]) { $('.wb-cookies', el).innerHTML = `<p class="muted">Aucun cookie : ${d ? `le site <b>${esc(d)}</b> n'existe pas dans cette simulation` : 'l\'adresse saisie est invalide'}.</p>`; return; }
     const c = jar[d] || {};
     $('.wb-cookies', el).innerHTML = `<p class="muted">Cookies de <b>${esc(d)}</b>. Le serveur fait confiance à ce que le navigateur lui envoie : modifie une valeur puis recharge la page.</p>
       <table class="ctf-table"><caption class="sr">Cookies</caption><thead><tr><th scope="col">Nom</th><th scope="col">Valeur</th></tr></thead><tbody>
@@ -98,7 +100,9 @@ export async function monter(el, opts) {
     $('[data-ckok]', el).addEventListener('click', () => { $$('[data-ck]', el).forEach(i => { jar[d][i.dataset.ck] = i.value; }); onglet('page'); afficher(courant.url, 'get', {}, false); });
   }
   function rendreReseau(donnees = {}) {
-    const r = courant.r, x = new URL(courant.url);
+    const r = courant.r;
+    let x; try { x = new URL(courant.url); } catch { x = null; }
+    if (!x || r.statut === 400) { $('.wb-reseau', el).innerHTML = `<p class="muted">Aucune requête envoyée : l'adresse <code>${esc(courant.url)}</code> est invalide.</p>`; return; }
     const cookies = Object.entries(jar[x.hostname] || {}).map(([k, v]) => `${k}=${v}`).join('; ');
     const entetes = { 'Content-Type': r.type === 'text/plain' ? 'text/plain; charset=utf-8' : 'text/html; charset=utf-8', Server: (r.site && r.site.serveur) || 'nginx', ...(r.site && r.site.entetes), ...(r.entetes || {}) };
     $('.wb-reseau', el).innerHTML = `<h4>Requête</h4><pre class="ctf-pre">${esc(`${(courant.methode || 'get').toUpperCase()} ${x.pathname}${x.search} HTTP/1.1\nHost: ${x.hostname}\nUser-Agent: LumioNavigateur/1.0\n${cookies ? 'Cookie: ' + cookies + '\n' : ''}${Object.keys(donnees).length ? '\n' + new URLSearchParams(donnees).toString() : ''}`)}</pre>
@@ -107,7 +111,7 @@ export async function monter(el, opts) {
   const naviguer = (h, methode = 'get', donnees = {}) => {
     let u;
     try { u = new URL(h, courant ? courant.url : opts.depart).href; } catch { u = h; }
-    if (methode === 'get' && Object.keys(donnees).length) { const x = new URL(u); Object.entries(donnees).forEach(([k, v]) => x.searchParams.set(k, v)); u = x.href; afficher(u, 'get', {}); return; }
+    if (methode === 'get' && Object.keys(donnees).length) { let x; try { x = new URL(u); } catch { afficher(u, 'get', {}); return; } Object.entries(donnees).forEach(([k, v]) => x.searchParams.set(k, v)); u = x.href; afficher(u, 'get', {}); return; }
     afficher(u, methode, donnees);
   };
   const ecoute = e => {
@@ -123,10 +127,10 @@ export async function monter(el, opts) {
     $('.wb-source', el).hidden = o !== 'source'; $('.wb-cookies', el).hidden = o !== 'cookies'; $('.wb-reseau', el).hidden = o !== 'reseau';
   };
   $$('[data-o]', el).forEach(b => b.addEventListener('click', () => onglet(b.dataset.o)));
-  $('.wb-adr', el).addEventListener('submit', e => { e.preventDefault(); let v = adr.value.trim(); if (!/^https?:\/\//.test(v)) v = 'https://' + v.replace(/^\/+/, ''); naviguer(v); onglet('page'); });
+  $('.wb-adr', el).addEventListener('submit', e => { e.preventDefault(); let v = adr.value.trim(); if (!v) return; if (/^javascript:/i.test(v)) v = 'https://' + v.replace(/^javascript:/i, 'javascript-'); else if (!/^https?:\/\//i.test(v)) v = 'https://' + v.replace(/^\/+/, ''); naviguer(v); onglet('page'); });
   $('[data-a="prec"]', el).addEventListener('click', () => { if (pos > 0) { pos--; afficher(hist[pos], 'get', {}, false); } });
   $('[data-a="suiv"]', el).addEventListener('click', () => { if (pos < hist.length - 1) { pos++; afficher(hist[pos], 'get', {}, false); } });
-  $('[data-a="rech"]', el).addEventListener('click', () => afficher(courant.url, 'get', {}, false));
+  $('[data-a="rech"]', el).addEventListener('click', () => courant && afficher(courant.url, 'get', {}, false));
   naviguer(opts.depart);
   return { naviguer, onglet, cookies: jar, courant: () => courant, frame };
 }

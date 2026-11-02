@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { parcours } from '../content/index.js';
 import { CATEGORIES, DIFFICULTES } from '../content/ctf/categories.js';
-import { ouvrir } from '../app/ctf/securite.js';
+import { ouvrir, wfValide } from '../app/ctf/securite.js';
 import { normaliserPack } from '../app/ctf/packs.js';
 
 const RACINE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -41,8 +41,14 @@ console.log(`TOTAL      ${totaux.modules} modules  ${totaux.lecons} leçons  ${t
 console.log('Types d\'exercices :', types);
 
 /* ---------- arène CTF ---------- */
-const { default: ctf } = await import('../content/ctf/defis.js');
-const defis = ctf.defis;
+const { default: index } = await import('../content/ctf/index.js');
+const defis = [];
+for (const e of index.defis) {
+  const d = JSON.parse(await readFile(path.join(RACINE, 'content/ctf/defis', e.id + '.json'), 'utf8').catch(() => 'null'));
+  if (!d) { erreurs.push(`CTF ${e.id} : fichier content/ctf/defis/${e.id}.json introuvable`); continue; }
+  for (const k of ['categorie', 'titre', 'points', 'validation']) if (d[k] !== e[k]) erreurs.push(`CTF ${e.id} : index et fichier du défi divergent (${k})`);
+  defis.push(d);
+}
 console.log('\nArène CTF');
 console.log('-'.repeat(80));
 const fichiers = new Set();
@@ -58,6 +64,7 @@ for (const c of CATEGORIES) {
 }
 for (const d of defis) {
   if (d.validation === 'flag' && !(d.h || []).length) erreurs.push(`CTF ${d.id} : aucune empreinte de flag`);
+  if (d.validation === 'flag' && !wfValide(d.wf)) erreurs.push(`CTF ${d.id} : writeup chiffré absent ou mal formé`);
   if (d.validation === 'carte' && !(d.zones || []).length) erreurs.push(`CTF ${d.id} : aucune zone acceptée`);
   if (!d.wu || !(d.indices || []).length) erreurs.push(`CTF ${d.id} : writeup ou indices manquants`);
   collecter(ouvrir(d.ressources || [], d.id));
@@ -70,7 +77,7 @@ persos.forEach(d => collecter(d.ressources));
 for (const f of fichiers) await access(path.join(RACINE, f)).catch(() => erreurs.push(`CTF : fichier introuvable ${f}`));
 console.log('-'.repeat(80));
 console.log(`TOTAL      ${defis.length} défis officiels · ${defis.reduce((a, d) => a + d.points, 0)} points · ${defis.filter(d => d.validation === 'carte').length} géolocalisations sur carte · ${fichiers.size} fichiers référencés, tous présents`);
-console.log(`Mes photos : ${persos.length} défi(s) dans assets/ctf/photos/defis.json`);
+console.log(`Mes photos : ${persos.length} défi(s) dans assets/ctf/photos/defis.json${persos.length ? '' : ' (catégorie masquée tant qu\'il est vide : voir outils/ctf/mes-photos.exemple.json)'}`);
 if (defis.length < 40) erreurs.push('CTF : moins de 40 défis');
 
 if (erreurs.length) { console.log('ERREURS :'); erreurs.forEach(e => console.log(' -', e)); process.exit(1); }

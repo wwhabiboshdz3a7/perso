@@ -1,18 +1,24 @@
 // Lumio — Arène CTF : liste des défis, page de défi, classement, établi, charte.
 import { progression, BADGES } from '../progress.js';
 import * as S from './securite.js';
-import { $, $$, esc, url, modale, formatDuree, telecharger, copier } from './commun.js';
+import { $, $$, esc, url, modale, formatDuree, telecharger, copier, reduitMouvement } from './commun.js';
 import { CATEGORIES, CATEGORIES_SPECIALES, DIFFICULTES } from '../../content/ctf/categories.js';
 import { lirePacks, normaliserPack } from './packs.js';
+import { lireCoordonnees, EXEMPLE_DECIMAL, EXEMPLE_DMS } from './coords.js';
+import { typographier } from '../typo.js';
 
+export { lireCoordonnees };
 let ctx = null;      // fourni par app.js : main, toast, setTitre, courant(id), badgesGagnes
 let donnees = null;
 const CAT = Object.fromEntries([...CATEGORIES, ...Object.values(CATEGORIES_SPECIALES)].map(c => [c.id, c]));
+const sansAccent = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /* ---------- données ---------- */
+// L'index léger (titres, accroches, points) suffit pour l'arène, le classement et la recherche ;
+// le contenu complet d'un défi officiel n'est chargé qu'à son ouverture.
 export async function chargerDefis() {
   if (donnees) return donnees;
-  const m = await import('../../content/ctf/defis.js');
+  const m = await import('../../content/ctf/index.js');
   const officiels = m.default.defis;
   let photos = [];
   try {
@@ -29,10 +35,18 @@ export async function chargerDefis() {
   return donnees;
 }
 export function invaliderDefis() { donnees = null; }
+const complets = new Map();
+async function chargerDefi(entree) {
+  if (entree.categorie === 'photos' || entree.categorie === 'packs') return entree;
+  if (!complets.has(entree.id)) complets.set(entree.id, fetch(url(`content/ctf/defis/${entree.id}.json`)).then(r => { if (!r.ok) throw new Error('Défi introuvable : ' + entree.id); return r.json(); }));
+  try { return await complets.get(entree.id); } catch (e) { complets.delete(entree.id); throw e; }
+}
 
+const officiel = id => !String(id).startsWith('p-');
 const statut = id => progression.ctfResolu(id) ? 'resolu' : progression.ctfAbandonne(id) ? 'abandon' : progression.ctf.ouverts[id] ? 'encours' : 'nouveau';
-const diffPips = n => `<span class="ctf-diff" title="Difficulté : ${DIFFICULTES[n]}" aria-label="Difficulté : ${DIFFICULTES[n]}">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</span>`;
+const diffPips = n => `<span class="ctf-diff" role="img" aria-label="Difficulté : ${DIFFICULTES[n]}" title="Difficulté : ${DIFFICULTES[n]}">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</span>`;
 const badgesCTF = () => { const g = progression.verifierBadges(); g.forEach(b => ctx.toast(`${b.e} Badge obtenu : <b>${esc(b.nom)}</b>`, 'ok')); };
+const defiler = el => el && el.scrollIntoView({ behavior: reduitMouvement() ? 'auto' : 'smooth', block: 'start' });
 
 /* ---------- point d'entrée (routage) ---------- */
 export async function vueCTF(sous, requete, id, contexte) {
@@ -60,10 +74,12 @@ function radar(stats) {
   const points = stats.map((s, i) => { const [x, y] = pt(i, R * Math.max(0.04, s.ratio)); return `<circle cx="${x}" cy="${y}" r="3.2" style="fill:${s.couleur}"/>`; }).join('');
   return `<svg class="ctf-radar" viewBox="-40 -6 320 252" role="img" aria-label="Progression par catégorie : ${stats.map(s => `${s.titre} ${Math.round(s.ratio * 100)} %`).join(', ')}">${anneaux}${axes}<polygon points="${poly}" class="rd-zone"/>${points}${labels}</svg>`;
 }
+// « mérité » : résolu sans avoir lu le writeup avant
+const merite = id => { const r = progression.ctfResolu(id); return !!r && !r.abandon; };
 function statsCategories(d) {
   return CATEGORIES.map(c => {
     const l = d.officiels.filter(x => x.categorie === c.id);
-    const r = l.filter(x => progression.ctfResolu(x.id)).length;
+    const r = l.filter(x => merite(x.id)).length;
     return { id: c.id, titre: c.titre, court: c.court, couleur: c.couleur, total: l.length, resolus: r, ratio: l.length ? r / l.length : 0 };
   });
 }
@@ -83,7 +99,7 @@ async function vueArene(navId) {
   const d = await chargerDefis();
   if (!ctx.courant(navId)) return;
   const stats = statsCategories(d);
-  const total = d.officiels.length, faits = d.officiels.filter(x => progression.ctfResolu(x.id)).length;
+  const total = d.officiels.length, faits = d.officiels.filter(x => merite(x.id)).length;
   const rang = classementEntrees().findIndex(e => e.moi) + 1;
   const suivant = d.officiels.find(x => !progression.ctfResolu(x.id) && !progression.ctfAbandonne(x.id)) || d.officiels[0];
   const cats = [...CATEGORIES, ...(d.defis.some(x => x.categorie === 'photos') ? [CAT.photos] : []), ...(d.defis.some(x => x.categorie === 'packs') ? [CAT.packs] : [])];
@@ -131,11 +147,11 @@ async function vueArene(navId) {
   </div>`;
 
   const liste = () => {
-    const q = filtres.q.trim().toLowerCase();
+    const q = sansAccent(filtres.q.trim());
     const garde = x => (filtres.cat === 'tous' || x.categorie === filtres.cat)
       && (filtres.diff === 'toutes' || String(x.difficulte) === filtres.diff)
       && (filtres.etat === 'tous' || (filtres.etat === 'resolus' ? !!progression.ctfResolu(x.id) : !progression.ctfResolu(x.id)))
-      && (!q || (x.titre + ' ' + (x.accroche || '') + ' ' + CAT[x.categorie].titre).toLowerCase().includes(q));
+      && (!q || sansAccent(x.titre + ' ' + (x.accroche || '') + ' ' + CAT[x.categorie].titre + ' ' + (x.pack ? x.pack.titre : '')).includes(q));
     const html = cats.map(c => {
       const l = d.defis.filter(x => x.categorie === c.id && garde(x));
       if (!l.length) return '';
@@ -146,7 +162,9 @@ async function vueArene(navId) {
         <div class="ctf-grid">${l.map(carte).join('')}</div>
       </section>`;
     }).join('');
-    $('#ctfListe').innerHTML = html || '<p class="empty">Aucun défi ne correspond à ces filtres.</p>';
+    const z = $('#ctfListe');
+    z.innerHTML = html || '<p class="empty">Aucun défi ne correspond à ces filtres.</p>';
+    typographier(z);
   };
   const sauver = () => { try { sessionStorage.setItem('lumio.ctf.filtres', JSON.stringify(filtres)); } catch { /* ignoré */ } liste(); };
   $$('.ctf-chips .chip').forEach(b => b.addEventListener('click', () => { filtres.cat = b.dataset.cat; $$('.ctf-chips .chip').forEach(x => x.setAttribute('aria-pressed', x === b)); sauver(); }));
@@ -157,10 +175,10 @@ async function vueArene(navId) {
 }
 function carte(x) {
   const c = CAT[x.categorie], st = statut(x.id), r = progression.ctfResolu(x.id);
-  const etat = st === 'resolu' ? `<span class="ctf-etat ok">✓ ${r.points} pts</span>` : st === 'abandon' ? '<span class="ctf-etat ab">Writeup lu</span>' : st === 'encours' ? '<span class="ctf-etat ec">En cours</span>' : `<span class="ctf-etat">${x.validation === 'carte' ? 'Carte' : 'Flag'}</span>`;
+  const etat = st === 'resolu' ? `<span class="ctf-etat ok">✓ ${Number(r.points) || 0} pts</span>` : st === 'abandon' ? '<span class="ctf-etat ab">Writeup lu</span>' : st === 'encours' ? '<span class="ctf-etat ec">En cours</span>' : `<span class="ctf-etat">${x.validation === 'carte' ? 'Carte' : 'Flag'}</span>`;
   return `<a class="ctf-card st-${st}" href="#/ctf/${x.id}" style="--c:${c.couleur}">
     ${x.miniature ? `<span class="ctf-card-img"><img src="${esc(url(x.miniature))}" alt="" loading="lazy" decoding="async"></span>` : ''}
-    <div class="ctf-card-top"><span class="ctf-tag">${esc(x.pack ? x.pack.titre : c.court)}</span><span class="ctf-pts">${x.points} pts</span></div>
+    <div class="ctf-card-top"><span class="ctf-tag">${esc(x.categorie === 'packs' && x.pack ? x.pack.titre : c.court)}</span><span class="ctf-pts">${x.points} pts</span></div>
     <h3>${esc(x.titre)}</h3>
     <p>${esc(x.accroche || '')}</p>
     <div class="ctf-card-bas">${diffPips(x.difficulte)}${etat}</div>
@@ -174,17 +192,21 @@ const OUTILS = {
 async function vueDefi(id, navId) {
   const d = await chargerDefis();
   if (!ctx.courant(navId)) return;
-  const defi = d.parId[id];
-  if (!defi) { ctx.main.innerHTML = `<div class="wrap"><div class="empty"><h2>Défi introuvable</h2><p>Ce défi n'existe pas ou provient d'un pack qui n'est plus installé.</p><a class="btn primary" href="#/ctf">Retour à l'arène</a></div></div>`; return; }
+  const entree = d.parId[id];
+  const introuvable = () => { ctx.main.innerHTML = `<div class="wrap"><div class="empty"><h2>Défi introuvable</h2><p>Ce défi n'existe pas ou provient d'un pack qui n'est plus installé.</p><a class="btn primary" href="#/ctf">Retour à l'arène</a></div></div>`; };
+  if (!entree) return introuvable();
+  ctx.main.innerHTML = `<div class="wrap"><p class="muted"><span class="spinner"></span> Ouverture du défi…</p></div>`;
+  const defi = await chargerDefi(entree);
+  if (!ctx.courant(navId)) return;
   const c = CAT[defi.categorie];
   progression.ctfOuvrir(id);
   ctx.setTitre(defi.titre + ' · CTF');
   const memes = d.defis.filter(x => x.categorie === defi.categorie);
-  const i = memes.indexOf(defi), prec = memes[i - 1], suiv = memes[i + 1];
+  const i = memes.findIndex(x => x.id === defi.id), prec = memes[i - 1], suiv = memes[i + 1];
   const ressources = S.ouvrir(defi.ressources || [], defi.id);
   const outils = [...new Set([...(defi.outils || []), ...ressources.flatMap(r => r.outils || [])])].filter(o => OUTILS[o]);
 
-  ctx.main.innerHTML = `<div class="wrap ctf ctf-page" style="--c:${c.couleur}">
+  ctx.main.innerHTML = `<div class="wrap ctf ctf-page v-${defi.validation === 'carte' ? 'carte' : 'flag'}" style="--c:${c.couleur}">
     <div class="crumbs"><a href="#/ctf">Arène CTF</a> › <span>${esc(c.titre)}</span> › <span>${esc(defi.titre)}</span></div>
     <header class="ctf-dhead">
       <span class="ctf-ico lg">${c.icone}</span>
@@ -203,7 +225,7 @@ async function vueDefi(id, navId) {
           <div class="ctf-tabs" role="tablist" aria-label="Outils d'analyse">${outils.map((o, k) => `<button type="button" role="tab" id="tab-${o}" aria-controls="pan-${o}" aria-selected="${k === 0}" tabindex="${k === 0 ? 0 : -1}" data-outil="${o}">${OUTILS[o]}</button>`).join('')}</div></div>
           ${outils.map((o, k) => `<div class="ctf-panel" role="tabpanel" id="pan-${o}" aria-labelledby="tab-${o}" ${k ? 'hidden' : ''}></div>`).join('')}
         </section>` : ''}
-        <div id="writeup"></div>
+        <div id="writeup" class="ctf-wu-zone"></div>
       </div>
       <aside class="ctf-side" aria-label="Validation du défi">
         <section class="card ctf-valid" id="valid"></section>
@@ -216,42 +238,60 @@ async function vueDefi(id, navId) {
     </div>
   </div>`;
 
-  const page = { defi, ressources, carte: null, etabli: null };
-  page.etabli = monterEtabli(outils);
-  await rendreRessources(page);
-  // le premier outil de l'établi s'ouvre directement sur le fichier du défi qui lui correspond
-  const premier = outils[0] && ressources.find(r => (r.outils || []).includes(outils[0]) && r.src);
-  if (premier) page.etabli.ouvrir(outils[0], { src: premier.src, nom: premier.nom }, false).catch(() => {});
+  const racine = $('.ctf-page', ctx.main);
+  // toutes les références passent par la page créée ici : si l'on navigue ailleurs pendant un chargement,
+  // la suite de cette fonction ne touche plus qu'une page détachée (et s'arrête au contrôle suivant).
+  const page = { defi, ressources, carte: null, etabli: null, racine, navId, q: s => $(s, racine), qq: s => $$(s, racine) };
+  const encore = () => ctx.courant(navId) && racine.isConnected;
+  // fichiers du défi proposés dans chaque outil (seul le labo image s'ouvre directement : il ne fait qu'afficher l'image)
+  const propositions = {};
+  for (const o of outils) { const r = ressources.find(x => (x.outils || []).includes(o) && x.src); if (r) propositions[o] = { src: r.src, nom: r.nom || r.titre }; }
+  page.etabli = monterEtabli(outils, racine, propositions);
   rendreValidation(page);
   rendreIndices(page);
-  if (progression.ctfResolu(id) || progression.ctfAbandonne(id)) afficherWriteup(page);
+  typographier(racine);
+  await rendreRessources(page, encore);
+  if (!encore()) return;
+  if (outils[0] === 'image' && propositions.image) page.etabli.ouvrir('image', propositions.image, false).catch(() => {});
+  if (progression.ctfResolu(id) || progression.ctfAbandonne(id)) await afficherWriteup(page);
 }
 const texteEnParagraphes = t => String(t || '').split(/\n{2,}/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
 
 /* ---------- établi (outils d'analyse en onglets) ---------- */
-function monterEtabli(outils) {
-  const montes = {};
+function monterEtabli(outils, racine, propositions = {}) {
+  const montes = {}, charges = {};
+  const q = s => $(s, racine), qq = s => $$(s, racine);
   const api = {
-    async ouvrir(nom, charge, defiler = !!charge) {
-      if (!OUTILS[nom] || !$('#tab-' + nom)) return null;
-      $$('.ctf-tabs [role=tab]').forEach(t => { const on = t.dataset.outil === nom; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; $('#pan-' + t.dataset.outil).hidden = !on; });
+    async ouvrir(nom, charge, defilerVers = !!charge) {
+      if (!OUTILS[nom] || !q('#tab-' + nom)) return null;
+      qq('.ctf-tabs [role=tab]').forEach(t => { const on = t.dataset.outil === nom; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; q('#pan-' + t.dataset.outil).hidden = !on; });
       if (!montes[nom]) {
-        const pan = $('#pan-' + nom);
-        pan.innerHTML = '<p class="muted"><span class="spinner"></span> Chargement de l\'outil…</p>';
-        montes[nom] = import(`./outils/${nom}.js`).then(m => { pan.innerHTML = ''; return m.monter(pan, { toast: ctx.toast }); });
+        const pan = q('#pan-' + nom);
+        pan.innerHTML = `<div class="ctf-propose" hidden></div><div class="ctf-outil"><p class="muted"><span class="spinner"></span> Chargement de l'outil…</p></div>`;
+        const zone = $('.ctf-outil', pan);
+        montes[nom] = import(`./outils/${nom}.js`).then(m => { zone.innerHTML = ''; return m.monter(zone, { toast: ctx.toast }); });
       }
       const outil = await montes[nom];
-      if (charge && outil.charger) await outil.charger(charge);
-      if (charge && defiler) $('#etabli').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      if (charge && outil.charger) { charges[nom] = true; const p = q(`#pan-${nom} .ctf-propose`); if (p) p.hidden = true; await outil.charger(charge); }
+      else if (!charges[nom] && propositions[nom]) proposer(nom);
+      if (charge && defilerVers) defiler(q('#etabli'));
       return outil;
     }
   };
+  // tant que le fichier du défi n'est pas chargé, l'outil affiche un état vide et un bouton pour l'analyser
+  function proposer(nom) {
+    const p = q(`#pan-${nom} .ctf-propose`), f = propositions[nom];
+    if (!p || !f) return;
+    p.hidden = false;
+    p.innerHTML = `<p>Fichier du défi : <code>${esc(f.nom || String(f.src).split('/').pop())}</code></p><button type="button" class="btn small primary">Analyser ce fichier avec l'outil « ${esc(OUTILS[nom])} »</button>`;
+    $('button', p).addEventListener('click', () => api.ouvrir(nom, f, false));
+  }
   if (outils.length) {
-    $$('.ctf-tabs [role=tab]').forEach(t => {
+    qq('.ctf-tabs [role=tab]').forEach(t => {
       t.addEventListener('click', () => api.ouvrir(t.dataset.outil));
       t.addEventListener('keydown', e => {
-        const tabs = $$('.ctf-tabs [role=tab]'), k = tabs.indexOf(t);
-        const n = e.key === 'ArrowRight' ? (k + 1) % tabs.length : e.key === 'ArrowLeft' ? (k - 1 + tabs.length) % tabs.length : -1;
+        const tabs = qq('.ctf-tabs [role=tab]'), k = tabs.indexOf(t);
+        const n = e.key === 'ArrowRight' ? (k + 1) % tabs.length : e.key === 'ArrowLeft' ? (k - 1 + tabs.length) % tabs.length : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : -1;
         if (n >= 0) { e.preventDefault(); tabs[n].focus(); api.ouvrir(tabs[n].dataset.outil); }
       });
     });
@@ -262,14 +302,16 @@ function monterEtabli(outils) {
 
 /* ---------- ressources ---------- */
 const ICONES = { texte: '📄', scene: '🖼️', image: '🖼️', fichier: '📦', audio: '🔊', galerie: '🗂️', web: '🌐', terminal: '⌨️', geojson: '🗺️', lens: '🔍', log: '📜' };
-async function rendreRessources(page) {
-  const zone = $('#ressources');
+async function rendreRessources(page, encore) {
+  const zone = page.q('#ressources');
   for (const [k, r] of page.ressources.entries()) {
     const sec = document.createElement('section');
     sec.className = 'card ctf-res ctf-res-' + r.type;
     sec.setAttribute('aria-label', r.titre || r.nom || 'Ressource');
     zone.appendChild(sec);
     await rendreRessource(sec, r, page, k);
+    if (!encore()) return;
+    typographier(sec);
   }
   if (page.defi.validation === 'carte') {
     const sec = document.createElement('section');
@@ -277,7 +319,11 @@ async function rendreRessources(page) {
     sec.innerHTML = `<header class="ctf-res-tete"><h2 class="ctf-h">🧭 Carte — place ton repère</h2><span class="muted ctf-res-sous">Clic sur la carte, ou coordonnées dans le panneau de validation</span></header><div class="ctf-carte" id="carteDefi"></div>`;
     zone.appendChild(sec);
     const { creerCarte } = await import('./carte.js');
-    page.carte = await creerCarte($('#carteDefi', sec), { vue: page.defi.vue, fond: page.defi.fond, calque: page.defi.calque, onChoix: () => majBoutonPosition(page) });
+    if (!encore()) return;
+    const v = Array.isArray(page.defi.vue) && page.defi.vue.length === 3 && page.defi.vue.every(Number.isFinite) ? page.defi.vue : [30, 10, 2];
+    page.carte = await creerCarte($('#carteDefi', sec), { vue: v, fond: page.defi.fond, calque: page.defi.calque, onChoix: () => majBoutonPosition(page) });
+    if (!encore()) return;
+    majBoutonPosition(page);
   }
 }
 const boutonsOutils = (r, src) => (r.outils || []).filter(o => OUTILS[o]).map(o => `<button type="button" class="btn small" data-ouvrir="${o}" data-src="${esc(src)}">${esc(OUTILS[o])}</button>`).join('');
@@ -287,10 +333,10 @@ async function rendreRessource(sec, r, page, k) {
   const lier = () => $$('[data-ouvrir]', sec).forEach(b => b.addEventListener('click', () => page.etabli.ouvrir(b.dataset.ouvrir, { src: b.dataset.src, nom: b.dataset.nom || r.nom })));
   switch (r.type) {
     case 'texte': case 'log': {
-      sec.innerHTML = tete(`<div class="row"><button type="button" class="btn small" data-copier>Copier</button>${page.etabli && $('#tab-boite') && r.type === 'texte' ? '<button type="button" class="btn small" data-boite>Envoyer dans la boîte à outils</button>' : ''}${r.type === 'log' ? `<button type="button" class="btn small" data-dl>Télécharger</button>` : ''}</div>`)
+      sec.innerHTML = tete(`<div class="row"><button type="button" class="btn small" data-copier>Copier</button>${page.q('#tab-boite') && r.type === 'texte' ? '<button type="button" class="btn small" data-boite>Envoyer dans la boîte à outils</button>' : ''}${r.type === 'log' ? `<button type="button" class="btn small" data-dl>Télécharger</button>` : ''}</div>`)
         + (r.description ? `<p class="ctf-res-desc">${r.description}</p>` : '')
         + (r.type === 'log' ? `<div class="ctf-logfiltre"><label for="lf${k}">Filtrer les lignes</label><input id="lf${k}" type="search" placeholder="ex. 401, sshd, 203.0.113" autocomplete="off"><span class="muted" data-compte></span></div>` : '')
-        + `<pre class="ctf-pre ${r.type === 'log' ? 'ctf-log' : ''}" tabindex="0">${esc(r.contenu)}</pre>`;
+        + `<pre class="ctf-pre ${r.type === 'log' ? 'ctf-log' : ''}" tabindex="0" role="region" aria-label="${esc(r.titre || r.nom || 'Contenu')}">${esc(r.contenu)}</pre>`;
       $('[data-copier]', sec).addEventListener('click', async () => ctx.toast(await copier(r.contenu) ? 'Copié dans le presse-papiers.' : 'Copie impossible : sélectionne le texte à la main.'));
       $('[data-boite]', sec)?.addEventListener('click', () => page.etabli.ouvrir('boite', { texte: r.contenu }));
       $('[data-dl]', sec)?.addEventListener('click', () => telecharger(r.nom || 'journal.log', r.contenu, 'text/plain'));
@@ -304,13 +350,13 @@ async function rendreRessource(sec, r, page, k) {
     case 'scene': case 'image': {
       sec.innerHTML = tete(`<div class="row"><button type="button" class="btn small" data-zoom>Agrandir</button>${boutonsOutils(r, r.src)}${r.telechargeable !== false ? `<a class="btn small" href="${esc(url(r.src))}" download>Télécharger</a>` : ''}</div>`)
         + `<figure class="ctf-fig"><button type="button" class="ctf-figbtn" data-zoom aria-label="Agrandir l'image : ${esc(r.alt || '')}"><img src="${esc(url(r.src))}" alt="${esc(r.alt || '')}" loading="lazy" decoding="async"></button>${r.legende ? `<figcaption>${r.legende}</figcaption>` : ''}</figure>`;
-      $$('[data-zoom]', sec).forEach(b => b.addEventListener('click', () => visionneuse(r)));
+      $$('[data-zoom]', sec).forEach(b => b.addEventListener('click', () => visionneuse(r, b)));
       lier();
       break;
     }
     case 'galerie': {
       sec.innerHTML = tete() + (r.description ? `<p class="ctf-res-desc">${r.description}</p>` : '') + `<div class="ctf-galerie">${r.images.map((im, j) => `<figure><button type="button" class="ctf-figbtn" data-j="${j}" aria-label="Agrandir : ${esc(im.legende || im.alt || '')}"><img src="${esc(url(im.src))}" alt="${esc(im.alt || '')}" loading="lazy"></button><figcaption>${im.legende || ''}</figcaption>${(im.outils || []).length ? `<div class="row">${boutonsOutils(im, im.src)}</div>` : ''}</figure>`).join('')}</div>`;
-      $$('[data-j]', sec).forEach(b => b.addEventListener('click', () => visionneuse(r.images[+b.dataset.j])));
+      $$('[data-j]', sec).forEach(b => b.addEventListener('click', () => visionneuse(r.images[+b.dataset.j], b)));
       lier();
       break;
     }
@@ -328,6 +374,7 @@ async function rendreRessource(sec, r, page, k) {
     case 'web': case 'terminal': case 'geojson': case 'lens': {
       sec.innerHTML = tete() + (r.description ? `<p class="ctf-res-desc">${r.description}</p>` : '') + '<div class="ctf-outil-int"><p class="muted"><span class="spinner"></span> Chargement…</p></div>';
       const mod = await import(`./outils/${{ web: 'web', terminal: 'terminal', geojson: 'overpass', lens: 'lens' }[r.type]}.js`);
+      if (!sec.isConnected) return;
       const z = $('.ctf-outil-int', sec); z.innerHTML = '';
       await mod.monter(z, { ...r, toast: ctx.toast, defi: page.defi });
       break;
@@ -336,22 +383,28 @@ async function rendreRessource(sec, r, page, k) {
   }
 }
 
-// Visionneuse plein écran avec zoom et déplacement (souris, tactile, clavier).
-function visionneuse(r) {
+// Visionneuse plein écran avec zoom et déplacement (souris, tactile, clavier) ; focus piégé, rendu à la fermeture.
+function visionneuse(r, declencheur) {
   const bg = document.createElement('div');
   bg.className = 'modal-bg ctf-viewer';
   bg.innerHTML = `<div class="ctf-viewer-in" role="dialog" aria-modal="true" aria-label="Image agrandie">
     <div class="ctf-viewer-bar"><span>${esc(r.legende ? r.legende.replace(/<[^>]+>/g, '') : r.alt || '')}</span>
       <div class="row"><button type="button" class="btn small" data-z="-1" aria-label="Dézoomer">−</button><button type="button" class="btn small" data-z="0">Ajuster</button><button type="button" class="btn small" data-z="1" aria-label="Zoomer">+</button><button type="button" class="btn small" data-miroir aria-pressed="false">Miroir</button><button type="button" class="btn small primary" data-fermer>Fermer</button></div></div>
-    <div class="ctf-viewer-zone" tabindex="0" aria-label="Zone d'image : flèches pour se déplacer, + et − pour zoomer"><img src="${esc(url(r.src))}" alt="${esc(r.alt || '')}" draggable="false"></div></div>`;
+    <div class="ctf-viewer-zone" tabindex="0" role="img" aria-label="Zone d'image : flèches pour se déplacer, + et − pour zoomer"><img src="${esc(url(r.src))}" alt="${esc(r.alt || '')}" draggable="false"></div></div>`;
   document.body.appendChild(bg);
   const img = $('img', bg), zoneV = $('.ctf-viewer-zone', bg);
   let z = 1, x = 0, y = 0, miroir = false;
   const maj = () => { img.style.transform = `translate(${x}px, ${y}px) scale(${z * (miroir ? -1 : 1)}, ${z})`; };
   const zoom = f => { z = Math.min(12, Math.max(0.5, z * f)); maj(); };
-  const fermer = () => { bg.remove(); document.removeEventListener('keydown', clavier, true); };
+  const fermer = () => { bg.remove(); document.removeEventListener('keydown', clavier, true); if (declencheur && declencheur.isConnected) declencheur.focus(); };
   const clavier = e => {
     if (e.key === 'Escape') { e.stopPropagation(); fermer(); }
+    else if (e.key === 'Tab') {
+      const f = $$('button, [tabindex="0"]', bg).filter(n => !n.disabled);
+      const k = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    }
     else if (e.key === '+' || e.key === '=') zoom(1.25); else if (e.key === '-') zoom(0.8);
     else if (e.key.startsWith('Arrow') && document.activeElement === zoneV) { e.preventDefault(); const p = 40; if (e.key === 'ArrowLeft') x += p; if (e.key === 'ArrowRight') x -= p; if (e.key === 'ArrowUp') y += p; if (e.key === 'ArrowDown') y -= p; maj(); }
   };
@@ -370,15 +423,18 @@ function visionneuse(r) {
 /* ---------- validation ---------- */
 const coutIndices = defi => progression.ctfIndices(defi.id).reduce((a, n) => a + ((defi.indices || [])[n]?.cout || 0), 0);
 const pointsPossibles = defi => Math.max(Math.ceil(defi.points * 0.1), defi.points - coutIndices(defi));
-let attente = 0;
+// pause de 20 s toutes les 5 erreurs, propre à chaque défi (et conservée pendant la session)
+const CLE_ATTENTE = 'lumio.ctf.attente';
+const lireAttente = id => { try { return +(JSON.parse(sessionStorage.getItem(CLE_ATTENTE) || '{}')[id] || 0); } catch { return 0; } };
+const ecrireAttente = (id, t) => { try { const o = JSON.parse(sessionStorage.getItem(CLE_ATTENTE) || '{}'); o[id] = t; sessionStorage.setItem(CLE_ATTENTE, JSON.stringify(o)); } catch { /* ignoré */ } };
 function rendreValidation(page) {
-  const { defi } = page, z = $('#valid'), r = progression.ctfResolu(defi.id), ab = progression.ctfAbandonne(defi.id);
+  const { defi, q } = page, z = q('#valid'), r = progression.ctfResolu(defi.id), ab = progression.ctfAbandonne(defi.id);
   const entete = r
-    ? `<div class="ctf-ok"><span class="ctf-ok-ico" aria-hidden="true">✓</span><div><b>Défi résolu</b><span>${r.abandon ? 'après lecture du writeup · 0 point' : `+${r.points} points · ${formatDuree(r.duree)}${r.indices ? ` · ${r.indices} indice${r.indices > 1 ? 's' : ''}` : ''}`}</span></div></div>`
+    ? `<div class="ctf-ok"><span class="ctf-ok-ico" aria-hidden="true">✓</span><div><b>Défi résolu</b><span>${r.abandon ? 'après lecture du writeup · 0 point' : `+${Number(r.points) || 0} points · ${formatDuree(r.duree)}${r.indices ? ` · ${r.indices} indice${r.indices > 1 ? 's' : ''}` : ''}`}</span></div></div>`
     : `<h2 class="ctf-h">Valider</h2><p class="ctf-pot">Points possibles : <b id="ptsPot">${ab ? 0 : pointsPossibles(defi)}</b>${defi.validation === 'carte' ? ' <span class="muted">(selon la précision)</span>' : ''}</p>`;
   const formulaire = defi.validation === 'carte'
     ? `<p class="ctf-aide">Place ton repère sur la carte (clic), ou saisis des coordonnées puis « Placer ».</p>
-       <div class="field"><label for="coords">Coordonnées (décimales ou DMS)</label><input id="coords" placeholder="43.6045, 1.4440" autocomplete="off" spellcheck="false"></div>
+       <div class="field"><label for="coords">Coordonnées (décimales, DMS ou lien de carte)</label><input id="coords" placeholder="ex. ${esc(EXEMPLE_DECIMAL)}" autocomplete="off" spellcheck="false" aria-describedby="coordsAide"><p class="ctf-aide" id="coordsAide">Exemple fictif en plein océan, à remplacer par ta réponse.</p></div>
        <div class="row"><button type="button" class="btn small" id="placer">Placer</button><button type="button" class="btn small" id="centre">Repère au centre</button></div>
        <button type="button" class="btn primary ctf-big" id="validerPos" disabled>Valider ma position</button>`
     : `<form id="flagForm" class="ctf-flagform" novalidate><label for="flag">Ton flag</label>
@@ -387,90 +443,76 @@ function rendreValidation(page) {
   z.innerHTML = `${entete}${r ? '' : formulaire}<div id="retour" class="ctf-retour" role="status" aria-live="polite"></div>
     ${r ? '' : `<button type="button" class="btn ghost small ctf-abandon" id="abandon">${ab ? 'Revoir le writeup' : 'Abandonner et lire le writeup'}</button>`}
     ${r || ab ? '' : `<p class="ctf-essais muted">${progression.ctfEssais(defi.id) ? `${progression.ctfEssais(defi.id)} essai(s) incorrect(s)` : ''}</p>`}`;
-  const retour = (ok, html) => { const el = $('#retour'); el.className = 'ctf-retour ' + (ok === true ? 'ok' : ok === false ? 'ko' : 'info'); el.innerHTML = html; };
+  const retour = (ok, html) => { const el = q('#retour'); if (!el) return; el.className = 'ctf-retour ' + (ok === true ? 'ok' : ok === false ? 'ko' : 'info'); el.innerHTML = html; typographier(el); };
   const tempo = () => {
-    const reste = Math.ceil((attente - Date.now()) / 1000);
-    if (reste > 0) { retour(false, `Trop d'essais d'affilée : patiente ${reste} s. Relis le briefing ou prends un indice.`); return true; }
+    const reste = Math.ceil((lireAttente(defi.id) - Date.now()) / 1000);
+    if (reste > 0) { retour(false, `Trop d'essais d'affilée sur ce défi : patiente ${reste} s. Relis le briefing ou prends un indice.`); return true; }
     return false;
   };
   const echec = msg => {
     const n = progression.ctfMauvaiseReponse(defi.id);
     retour(false, msg);
-    const e = $('.ctf-essais'); if (e) e.textContent = `${n} essai(s) incorrect(s)`;
-    if (n % 5 === 0) { attente = Date.now() + 20000; tempo(); }
+    const e = q('.ctf-essais'); if (e) e.textContent = `${n} essai(s) incorrect(s)`;
+    if (n % 5 === 0) { ecrireAttente(defi.id, Date.now() + 20000); tempo(); }
   };
   if (!r && defi.validation === 'carte') {
-    $('#placer').addEventListener('click', () => {
-      const p = lireCoordonnees($('#coords').value);
-      if (!p) return retour(null, 'Coordonnées non reconnues. Exemples : <code>43.6045, 1.4440</code> ou <code>43°36\'16"N 1°26\'38"E</code>.');
-      page.carte?.placer(p.lat, p.lon, true); majBoutonPosition(page);
+    q('#placer').addEventListener('click', () => {
+      const p = lireCoordonnees(q('#coords').value);
+      if (!p) return retour(null, `Coordonnées non reconnues. Formats acceptés, par exemple : <code>${esc(EXEMPLE_DECIMAL)}</code>, <code>${esc(EXEMPLE_DMS)}</code>, <code>12.3456 N, 45.6789 W</code> ou un lien openstreetmap.org/#map=…`);
+      if (!page.carte) return retour(null, 'La carte est encore en cours de chargement.');
+      page.carte.placer(p.lat, p.lon, true); majBoutonPosition(page);
     });
-    $('#coords').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#placer').click(); } });
-    $('#centre').addEventListener('click', () => { page.carte?.placerAuCentre(); majBoutonPosition(page); });
-    $('#validerPos').addEventListener('click', async () => {
+    q('#coords').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); q('#placer').click(); } });
+    q('#centre').addEventListener('click', () => { page.carte?.placerAuCentre(); majBoutonPosition(page); });
+    q('#validerPos').addEventListener('click', async () => {
       if (tempo()) return;
       const pos = page.carte?.position();
       if (!pos) return retour(null, 'Place d\'abord ton repère.');
       const res = await S.verifierPosition(defi, pos.lat, pos.lng);
+      if (!page.racine.isConnected) return;
       if (res && res.part > 0) return reussite(page, { points: pointsPossibles(defi) * res.part, anneau: res.anneau, carte: true, message: res.anneau === 0 ? 'En plein dans le mille !' : `Accepté à moins de ${fmtDist(res.rayon)} : ${Math.round(res.part * 100)} % des points.` });
       echec(res ? `Tu chauffes : tu es à moins de ${fmtDist(res.rayon)} de la cible, mais pas assez près. Affine avec les détails de l'image.` : 'Ce n\'est pas le bon endroit. Reprends les indices visuels un par un : langue, sens de circulation, panneaux, architecture.');
     });
     majBoutonPosition(page);
   } else if (!r) {
-    $('#flagForm').addEventListener('submit', async e => {
+    q('#flagForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (tempo()) return;
-      const v = $('#flag').value;
+      const v = q('#flag').value;
       if (!v.trim()) return retour(null, 'Saisis un flag.');
-      if (await S.verifierFlag(defi, v)) return reussite(page, { points: pointsPossibles(defi), message: 'Flag correct !' });
+      if (await S.verifierFlag(defi, v)) return reussite(page, { points: pointsPossibles(defi), message: 'Flag correct !', flag: v });
+      if (!page.racine.isConnected) return;
       const norm = S.normaliserFlag(v);
       echec(`<code>${esc(norm)}</code> n'est pas le bon flag.${/[{}]/.test(norm.slice(6, -1)) ? ' Attention aux accolades en trop.' : ''}`);
     });
   }
-  $('#abandon')?.addEventListener('click', async () => {
+  q('#abandon')?.addEventListener('click', async () => {
     if (!ab) {
-      const rep = await modale({ titre: 'Abandonner ce défi ?', corps: '<p>Le writeup complet (avec la solution) s\'affichera. Tu pourras encore valider le défi ensuite, mais il ne rapportera plus de points.</p>', actions: [{ id: 'non', texte: 'Continuer à chercher' }, { id: 'oui', texte: 'Lire le writeup', primaire: true }] });
-      if (rep !== 'oui') return;
+      const rep = await modale({ titre: 'Abandonner ce défi ?', corps: '<p>Le writeup (la méthode pas à pas) s\'affichera. Tu pourras encore valider le défi ensuite, mais il ne rapportera plus de points ni de badge.</p>', actions: [{ id: 'non', texte: 'Continuer à chercher' }, { id: 'oui', texte: 'Lire le writeup', primaire: true }] });
+      if (rep !== 'oui' || !page.racine.isConnected) return;
       progression.ctfAbandonner(defi.id);
       rendreValidation(page); rendreIndices(page);
     }
-    afficherWriteup(page, true);
+    await afficherWriteup(page, true);
   });
 }
 const fmtDist = m => m >= 1000 ? (m / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' km' : Math.round(m) + ' m';
-function majBoutonPosition(page) { const b = $('#validerPos'); if (b) b.disabled = !page.carte?.position(); }
+function majBoutonPosition(page) { const b = page.q('#validerPos'); if (b) b.disabled = !page.carte?.position(); }
 
-// Coordonnées décimales (« 43.6, 1.44 ») ou DMS (« 43°36'16"N 1°26'38"E »).
-export function lireCoordonnees(t) {
-  t = String(t || '').trim();
-  // virgule décimale à la française : « 43,6045 ; 1,4440 » ou « 43,6045 1,4440 »
-  if (!t.includes('.') && /\d,\d+\s*[;\s]\s*-?\d+,\d/.test(t)) t = t.replace(/(\d),(\d)/g, '$1.$2');
-  const dms = [...t.matchAll(/(-?\d+(?:\.\d+)?)\s*°\s*(?:(\d+(?:\.\d+)?)\s*['′]\s*)?(?:(\d+(?:\.\d+)?)\s*["″]\s*)?([NSEOW])?/gi)];
-  if (dms.length >= 2) {
-    const v = dms.slice(0, 2).map(m => { let x = Math.abs(+m[1]) + (+m[2] || 0) / 60 + (+m[3] || 0) / 3600; if (+m[1] < 0 || /[SOW]/i.test(m[4] || '')) x = -x; return { x, l: (m[4] || '').toUpperCase() }; });
-    let lat = v[0].x, lon = v[1].x;
-    if (/[EOW]/.test(v[0].l) && /[NS]/.test(v[1].l)) [lat, lon] = [lon, lat];
-    if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { lat, lon };
-  }
-  const n = t.match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/);
-  if (n) { const lat = +n[1], lon = +n[2]; if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { lat, lon }; }
-  return null;
-}
-
-function reussite(page, { points, anneau = null, carte = false, message }) {
+async function reussite(page, { points, anneau = null, carte = false, message, flag = null }) {
   const { defi } = page;
   const r = progression.ctfResoudre(defi.id, { points, anneau, carte });
   if (!r) return;
   ctx.toast(r.points ? `🚩 ${esc(message)} +${r.points} points, +${r.xp} XP` : '🚩 Défi validé (writeup déjà lu : 0 point).', 'ok');
   badgesCTF();
   rendreValidation(page); rendreIndices(page);
-  const v = $('#retour'); if (v) { v.className = 'ctf-retour ok'; v.textContent = message; }
-  afficherWriteup(page, true);
+  const v = page.q('#retour'); if (v) { v.className = 'ctf-retour ok'; v.textContent = message; }
+  await afficherWriteup(page, true, flag);
 }
 
 /* ---------- indices ---------- */
 function rendreIndices(page) {
-  const { defi } = page, z = $('#indices');
+  const { defi, q, qq } = page, z = q('#indices');
   const ind = defi.indices || [];
   if (!ind.length) { z.hidden = true; return; }
   const libre = !!(progression.ctfResolu(defi.id) || progression.ctfAbandonne(defi.id));
@@ -480,36 +522,53 @@ function rendreIndices(page) {
     return `<li class="${vu ? 'vu' : ''}">${vu ? `<div class="ctf-ind-txt"><span class="muted">Indice ${n + 1}${achetes.includes(n) ? ` · −${x.cout} pts` : ''}</span>${defi.texte ? esc(S.ouvrir(x.texte, defi.id)) : S.ouvrir(x.texte, defi.id)}</div>`
       : `<button type="button" class="btn small" data-n="${n}" ${bloque ? 'disabled' : ''}>Indice ${n + 1} · −${x.cout} pts</button>${bloque ? '<span class="muted">après l\'indice ' + n + '</span>' : ''}`}</li>`;
   }).join('')}</ol>`;
+  typographier(z);
   $$('[data-n]', z).forEach(b => b.addEventListener('click', async () => {
     const n = +b.dataset.n;
     const rep = await modale({ titre: `Indice ${n + 1}`, corps: `<p>Cet indice coûte <b>${ind[n].cout} points</b> sur ce défi. Les points possibles passeront à ${Math.max(Math.ceil(defi.points * 0.1), pointsPossibles(defi) - ind[n].cout)}.</p>`, actions: [{ id: 'non', texte: 'Annuler' }, { id: 'oui', texte: 'Voir l\'indice', primaire: true }] });
-    if (rep !== 'oui') return;
+    if (rep !== 'oui' || !page.racine.isConnected) return;
     progression.ctfAcheterIndice(defi.id, n);
     rendreIndices(page);
-    const p = $('#ptsPot'); if (p && !progression.ctfAbandonne(defi.id)) p.textContent = pointsPossibles(defi);
-    $$('#indices .ctf-ind li')[n]?.querySelector('.ctf-ind-txt')?.setAttribute('tabindex', '-1');
-    $$('#indices .ctf-ind li')[n]?.querySelector('.ctf-ind-txt')?.focus();
+    const p = q('#ptsPot'); if (p && !progression.ctfAbandonne(defi.id)) p.textContent = pointsPossibles(defi);
+    const t = qq('#indices .ctf-ind li')[n]?.querySelector('.ctf-ind-txt');
+    if (t) { t.setAttribute('tabindex', '-1'); t.focus(); }
   }));
 }
 
 /* ---------- writeup ---------- */
-function afficherWriteup(page, defiler = false) {
-  const { defi } = page, z = $('#writeup');
+// Après abandon : writeup sans le flag exact. Après réussite : writeup complet, déchiffré avec le flag saisi
+// (la clé de contenu est ensuite gardée dans la progression pour les visites suivantes).
+async function afficherWriteup(page, defilerVers = false, flag = null) {
+  const { defi } = page, z = page.q('#writeup');
   let wu;
   try { wu = JSON.parse(S.demasquer(defi.wu, defi.id)); } catch { wu = { html: '<p>Writeup indisponible.</p>' }; }
+  let complet = false;
+  const r = progression.ctfResolu(defi.id);
+  if (r && defi.wf) {
+    let texte = r.k ? await S.ouvrirAvecCle(defi.wf, r.k) : null;
+    if (!texte && flag) { const o = await S.ouvrirAvecFlag(defi.id, defi.wf, flag); if (o) { texte = o.texte; progression.ctfCle(defi.id, o.cle); } }
+    if (texte) { try { wu = { ...wu, ...JSON.parse(texte), masque: false }; complet = true; } catch { /* version abandon */ } }
+  }
+  if (!z.isConnected) return;
   const corps = defi.texte ? texteEnParagraphes(wu.html) : wu.html;
+  const retenir = wu.retenir ? (defi.texte ? esc(wu.retenir) : wu.retenir) : '';
+  const note = wu.masque && !complet ? `<p class="callout info ctf-wu-note"><b>Flag masqué</b>${r ? 'Ce défi a été validé sur un autre appareil ou avant la mise à jour : revalide le flag pour afficher sa forme exacte.' : 'Le writeup donne toute la méthode ; le flag exact n\'apparaît qu\'une fois le défi validé. Applique la dernière étape et valide-le (0 point après abandon).'}</p>` : '';
   z.innerHTML = `<section class="card ctf-writeup" aria-labelledby="hWu" tabindex="-1">
     <h2 id="hWu" class="ctf-h">Writeup — la solution expliquée</h2>
     ${wu.lieu ? `<p class="ctf-lieu"><b>Lieu :</b> ${esc(wu.lieu)}</p>` : ''}
+    ${note}
     <div class="theorie">${corps}</div>
-    ${wu.retenir ? `<div class="callout ok"><b>À retenir</b>${wu.retenir}</div>` : ''}
+    ${retenir ? `<div class="callout ok"><b>À retenir</b>${retenir}</div>` : ''}
   </section>`;
-  if (page.carte && wu.cible) page.carte.montrerCible(wu.cible.lat, wu.cible.lon, wu.cible.r || (defi.zones && defi.zones[0] && defi.zones[0].r) || 300, wu.lieu);
+  const c = wu.cible;
+  if (page.carte && c && Number.isFinite(+c.lat) && Number.isFinite(+c.lon)) page.carte.montrerCible(+c.lat, +c.lon, Math.max(1, +c.r || (defi.zones && defi.zones[0] && defi.zones[0].r) || 300), wu.lieu);
   ctx.colorer && ctx.colorer(z);
-  if (defiler) { const s = $('.ctf-writeup', z); s.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); s.focus({ preventScroll: true }); }
+  typographier(z);
+  if (defilerVers) { const s = $('.ctf-writeup', z); defiler(s); s.focus({ preventScroll: true }); }
 }
 
 /* ---------- classement ---------- */
+const nombre = v => (Number.isFinite(+v) ? Math.round(+v) : 0);
 async function vueClassement(navId) {
   ctx.setTitre('Classement CTF');
   const d = await chargerDefis();
@@ -520,14 +579,14 @@ async function vueClassement(navId) {
     ctx.main.innerHTML = `<div class="wrap ctf">
       <div class="crumbs"><a href="#/ctf">Arène CTF</a> › <span>Classement</span></div>
       <h1>Classement local</h1>
-      <p class="muted ctf-intro">Ton score, tes parties précédentes et les cartes de score de tes amis. Tout reste dans ton navigateur : échange les cartes en fichier ou en texte.</p>
+      <p class="muted ctf-intro">Ton score, tes parties précédentes et les cartes de score de tes amis. Seuls les défis officiels et ceux du propriétaire du site comptent, sans les défis abandonnés. Tout reste dans ton navigateur : échange les cartes en fichier ou en texte.</p>
       ${sousNav('classement')}
       <div class="ctf-classement">
         <section class="card">
           <div class="field"><label for="pseudo">Ton pseudo d'arène</label><input id="pseudo" maxlength="32" value="${esc(progression.ctf.pseudo || progression.nom || '')}" placeholder="ex. geo_hibou" autocomplete="nickname"></div>
           <div class="table-scroll"><table class="ctf-table"><caption class="sr">Classement par points, puis par nombre de flags, puis par temps</caption>
             <thead><tr><th scope="col">#</th><th scope="col">Pseudo</th><th scope="col">Points</th><th scope="col">Flags</th><th scope="col">Temps</th><th scope="col">Origine</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
-            <tbody>${e.map((x, i) => `<tr class="${x.moi ? 'moi' : ''}"><td>${i + 1}</td><td><b>${esc(x.pseudo)}</b></td><td>${x.points}</td><td>${x.flags}</td><td>${x.flags ? formatDuree(x.temps) : '—'}</td><td>${x.moi ? 'Toi (en cours)' : x.archive ? 'Partie du ' + new Date(x.date).toLocaleDateString('fr-FR') : 'Ami·e'}</td><td>${x.ami ? `<button type="button" class="btn small ghost" data-retirer="${esc(x.pseudo)}" aria-label="Retirer ${esc(x.pseudo)}">Retirer</button>` : ''}</td></tr>`).join('')}</tbody></table></div>
+            <tbody>${e.map((x, i) => `<tr class="${x.moi ? 'moi' : ''}"><td>${i + 1}</td><td><b>${esc(x.pseudo)}</b></td><td>${nombre(x.points)}</td><td>${nombre(x.flags)}</td><td>${nombre(x.flags) ? formatDuree(nombre(x.temps)) : '—'}</td><td>${x.moi ? 'Toi (en cours)' : x.archive ? 'Partie du ' + esc(dateFr(x.date)) : 'Ami·e'}</td><td>${x.ami ? `<button type="button" class="btn small ghost" data-retirer="${esc(x.pseudo)}" aria-label="Retirer ${esc(x.pseudo)}">Retirer</button>` : ''}</td></tr>`).join('')}</tbody></table></div>
         </section>
         <section class="card">
           <h2 class="ctf-h">Échanger les scores</h2>
@@ -546,6 +605,7 @@ async function vueClassement(navId) {
       <div class="section-title"><h2>Badges de l'arène</h2></div>
       <div class="badges">${BADGES.filter(b => b.ctf).map(b => `<div class="badge ${progression.etat.badges.includes(b.id) ? 'won' : ''}"><div class="e">${b.e}</div><b>${b.nom}</b><small>${b.desc}</small></div>`).join('')}</div>
     </div>`;
+    typographier(ctx.main);
     $('#pseudo').addEventListener('change', ev => { progression.ctfPseudo(ev.target.value.trim()); ctx.toast('Pseudo enregistré.'); rendre(); });
     $('#expScore').addEventListener('click', () => telecharger(`lumio-ctf-score-${(progression.ctf.pseudo || 'moi').replace(/[^\w-]+/g, '_')}.json`, JSON.stringify(progression.ctfCarteScore(), null, 2), 'application/json'));
     $('#copScore').addEventListener('click', async () => ctx.toast(await copier(JSON.stringify(progression.ctfCarteScore())) ? 'Carte de score copiée.' : 'Copie impossible.'));
@@ -561,12 +621,13 @@ async function vueClassement(navId) {
   };
   rendre();
 }
+const dateFr = d => { const x = new Date(d); return isNaN(x) ? '—' : x.toLocaleDateString('fr-FR'); };
 
 /* ---------- établi libre ---------- */
 async function vueOutils(navId) {
   ctx.setTitre('Établi CTF');
   const noms = Object.keys(OUTILS);
-  ctx.main.innerHTML = `<div class="wrap ctf">
+  ctx.main.innerHTML = `<div class="wrap ctf ctf-libre">
     <div class="crumbs"><a href="#/ctf">Arène CTF</a> › <span>Établi</span></div>
     <h1>Établi d'analyse</h1>
     <p class="muted ctf-intro">Les outils de l'arène, utilisables sur tes propres fichiers. Rien n'est envoyé sur Internet : tout est calculé dans ton navigateur.</p>
@@ -582,7 +643,7 @@ async function vueOutils(navId) {
     </div>
   </div>`;
   if (!ctx.courant(navId)) return;
-  monterEtabli(noms);
+  monterEtabli(noms, $('.ctf-libre', ctx.main));
 }
 
 /* ---------- charte ---------- */
@@ -603,6 +664,8 @@ function vueCharte() {
         <li><b>Signaler plutôt qu'exploiter.</b> Une faille trouvée par hasard se signale à l'organisation (adresse <code>security.txt</code>, programme de divulgation) ou à l'ANSSI / CERT-FR, sans aller plus loin.</li>
         <li><b>Vérifier avant de partager.</b> Une géolocalisation ou une attribution erronée peut nuire à des innocents : recoupe toujours avec au moins deux sources indépendantes.</li>
       </ol>
+      <h2>Le jeu de l'arène : ce que fait (et ne fait pas) la vérification</h2>
+      <p>L'arène fonctionne sans serveur : tout se passe dans ton navigateur. Les flags ne sont jamais publiés en clair (seule leur empreinte SHA-256 l'est), les positions des cartes sont vérifiées par des empreintes de cellules geohash, et le writeup complet est chiffré avec une clé tirée du flag lui-même. En revanche, le writeup « abandon » (la méthode, sans le flag exact), les indices et le lieu des défis de carte sont seulement masqués : quelqu'un qui lit le code depuis la console peut les retrouver. C'est une limite assumée d'un site statique : le score n'a de valeur que si tu joues le jeu.</p>
       <h2>Où s'entraîner légalement</h2>
       <p>Root-Me, TryHackMe, Hack The Box, PortSwigger Web Security Academy, les CTF listés sur CTFtime, et pour l'OSINT : les défis de géolocalisation communautaires, les exercices de vérification d'images, les compétitions OSINT à personnages fictifs.</p>
       <div class="callout info"><b>Ressources officielles</b>CNIL (cnil.fr) pour le RGPD, ANSSI et CERT-FR pour la sécurité, cybermalveillance.gouv.fr pour l'assistance aux victimes, legifrance.gouv.fr pour le texte des articles 323-1 à 323-8 du Code pénal.</div>
@@ -613,9 +676,10 @@ function vueCharte() {
 /* ---------- recherche globale ---------- */
 export async function rechercherDefis(mots) {
   const d = await chargerDefis();
+  const m = mots.map(sansAccent);
   return d.defis.map(x => {
-    const t = (x.titre + ' ' + (x.accroche || '')).toLowerCase();
-    const score = mots.reduce((a, m) => a + (t.includes(m) ? 10 : 0) + (CAT[x.categorie].titre.toLowerCase().includes(m) ? 3 : 0), 0);
+    const t = sansAccent(x.titre + ' ' + (x.accroche || '')), c = sansAccent(CAT[x.categorie].titre), k = String(x.mots || '');
+    const score = m.reduce((a, w) => a + (t.includes(w) ? 10 : 0) + (k.includes(w) ? 4 : 0) + (c.includes(w) ? 3 : 0), 0);
     return { x, score, cat: CAT[x.categorie] };
   }).filter(r => r.score > 0).sort((a, b) => b.score - a.score);
 }

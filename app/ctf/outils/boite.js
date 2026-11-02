@@ -104,7 +104,7 @@ export function monter(el, { toast = () => {} } = {}) {
     <div class="bx-rec"><div class="bx-tete"><span class="bx-lab">Recette</span><button type="button" class="btn small ghost" data-vider>Vider</button></div><ol class="bx-etapes" aria-live="polite"></ol></div>
     <div class="bx-io"><label for="bxIn" class="bx-lab">Entrée</label><textarea id="bxIn" class="bx-in" spellcheck="false" placeholder="Colle ici le texte à transformer."></textarea>
       <div class="bx-tete"><span class="bx-lab" id="bxOutLab">Sortie</span><span class="row"><label class="ctf-check small"><input type="checkbox" data-hex> hexa</label><button type="button" class="btn small ghost" data-copier>Copier</button><button type="button" class="btn small ghost" data-vers-entree title="Remplacer l'entrée par la sortie">↑ En entrée</button></span></div>
-      <pre class="bx-out" aria-labelledby="bxOutLab" tabindex="0"></pre><p class="bx-stat muted"></p></div>
+      <pre class="bx-out" role="region" aria-labelledby="bxOutLab" tabindex="0"></pre><p class="bx-stat muted"></p></div>
   </div>`;
   const etapes = $('.bx-etapes', el), entree = $('#bxIn', el), sortie = $('.bx-out', el), stat = $('.bx-stat', el);
   let dernier = new Uint8Array();

@@ -62,7 +62,7 @@ const tagsTexte = t => Object.entries(t).filter(([k]) => !k.startsWith('@')).map
 export async function monter(el, opts = {}) {
   const fc = await fetch(url(opts.src)).then(r => r.json());
   const exemple = opts.requete || '[out:json];\nnode["amenity"="cafe"];\nout;';
-  const enLigne = opts.enLigne || '[out:json][timeout:25];\n// Fontaines d\'eau potable autour du Capitole (Toulouse)\nnode["amenity"="drinking_water"](around:600,43.6045,1.4440);\nout body;';
+  const enLigne = opts.enLigne || '[out:json][timeout:25];\n// Fontaines d\'eau potable autour de la place de la Bourse (Bordeaux)\nnode["amenity"="drinking_water"](around:600,44.8411,-0.5694);\nout body;';
   el.innerHTML = `<div class="op">
     <div class="op-modes row" role="group" aria-label="Mode d'exécution"><button type="button" class="btn small" data-m="local" aria-pressed="true">Jeu de données du défi</button><button type="button" class="btn small" data-m="ligne" aria-pressed="false">En ligne (overpass-api.de)</button><a class="btn small ghost" target="_blank" rel="noopener" data-turbo href="#">Ouvrir dans overpass-turbo ↗</a></div>
     <p class="op-info muted"></p>
@@ -76,6 +76,7 @@ export async function monter(el, opts = {}) {
   let mode = 'local', textes = { local: exemple, ligne: enLigne };
   ta.value = textes.local;
   const carte = await creerCarte($('.op-carte', el), { vue: opts.vue || [43.6, 1.44, 15], fond: 'aucun', interactif: false });
+  if (!carte) return {};
   let calque = dessinerDonnees(carte, fc, { etiquettes: true });
   carte.map.fitBounds(calque.getBounds().pad(0.08));
   let carteLigne = null, calqueLigne = null;
@@ -113,15 +114,23 @@ export async function monter(el, opts = {}) {
     let q = ta.value.trim();
     if (!/\[out:json\]/.test(q)) q = '[out:json][timeout:25];\n' + q.replace(/\[out:\w+\]\s*;?/, '');
     try {
-      const rep = await fetch(OVERPASS_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: 'data=' + encodeURIComponent(q) });
+      let rep;
+      try { rep = await fetch(OVERPASS_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: 'data=' + encodeURIComponent(q) }); }
+      catch { throw Object.assign(new Error('Failed to fetch'), { reseau: true }); }
       if (!rep.ok) throw new Error(rep.status === 429 ? 'Serveur saturé (429) : réessaie dans une minute.' : rep.status === 400 ? 'Requête refusée (400) : vérifie la syntaxe.' : 'Erreur HTTP ' + rep.status);
-      const json = await rep.json();
+      const brut = await rep.text();
+      let json;
+      try { json = JSON.parse(brut); }
+      catch { throw new Error(/^\s*</.test(brut) ? 'Overpass a répondu par une page HTML au lieu de données JSON (serveur surchargé, ou requête sans [out:json]). Réessaie plus tard, ou utilise le jeu de données du défi.' : 'Réponse d\'Overpass illisible (JSON invalide).'); }
+      if (!json || typeof json !== 'object') throw new Error('Réponse d\'Overpass inattendue.');
       const els = json.elements || [];
       stat.textContent = `${els.length} élément${els.length > 1 ? 's' : ''} reçu${els.length > 1 ? 's' : ''} d'OpenStreetMap`;
       resZ.innerHTML = els.length ? tableau(els.map(x => ({ id: `${x.type}/${x.id}`, nom: x.tags && x.tags.name, pos: x.lat !== undefined ? [x.lat, x.lon] : x.center ? [x.center.lat, x.center.lon] : null, tags: tagsTexte(x.tags || {}) }))) : '<p class="muted">Aucun résultat.</p>';
       if (!carteLigne) {
         const z = document.createElement('div'); z.className = 'op-carte'; $('.op-grille', el).appendChild(z);
-        carteLigne = await creerCarte(z, { vue: [43.6045, 1.444, 14], fond: 'osm', interactif: false }); carteLigne.el = z;
+        carteLigne = await creerCarte(z, { vue: [46.6, 2.4, 5], fond: 'osm', interactif: false });
+        if (!carteLigne) return;
+        carteLigne.el = z;
       }
       if (calqueLigne) carteLigne.map.removeLayer(calqueLigne);
       const pts = els.map(x => x.lat !== undefined ? [x.lat, x.lon, x] : x.center ? [x.center.lat, x.center.lon, x] : null).filter(Boolean);
@@ -129,7 +138,7 @@ export async function monter(el, opts = {}) {
       if (pts.length) carteLigne.map.fitBounds(window.L.latLngBounds(pts.map(p => [p[0], p[1]])).pad(0.3), { maxZoom: 17 });
     } catch (err) {
       stat.textContent = '';
-      resZ.innerHTML = `<p class="callout warn"><b>Impossible de joindre Overpass</b>${esc(err.message === 'Failed to fetch' ? 'Pas de connexion à overpass-api.de (hors ligne ou réseau filtré). Le jeu de données du défi suffit pour le résoudre ; tu peux aussi copier la requête dans overpass-turbo.' : err.message)}</p>`;
+      resZ.innerHTML = `<p class="callout warn"><b>${err.reseau ? 'Impossible de joindre Overpass' : 'Réponse d\'Overpass inutilisable'}</b>${esc(err.reseau ? 'Pas de connexion à overpass-api.de (hors ligne ou réseau filtré). Le jeu de données du défi suffit pour le résoudre ; tu peux aussi copier la requête dans overpass-turbo.' : err.message)}</p>`;
     }
   }
   $('[data-exec]', el).addEventListener('click', executer);

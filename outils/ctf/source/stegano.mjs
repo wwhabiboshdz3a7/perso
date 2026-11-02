@@ -37,7 +37,7 @@ export default [
     retenir: 'Réflexe stéganographie sur une image : explorer les plans de bits de chaque canal et forcer le contraste.'
   },
   {
-    id: 'steg-lsb', categorie: 'stegano', titre: 'Le coucher de soleil codé', difficulte: 2, points: 250,
+    id: 'steg-lsb', motsPublics: ['les_bits_de_poids_faible'], categorie: 'stegano', titre: 'Le coucher de soleil codé', difficulte: 2, points: 250,
     accroche: 'Un message entier dissimulé dans le dernier bit de chaque couleur.',
     briefing: `<p class="dossier">Dossier ST-03 · Échange suspect sur un forum de dessin</p>
 <p>Deux membres d'un forum s'envoient toujours la même illustration de coucher de soleil. Un modérateur soupçonne un canal caché. Le fichier est un PNG (sans perte) : chaque pixel a trois couleurs, rouge, vert, bleu, codées de 0 à 255.</p>

@@ -1,6 +1,6 @@
 // Carte des défis : Leaflet (servi localement) + tuiles OpenStreetMap, avec repli hors ligne
 // sur un fond Natural Earth simplifié si les tuiles ne se chargent pas.
-import { chargerScript, chargerStyle, url, esc } from './commun.js';
+import { chargerScript, chargerStyle, url, esc, reduitMouvement } from './commun.js';
 
 export async function chargerLeaflet() {
   await Promise.all([chargerStyle('vendor/leaflet/leaflet.css'), chargerScript('vendor/leaflet/leaflet.js')]);
@@ -12,6 +12,28 @@ const ATTRIB_NE = 'Fond simplifié : <a href="https://www.naturalearthdata.com/"
 export const TUILES_OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 const icone = (L, cls, txt = '') => L.divIcon({ className: 'ctf-pin ' + cls, html: `<span>${txt}</span>`, iconSize: [30, 40], iconAnchor: [15, 38] });
+
+// Une seule tuile d'essai avant d'afficher la couche OSM : hors ligne, on passe directement au fond simplifié
+// (une seule requête en échec au lieu d'une par tuile). Le résultat est gardé pour la session.
+let sondePromesse = null;
+function sonderTuiles() {
+  if (!sondePromesse) sondePromesse = (async () => {
+    // « ok » vaut pour la session ; un échec est retenté au bout de deux minutes
+    try { const v = sessionStorage.getItem('lumio.ctf.tuiles') || ''; if (v === 'ok') return true; if (v.startsWith('ko:') && Date.now() - +v.slice(3) < 120000) return false; } catch { /* ignoré */ }
+    if (navigator.onLine === false) return false;
+    const ok = await new Promise(res => {
+      const im = new Image(), fin = v => { clearTimeout(t); im.onload = im.onerror = null; res(v); };
+      const t = setTimeout(() => fin(false), 6000);
+      im.crossOrigin = 'anonymous';
+      im.onload = () => fin(true); im.onerror = () => fin(false);
+      im.src = TUILES_OSM.replace('{z}/{x}/{y}', '0/0/0');
+    });
+    try { sessionStorage.setItem('lumio.ctf.tuiles', ok ? 'ok' : 'ko:' + Date.now()); } catch { /* ignoré */ }
+    if (!ok) setTimeout(() => { sondePromesse = null; }, 120000);
+    return ok;
+  })();
+  return sondePromesse;
+}
 
 let paysPromesse = null;
 async function chargerPays() {
@@ -56,11 +78,13 @@ export function dessinerDonnees(api, fc, { etiquettes = false, surbrillance = nu
 // options : vue [lat, lon, zoom], fond 'osm' | 'aucun', onChoix(latlng), interactif (placement d'un repère), calque (GeoJSON à afficher)
 export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix = null, interactif = true, hauteur, calque = null } = {}) {
   const L = await chargerLeaflet();
+  if (!el.isConnected) return null; // la page a changé pendant le chargement de Leaflet
   el.classList.add('ctf-map');
   if (hauteur) el.style.height = hauteur;
   el.innerHTML = `<div class="ctf-map-in"></div><div class="ctf-map-info" aria-live="polite"></div>`;
   const zone = el.querySelector('.ctf-map-in'), info = el.querySelector('.ctf-map-info');
-  const map = L.map(zone, { worldCopyJump: true, zoomControl: true, attributionControl: true, minZoom: 1, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90 }).setView([vue[0], vue[1]], vue[2]);
+  const anim = !reduitMouvement();
+  const map = L.map(zone, { worldCopyJump: true, zoomControl: true, attributionControl: true, minZoom: 1, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90, zoomAnimation: anim, fadeAnimation: anim, markerZoomAnimation: anim, inertia: anim }).setView([vue[0], vue[1]], vue[2]);
   map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   L.control.scale({ metric: true, imperial: false }).addTo(map);
   let repli = false;
@@ -68,6 +92,7 @@ export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix 
   async function basculerRepli(raison) {
     if (repli) return; repli = true;
     if (tuiles) map.removeLayer(tuiles);
+    map.attributionControl.removeAttribution(ATTRIB_OSM);
     el.classList.add('is-repli');
     const msg = document.createElement('div');
     msg.className = 'ctf-map-repli'; msg.setAttribute('role', 'status');
@@ -82,13 +107,18 @@ export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix 
 
   let tuiles = null;
   if (fond === 'osm') {
-    tuiles = L.tileLayer(TUILES_OSM, { maxZoom: 19, attribution: ATTRIB_OSM, crossOrigin: true });
-    let ok = 0, ko = 0;
-    tuiles.on('tileload', () => { ok++; });
-    tuiles.on('tileerror', () => { ko++; if (!ok && ko >= 3) basculerRepli('Les tuiles OpenStreetMap ne se chargent pas (hors ligne ou réseau filtré).'); });
-    tuiles.addTo(map);
-    setTimeout(() => { if (!ok && !repli) basculerRepli('Les tuiles OpenStreetMap ne répondent pas.'); }, 9000);
-    if (navigator.onLine === false) basculerRepli('Tu sembles hors ligne.');
+    map.attributionControl.addAttribution(ATTRIB_OSM);
+    sonderTuiles().then(dispo => {
+      if (!el.isConnected || repli) return;
+      if (!dispo) return basculerRepli(navigator.onLine === false ? 'Tu sembles hors ligne.' : 'Les tuiles OpenStreetMap ne se chargent pas (hors ligne ou réseau filtré).');
+      map.attributionControl.removeAttribution(ATTRIB_OSM);
+      tuiles = L.tileLayer(TUILES_OSM, { maxZoom: 19, attribution: ATTRIB_OSM, crossOrigin: true });
+      let ok = 0, ko = 0;
+      tuiles.on('tileload', () => { ok++; });
+      tuiles.on('tileerror', () => { ko++; if (!ok && ko >= 3) basculerRepli('Les tuiles OpenStreetMap ne se chargent pas (hors ligne ou réseau filtré).'); });
+      tuiles.addTo(map);
+      setTimeout(() => { if (!ok && !repli && el.isConnected) basculerRepli('Les tuiles OpenStreetMap ne répondent pas.'); }, 9000);
+    });
   } else {
     el.classList.add('is-neutre');
     graticule(L, map, 0.005);
@@ -96,25 +126,25 @@ export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix 
 
   let repere = null, cible = null;
   const afficherInfo = () => {
-    const p = repere && repere.getLatLng();
+    const p = repere && repere.getLatLng().wrap();
     info.textContent = p ? `Repère : ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}` : (interactif ? 'Clique sur la carte pour placer ton repère.' : '');
   };
   const api = {
     map, L,
-    position: () => repere ? repere.getLatLng() : null,
+    position: () => repere ? repere.getLatLng().wrap() : null,
     placer(lat, lon, centrer = false) {
       if (!repere) {
         repere = L.marker([lat, lon], { icon: icone(L, 'is-moi'), draggable: true, keyboard: true, title: 'Ton repère (déplaçable)', alt: 'Ton repère' }).addTo(map);
-        repere.on('dragend', () => { afficherInfo(); onChoix && onChoix(repere.getLatLng()); });
+        repere.on('dragend', () => { afficherInfo(); onChoix && onChoix(api.position()); });
       } else repere.setLatLng([lat, lon]);
       if (centrer) map.setView([lat, lon], Math.max(map.getZoom(), 14));
-      afficherInfo(); onChoix && onChoix(repere.getLatLng());
+      afficherInfo(); onChoix && onChoix(api.position());
     },
-    placerAuCentre() { const c = map.getCenter(); api.placer(c.lat, c.lng); },
+    placerAuCentre() { const c = map.getCenter().wrap(); api.placer(c.lat, c.lng); },
     montrerCible(lat, lon, r, lieu) {
       if (cible) cible.forEach(x => map.removeLayer(x));
       cible = [L.circle([lat, lon], { radius: r, color: '#16a34a', weight: 2, fillOpacity: 0.12 }), L.marker([lat, lon], { icon: icone(L, 'is-cible', '★'), title: lieu || 'Cible', alt: 'Emplacement de la cible' }).bindPopup(esc(lieu || 'Cible'))];
-      const p = repere && repere.getLatLng();
+      const p = repere && repere.getLatLng().wrap();
       if (p) {
         const d = map.distance(p, [lat, lon]);
         cible.push(L.polyline([p, [lat, lon]], { color: '#16a34a', dashArray: '6 6', weight: 2 }));
@@ -125,11 +155,14 @@ export async function creerCarte(el, { vue = [30, 10, 2], fond = 'osm', onChoix 
     },
     basculerRepli
   };
+  // sur une copie du monde (après défilement), la longitude du clic sort de [-180, 180] : le repère reste là où
+  // l'on a cliqué, mais position() et l'affichage la ramènent dans l'intervalle (vérification par geohash).
   if (interactif) map.on('click', e => api.placer(e.latlng.lat, e.latlng.lng));
   if (calque) {
     try { const fc = await fetch(url(calque)).then(r => r.json()); api.donnees = dessinerDonnees(api, fc, { etiquettes: true }); } catch { /* calque indisponible */ }
   }
   afficherInfo();
+  el.lumioCarte = api; // accès pour les tests automatiques et le débogage
   // la carte peut être montée dans un conteneur qui vient d'apparaître
   setTimeout(() => map.invalidateSize(), 60);
   if ('ResizeObserver' in window) new ResizeObserver(() => map.invalidateSize()).observe(zone);

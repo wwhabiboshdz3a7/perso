@@ -29,6 +29,9 @@ export async function verifierFlag(defi, saisie) {
 /* ---------- geohash ---------- */
 const B32 = '0123456789bcdefghjkmnpqrstuvwxyz';
 export function geohash(lat, lon, precision = 7) {
+  // une carte qui montre plusieurs copies du monde peut donner une longitude hors de [-180, 180]
+  lon = ((((+lon + 180) % 360) + 360) % 360) - 180;
+  lat = Math.max(-90, Math.min(90, +lat));
   let latMin = -90, latMax = 90, lonMin = -180, lonMax = 180;
   let bit = 0, ch = 0, pair = true, out = '';
   while (out.length < precision) {
@@ -53,11 +56,11 @@ export function boiteGeohash(gh) {
   return { latMin, latMax, lonMin, lonMax };
 }
 // Taille approximative d'une cellule (mètres) selon la précision, à l'équateur.
-export const TAILLE_CELLULE = { 2: 1250000, 3: 156000, 4: 39100, 5: 4890, 6: 1220, 7: 153, 8: 38 };
+export const TAILLE_CELLULE = { 2: 1250000, 3: 156000, 4: 39100, 5: 4890, 6: 1220, 7: 153, 8: 38, 9: 4.8 };
 export function precisionPourRayon(r) {
   // la cellule la plus grande qui reste plus petite que le rayon accepté
-  for (const p of [2, 3, 4, 5, 6, 7, 8]) if (TAILLE_CELLULE[p] <= r) return p;
-  return 8;
+  for (const p of [2, 3, 4, 5, 6, 7, 8, 9]) if (TAILLE_CELLULE[p] <= r) return p;
+  return 9;
 }
 
 export function distance(lat1, lon1, lat2, lon2) {
@@ -112,6 +115,56 @@ export async function construireZones(id, cibles, anneaux) {
     zones.push({ p, part: a.part, r: a.r, c });
   }
   return zones;
+}
+
+/* ---------- contenu réservé à la réussite (AES-GCM, clé dérivée du flag) ---------- */
+// Le writeup complet (avec le flag) est chiffré par une clé de contenu aléatoire, elle-même chiffrée
+// avec une clé dérivée (HKDF) de chaque flag accepté. Sans le bon flag, ce contenu reste illisible,
+// même depuis la console. La clé de contenu est conservée dans la progression après la réussite.
+const sub = () => globalThis.crypto.subtle;
+async function cleDeFlag(id, flag) {
+  const base = await sub().importKey('raw', enc.encode(normaliserFlag(flag)), 'HKDF', false, ['deriveKey']);
+  return sub().deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: enc.encode('lumio-wf|' + id), info: enc.encode('writeup') }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+const aes = raw => sub().importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+// IV et clé de contenu dérivés du contenu lui-même (secret) : sortie reproductible d'une génération à l'autre,
+// sans jamais réutiliser un IV pour deux contenus différents avec la même clé.
+const octetsHash = async t => new Uint8Array(await sub().digest('SHA-256', typeof t === 'string' ? enc.encode(t) : t));
+async function chiffrer(cle, octets, graineIV) {
+  const iv = (await octetsHash(graineIV)).slice(0, 12);
+  return { iv: b64.enc(iv), ct: b64.enc(new Uint8Array(await sub().encrypt({ name: 'AES-GCM', iv }, cle, octets))) };
+}
+const dechiffrer = async (cle, x) => new Uint8Array(await sub().decrypt({ name: 'AES-GCM', iv: b64.dec(x.iv) }, cle, b64.dec(x.ct)));
+export async function chiffrerPourFlags(id, texte, flags) {
+  const k = await octetsHash('lumio-k|' + id + '|' + texte + '|' + flags.join('|'));
+  const kh = [...k].map(b => b.toString(16).padStart(2, '0')).join('');
+  const corps = await chiffrer(await aes(k), enc.encode(texte), 'iv|' + kh);
+  const cles = [];
+  for (const f of [...new Set(flags.map(normaliserFlag))]) cles.push(await chiffrer(await cleDeFlag(id, f), k, 'ivk|' + kh + '|' + f));
+  return { ...corps, k: cles };
+}
+// Renvoie { texte, cle } (cle : clé de contenu en base64, à conserver) ou null.
+export async function ouvrirAvecFlag(id, wf, flag) {
+  if (!wf || !Array.isArray(wf.k)) return null;
+  const kek = await cleDeFlag(id, flag);
+  for (const x of wf.k) {
+    try { const k = await dechiffrer(kek, x); return { texte: dec.decode(await dechiffrer(await aes(k), wf)), cle: b64.enc(k) }; } catch { /* autre flag */ }
+  }
+  return null;
+}
+export async function ouvrirAvecCle(wf, cle) {
+  try { return dec.decode(await dechiffrer(await aes(b64.dec(cle)), wf)); } catch { return null; }
+}
+export const wfValide = wf => !!wf && typeof wf === 'object' && typeof wf.iv === 'string' && typeof wf.ct === 'string' && Array.isArray(wf.k)
+  && /^[A-Za-z0-9+/=]{16}$/.test(wf.iv) && /^[A-Za-z0-9+/=]{1,400000}$/.test(wf.ct) && wf.k.length <= 12
+  && wf.k.every(x => x && /^[A-Za-z0-9+/=]{16}$/.test(x.iv) && /^[A-Za-z0-9+/=]{40,80}$/.test(x.ct));
+// Remplace chaque occurrence des flags par une marque « masqué » (version lisible après abandon).
+export function masquerFlags(html, flags, marque = '<span class="ctf-flag-cache" title="Le flag exact s\'affiche une fois le défi validé">LUMIO{…}</span>') {
+  let n = 0;
+  const motifs = [...new Set(flags)].sort((a, b) => b.length - a.length).map(f => f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  if (!motifs.length) return { html, n };
+  const re = new RegExp(motifs.join('|'), 'gi');
+  return { html: String(html).replace(re, () => { n++; return marque; }), n };
 }
 
 /* ---------- masquage réversible (contenus révélés après réussite ou abandon) ---------- */

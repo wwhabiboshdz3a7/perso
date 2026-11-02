@@ -271,7 +271,16 @@ function leCap() {
   // le photographe regarde vers le SUD (la montagne) à 12 h 41 : le soleil est dans son dos, au NORD,
   // et les ombres partent vers la montagne. On roule à GAUCHE.
   const VX = 800, VY = 640;
-  const lampadaire = (x, base, h) => `<rect x="${x - 4}" y="${base - h}" width="8" height="${h}" fill="#374151"/><rect x="${x - 4}" y="${base - h}" width="${x < VX ? 40 : -40}" height="6" fill="#374151"/><path d="M${x - 4} ${base} L${f(x + (VX - x) * 0.35 - 3)} ${f(base - (base - VY) * 0.35)} L${f(x + (VX - x) * 0.35 + 3)} ${f(base - (base - VY) * 0.35)} L${x + 4} ${base}Z" fill="#000" opacity=".3"/>`;
+  // Ombres portées nettes : le soleil est dans le dos du photographe, toutes les ombres filent vers le point
+  // de fuite, c'est-à-dire vers la montagne. part = fraction du chemin vers le point de fuite.
+  const versVP = (x, base, part) => [f(x + (VX - x) * part), f(base - (base - VY) * part)];
+  const ombreSol = (x, base, l, part, op = 0.5) => { const [ex, ey] = versVP(x, base, part); return `<path d="M${f(x - l / 2)} ${base} L${f(ex - l * 0.3)} ${ey} L${f(ex + l * 0.3)} ${ey} L${f(x + l / 2)} ${base}Z" fill="#111827" opacity="${op}"/>`; };
+  const lampadaire = (x, base, h, part) => { const [ex, ey] = versVP(x, base, part), bras = x < VX ? 1 : -1;
+    return `${ombreSol(x, base, 12, part, 0.55)}<path d="M${ex} ${ey} l${f(bras * 26 * (1 - part))} ${f(-4 * (1 - part))}" stroke="#111827" stroke-width="${f(8 * (1 - part * 0.5))}" opacity=".55" stroke-linecap="round"/>
+    <rect x="${x - 4}" y="${base - h}" width="8" height="${h}" fill="#374151"/><rect x="${x - 4}" y="${base - h}" width="${bras * 40}" height="6" fill="#374151"/>`; };
+  const ombrePalmier = (x, base, part) => { const [ex, ey] = versVP(x, base, part);
+    return `${ombreSol(x, base, 20, part, 0.5)}<g transform="translate(${ex} ${ey}) rotate(${f(Math.atan2(ey - base, ex - x) * 180 / Math.PI)})" opacity=".5" fill="#111827">${[-50, -25, 0, 25, 50].map(a => `<ellipse cx="0" cy="0" rx="62" ry="9" transform="rotate(${a})"/>`).join('')}</g>`; };
+  const ombreVoiture = (cx, base, l, part) => { const [ex, ey] = versVP(cx, base, part); return `<path d="M${f(cx - l * 0.5)} ${base} L${f(ex - l * 0.32)} ${ey} L${f(ex + l * 0.32)} ${ey} L${f(cx + l * 0.5)} ${base}Z" fill="#111827" opacity=".42"/>`; };
   return svg(L, H, `
   <rect width="${L}" height="${H}" fill="url(#cielCap)"/>
   <!-- Devil's Peak (gauche), Table Mountain (sommet plat, « nappe » de nuage), Lion's Head (droite) -->
@@ -285,14 +294,16 @@ function leCap() {
   <path d="M0 1000 L0 760 L${VX} ${VY} L640 1000Z" fill="#cbd5e1"/><path d="M1600 1000 L1600 760 L${VX} ${VY} L960 1000Z" fill="#cbd5e1"/>
   <path d="M640 1000 L${VX} ${VY} L960 1000Z" fill="#4b5563"/><path d="M180 1000 L${VX} ${VY} L1420 1000Z" fill="#4b5563"/>
   <path d="M800 1000 L${VX} ${VY}" stroke="#f8fafc" stroke-width="6" stroke-dasharray="40 34"/><path d="M180 1000 L${VX} ${VY} M1420 1000 L${VX} ${VY}" stroke="#facc15" stroke-width="5"/>
-  ${palmier(130, 800, 300)}${palmier(1470, 800, 280)}
-  ${lampadaire(330, 900, 300)}${lampadaire(1270, 900, 300)}${lampadaire(600, 735, 150)}${lampadaire(1000, 735, 150)}
+  ${ombrePalmier(130, 800, 0.62)}${ombrePalmier(1470, 800, 0.6)}${palmier(130, 800, 300)}${palmier(1470, 800, 280)}
+  ${lampadaire(330, 900, 300, 0.5)}${lampadaire(1270, 900, 300, 0.5)}${lampadaire(600, 735, 150, 0.45)}${lampadaire(1000, 735, 150, 0.45)}
+  ${ombreVoiture(560, 960, 250, 0.42)}${ombreVoiture(720, 735, 90, 0.4)}${ombreVoiture(1020, 820, 150, 0.4)}${ombreVoiture(870, 700, 60, 0.4)}
   <!-- voies : on s'éloigne à gauche, on arrive à droite -->
   ${voiture(560, 960, 250, { couleur: '#b91c1c', vue: 'arriere', plaque: (x, y, l) => plaqueZA(x, y, l, 'CA 418-206'), ombre: [6, -30] })}
   ${voiture(720, 735, 90, { couleur: '#e5e7eb', vue: 'arriere', plaque: (x, y, l) => plaqueZA(x, y, l, 'CA 77-301') })}
   ${voiture(1020, 820, 150, { couleur: '#0f766e', vue: 'avant', plaque: null, ombre: [-2, -18] })}
   ${voiture(870, 700, 60, { couleur: '#1d4ed8', vue: 'avant', plaque: null })}
-  ${personne(230, 930, 130, { haut: '#1e3a8a', ombre: [12, -60] })}${personne(1380, 950, 130, { haut: '#9f1239', ombre: [-12, -60] })}
+  ${personne(230, 930, 130, { haut: '#1e3a8a', ombre: [146, -74], ombreNette: true })}${personne(1380, 950, 130, { haut: '#9f1239', ombre: [-142, -76], ombreNette: true })}
+  ${personne(400, 836, 96, { haut: '#047857', ombre: [146, -72], ombreNette: true, sac: true })}${personne(1230, 846, 96, { haut: '#a16207', ombre: [-146, -70], ombreNette: true })}
   <!-- panneaux -->
   <rect x="60" y="560" width="220" height="74" rx="8" fill="#e11d48"/>${texte(170, 594, 'MyCiTi', { taille: 30, coul: '#fff' })}${texte(170, 620, 'Civic Centre · Stadsentrum', { taille: 13, coul: '#fff', gras: false })}<rect x="164" y="634" width="10" height="150" fill="#334155"/>
   <rect x="1356" y="560" width="10" height="210" fill="#334155"/><rect x="1296" y="520" width="130" height="50" rx="6" fill="#0f172a"/>${texte(1361, 553, '12:41', { taille: 30, coul: '#facc15', police: "'DejaVu Sans Mono', monospace" })}

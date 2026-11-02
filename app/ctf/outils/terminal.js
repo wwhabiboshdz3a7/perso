@@ -79,7 +79,7 @@ export function creerShell({ fs, utilisateur = 'analyste', hote = 'lumio', cwd }
 
   const CMD = {
     help: () => T(`Commandes disponibles :
-  ls [-a] [-l] [chemin]      lister (les fichiers cachés commencent par un point : ls -a)
+  ls [-a] [-l] [chemin]      lister (-a : aussi les noms qui débutent par « . »)
   cd [chemin]  pwd           se déplacer / afficher le dossier courant (cd .. remonte, cd ~ revient au départ)
   cat fichier                afficher un fichier
   head|tail [-n N] fichier   début / fin d'un fichier

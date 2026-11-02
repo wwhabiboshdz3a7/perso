@@ -200,7 +200,7 @@ export default [
     retenir: 'E-mail → moteurs, pastes, fuites : un identifiant unique ouvre de nombreuses pistes. Ce qu\'on y trouve se signale, ne s\'utilise pas.'
   },
   {
-    id: 'osint-geo', categorie: 'osint', titre: 'La pause café avec vue', difficulte: 3, points: 300,
+    id: 'osint-geo', categorie: 'osint', titre: 'La pause café avec vue', difficulte: 3, points: 300, sensibles: ['Saint-Sernin'],
     accroche: 'Une photo depuis la fenêtre du bureau. Un clocher très reconnaissable…',
     briefing: `<p class="dossier">Dossier OI-05 · Audit d'exposition en ligne</p>${MANDAT}
 <p>Sur Chirp, Inès a publié la vue depuis la fenêtre de son bureau. Elle pense qu'on ne peut pas savoir où elle travaille. Montre-lui le contraire : <b>place ton repère sur le monument visible</b> au centre de la photo (le bureau est juste à côté).</p>`,

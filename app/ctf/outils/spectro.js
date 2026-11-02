@@ -76,7 +76,7 @@ export function monter(el) {
       <label>Fréquence max <select data-c="fmax"><option value="0">toutes</option><option value="12000">12 kHz</option><option value="8000">8 kHz</option><option value="4000">4 kHz</option></select></label>
       <label>Contraste <input type="range" min="30" max="110" value="80" data-c="plancher" aria-label="Plage dynamique en décibels"></label>
     </div>
-    <div class="sp-vue"><canvas class="sp-canvas" aria-label="Spectrogramme : le temps de gauche à droite, les fréquences de bas en haut"></canvas><div class="sp-axe muted"></div></div>
+    <div class="sp-vue"><canvas class="sp-canvas" role="img" aria-label="Spectrogramme : le temps de gauche à droite, les fréquences de bas en haut"></canvas><div class="sp-axe muted"></div></div>
     <audio class="sp-audio" controls hidden></audio></div>`;
   const cv = $('.sp-canvas', el), opts = { taille: 1024, fmax: 0, plancher: -80 };
   let wav = null;

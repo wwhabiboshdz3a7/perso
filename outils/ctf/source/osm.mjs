@@ -92,11 +92,11 @@ out;`)}
     outils: [],
     indices: [
       { cout: 30, texte: 'Commence par lister les bancs sans dossier : node["amenity"="bench"]["backrest"="no"]; — il en reste cinq.' },
-      { cout: 40, texte: 'Points d\'eau proches du port : la Fontaine du Quai (45.197035, -3.497005). Cherche les bancs sans dossier autour : node["amenity"="bench"]["backrest"="no"](around:40,45.197035,-3.497005);' },
+      { cout: 40, texte: 'Le point d\'eau le plus proche du port est la Fontaine du Quai (node/1031) : clique dessus dans la carte pour lire ses coordonnées, puis cherche les bancs sans dossier autour : node["amenity"="bench"]["backrest"="no"](around:40,LATITUDE,LONGITUDE);' },
       { cout: 50, texte: 'Le banc est entre la Fontaine du Quai et le bassin du port, à l\'est de la jetée.' }
     ],
     validation: 'carte', vue: [45.1985, -3.4985, 16], fond: 'aucun', calque: DONNEES,
-    cible: { lieu: 'Banc de pierre du Quai du Port (île fictive de Saint-Lumin)', points: [{ lat: 45.196928, lon: -3.497195 }], anneaux: [{ r: 18, part: 1 }, { r: 60, part: 0.5 }, { r: 300, part: 0 }], dansLesDonnees: true, faux: { lat: 45.198628, lon: -3.500255 } },
+    cible: { lieu: 'Banc de pierre du Quai du Port (île fictive de Saint-Lumin)', points: [{ lat: 45.196928, lon: -3.497195 }], anneaux: [{ r: 10, part: 1 }, { r: 25, part: 0.5 }, { r: 300, part: 0 }], dansLesDonnees: true, faux: { lat: 45.198628, lon: -3.500255 } },
     writeup: `<h3>1. Filtrer par tags</h3><p>Huit bancs sur l'île ; cinq ont <code>backrest=no</code>.</p>
 <h3>2. Croiser avec la distance aux points d'eau</h3>${code('text', 'node["amenity"="drinking_water"]->.eau;\nnode["amenity"="bench"]["backrest"="no"](around.eau:40);\nout;')}
 <p>Deux candidats : le banc près de la Fontaine des Sauniers (sur la place de la Halle, à 190 m du port) et celui près de la Fontaine du Quai.</p>

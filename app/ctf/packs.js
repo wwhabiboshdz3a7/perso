@@ -3,6 +3,7 @@
 import * as S from './securite.js';
 import { $, $$, esc, modale, telecharger } from './commun.js';
 import { CATEGORIES, DIFFICULTES } from '../../content/ctf/categories.js';
+import { progression } from '../progress.js';
 
 const CLE = 'lumio.ctf.packs', CLE_BROUILLON = 'lumio.ctf.brouillon';
 export function lirePacks() {
@@ -14,7 +15,19 @@ const imageSure = s => typeof s === 'string' && (
   /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(s) ||
   (/^assets\/ctf\/photos\/[\w\-./]+\.(jpe?g|png|webp|gif|svg)$/i.test(s) && !s.includes('..')) ||
   /^https:\/\/[^\s"'<>()]+$/.test(s));
-const enveloppe = t => typeof t === 'string' ? t : (t && typeof t['~'] === 'string' ? { '~': t['~'] } : '');
+const enveloppe = t => typeof t === 'string' ? t.slice(0, 2000) : (t && typeof t['~'] === 'string' ? { '~': t['~'].slice(0, 4000) } : '');
+const coord = (v, max) => Number.isFinite(+v) && Math.abs(+v) <= max ? +v : null;
+// Le writeup d'un pack est démasqué, réduit à des champs connus et vérifiés (texte, lieu, cible numérique), puis remasqué.
+function writeupSur(wu, id) {
+  let o = {};
+  try { o = JSON.parse(S.demasquer(String(wu), id)); } catch { o = {}; }
+  if (!o || typeof o !== 'object') o = {};
+  const res = { html: String(o.html || '').slice(0, 20000), retenir: String(o.retenir || '').slice(0, 2000), masque: !!o.masque };
+  if (o.lieu) res.lieu = String(o.lieu).slice(0, 120);
+  const c = o.cible;
+  if (c && coord(c.lat, 90) !== null && coord(c.lon, 180) !== null) res.cible = { lat: +c.lat, lon: +c.lon, r: Math.min(2e6, Math.max(1, +c.r || 300)) };
+  return S.masquer(JSON.stringify(res), id);
+}
 
 // Transforme un pack JSON (non fiable : il vient d'un ami) en défis affichables. Tout le texte est échappé à l'affichage.
 export function normaliserPack(p, origine) {
@@ -23,7 +36,7 @@ export function normaliserPack(p, origine) {
   return p.defis.filter(d => d && typeof d.id === 'string' && /^(p|photo)-[a-z0-9-]{1,80}$/.test(d.id) && typeof d.wu === 'string' && (Array.isArray(d.h) || Array.isArray(d.zones))).map(d => {
     const carte = d.validation === 'carte';
     const zones = carte && Array.isArray(d.zones) ? d.zones.slice(0, 4).filter(z => z && Array.isArray(z.c)).map(z => ({ p: Math.min(9, Math.max(1, +z.p || 6)), part: Math.min(1, Math.max(0, +z.part || 0)), r: Math.max(1, +z.r || 100), c: z.c.filter(x => /^[0-9a-f]{24}$/.test(x)).slice(0, 5000) })) : [];
-    const vue = Array.isArray(d.vue) && d.vue.length === 3 && d.vue.every(Number.isFinite) ? d.vue.map(Number) : [30, 10, 2];
+    const vue = Array.isArray(d.vue) && d.vue.length === 3 && coord(d.vue[0], 90) !== null && coord(d.vue[1], 180) !== null && coord(d.vue[2], 19) !== null ? d.vue.map(Number) : [30, 10, 2];
     return {
       id: d.id, categorie: origine, sousCategorie: CATEGORIES.some(c => c.id === d.categorie) ? d.categorie : 'geoint', pack,
       titre: String(d.titre || 'Défi').slice(0, 80), accroche: String(d.accroche || '').slice(0, 160),
@@ -34,7 +47,7 @@ export function normaliserPack(p, origine) {
       miniature: imageSure(d.image) ? d.image : undefined,
       indices: (Array.isArray(d.indices) ? d.indices : []).slice(0, 3).map(i => ({ cout: Math.max(0, Math.min(500, Math.round(+i.cout || 0))), texte: enveloppe(i.texte) })),
       validation: carte ? 'carte' : 'flag', h: carte ? [] : (d.h || []).filter(x => /^[0-9a-f]{64}$/.test(x)).slice(0, 10), zones, vue, fond: 'osm',
-      wu: d.wu, format: 'Format : LUMIO{…}'
+      wu: writeupSur(d.wu, d.id), ...(!carte && S.wfValide(d.wf) ? { wf: { iv: d.wf.iv, ct: d.wf.ct, k: d.wf.k.map(x => ({ iv: x.iv, ct: x.ct })) } } : {}), format: 'Format : LUMIO{…}'
     };
   });
 }
@@ -55,7 +68,11 @@ export async function genererPack({ titre, auteur, proprietaire = false, defis }
       o.wu = S.masquer(JSON.stringify({ html: d.writeup || '', lieu: d.lieu || '', cible: { lat: d.lat, lon: d.lon, r } }), did);
     } else {
       o.h = [await S.empreinteFlag(did, d.flag)];
-      o.wu = S.masquer(JSON.stringify({ html: (d.writeup || '') + `\n\nFlag : ${S.normaliserFlag(d.flag)}` }), did);
+      // writeup complet (avec le flag) chiffré par le flag ; version « abandon » sans le flag exact
+      const flag = S.normaliserFlag(d.flag), complet = (d.writeup || '') + `\n\nFlag : ${flag}`;
+      o.wf = await S.chiffrerPourFlags(did, JSON.stringify({ html: complet }), [flag]);
+      const m = S.masquerFlags(d.writeup || '', [flag, d.flag], 'LUMIO{…}');
+      o.wu = S.masquer(JSON.stringify({ html: m.html + '\n\nFlag : LUMIO{…} (affiché une fois le défi validé)', masque: true }), did);
     }
     sortie.defis.push(o);
   }
@@ -117,7 +134,7 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
         </div>
         <div class="field"><label for="fBrief">Briefing *</label><textarea id="fBrief" class="answer" rows="4" required placeholder="Raconte la situation et ce qu'il faut trouver."></textarea></div>
         <div class="ctf-form-grille">
-          <div class="field"><label for="fImg">Image (facultative)</label><input id="fImg" type="file" accept="image/*"></div>
+          <div class="field"><span class="ctf-lab" id="fImgLab">Image (facultative)</span><div class="ctf-fichier-choix"><label class="btn small" for="fImg">🖼 Choisir une image</label><input id="fImg" type="file" accept="image/*" class="sr" aria-labelledby="fImgLab"><span class="muted" id="fImgNom" aria-live="polite">Aucun fichier choisi</span></div></div>
           <div class="field"><label for="fImgChemin">… ou chemin dans le site</label><input id="fImgChemin" placeholder="assets/ctf/photos/ma-photo.jpg"></div>
           <div class="field"><label for="fAlt">Description de l'image (accessibilité)</label><input id="fAlt" maxlength="200"></div>
         </div>
@@ -158,6 +175,7 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
   $$('[data-sup]').forEach(x => x.addEventListener('click', async () => {
     const p = packs[+x.dataset.sup];
     if (await modale({ titre: 'Supprimer ce pack ?', corps: `<p>« ${esc(p.titre)} » sera retiré de ce navigateur.</p>`, actions: [{ id: 'non', texte: 'Annuler' }, { id: 'oui', texte: 'Supprimer', primaire: true }] }) !== 'oui') return;
+    progression.ctfOublier((p.defis || []).map(z => z && z.id).filter(id => typeof id === 'string'));
     ecrirePacks(packs.filter((_, i) => i !== +x.dataset.sup)); recharger();
   }));
 
@@ -179,11 +197,12 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
   });
 
   // formulaire de défi
+  $('#fImg').addEventListener('change', e => { const f = e.target.files[0]; $('#fImgNom').textContent = f ? f.name : 'Aucun fichier choisi'; });
   let carteEd = null;
   $('#fType').addEventListener('change', async e => {
     const carte = e.target.value === 'carte';
     $('#zFlag').hidden = carte; $('#zCarte').hidden = !carte;
-    if (carte && !carteEd) { const { creerCarte } = await import('./carte.js'); carteEd = await creerCarte($('#carteEd'), { vue: [43.6, 1.44, 5] }); }
+    if (carte && !carteEd) { const { creerCarte } = await import('./carte.js'); carteEd = await creerCarte($('#carteEd'), { vue: [43.6, 1.44, 5] }) || null; }
   });
   $('#formDefi').addEventListener('submit', async e => {
     e.preventDefault();

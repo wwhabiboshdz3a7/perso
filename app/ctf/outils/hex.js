@@ -100,13 +100,13 @@ export function monter(el) {
       }
       corps.innerHTML = `<div class="row hx-nav"><button type="button" class="btn small" data-p="-1" ${page ? '' : 'disabled'}>← Précédent</button><span class="muted">Page ${page + 1}/${pages}</span><button type="button" class="btn small" data-p="1" ${page < pages - 1 ? '' : 'disabled'}>Suivant →</button>
         <label class="hx-aller">Aller à l'octet <input type="text" inputmode="numeric" placeholder="0x1a2b ou 6699" size="12"></label><button type="button" class="btn small" data-p="fin">Fin du fichier</button></div>
-        <pre class="hx-dump" tabindex="0" aria-label="Vue hexadécimale">${esc(lignes)}</pre>`;
+        <pre class="hx-dump" tabindex="0" role="region" aria-label="Vue hexadécimale">${esc(lignes)}</pre>`;
       $$('[data-p]', corps).forEach(x => x.addEventListener('click', () => { page = x.dataset.p === 'fin' ? pages - 1 : page + +x.dataset.p; rendre(); }));
       $('.hx-aller input', corps).addEventListener('keydown', e => { if (e.key === 'Enter') { const t = e.target.value.trim(); const n = /^0x/i.test(t) ? parseInt(t, 16) : parseInt(t, 10); if (Number.isFinite(n)) { page = Math.floor(n / (LIGNES * 16)); rendre(); } } });
     } else {
       const l = chaines(b, minStr).filter(x => !filtre || x.texte.toLowerCase().includes(filtre.toLowerCase()));
       corps.innerHTML = `<div class="row hx-nav"><label>Longueur minimale <input type="number" min="3" max="40" value="${minStr}" data-min style="width:5em"></label><label>Filtrer <input type="search" value="${esc(filtre)}" data-filtre placeholder="ex. LUMIO, http, pass"></label><span class="muted">${l.length} chaîne(s)</span></div>
-        <pre class="hx-dump" tabindex="0" aria-label="Chaînes lisibles">${esc(l.slice(0, 3000).map(x => `${x.offset.toString(16).padStart(8, '0')}  ${x.texte}`).join('\n'))}</pre>`;
+        <pre class="hx-dump" tabindex="0" role="region" aria-label="Chaînes lisibles">${esc(l.slice(0, 3000).map(x => `${x.offset.toString(16).padStart(8, '0')}  ${x.texte}`).join('\n'))}</pre>`;
       $('[data-min]', corps).addEventListener('change', e => { minStr = Math.max(3, +e.target.value || 4); rendre(); });
       $('[data-filtre]', corps).addEventListener('input', e => { filtre = e.target.value; const pos = e.target.selectionStart; rendre(); const f = $('[data-filtre]', corps); f.focus(); f.setSelectionRange(pos, pos); });
     }

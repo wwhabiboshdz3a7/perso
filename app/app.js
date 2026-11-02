@@ -2,7 +2,8 @@
 import { parcours, categories, chargerParcours, chargerTout } from '../content/index.js';
 import { glossaire } from '../content/glossaire.js';
 import { progression, BADGES } from './progress.js';
-import { creerEditeur, colorer } from './editor.js';
+import { creerEditeur, colorer, chargerCodeMirror } from './editor.js';
+import { typographier } from './typo.js';
 import { executerJS, executerPython, rendreHTML } from './runner.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -104,9 +105,18 @@ async function router() {
   for (const [re, fn] of routes) {
     const m = hash.match(re);
     if (m) {
-      try { await fn(...m.slice(1).map(x => x === undefined ? x : decodeURIComponent(x)), id); }
-      catch (err) { console.error(err); main.innerHTML = `<div class="wrap"><div class="card"><h2>Oups</h2><p>Impossible d'afficher cette page : ${esc(err.message)}</p><a class="btn" href="#/">Retour à l'accueil</a></div></div>`; }
-      if (id === navId) { window.scrollTo({ top: 0 }); colorer(main); }
+      try {
+        // l'éditeur de code (CodeMirror) n'est chargé que pour les leçons
+        if (/^\/cours\//.test(hash)) await chargerCodeMirror().catch(() => {});
+        if (id !== navId) return;
+        await fn(...m.slice(1).map(x => x === undefined ? x : decodeURIComponent(x)), id);
+      }
+      catch (err) {
+        // une page quittée avant la fin de son chargement ne doit pas écraser la suivante
+        if (id !== navId) return;
+        console.error(err); main.innerHTML = `<div class="wrap"><div class="card"><h2>Oups</h2><p>Impossible d'afficher cette page : ${esc(err.message)}</p><a class="btn" href="#/">Retour à l'accueil</a></div></div>`;
+      }
+      if (id === navId) { window.scrollTo({ top: 0 }); colorer(main); typographier(main); }
       return;
     }
   }
@@ -187,7 +197,7 @@ async function vueParcours(slug, id) {
         <h1>${esc(p.titre)}</h1>
         <p class="muted" style="margin-bottom:10px">${esc(p.description)}</p>
         <div class="row" style="margin-bottom:12px"><span class="pill ${niveauClasse(p.niveau)}">${esc(p.niveau)}</span><span class="pill">${p.modules.length} modules · ${total} leçons</span><span class="pill">≈ ${fmtDuree(dureeParcours(p))}</span></div>
-        <div class="progress" aria-label="Progression"><span style="width:${pct(faites, total)}%"></span></div>
+        <div class="progress" role="progressbar" aria-label="Progression dans le parcours" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${faites}"><span style="width:${pct(faites, total)}%"></span></div>
         <div class="row" style="margin-top:14px">
           <a class="btn primary" href="#/cours/${slug}/${suivante.index}">${faites ? 'Continuer' : 'Commencer'} : ${esc(suivante.titre)}</a>
           ${faites >= total ? `<a class="btn ok" href="#/certificat/${slug}">Voir mon certificat</a>` : `<span class="muted">${faites}/${total} leçons terminées</span>`}
@@ -549,22 +559,28 @@ async function vueRecherche(q = '', id) {
   main.innerHTML = `<div class="wrap"><h1>Recherche</h1><p class="muted"><span class="spinner"></span> Chargement des parcours…</p></div>`;
   const tous = await chargerTout();
   if (id !== navId) return;
-  const mots = q.toLowerCase().split(/\s+/).filter(Boolean);
+  // recherche insensible à la casse et aux accents (« vigenere » trouve « Vigenère »)
+  const plat = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const mots = plat(q).split(/\s+/).filter(Boolean);
   const res = [];
   if (mots.length) {
     for (const p of tous) for (const l of p.lecons) {
-      const titre = l.titre.toLowerCase(), texte = texteBrut(l.theorie).toLowerCase();
+      const titre = plat(l.titre), brut = texteBrut(l.theorie), texte = plat(brut);
       let score = 0;
-      for (const m of mots) { if (titre.includes(m)) score += 10; if (p.titre.toLowerCase().includes(m)) score += 4; const n = texte.split(m).length - 1; score += Math.min(n, 5); }
+      for (const m of mots) { if (titre.includes(m)) score += 10; if (plat(p.titre).includes(m)) score += 4; const n = texte.split(m).length - 1; score += Math.min(n, 5); }
       if (score > 0) {
+        // la forme sans accents a la même longueur que le texte (lettres de base), la position est donc la même
         const pos = texte.indexOf(mots[0]);
-        const extrait = texteBrut(l.theorie).slice(Math.max(0, pos - 70), pos + 130);
+        const extrait = brut.slice(Math.max(0, pos - 70), pos + 130);
         res.push({ p, l, score, extrait });
       }
     }
     res.sort((a, b) => b.score - a.score);
   }
-  const surligner = s => { let out = esc(s); mots.forEach(m => { out = out.replace(new RegExp(m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), x => `<mark>${x}</mark>`); }); return out; };
+  // surlignage tolérant aux accents : chaque lettre de base accepte ses variantes accentuées
+  const VARIANTES = { a: 'aàâä', c: 'cç', e: 'eéèêë', i: 'iîï', o: 'oôö', u: 'uùûü', y: 'yÿ' };
+  const motifMot = m => [...m].map(ch => VARIANTES[ch] ? `[${VARIANTES[ch]}]` : ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('');
+  const surligner = s => { let out = esc(s); mots.forEach(m => { out = out.replace(new RegExp(motifMot(m), 'gi'), x => `<mark>${x}</mark>`); }); return out; };
   let defis = [];
   if (mots.length) { try { defis = await (await import('./ctf/ctf.js')).rechercherDefis(mots); } catch { defis = []; } }
   if (id !== navId) return;
