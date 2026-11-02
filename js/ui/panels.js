@@ -91,12 +91,12 @@ export function openMemoryReview(app, { loading = true } = {}) {
         if (!row || row.dataset.done) return;
         if (e.target.closest('[data-keep]')) {
           const text = row.querySelector('input').value;
-          await memory.add(text, 'proposé');
           row.dataset.done = '1';
           row.classList.add('accepted');
           row.querySelector('input').readOnly = true;
           row.querySelectorAll('button').forEach((b) => b.remove());
           row.insertAdjacentHTML('beforeend', `<span class="tag-done">${icon('check')}Gardé</span>`);
+          memory.add(text, 'proposé');
         } else if (e.target.closest('[data-skip]')) {
           row.dataset.done = '1';
           row.classList.add('rejected');

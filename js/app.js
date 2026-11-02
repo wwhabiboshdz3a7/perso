@@ -269,6 +269,12 @@ function ctxFor(msg, conv) {
   };
 }
 
+const seenMessages = new Set();
+function markEnter(el, id) {
+  if (!seenMessages.has(id)) { el.classList.add('enter'); seenMessages.add(id); }
+  return el;
+}
+
 function renderThread() {
   const conv = state.current;
   els.messages.innerHTML = '';
@@ -287,8 +293,8 @@ function renderThread() {
   const frag = document.createDocumentFragment();
   const lastUser = [...conv.messages].reverse().find((m) => m.role === 'user');
   for (const m of conv.messages) {
-    if (m.role === 'user') frag.appendChild(userMessageEl(m, { isLast: m === lastUser }));
-    else frag.appendChild(assistantMessageEl(m, ctxFor(m, conv)));
+    if (m.role === 'user') frag.appendChild(markEnter(userMessageEl(m, { isLast: m === lastUser }), m.id));
+    else frag.appendChild(markEnter(assistantMessageEl(m, ctxFor(m, conv)), m.id));
   }
   els.messages.appendChild(frag);
 }
@@ -582,8 +588,9 @@ async function switchVersion(msgId, delta) {
   const next = Math.min(Math.max(0, (msg.current ?? 0) + delta), msg.versions.length - 1);
   msg.current = next;
   Object.assign(msg, msg.versions[next]);
-  await saveConversation(conv);
   updateMessage(msg);
+  messageEl(msg.id)?.querySelector(`[data-act="${delta < 0 ? 'prev' : 'next'}"]:not([disabled])`)?.focus();
+  await saveConversation(conv);
 }
 
 function startEdit(msgId) {
@@ -737,7 +744,7 @@ function updateComposerState() {
   els.send.title = busy ? 'Arrêter (Échap)' : 'Envoyer';
   els.send.disabled = !busy && !has;
   const name = settings.get().assistant.name;
-  els.input.placeholder = `Écrivez à ${name}… (/ pour les modèles de requêtes)`;
+  els.input.placeholder = mobileMQ.matches ? `Écrivez à ${name}…` : `Écrivez à ${name}… (/ pour les modèles de requêtes)`;
 }
 
 const updateTokens = debounce(() => {
@@ -1123,7 +1130,7 @@ function initSidebar() {
   try { saved = localStorage.getItem('nour.sidebar') || 'open'; } catch { /* ignoré */ }
   setSidebar(!mobileMQ.matches && saved !== 'closed');
 }
-mobileMQ.addEventListener('change', () => initSidebar());
+mobileMQ.addEventListener('change', () => { initSidebar(); updateComposerState(); });
 
 /* ---------- Délégation des actions globales ---------- */
 document.addEventListener('click', (e) => {
@@ -1211,7 +1218,11 @@ document.addEventListener('keydown', (e) => {
     if (state.slash.open) { closeSlash(); return; }
   }
   if (!mod || inDialog) return;
-  if (k === 'k' && !e.shiftKey) { e.preventDefault(); if (!sidebarOpen()) setSidebar(true); setTimeout(() => { els.search.focus(); els.search.select(); }, 40); }
+  if (k === 'k' && !e.shiftKey) {
+    e.preventDefault();
+    const focusSearch = () => { els.search.focus(); els.search.select(); };
+    if (sidebarOpen()) focusSearch(); else { setSidebar(true); setTimeout(focusSearch, 40); }
+  }
   else if (k === 'o' && e.shiftKey) { e.preventDefault(); newChat(); }
   else if (k === 'b' && !e.shiftKey) { e.preventDefault(); setSidebar(!sidebarOpen()); }
   else if (e.key === ',') { e.preventDefault(); openSettings(app, { tab: 'connexion' }); }

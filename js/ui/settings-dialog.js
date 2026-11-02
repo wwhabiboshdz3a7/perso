@@ -26,7 +26,7 @@ export function openSettings(app, { tab = 'connexion', provider = null } = {}) {
   const d = openDialog({
     id: 'dlg-settings', title: 'Réglages', tabs: tabsHTML, body,
     foot: '<span class="hint" style="flex:1">Les modifications sont enregistrées automatiquement.</span><button class="btn btn-primary" type="button" data-close>Terminé</button>',
-    onClose: () => app.refreshStatus(),
+    onClose: () => app.refreshChrome(),
   });
 
   if (provider) {
@@ -75,9 +75,10 @@ function renderConnection(root, app) {
   root.innerHTML = `
     <div class="field">
       <span class="field-label" id="mode-label">Mode de connexion</span>
+      <p class="hint" style="margin-bottom:4px">« Clé locale » : votre clé reste dans ce navigateur. « Serveur sécurisé » : la clé reste sur votre fonction Netlify.</p>
       <div class="seg" role="radiogroup" aria-labelledby="mode-label">
-        <label><input type="radio" name="conn-mode" value="browser" ${c.mode !== 'server' ? 'checked' : ''}><span>${icon('key')}Clé dans ce navigateur</span></label>
-        <label><input type="radio" name="conn-mode" value="server" ${c.mode === 'server' ? 'checked' : ''}><span>${icon('server')}Serveur sécurisé (Netlify)</span></label>
+        <label><input type="radio" name="conn-mode" value="browser" ${c.mode !== 'server' ? 'checked' : ''}><span>${icon('key')}Clé locale</span></label>
+        <label><input type="radio" name="conn-mode" value="server" ${c.mode === 'server' ? 'checked' : ''}><span>${icon('server')}Serveur sécurisé</span></label>
       </div>
     </div>
     <div data-mode-panel></div>`;
@@ -282,7 +283,7 @@ function drawBrowser(panel, app) {
   if (encrypted && locked) setStatus('Déverrouillez le coffre pour utiliser ou modifier la clé.', '');
 }
 
-function drawServer(panel, app) {
+function drawServer(panel, app, { autoload = false } = {}) {
   const c = settings.get().connection;
   const s = session.get();
   panel.innerHTML = `
@@ -321,11 +322,7 @@ function drawServer(panel, app) {
         await serverLogin(pass.value);
         settings.set('onboarded', true);
         app.refreshStatus(true);
-        drawServer(panel, app);
-        const st = $('[data-status]', panel);
-        st.dataset.kind = 'ok';
-        st.innerHTML = `${icon('check')}<span>Connecté au serveur.</span>`;
-        loadServerModels();
+        drawServer(panel, app, { autoload: true });
       } catch (err) {
         pass.setAttribute('aria-invalid', 'true');
         const info = describeError(err);
@@ -342,6 +339,7 @@ function drawServer(panel, app) {
       onPrefs: (prefs) => settings.set('connection', prefs),
     });
     $('[data-load]', panel).addEventListener('click', () => loadServerModels());
+    if (autoload) { setStatus('Connecté au serveur. Chargement des modèles…', 'ok'); loadServerModels(); }
   }
   async function loadServerModels() {
     const pk = picker;
@@ -349,7 +347,7 @@ function drawServer(panel, app) {
       const models = await listModels();
       app.setModels(models);
       pk?.setModels(models);
-      setStatus(`${models.filter((m) => m.chat).length} modèles disponibles sur le serveur.`, 'ok');
+      setStatus(`Connecté : ${models.filter((m) => m.chat).length} modèles disponibles sur le serveur.`, 'ok');
     } catch (err) {
       const info = describeError(err);
       setStatus(`${info.title}. ${info.text}`, 'error');
@@ -376,10 +374,8 @@ function renderAssistant(root, app) {
     </div>
 
     <h3 class="section-title">Vous</h3>
-    <div class="grid-2">
-      <div class="field"><label for="pf-name">Votre prénom</label><input type="text" id="pf-name" value="${esc(s.profile.name)}" maxlength="40" autocomplete="given-name"></div>
-      <div class="field"><label for="pf-about">À propos de vous</label><input type="text" id="pf-about" value="${esc(s.profile.about)}" maxlength="400" autocomplete="off"></div>
-    </div>
+    <div class="field"><label for="pf-name">Votre prénom</label><input type="text" id="pf-name" value="${esc(s.profile.name)}" maxlength="40" autocomplete="given-name"></div>
+    <div class="field"><label for="pf-about">À propos de vous</label><textarea id="pf-about" class="short" rows="2" maxlength="600">${esc(s.profile.about)}</textarea><p class="hint">Contexte transmis à chaque conversation : métier, projets, préférences.</p></div>
 
     <h3 class="section-title">Mode par défaut des nouvelles conversations</h3>
     <div class="persona-list" role="group" aria-label="Mode par défaut" data-personas></div>

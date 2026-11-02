@@ -18,7 +18,7 @@ export function describeError(err) {
     case 'bad-password':
       return { ...info, title: 'Mot de passe incorrect', text: 'Vérifiez le mot de passe d’accès défini sur le serveur.', action: 'settings' };
     case 'no-server':
-      return { ...info, title: 'Serveur introuvable', text: 'La fonction /api n’est pas déployée sur ce site. Publiez-le sur Netlify avec le dossier netlify/functions, ou utilisez le mode « Clé dans ce navigateur ».', action: 'settings' };
+      return { ...info, title: 'Serveur introuvable', text: 'La fonction /api n’est pas déployée sur ce site. Publiez-le sur Netlify avec le dossier netlify/functions, ou utilisez le mode « Clé locale ».', action: 'settings' };
     case 'quota':
       return { ...info, title: 'Limite atteinte', text: `Le quota ou la limite de débit est atteint (erreur 429).${wait} Vous pouvez aussi choisir un autre modèle ou vérifier votre crédit.`, action: 'retry' };
     case 'payment':
