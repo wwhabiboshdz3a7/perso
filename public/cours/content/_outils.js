@@ -6,8 +6,9 @@ const escHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').repl
 export const code = (lang, src) => `<pre><code class="language-${lang}">${escHtml(String(src).replace(/^\n/, '').replace(/\n\s*$/, ''))}</code></pre>`;
 /** Encadré : type = info | warn | ok | legal. */
 export const encart = (type, titre, html) => `<div class="callout ${type}"><b>${titre}</b>${html}</div>`;
-/** Tableau HTML simple. */
-export const tableau = (entetes, lignes) => `<table><thead><tr>${entetes.map(e => `<th>${e}</th>`).join('')}</tr></thead><tbody>${lignes.map(l => `<tr>${l.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+/** Tableau HTML simple. Chaque cellule porte le libellé de sa colonne (affichage en cartes sur mobile). */
+const libelle = h => String(h).replace(/<[^>]+>/g, '').replace(/"/g, '&quot;');
+export const tableau = (entetes, lignes) => `<table${entetes.length >= 3 ? ' class="t-large"' : ''}><thead><tr>${entetes.map(e => `<th scope="col">${e}</th>`).join('')}</tr></thead><tbody>${lignes.map(l => `<tr>${l.map((c, i) => `<td data-label="${libelle(entetes[i] ?? '')}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 /** Étape du pas-à-pas. */
 export const pas = (t, d) => ({ t, d });
 /** Question de quiz (bonne = index de la bonne réponse). */

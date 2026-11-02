@@ -201,7 +201,7 @@ async function scenarios(navigateur, largeur) {
       await page.waitForURL(/lecon\/m0\/2/);
       await page.locator('#exo .checklist').waitFor();
       await faireExercice(page);
-      await faireQuiz(page);
+      await faireQuiz(page, true);
       await page.locator('#doneBar.is-done').waitFor({ timeout: 4000 });
       await page.goto(BASE + '/cours/#/profil');
       await page.fill('#nom', 'Ana Martin');

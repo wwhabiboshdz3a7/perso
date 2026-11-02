@@ -13,7 +13,11 @@ const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 const main = $('#main');
 const num = n => String(n).padStart(2, '0');
 const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
-const texteBrut = html => String(html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+/** Texte d'un fragment HTML, entités décodées (DOMParser n'exécute aucun script). */
+const analyseur = new DOMParser();
+const texteBrut = html => (analyseur.parseFromString(`<body>${String(html || '').replace(/<\/(p|li|h\d|td|th|pre|div)>/g, '$& ')}</body>`, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
+/** Erreur dont le message, en français, peut être montré tel quel à l'élève. */
+class ErreurPage extends Error {}
 const nomFormateur = () => [CFG.formateur?.prenom, CFG.formateur?.nom].filter(Boolean).join(' ') || 'Le formateur';
 const url = new URL(location.href);
 const modeFormateur = url.searchParams.get('formateur') === '1';
@@ -43,6 +47,15 @@ function dureeLecon(l) {
   if (l.exercice) min += l.exercice.type === 'texte' ? 10 : 5;
   if (l.quiz) min += l.quiz.length;
   return Math.max(5, min);
+}
+/** Ordre d'affichage stable des réponses : même élève et même question, même ordre (mélange de Fisher-Yates). */
+function ordreMelange(n, graine) {
+  let h = 2166136261;
+  for (const c of String(graine)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  const alea = () => { h = (h + 0x6D2B79F5) >>> 0; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const ordre = [...Array(n).keys()];
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); [ordre[i], ordre[j]] = [ordre[j], ordre[i]]; }
+  return ordre;
 }
 const fmtDuree = m => m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}` : `${m} min`;
 const badgesGagnes = () => progression.verifierBadges().forEach(b => toast(`Badge obtenu : ${b.nom}`, 'ok'));
@@ -82,7 +95,7 @@ $('#searchForm').addEventListener('submit', e => {
 });
 document.addEventListener('keydown', e => {
   const tag = (e.target.tagName || '').toLowerCase();
-  if (e.key === 'Escape') { $('.sidebar.open')?.classList.remove('open'); $('#topbar').classList.remove('menu-open'); return; }
+  if (e.key === 'Escape') { fermerSommaire?.(); $('#topbar').classList.remove('menu-open'); return; }
   if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
   if (e.key === '/') { e.preventDefault(); $('#searchInput').focus(); }
   else if (e.altKey && e.key === 'ArrowRight') $('#navSuiv')?.click();
@@ -103,6 +116,34 @@ const routes = [
   [/^\/scripts$/, vueScripts]
 ];
 let navId = 0;
+let fermerSommaire = null;
+function messageErreur(err) {
+  if (err instanceof ErreurAcces || err instanceof ErreurPage) return err.message;
+  if (!navigator.onLine) return 'Vous semblez hors ligne : le contenu n\'a pas pu être chargé. Vérifiez votre connexion, puis réessayez.';
+  return 'Le contenu n\'a pas pu être chargé (connexion interrompue ou erreur passagère). Réessayez dans un instant.';
+}
+function pageErreur(message) {
+  main.innerHTML = `<div class="wrap narrow"><div class="card page-erreur"><h1 class="h2">Impossible d'afficher cette page</h1><p>${esc(message)}</p><div class="row"><button class="btn primary" id="reessayer" type="button">Réessayer</button><a class="btn" href="#/">Retour au tableau de bord</a></div></div></div>`;
+  $('#reessayer').addEventListener('click', () => router());
+}
+/** Les blocs de code et tableaux qui défilent deviennent atteignables au clavier. */
+function regionsDefilantes(racine = main) {
+  for (const el of $$('pre, table', racine)) {
+    const defile = el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+    if (defile && !el.hasAttribute('tabindex')) {
+      el.tabIndex = 0;
+      el.dataset.defile = '1';
+      if (el.tagName === 'PRE') { el.setAttribute('role', 'region'); el.setAttribute('aria-label', el.classList.contains('prompt') ? 'Texte du prompt (défilant)' : 'Bloc de code (défilant)'); }
+    } else if (!defile && el.dataset.defile) {
+      el.removeAttribute('tabindex'); delete el.dataset.defile;
+      if (el.tagName === 'PRE') { el.removeAttribute('role'); el.removeAttribute('aria-label'); }
+    }
+  }
+}
+let minuterieDefile = 0;
+window.addEventListener('resize', () => { clearTimeout(minuterieDefile); minuterieDefile = setTimeout(() => regionsDefilantes(), 200); });
+document.addEventListener('toggle', e => { if (e.target.tagName === 'DETAILS' && e.target.open) regionsDefilantes(e.target); }, true);
+
 async function router() {
   const hash = location.hash.replace(/^#/, '') || '/';
   const id = ++navId;
@@ -116,20 +157,28 @@ async function router() {
     if (actif) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   majStatutAcces();
+  fermerSommaire = null;
   for (const [re, fn] of routes) {
     const m = hash.match(re);
     if (!m) continue;
-    try {
-      await fn(...m.slice(1).map(x => x === undefined ? x : decodeURIComponent(x)), id);
-    } catch (err) {
-      if (id !== navId) return;
-      if (err instanceof ErreurAcces && err.statut === 401) { majStatutAcces(); toast(err.message); location.hash = '#/acces'; return; }
-      console.warn(err);
-      main.innerHTML = `<div class="wrap"><div class="card"><h1 class="h2">Impossible d'afficher cette page</h1><p>${esc(err.message)}</p><a class="btn primary" href="#/">Retour au tableau de bord</a></div></div>`;
+    let args = null;
+    try { args = m.slice(1).map(x => x === undefined ? x : decodeURIComponent(x)); } catch { /* adresse mal encodée */ }
+    if (!args) {
+      pageErreur('Cette adresse est mal formée. Revenez au tableau de bord ou relancez votre recherche.');
+    } else {
+      try {
+        await fn(...args, id);
+      } catch (err) {
+        if (id !== navId) return;
+        if (err instanceof ErreurAcces && err.statut === 401) { majStatutAcces(); toast(err.message); location.hash = '#/acces'; return; }
+        console.warn(err);
+        pageErreur(messageErreur(err));
+      }
     }
     if (id === navId) {
       window.scrollTo({ top: 0 });
       colorer(main);
+      regionsDefilantes();
       const h1 = $('h1', main);
       if (h1 && document.activeElement !== $('#searchInput')) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); }
     }
@@ -274,7 +323,7 @@ async function vueModule(id, nav) {
     return;
   }
   const meta = trouverModule(id);
-  if (!meta) throw new Error('Module inconnu.');
+  if (!meta) throw new ErreurPage('Ce module n\'existe pas.');
   setTitre(`M${num(meta.numero)} ${meta.titre}`);
   const entete = `<div class="crumbs"><a href="#/">Tableau de bord</a> › <span>Module ${meta.numero}</span></div>
     <header class="mhead"><span class="mnum big" aria-hidden="true">M${num(meta.numero)}</span><div><h1>${esc(meta.titre)}</h1><p class="lead">${esc(meta.accroche)}</p><div class="row">${pillOffre(meta.offre)}<span class="pill">${meta.lecons.length} leçons</span></div></div></header>`;
@@ -351,7 +400,7 @@ function blocFichiers(liste) {
 
 async function vueLecon(id, numStr, nav) {
   const meta = trouverModule(id);
-  if (!meta || id === 'bonus') throw new Error('Module inconnu.');
+  if (!meta || id === 'bonus') throw new ErreurPage('Ce module n\'existe pas.');
   if (!estAccessible(id)) { location.replace('#/module/' + id); return; }
   main.innerHTML = `<div class="wrap narrow"><p class="muted"><span class="spinner"></span> Chargement de la leçon…</p></div>`;
   const m = await chargerModule(id);
@@ -364,7 +413,9 @@ async function vueLecon(id, numStr, nav) {
   const fait = progression.leconFaite(id, idx);
 
   main.innerHTML = `<div class="lesson-layout">
+    <div class="sb-fond" id="sbFond" hidden></div>
     <aside class="sidebar" id="sidebar" aria-label="Leçons du module">
+      <div class="sb-tete"><span>Sommaire</span><button class="iconbtn sb-fermer" id="sbFermer" type="button" aria-label="Fermer le sommaire"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
       <div class="sb-title"><a href="#/module/${id}">M${num(m.numero)} · ${esc(m.titre)}</a><span class="muted">${progression.nbLecons(id)}/${m.lecons.length}</span></div>
       <div class="sb-progress"><div class="progress"><span style="width:${pct(progression.nbLecons(id), m.lecons.length)}%"></span></div></div>
       <nav>${m.lecons.map(x => `<a class="lk ${x.index === idx ? 'current' : ''} ${progression.leconFaite(id, x.index) ? 'done' : ''}" href="#/lecon/${id}/${x.index}" ${x.index === idx ? 'aria-current="page"' : ''}><span class="dot"></span><span>${esc(x.titre)}</span></a>`).join('')}</nav>
@@ -375,8 +426,7 @@ async function vueLecon(id, numStr, nav) {
       <h1>${esc(l.titre)}</h1>
       <div class="lesson-meta">
         <button class="btn small ghost sb-toggle" id="sbToggle" type="button" aria-controls="sidebar" aria-expanded="false">Sommaire</button>
-        <span>≈ ${fmtDuree(dureeLecon(l))}</span>
-        ${l.exercice ? `<span>· ${l.exercice.type === 'checklist' ? 'Checklist' : 'Exercice'}</span>` : ''}${l.quiz ? `<span>· Quiz ${l.quiz.length} questions</span>` : ''}
+        <div class="meta-cadre"><ul class="meta-liste" aria-label="En bref"><li>≈ ${fmtDuree(dureeLecon(l))}</li>${l.exercice ? `<li>${l.exercice.type === 'checklist' ? 'Checklist' : 'Exercice'}</li>` : ''}${l.quiz ? `<li>Quiz de ${l.quiz.length} questions</li>` : ''}</ul></div>
       </div>
       ${l.objectifs?.length ? `<div class="objectifs"><p class="eyebrow">À la fin de cette leçon</p><ul>${l.objectifs.map(o => `<li>${esc(o)}</li>`).join('')}</ul></div>` : ''}
       ${blocVideo(id, idx)}
@@ -398,9 +448,20 @@ async function vueLecon(id, numStr, nav) {
     </article>
   </div>`;
 
-  const sb = $('#sidebar'), tg = $('#sbToggle');
-  tg.addEventListener('click', () => { const o = sb.classList.toggle('open'); tg.setAttribute('aria-expanded', String(o)); });
-  sb.addEventListener('click', e => { if (e.target.closest('a.lk')) sb.classList.remove('open'); });
+  const sb = $('#sidebar'), tg = $('#sbToggle'), fond = $('#sbFond');
+  const ouvrirSommaire = () => {
+    sb.classList.add('open'); fond.hidden = false; tg.setAttribute('aria-expanded', 'true');
+    $('#sbFermer').focus();
+  };
+  fermerSommaire = (rendreFocus = true) => {
+    if (!sb.classList.contains('open')) return;
+    sb.classList.remove('open'); fond.hidden = true; tg.setAttribute('aria-expanded', 'false');
+    if (rendreFocus) tg.focus();
+  };
+  tg.addEventListener('click', () => sb.classList.contains('open') ? fermerSommaire() : ouvrirSommaire());
+  $('#sbFermer').addEventListener('click', () => fermerSommaire());
+  fond.addEventListener('click', () => fermerSommaire());
+  sb.addEventListener('click', e => { if (e.target.closest('a.lk')) fermerSommaire(false); });
   $$('.copy-script', main).forEach(b => b.addEventListener('click', () => copier(b.closest('details').querySelector('.script-src').value, b)));
   $$('button.dl', main).forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;
@@ -409,14 +470,17 @@ async function vueLecon(id, numStr, nav) {
     finally { b.disabled = false; }
   }));
 
-  const etatLecon = { exo: !l.exercice || progression.exercice(cle).reussi, quiz: !l.quiz || !!progression.quiz(cle) };
+  const etatLecon = { exo: !l.exercice || progression.exercice(cle).reussi, quiz: !l.quiz || progression.quizReussi(cle) };
   const majDone = () => {
     const msg = $('#doneMsg');
-    if (progression.leconFaite(id, idx)) { msg.textContent = 'Leçon validée. Passez à la suivante quand vous voulez.'; return; }
     const reste = [];
     if (!etatLecon.exo) reste.push(l.exercice.type === 'checklist' ? 'cocher la checklist' : 'réussir l\'exercice');
-    if (!etatLecon.quiz) reste.push('faire le quiz');
-    msg.textContent = reste.length ? `Pour valider automatiquement : ${reste.join(' et ')}. Vous pouvez aussi la marquer comme terminée.` : 'Exercice et quiz faits : la leçon est validée.';
+    if (!etatLecon.quiz) reste.push(`réussir le quiz (au moins ${Math.ceil(l.quiz.length / 2)} bonnes réponses)`);
+    if (progression.leconFaite(id, idx)) {
+      msg.textContent = reste.length ? `Leçon marquée comme terminée. Pour qu'elle compte dans le certificat : ${reste.join(' et ')}.` : 'Leçon validée. Passez à la suivante quand vous voulez.';
+      return;
+    }
+    msg.textContent = reste.length ? `Pour valider automatiquement : ${reste.join(' et ')}. Vous pouvez aussi la marquer comme terminée.` : 'Exercice et quiz réussis : la leçon est validée.';
   };
   const terminer = auto => {
     const nouveau = progression.marquerLecon(id, idx, m.lecons.length);
@@ -435,7 +499,7 @@ async function vueLecon(id, numStr, nav) {
   const verifierAuto = () => { majDone(); if (etatLecon.exo && etatLecon.quiz && !progression.leconFaite(id, idx)) terminer(true); };
   majDone();
   if (l.exercice) rendreExercice(l.exercice, cle, $('#exo'), () => { etatLecon.exo = true; verifierAuto(); });
-  if (l.quiz) rendreQuiz(l.quiz, cle, $('#quiz'), () => { etatLecon.quiz = true; verifierAuto(); });
+  if (l.quiz) rendreQuiz(l.quiz, cle, $('#quiz'), reussi => { etatLecon.quiz = reussi; verifierAuto(); });
 }
 
 /* ---------- exercices ---------- */
@@ -457,7 +521,7 @@ function rendreExercice(ex, cle, cont, onReussite) {
     if (!b) { b = document.createElement('div'); b.setAttribute('role', 'status'); zone.appendChild(b); }
     b.className = 'result-banner ' + (ok ? 'ok' : 'ko'); b.textContent = texte;
   };
-  if (ex.type === 'qcm') return exerciceQCM(ex, zone, { reussite, echec, banniere });
+  if (ex.type === 'qcm') return exerciceQCM(ex, cle, zone, { reussite, echec, banniere });
   if (ex.type === 'checklist') return exerciceChecklist(ex, cle, zone, { reussite, banniere, deja: etatEx.reussi });
   return exerciceTexte(ex, cle, zone, { reussite, echec, banniere });
 }
@@ -502,15 +566,16 @@ function exerciceTexte(ex, cle, zone, h) {
     majSol();
   });
 }
-function exerciceQCM(ex, zone, h) {
-  const nom = 'qcm-' + Math.random().toString(36).slice(2, 8);
-  zone.innerHTML = `<fieldset class="quiz"><legend class="sr-only">Choisissez ${ex.multiple ? 'une ou plusieurs réponses' : 'une réponse'}</legend><div class="q">${ex.options.map((o, i) => `<label><input type="${ex.multiple ? 'checkbox' : 'radio'}" name="${nom}" value="${i}"> <span>${esc(o)}</span></label>`).join('')}</div></fieldset><button class="btn primary valid" type="button">Valider</button>`;
+function exerciceQCM(ex, cle, zone, h) {
+  const nom = 'qcm-' + cle.replace('/', '-');
+  const ordre = ordreMelange(ex.options.length, `${progression.graine}|qcm|${cle}`);
+  zone.innerHTML = `<fieldset class="quiz"><legend class="sr-only">Choisissez ${ex.multiple ? 'une ou plusieurs réponses' : 'une réponse'}</legend><div class="q">${ordre.map(i => `<label><input type="${ex.multiple ? 'checkbox' : 'radio'}" name="${nom}" value="${i}"> <span>${esc(ex.options[i])}</span></label>`).join('')}</div></fieldset><button class="btn primary valid" type="button">Valider</button>`;
   $('.valid', zone).addEventListener('click', () => {
     const choisis = $$(`input[name=${nom}]:checked`, zone).map(c => +c.value);
     if (!choisis.length) return toast('Choisissez au moins une réponse.');
     const bonnes = Array.isArray(ex.bonne) ? ex.bonne : [ex.bonne];
     const ok = choisis.length === bonnes.length && choisis.every(c => bonnes.includes(c));
-    $$('label', zone).forEach((lab, i) => { lab.classList.toggle('ok', ok && bonnes.includes(i)); lab.classList.toggle('ko', choisis.includes(i) && !bonnes.includes(i)); });
+    $$('input', zone).forEach(inp => { const i = +inp.value, lab = inp.closest('label'); lab.classList.toggle('ok', ok && bonnes.includes(i)); lab.classList.toggle('ko', choisis.includes(i) && !bonnes.includes(i)); });
     if (ok) { h.banniere(true, ex.explication || 'Bonne réponse.'); h.reussite(); } else { h.echec(); h.banniere(false, 'Ce n\'est pas encore ça. Relisez la leçon et réessayez.'); }
   });
 }
@@ -533,30 +598,39 @@ function exerciceChecklist(ex, cle, zone, h) {
 }
 
 /* ---------- quiz ---------- */
+// Les réponses sont affichées dans un ordre propre à chaque élève (graine stable) ; la valeur de chaque
+// case reste l'index d'origine, ce qui garde la correction et les scores comparables.
 function rendreQuiz(quiz, cle, cont, onFait) {
   const ancien = progression.quiz(cle);
   const base = 'q-' + cle.replace('/', '-');
-  cont.innerHTML = `<section class="block quiz" aria-labelledby="${base}-t"><header><span id="${base}-t">Quiz de la leçon</span><span class="tag">${quiz.length} questions${ancien ? ` · meilleur score ${ancien.score}/${ancien.total}` : ''}</span></header><div class="body">
-    ${quiz.map((q, qi) => `<fieldset class="q"><legend class="qt">${qi + 1}. ${esc(q.q)}</legend>${q.options.map((o, i) => `<label><input type="radio" name="${base}-${qi}" value="${i}"> <span>${esc(o)}</span></label>`).join('')}<p class="expl" hidden>${esc(q.explication || '')}</p></fieldset>`).join('')}
+  const seuil = Math.ceil(quiz.length / 2);
+  cont.innerHTML = `<section class="block quiz" aria-labelledby="${base}-t"><header><span id="${base}-t">Quiz de la leçon</span><span class="tag">${quiz.length} questions${ancien ? ` · meilleur score ${esc(ancien.score)}/${esc(ancien.total)}` : ''}</span></header><div class="body">
+    ${quiz.map((q, qi) => `<fieldset class="q"><legend class="qt">${qi + 1}. ${esc(q.q)}</legend>${ordreMelange(q.options.length, `${progression.graine}|${cle}|${qi}`).map(i => `<label><input type="radio" name="${base}-${qi}" value="${i}"> <span>${esc(q.options[i])}</span></label>`).join('')}<p class="expl" hidden>${esc(q.explication || '')}</p></fieldset>`).join('')}
     <div class="row"><button class="btn primary corr" type="button">Corriger le quiz</button><span class="quiz-score" role="status" aria-live="polite"></span></div></div></section>`;
   $('.corr', cont).addEventListener('click', () => {
-    let score = 0, repondues = 0;
+    const choix = quiz.map((q, qi) => $(`input[name="${base}-${qi}"]:checked`, cont));
+    const manquantes = choix.filter(c => !c).length;
+    if (manquantes) {
+      toast(manquantes === quiz.length ? 'Répondez aux questions avant de corriger.' : `Répondez à toutes les questions avant de corriger (${manquantes} sans réponse).`);
+      cont.querySelectorAll('fieldset.q')[choix.findIndex(c => !c)]?.querySelector('input')?.focus();
+      return;
+    }
+    let score = 0;
     quiz.forEach((q, qi) => {
-      const c = $(`input[name="${base}-${qi}"]:checked`, cont);
-      if (c) repondues++;
-      $$(`input[name="${base}-${qi}"]`, cont).forEach((inp, i) => {
-        const lab = inp.closest('label');
+      const c = choix[qi];
+      $$(`input[name="${base}-${qi}"]`, cont).forEach(inp => {
+        const i = +inp.value, lab = inp.closest('label');
         lab.classList.toggle('ok', i === q.bonne);
-        lab.classList.toggle('ko', !!c && +c.value === i && i !== q.bonne);
+        lab.classList.toggle('ko', +c.value === i && i !== q.bonne);
       });
-      if (c && +c.value === q.bonne) score++;
+      if (+c.value === q.bonne) score++;
       $$('.expl', cont)[qi].hidden = !q.explication;
     });
-    if (!repondues) { toast('Répondez aux questions avant de corriger.'); return; }
-    $('.quiz-score', cont).textContent = `Score : ${score}/${quiz.length}` + (score === quiz.length ? ' · parfait.' : score >= quiz.length / 2 ? ' · bien, lisez les explications.' : ' · relisez la leçon puis réessayez.');
+    const reussi = score >= seuil;
+    $('.quiz-score', cont).textContent = `Score : ${score}/${quiz.length}` + (score === quiz.length ? ' · parfait.' : reussi ? ' · quiz réussi, lisez les explications.' : ` · il faut au moins ${seuil} bonnes réponses : relisez la leçon puis réessayez.`);
     progression.scoreQuiz(cle, score, quiz.length);
     badgesGagnes();
-    onFait();
+    onFait(progression.quizReussi(cle));
   });
 }
 
@@ -714,7 +788,8 @@ function texteBrutAvecLignes(html) {
 async function vueProfil(nav) {
   setTitre('Mon profil');
   const st = progression.etat;
-  const formationOk = !!st.certificats.formation;
+  const toutAccessible = modules.every(m => estAccessible(m.id));
+  const formationOk = toutAccessible && modules.every(m => progression.nbLecons(m.id) >= m.lecons.length);
   main.innerHTML = `<div class="wrap">
     <h1>Mon profil</h1>
     <div class="grid2">
@@ -722,7 +797,7 @@ async function vueProfil(nav) {
         <h2 class="h3">Identité</h2>
         <div class="field"><label for="nom">Nom affiché sur les certificats</label><input id="nom" value="${esc(st.nom)}" placeholder="Prénom Nom" autocomplete="name"></div>
         <div class="stats">
-          <div class="stat"><b>${st.xp}</b><small>XP</small></div><div class="stat"><b>${progression.totalLecons()}</b><small>leçons</small></div>
+          <div class="stat"><b>${esc(st.xp)}</b><small>XP</small></div><div class="stat"><b>${progression.totalLecons()}</b><small>leçons</small></div>
           <div class="stat"><b>${progression.nbExercices()}</b><small>exercices</small></div><div class="stat"><b>${progression.serie()}</b><small>jours d'affilée</small></div>
         </div>
       </div>
@@ -737,8 +812,8 @@ async function vueProfil(nav) {
     <div class="badges">${BADGES.map((b, i) => `<div class="badge ${st.badges.includes(b.id) ? 'won' : ''}"><span class="bn">${num(i + 1)}</span><b>${esc(b.nom)}</b><small>${esc(b.desc)}</small></div>`).join('')}</div>
     <div class="section-title"><h2>Certificats</h2></div>
     <ul class="plist">
-      ${modules.map(m => { const n = Math.min(progression.nbLecons(m.id), m.lecons.length), t = m.lecons.length, acc = estAccessible(m.id); return `<li><span><b>M${num(m.numero)} · ${esc(m.titre)}</b> <span class="muted">${n}/${t} leçons</span></span><span>${n >= t ? `<a class="btn small ok" href="#/certificat/${m.id}">Certificat</a>` : acc ? `<a class="btn small" href="#/module/${m.id}">${n ? 'Continuer' : 'Commencer'}</a>` : `<span class="lockline">${ICO.lock} ${esc(NOMS_OFFRES[m.offre])}</span>`}</span><div class="progress" aria-hidden="true"><span style="width:${pct(n, t)}%"></span></div></li>`; }).join('')}
-      <li class="final"><span><b>Certificat de fin de formation</b> <span class="muted">toutes les leçons des modules 0 à 8</span></span><span>${formationOk ? '<a class="btn small ok" href="#/certificat/formation">Certificat</a>' : `<span class="muted">${progression.totalLecons()}/${totalLecons}</span>`}</span></li>
+      ${modules.map(m => { const n = Math.min(progression.nbLecons(m.id), m.lecons.length), t = m.lecons.length, acc = estAccessible(m.id); return `<li><span><b>M${num(m.numero)} · ${esc(m.titre)}</b> <span class="muted">${n}/${t} leçons</span></span><span>${!acc ? `<span class="lockline">${ICO.lock} ${esc(NOMS_OFFRES[m.offre])}</span>` : n >= t ? `<a class="btn small ok" href="#/certificat/${m.id}">Certificat</a>` : `<a class="btn small" href="#/module/${m.id}">${n ? 'Continuer' : 'Commencer'}</a>`}</span><div class="progress" aria-hidden="true"><span style="width:${pct(n, t)}%"></span></div></li>`; }).join('')}
+      <li class="final"><span><b>Certificat de fin de formation</b> <span class="muted">${toutAccessible ? 'toutes les leçons des modules 0 à 8, exercices et quiz réussis' : 'avec l\'offre Pro ou VIP : toutes les leçons des modules 0 à 8'}</span></span><span>${formationOk ? '<a class="btn small ok" href="#/certificat/formation">Certificat</a>' : toutAccessible ? `<span class="muted">${Math.min(progression.totalLecons(), totalLecons)}/${totalLecons}</span>` : `<span class="lockline">${ICO.lock} Pro</span>`}</span></li>
     </ul>
   </div>`;
   $('#nom').addEventListener('change', e => { progression.nom = e.target.value.trim(); toast('Nom enregistré.'); });
@@ -750,77 +825,131 @@ async function vueProfil(nav) {
   });
   $('#importFile').addEventListener('change', async e => {
     const f = e.target.files[0]; if (!f) return;
-    try { progression.importer(await f.text()); toast('Progression importée.', 'ok'); router(); } catch (err) { toast('Import impossible : ' + err.message); }
+    try { progression.importer(await f.text()); toast('Progression importée.', 'ok'); router(); } catch (err) { toast('Import impossible : ' + err.message + '.'); }
+    finally { e.target.value = ''; }
   });
   $('#resetBtn').addEventListener('click', () => { if (confirm('Effacer toute votre progression sur cet appareil ? Cette action est irréversible.')) { progression.reinitialiser(); router(); } });
 }
 
 /* ---------- certificat ---------- */
+// Un certificat n'est délivré que pour un module accessible avec l'offre active, dont chaque leçon est
+// terminée avec son exercice et son quiz réussis. Celui de la formation exige en plus l'accès à tous
+// les modules (offre Pro ou VIP).
 function refCertificat(...parts) {
   let h = 2166136261;
   for (const c of parts.join('|')) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
   return h.toString(36).toUpperCase().padStart(7, '0');
 }
-async function vueCertificat(id) {
+/** Leçons d'un module qui manquent pour le certificat : [{ index, titre, manque: [...] }] */
+function leconsManquantes(m) {
+  return m.lecons.map(l => {
+    const cle = `${m.id}/${l.index}`, manque = [];
+    if (!progression.leconFaite(m.id, l.index)) manque.push('à terminer');
+    if (l.exercice && !progression.exercice(cle).reussi) manque.push(l.exercice.type === 'checklist' ? 'checklist à compléter' : 'exercice à réussir');
+    if (l.quiz && !progression.quizReussi(cle)) manque.push('quiz à réussir');
+    return { index: l.index, titre: l.titre, manque };
+  }).filter(x => x.manque.length);
+}
+async function vueCertificat(id, nav) {
   const formation = id === 'formation';
   const meta = formation ? null : trouverModule(id);
-  if (!formation && (!meta || id === 'bonus')) throw new Error('Certificat inconnu.');
-  const titre = formation ? `${NOM_PRODUIT} : la formation complète` : `Module ${meta.numero} · ${meta.titre}`;
+  if (!formation && (!meta || id === 'bonus')) throw new ErreurPage('Ce certificat n\'existe pas.');
   setTitre('Certificat');
-  const n = formation ? modules.filter(m => progression.nbLecons(m.id) >= m.lecons.length).length : progression.nbLecons(id);
-  const t = formation ? modules.length : meta.lecons.length;
-  if (n < t) {
-    main.innerHTML = `<div class="wrap narrow"><div class="card"><h1 class="h2">Certificat pas encore disponible</h1><p>${formation ? `Vous avez terminé ${n} module(s) sur ${t}.` : `Vous avez terminé ${n} leçon(s) sur ${t} de ce module.`} Terminez toutes les leçons pour l'obtenir.</p><a class="btn primary" href="${formation ? '#/' : '#/module/' + id}">Reprendre</a></div></div>`;
+  const pasEncore = (texte, lien, libelle) => {
+    main.innerHTML = `<div class="wrap narrow"><div class="card"><h1 class="h2">Certificat pas encore disponible</h1>${texte}<div class="row"><a class="btn primary" href="${lien}">${libelle}</a><a class="btn" href="#/profil">Mon profil</a></div></div></div>`;
+  };
+  const verrouilles = formation ? modules.filter(m => !estAccessible(m.id)) : (estAccessible(id) ? [] : [meta]);
+  if (verrouilles.length) {
+    const requise = formation ? 'pro' : meta.offre;
+    pasEncore(`<p>${formation ? 'Le certificat de fin de formation couvre les modules 0 à 8 : il demande l\'accès à tout le programme (offre Pro ou VIP).' : `Ce module fait partie de l'offre ${esc(NOMS_OFFRES[requise])} : son certificat est délivré aux élèves qui y ont accès et l'ont terminé.`}</p>`, RANGS[offreActuelle()] > 0 ? '#/acces' : '../#offres', RANGS[offreActuelle()] > 0 ? 'Gérer mon accès' : 'Voir les offres');
     return;
   }
+  main.innerHTML = `<div class="wrap narrow"><p class="muted"><span class="spinner"></span> Vérification de votre progression…</p></div>`;
+  const contenus = formation ? await chargerAccessibles() : [await chargerModule(id)];
+  if (nav !== navId) return;
+  if (formation && contenus.length < modules.length) throw new ErreurPage('Certains modules n\'ont pas pu être chargés. Vérifiez votre connexion et réessayez.');
+  const manques = contenus.map(m => ({ m, liste: leconsManquantes(m) })).filter(x => x.liste.length);
+  if (manques.length) {
+    const lignes = manques.flatMap(({ m, liste }) => liste.map(x => `<li><a href="#/lecon/${m.id}/${x.index}">M${num(m.numero)} · ${esc(x.titre)}</a> <span class="muted">(${esc(x.manque.join(', '))})</span></li>`));
+    pasEncore(`<p>Le certificat atteste que chaque leçon est terminée, avec son exercice et son quiz réussis (au moins la moitié de bonnes réponses). Il reste ${lignes.length} leçon${lignes.length > 1 ? 's' : ''} :</p><ul class="manques">${lignes.slice(0, 12).join('')}${lignes.length > 12 ? `<li class="muted">… et ${lignes.length - 12} autre(s).</li>` : ''}</ul>`, manques[0].liste[0] ? `#/lecon/${manques[0].m.id}/${manques[0].liste[0].index}` : '#/', 'Reprendre');
+    return;
+  }
+  if (formation) progression.certifierFormation();
+  const titre = formation ? `${NOM_PRODUIT} : la formation complète` : `Module ${meta.numero} · ${meta.titre}`;
   const dateIso = progression.etat.certificats[id] || new Date().toISOString();
   const date = new Date(dateIso);
   const nom = progression.nom || '';
   main.innerHTML = `<div class="wrap">
     <div class="row between noprint" style="margin-bottom:14px"><a class="btn" href="#/profil">← Retour</a><div class="row">${nom ? '' : '<a class="btn" href="#/profil">Indiquer mon nom</a>'}<button class="btn primary" id="printBtn" type="button">Imprimer ou enregistrer en PDF</button></div></div>
     <div class="certif">
-      <div class="certif-top"><span class="logo-mark" aria-hidden="true"></span><span class="certif-brand">${esc(NOM_PRODUIT)}</span><span class="certif-ref">Réf. ${refCertificat(nom, id, dateIso)}</span></div>
+      <div class="certif-top"><span class="logo-mark" aria-hidden="true"></span><span class="certif-brand">${esc(NOM_PRODUIT)}</span><span class="certif-ref">Réf. ${refCertificat(nom.toLowerCase(), id, dateIso.slice(0, 10))}</span></div>
       <p class="eyebrow">Certificat de réussite</p>
       <p class="certif-intro">Ce certificat atteste que</p>
       <h1 class="name">${esc(nom || 'Nom de l\'élève')}</h1>
       <p class="certif-intro">a terminé l'intégralité du programme</p>
       <p class="certif-titre">${esc(titre)}</p>
-      <p class="muted">${formation ? `${modules.length} modules et ${totalLecons} leçons, avec exercices et quiz` : `${meta.lecons.length} leçons, avec exercices et quiz`}.</p>
+      <p class="muted">${formation ? `${modules.length} modules et ${totalLecons} leçons` : `${meta.lecons.length} leçons`}, chacune avec son exercice et son quiz réussis.</p>
       <div class="sig"><span>Délivré le ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span><span><b>${esc(nomFormateur())}</b><br>${esc(CFG.formateur?.titre || 'Formateur')}</span></div>
-      <p class="certif-note">Formation indépendante, non affiliée à Anthropic. Claude est une marque d'Anthropic.</p>
+      <p class="certif-note">Certificat délivré par l'espace membre, sur la base de la progression enregistrée sur cet appareil. Formation indépendante, non affiliée à Anthropic. Claude est une marque d'Anthropic.</p>
     </div></div>`;
   $('#printBtn').addEventListener('click', () => window.print());
 }
 
 /* ---------- recherche ---------- */
+const sansAccents = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const echapperRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const cacheTexte = new WeakMap();
+function texteLecon(l) {
+  if (!cacheTexte.has(l)) cacheTexte.set(l, texteBrut(l.theorie + ' ' + (l.pas || []).map(p => p.t + ' ' + p.d).join(' ')));
+  return cacheTexte.get(l);
+}
+/** Surligne en une seule passe, sur le texte brut, tous les mots cherchés (sans tenir compte des accents). */
+function surlignerTexte(brut, mots) {
+  const n = sansAccents(brut);
+  if (!mots.length || n.length !== brut.length) return esc(brut);
+  const re = new RegExp([...mots].sort((a, b) => b.length - a.length).map(echapperRe).join('|'), 'g');
+  let out = '', i = 0, m;
+  while ((m = re.exec(n))) {
+    out += esc(brut.slice(i, m.index)) + '<mark>' + esc(brut.slice(m.index, m.index + m[0].length)) + '</mark>';
+    i = m.index + m[0].length;
+  }
+  return out + esc(brut.slice(i));
+}
+function extrait(brut, pos) {
+  let debut = Math.max(0, pos - 70), fin = Math.min(brut.length, pos + 150);
+  if (debut > 0) { const e = brut.indexOf(' ', debut); if (e > -1 && e < pos) debut = e + 1; }
+  if (fin < brut.length) { const e = brut.lastIndexOf(' ', fin); if (e > pos) fin = e; }
+  return { texte: brut.slice(debut, fin), avant: debut > 0, apres: fin < brut.length };
+}
 async function vueRecherche(q = '', nav) {
-  q = (q || '').trim();
+  q = (q || '').trim().slice(0, 200);
   $('#searchInput').value = q;
   setTitre('Recherche');
   main.innerHTML = `<div class="wrap narrow"><h1>Recherche</h1><p class="muted"><span class="spinner"></span> Recherche dans vos modules…</p></div>`;
   const tous = await chargerAccessibles();
   if (nav !== navId) return;
-  const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  const mots = norm(q).split(/\s+/).filter(m => m.length > 1);
+  const mots = [...new Set(sansAccents(q).split(/\s+/).filter(m => m.length > 1))];
   const res = [];
   if (mots.length) {
     for (const m of tous) for (const l of m.lecons) {
-      const titre = norm(l.titre), brut = texteBrut(l.theorie + ' ' + (l.pas || []).map(p => p.t + ' ' + p.d).join(' ')), texte = norm(brut);
+      const titre = sansAccents(l.titre), brut = texteLecon(l), texte = sansAccents(brut);
       let score = 0;
       for (const w of mots) { if (titre.includes(w)) score += 10; score += Math.min(texte.split(w).length - 1, 5); }
       if (score > 0) {
-        const pos = Math.max(0, texte.indexOf(mots[0]));
-        res.push({ m, l, score, extrait: brut.slice(Math.max(0, pos - 70), pos + 140) });
+        const pos = Math.max(0, Math.min(...mots.map(w => texte.indexOf(w)).filter(x => x >= 0), brut.length));
+        res.push({ m, l, score, extrait: extrait(brut, Number.isFinite(pos) ? pos : 0) });
       }
     }
     res.sort((a, b) => b.score - a.score);
   }
   const verrouilles = modules.filter(m => !estAccessible(m.id));
-  const surligner = s => { let out = esc(s); mots.forEach(w => { out = out.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), x => `<mark>${x}</mark>`); }); return out; };
+  const echecs = tous.echecs || [];
   main.innerHTML = `<div class="wrap narrow"><h1>Recherche</h1>
-    <p class="muted">${mots.length ? `${res.length} résultat${res.length > 1 ? 's' : ''} pour « ${esc(q)} »` : 'Tapez un mot-clé dans la barre de recherche.'}</p>
-    <ul class="results">${res.slice(0, 40).map(r => `<li><a href="#/lecon/${r.m.id}/${r.l.index}"><span class="path">M${num(r.m.numero)} · ${esc(r.m.titre)}</span><b>${surligner(r.l.titre)}</b><span class="muted small">…${surligner(r.extrait)}…</span></a></li>`).join('')}</ul>
+    ${echecs.length ? `<div class="callout warn" role="alert"><b>Recherche incomplète</b>${echecs.length} module(s) n'ont pas pu être chargés (connexion interrompue ?) : leurs leçons ne figurent pas dans les résultats. <button class="btn small" id="rechReessayer" type="button">Réessayer</button></div>` : ''}
+    <p class="muted" role="status">${mots.length ? `${res.length} résultat${res.length > 1 ? 's' : ''} pour « ${esc(q)} »` : 'Tapez un mot-clé (deux lettres au moins) dans la barre de recherche.'}</p>
+    <ul class="results">${res.slice(0, 40).map(r => `<li><a href="#/lecon/${r.m.id}/${r.l.index}"><span class="path">M${num(r.m.numero)} · ${esc(r.m.titre)}</span><b>${surlignerTexte(r.l.titre, mots)}</b><span class="muted small">${r.extrait.avant ? '… ' : ''}${surlignerTexte(r.extrait.texte, mots)}${r.extrait.apres ? ' …' : ''}</span></a></li>`).join('')}</ul>
     ${verrouilles.length && mots.length ? `<p class="muted small">La recherche porte sur les modules de votre offre. ${verrouilles.length} module(s) verrouillé(s) non inclus.</p>` : ''}</div>`;
+  $('#rechReessayer')?.addEventListener('click', () => router());
 }
 
 /* ---------- scripts vidéo (tournage) ---------- */
@@ -831,12 +960,14 @@ async function vueScripts(nav) {
   const tous = await chargerAccessibles();
   if (nav !== navId) return;
   main.innerHTML = `<div class="wrap narrow">
-    <div class="row between noprint"><a class="btn" href="#/profil">← Retour</a><button class="btn primary" id="printBtn" type="button">Imprimer</button></div>
+    <div class="row between noprint barre-actions"><a class="btn" href="#/profil">← Retour</a><button class="btn primary" id="printBtn" type="button">Imprimer</button></div>
     <h1>Scripts vidéo</h1><p class="lead">Un script par leçon, pour tourner les vidéos de la formation : accroche, plan, démonstration à l'écran et appel à l'action.</p>
+    ${tous.echecs?.length ? `<div class="callout warn noprint" role="alert"><b>Liste incomplète</b>${tous.echecs.length} module(s) n'ont pas pu être chargés. <button class="btn small" id="scriptsReessayer" type="button">Réessayer</button></div>` : ''}
     ${tous.map(m => `<section class="scripts-mod"><h2>M${num(m.numero)} · ${esc(m.titre)}</h2>${m.lecons.filter(l => l.script).map(l => `<article class="card script-print"><h3>${num(l.index)}. ${esc(l.titre)} <span class="muted small">(${esc(l.script.duree)})</span></h3>
       <p><b>Accroche :</b> ${esc(l.script.accroche)}</p><ol>${l.script.plan.map(p => `<li>${esc(p)}</li>`).join('')}</ol>${l.script.demo ? `<p><b>À l'écran :</b> ${esc(l.script.demo)}</p>` : ''}<p><b>Appel à l'action :</b> ${esc(l.script.cta)}</p></article>`).join('')}</section>`).join('')}
   </div>`;
   $('#printBtn').addEventListener('click', () => window.print());
+  $('#scriptsReessayer')?.addEventListener('click', () => router());
 }
 
 router();

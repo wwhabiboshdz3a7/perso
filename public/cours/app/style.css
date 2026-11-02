@@ -19,9 +19,9 @@
   --accent-text: var(--cobalt-2);
   --accent-soft: rgb(40 54 245 / .08);
   --code-bg: #ecebe4;
-  --ok: var(--vert);
+  --ok: #0b6b3a;               /* vert assombri : 5:1 sur son fond pâle (AA) */
   --ko: var(--rouge);
-  --ok-soft: rgb(15 122 67 / .10);
+  --ok-soft: rgb(11 107 58 / .10);
   --ko-soft: rgb(180 45 23 / .09);
   --marque: var(--encre);
   --marque-trait: var(--citron);
@@ -62,6 +62,17 @@ code { background: var(--code-bg); padding: .1em .4em; border-radius: 5px; borde
 pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: var(--rayon-s); padding: 14px 16px; overflow: auto; line-height: 1.55; margin: 0 0 1.1em; max-width: 100%; }
 pre code { background: none; border: 0; padding: 0; font-size: .85rem; word-break: normal; white-space: pre; }
 table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: .94rem; display: block; overflow-x: auto; }
+/* Ombres de défilement (Lea Verou) : visibles seulement du côté où il reste du contenu. */
+table[data-defile], pre[data-defile] { --couvre: var(--bg); background:
+  linear-gradient(to right, var(--couvre) 30%, transparent) left / 40px 100% no-repeat local,
+  linear-gradient(to left, var(--couvre) 30%, transparent) right / 40px 100% no-repeat local,
+  radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / .2), transparent) left / 14px 100% no-repeat scroll,
+  radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / .2), transparent) right / 14px 100% no-repeat scroll,
+  var(--couvre); }
+pre[data-defile] { --couvre: var(--code-bg); }
+.block table[data-defile], .card table[data-defile] { --couvre: var(--bg-2); }
+table[data-defile]:focus-visible, pre[data-defile]:focus-visible { outline-offset: 2px; }
+td code, th code { white-space: nowrap; }
 th, td { border-bottom: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; }
 th { font-family: var(--f-mono); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-2); font-weight: 600; background: var(--bg-3); }
 blockquote { margin: 0 0 1.1em; padding: 12px 18px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--rayon-s) var(--rayon-s) 0; }
@@ -222,6 +233,11 @@ h1:focus { outline: none; }
 .lesson { padding: 36px 48px 72px; max-width: 900px; min-width: 0; }
 .lesson-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: .88rem; color: var(--text-3); margin-bottom: 24px; align-items: center; }
 .sb-toggle { display: none; }
+.sb-tete, .sb-fond { display: none; }
+.lesson-meta .meta-cadre { overflow: hidden; flex: 1 1 200px; min-width: 0; }
+.meta-liste { list-style: none; margin: 0 0 0 -1.3em; padding: 0; display: flex; flex-wrap: wrap; row-gap: 2px; }
+.meta-liste li { margin: 0; white-space: nowrap; }
+.meta-liste li::before { content: "·"; display: inline-block; width: 1.3em; text-align: center; color: var(--text-3); }
 .objectifs { border: 1px solid var(--line); border-radius: var(--rayon); padding: 16px 20px; margin-bottom: 26px; background: var(--bg-2); }
 .objectifs ul { margin: 0; padding-left: 1.2em; }
 .objectifs li { margin-bottom: 3px; }
@@ -375,6 +391,10 @@ mark.var { background: var(--accent-soft); color: var(--accent-text); font-weigh
 .certif .sig span:last-child { text-align: right; }
 .certif-note { margin: 22px 0 0; font-size: .74rem; color: var(--encre-3); }
 .scripts-mod { margin-top: 30px; }
+.barre-actions { margin-bottom: 22px; }
+.manques { padding-left: 1.2em; margin: 0 0 1.2em; }
+.manques li { margin-bottom: 4px; }
+.page-erreur .row { margin-top: 6px; }
 .script-print h3 { font-size: 1.05rem; }
 
 /* ----- toasts ----- */
@@ -388,7 +408,7 @@ mark.var { background: var(--accent-soft); color: var(--accent-text); font-weigh
 .cm-keyword, .cm-atom { color: #7a2bd6; }
 .cm-string, .cm-string-2 { color: #0f7a43; }
 .cm-number { color: #b45309; }
-.cm-comment { color: #6b6b73; font-style: italic; }
+.cm-comment { color: #5f5f66; font-style: italic; }
 .cm-def, .cm-variable-2 { color: #1b26c4; }
 .cm-property, .cm-attribute { color: #8a3b12; }
 .cm-tag, .cm-header { color: #b42d17; font-weight: 600; }
@@ -408,6 +428,10 @@ mark.var { background: var(--accent-soft); color: var(--accent-text); font-weigh
   .sidebar { position: fixed; left: 0; top: var(--topbar-h); width: min(330px, 88vw); z-index: 60; transform: translateX(-102%); transition: transform .25s var(--ease); box-shadow: var(--shadow); visibility: hidden; }
   .sidebar.open { transform: none; visibility: visible; }
   .sb-toggle { display: inline-flex; }
+  .sidebar { padding-top: 10px; }
+  .sb-tete { display: flex; align-items: center; justify-content: space-between; padding: 0 12px 8px 20px; font-family: var(--f-mono); font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); }
+  .sb-fond { display: block; position: fixed; inset: var(--topbar-h) 0 0 0; z-index: 55; background: rgb(18 18 20 / .38); }
+  .sb-fond[hidden] { display: none; }
   .lesson { padding: 28px 22px 64px; }
   .dash-hero { grid-template-columns: 1fr; }
   .search { max-width: 240px; }
@@ -434,6 +458,19 @@ mark.var { background: var(--accent-soft); color: var(--accent-text); font-weigh
   .block > .body, .steps { padding-left: 16px; padding-right: 16px; }
   .steps li { padding-left: 46px; }
   .card { padding: 20px; }
+}
+@media (max-width: 600px) {
+  /* Tableaux de trois colonnes ou plus : une carte par ligne, libellé de colonne devant chaque valeur. */
+  table.t-large, table.t-large tbody, table.t-large tr, table.t-large td { display: block; width: 100%; }
+  table.t-large { overflow: visible; font-size: .93rem; background: none; }
+  table.t-large thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  table.t-large tr { border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); padding: 4px 14px; margin-bottom: 10px; }
+  table.t-large td { border: 0; padding: 7px 0; display: grid; grid-template-columns: minmax(84px, 34%) minmax(0, 1fr); gap: 12px; }
+  table.t-large td + td { border-top: 1px dashed var(--line); }
+  table.t-large td::before { content: attr(data-label); font-family: var(--f-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); padding-top: 3px; }
+  table.t-large td:first-child { display: block; font-family: var(--f-display); font-weight: 700; font-size: 1rem; padding-top: 10px; }
+  table.t-large td:first-child::before { content: none; }
+  table.t-large td code { white-space: normal; overflow-wrap: anywhere; }
 }
 @media (max-width: 560px) {
   .search { display: none; }
