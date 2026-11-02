@@ -1,0 +1,72 @@
+{
+  "name": "kinetika",
+  "version": "0.1.0",
+  "description": "Librairie d'animation JavaScript légère et sans dépendance : animate, timeline, stagger, ressorts, texte, défilement et SVG.",
+  "type": "module",
+  "main": "./dist/kinetika.cjs",
+  "module": "./dist/kinetika.esm.js",
+  "types": "./types/index.d.ts",
+  "unpkg": "./dist/kinetika.umd.min.js",
+  "jsdelivr": "./dist/kinetika.umd.min.js",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/kinetika.esm.js",
+      "require": "./dist/kinetika.cjs",
+      "default": "./dist/kinetika.esm.js"
+    },
+    "./min": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/kinetika.esm.min.js"
+    },
+    "./src": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "types",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test \"test/**/*.test.js\"",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "keywords": [
+    "animation",
+    "animate",
+    "motion",
+    "tween",
+    "timeline",
+    "stagger",
+    "spring",
+    "easing",
+    "svg",
+    "scroll",
+    "text",
+    "kinetic-typography",
+    "javascript"
+  ],
+  "author": "wwhabiboshdz3a7 (https://github.com/wwhabiboshdz3a7)",
+  "license": "MIT",
+  "homepage": "https://github.com/wwhabiboshdz3a7/kinetika#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wwhabiboshdz3a7/kinetika.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wwhabiboshdz3a7/kinetika/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "jsdom": "30.1.3"
+  }
+}
