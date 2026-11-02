@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; media-src 'self' blob: data:; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>Nour — assistant personnel</title>
+  <meta name="description" content="Nour, assistant personnel : une interface de conversation soignée qui se branche sur l'IA open source de votre choix (Groq, OpenRouter, Mistral, Hugging Face, Ollama…).">
+  <meta name="theme-color" content="#0E0F13" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F5F1E8" media="(prefers-color-scheme: light)">
+  <meta name="color-scheme" content="dark light">
+  <meta name="referrer" content="no-referrer">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-latin-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/app.css">
+  <script src="js/boot.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#composer-input">Aller à la zone de saisie</a>
+
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#FFE3B0"/>
+        <stop offset=".45" stop-color="#F2B65E"/>
+        <stop offset="1" stop-color="#F2B65E" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h16"/></symbol>
+    <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M9.5 4.5v15"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-compose" viewBox="0 0 24 24"><path d="M12 4.5H7a2.5 2.5 0 0 0-2.5 2.5v10A2.5 2.5 0 0 0 7 19.5h10a2.5 2.5 0 0 0 2.5-2.5v-5"/><path d="M17.6 3.9a1.9 1.9 0 0 1 2.7 2.7L13 13.9l-3.4.8.8-3.4z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 5 3.5 3.5v1.5h-11v-1.5L10 9z"/><path d="M12 14v6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M15.5 4.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V5h5v2M6.5 7l.8 12a1.5 1.5 0 0 0 1.5 1.4h6.4a1.5 1.5 0 0 0 1.5-1.4l.8-12M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.1" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><circle cx="18" cy="12" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+    <symbol id="i-memory" viewBox="0 0 24 24"><path d="M6.5 4.5h9l3 3v12h-12z"/><path d="M15.5 4.5v3h3M9.5 11.5h6M9.5 15h4"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="M5 5.5h4v13H5zM10 5.5h4v13h-4z"/><path d="m15.2 6.3 3.8-1 3 12.4-3.8 1z" transform="translate(-1.5 .4)"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v3"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m19 11.5-6.9 6.9a4.2 4.2 0 0 1-6-6l7.4-7.4a2.8 2.8 0 0 1 4 4l-7.3 7.3a1.4 1.4 0 0 1-2-2l6.6-6.6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.2"/><path d="M15.5 8.5V6.7a2.2 2.2 0 0 0-2.2-2.2H6.7a2.2 2.2 0 0 0-2.2 2.2v6.6a2.2 2.2 0 0 0 2.2 2.2h1.8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4.5 9.5h3l4.5-4v13l-4.5-4h-3z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4.5v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5v-11M7 9.5l5-5 5 5M5 19.5h14"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M9 20h6M12 16v4"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="3.5"/><path d="m10.5 12.5 8-8M16 7l2.5 2.5M14 9l2 2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="6.5" rx="1.8"/><rect x="4" y="13" width="16" height="6.5" rx="1.8"/><path d="M7.5 7.8h.01M7.5 16.2h.01"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5S9.6 6.1 12 3.5z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 3 19.5h18z"/><path d="M12 10v4.5M12 17.2h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3" y="6.5" width="18" height="11" rx="2"/><path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M7.5 14h9"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5c.6 4.4 2.6 6.9 7.5 8.5-4.9 1.6-6.9 4.1-7.5 8.5-.6-4.4-2.6-6.9-7.5-8.5 4.9-1.6 6.9-4.1 7.5-8.5z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13.5 3.5V9H19"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m20.5 16-4.5-4.5L7 19.5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10 5.8a9.6 9.6 0 0 1 2-.3c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.4 7.2A16.4 16.4 0 0 0 2.5 12S6 18.5 12 18.5a9.4 9.4 0 0 0 4.4-1.1M4 4l16 16"/><path d="M9.9 9.9a2.8 2.8 0 0 0 4 4"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M13.5 4.5h6v6M19.5 4.5 11 13M17.5 14v4a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 18V8A1.5 1.5 0 0 1 6 6.5h4"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h7M15.5 8l4 4-4 4M19.5 12H10"/></symbol>
+    <symbol id="i-brain" viewBox="0 0 24 24"><path d="M9.5 4.5a3 3 0 0 0-3 3v.3A3 3 0 0 0 4.5 13a3 3 0 0 0 2 4.7 3 3 0 0 0 3 2.3 2.5 2.5 0 0 0 2.5-2.5v-11A2.5 2.5 0 0 0 9.5 4.5zM14.5 4.5a3 3 0 0 1 3 3v.3a3 3 0 0 1 2 5.2 3 3 0 0 1-2 4.7 3 3 0 0 1-3 2.3 2.5 2.5 0 0 1-2.5-2.5"/></symbol>
+    <symbol id="i-slash" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m14 7.5-4 9"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M4 4l16 16M8.5 13.5a5 5 0 0 1 3.5-1.4M5 10a10 10 0 0 1 3.4-2.1M12 7a10 10 0 0 1 7 3M12 18.5h.01"/></symbol>
+    <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-.6c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3.5 12.5h17M11 12.5v1.5h2v-1.5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8.5 7.5-4.5 4.5 4.5 4.5M15.5 7.5l4.5 4.5-4.5 4.5M13.5 5l-3 14"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4.5 19.5c3-.5 5.5-1.5 7.5-3.5l7-7a2.1 2.1 0 0 0-3-3l-7 7c-2 2-3 4.5-3.5 7.5z"/><path d="m14.5 7.5 2 2M4.5 19.5h15"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M7.5 5v14M16.5 5v14M3.5 9.5h4M3.5 14.5h4M16.5 9.5h4M16.5 14.5h4"/></symbol>
+    <symbol id="i-languages" viewBox="0 0 24 24"><path d="M4 6h9M8.5 4v2c0 4-2 7-4.5 8.5M6.5 10c1 2 3 3.5 5.5 4.5"/><path d="m12.5 20 3.5-8.5 3.5 8.5M13.7 17.2h4.6"/></symbol>
+    <!-- Glyphes d'avatar -->
+    <symbol id="av-arche" viewBox="0 0 32 32"><path d="M8.5 27V15.5a7.5 7.5 0 0 1 15 0V27" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="17.2" r="6" fill="url(#g-glow)" class="av-glow"/><circle cx="16" cy="17.2" r="2.2" fill="#FFF4DC" class="av-core"/></symbol>
+    <symbol id="av-etoile" viewBox="0 0 32 32"><circle cx="16" cy="16" r="9" fill="url(#g-glow)" class="av-glow"/><path d="M16 5.5c.8 6.2 3.3 9.4 10.5 10.5-7.2 1.1-9.7 4.3-10.5 10.5-.8-6.2-3.3-9.4-10.5-10.5 7.2-1.1 9.7-4.3 10.5-10.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="av-orbite" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.4 3.2"/><circle cx="16" cy="16" r="6.5" fill="url(#g-glow)" class="av-glow"/><circle cx="16" cy="16" r="2.4" fill="#FFF4DC" class="av-core"/><circle cx="25.6" cy="11.8" r="1.6" fill="currentColor"/></symbol>
+    <symbol id="av-flamme" viewBox="0 0 32 32"><circle cx="16" cy="19" r="8" fill="url(#g-glow)" class="av-glow"/><path d="M16 5c3.8 4.4 6.5 7.8 6.5 12.2a6.5 6.5 0 0 1-13 0c0-2.4 1-4.3 2.6-6 .2 2 1.1 3.3 2.4 3.9C14 11.4 14.6 8.4 16 5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="av-zellige" viewBox="0 0 32 32"><circle cx="16" cy="16" r="8" fill="url(#g-glow)" class="av-glow"/><path d="M16 4.5 19.4 12.6 27.5 16 19.4 19.4 16 27.5 12.6 19.4 4.5 16 12.6 12.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 8 13.2 13.2M24 8l-5.2 5.2M8 24l5.2-5.2M24 24l-5.2-5.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <div class="app" id="app" data-sidebar="open">
+    <aside class="sidebar" id="sidebar" aria-label="Conversations">
+      <div class="sidebar-top">
+        <a class="brand" href="./" aria-label="Nour — accueil">
+          <svg class="brand-mark" aria-hidden="true"><use href="#av-arche"/></svg>
+          <span class="brand-name">Nour</span>
+        </a>
+        <button class="icon-btn only-desktop" type="button" data-action="toggle-sidebar" aria-label="Masquer la barre latérale" title="Masquer la barre latérale (Ctrl+B)"><svg class="ico"><use href="#i-sidebar"/></svg></button>
+        <button class="icon-btn only-mobile" type="button" data-action="close-sidebar" aria-label="Fermer le menu"><svg class="ico"><use href="#i-x"/></svg></button>
+      </div>
+      <button class="new-chat" type="button" data-action="new-chat" title="Nouvelle conversation (Ctrl+Maj+O)">
+        <svg class="ico"><use href="#i-compose"/></svg>
+        <span>Nouvelle conversation</span>
+      </button>
+      <div class="search">
+        <label class="sr-only" for="search-input">Rechercher dans les conversations</label>
+        <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="search-input" type="search" placeholder="Rechercher…" autocomplete="off" spellcheck="false">
+        <kbd class="kbd-hint" aria-hidden="true">Ctrl K</kbd>
+      </div>
+      <nav class="conv-list" id="conv-list" aria-label="Historique des conversations"></nav>
+      <div class="sidebar-foot">
+        <button class="foot-btn" type="button" data-action="open-memory"><svg class="ico"><use href="#i-brain"/></svg><span>Mémoire</span><span class="badge" id="memory-count" hidden></span></button>
+        <button class="foot-btn" type="button" data-action="open-library"><svg class="ico"><use href="#i-library"/></svg><span>Bibliothèque</span></button>
+        <button class="foot-btn" type="button" data-action="open-settings"><svg class="ico"><use href="#i-settings"/></svg><span>Réglages</span></button>
+        <button class="conn-status" type="button" id="conn-status" data-action="open-settings" data-tab="connexion">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="conn-text"><span class="conn-provider">Non connecté</span><span class="conn-model">Choisir un fournisseur</span></span>
+        </button>
+      </div>
+    </aside>
+    <div class="scrim" data-action="close-sidebar" hidden></div>
+
+    <main class="main" id="main">
+      <header class="topbar">
+        <button class="icon-btn" type="button" id="sidebar-toggle" data-action="toggle-sidebar" aria-label="Afficher la barre latérale" aria-controls="sidebar" aria-expanded="true"><svg class="ico"><use href="#i-sidebar"/></svg></button>
+        <div class="title-wrap">
+          <h1 class="conv-title" id="conv-title">Nouvelle conversation</h1>
+          <div class="persona-pick">
+            <label class="sr-only" for="persona-select">Mode de l'assistant</label>
+            <select id="persona-select"></select>
+            <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn only-mobile" type="button" data-action="new-chat" aria-label="Nouvelle conversation"><svg class="ico"><use href="#i-compose"/></svg></button>
+          <button class="model-chip" type="button" id="model-chip" title="Changer de modèle">
+            <span class="model-chip-label" id="model-chip-label">Aucun modèle</span>
+            <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+          </button>
+          <button class="icon-btn" type="button" data-action="toggle-theme" id="theme-btn" aria-label="Changer de thème" title="Thème"><svg class="ico"><use href="#i-moon"/></svg></button>
+          <div class="menu-wrap">
+            <button class="icon-btn" type="button" id="conv-menu-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="conv-menu" aria-label="Actions de la conversation"><svg class="ico"><use href="#i-dots"/></svg></button>
+            <div class="menu" id="conv-menu" role="menu" hidden>
+              <button role="menuitem" type="button" data-action="rename-current"><svg class="ico"><use href="#i-edit"/></svg>Renommer</button>
+              <button role="menuitem" type="button" data-action="pin-current"><svg class="ico"><use href="#i-pin"/></svg><span data-label>Épingler</span></button>
+              <button role="menuitem" type="button" data-action="suggest-memories"><svg class="ico"><use href="#i-brain"/></svg>Proposer des souvenirs</button>
+              <button role="menuitem" type="button" data-action="export-md"><svg class="ico"><use href="#i-download"/></svg>Exporter en Markdown</button>
+              <button role="menuitem" type="button" data-action="export-json-current"><svg class="ico"><use href="#i-download"/></svg>Exporter en JSON</button>
+              <button role="menuitem" type="button" data-action="open-shortcuts"><svg class="ico"><use href="#i-keyboard"/></svg>Raccourcis clavier</button>
+              <hr>
+              <button role="menuitem" type="button" class="danger" data-action="delete-current"><svg class="ico"><use href="#i-trash"/></svg>Supprimer</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="offline-bar" id="offline-bar" role="status" hidden>
+        <svg class="ico" aria-hidden="true"><use href="#i-wifi-off"/></svg>
+        Hors ligne — vos conversations restent consultables, l'envoi reprendra au retour du réseau.
+      </div>
+
+      <section class="thread" id="thread" aria-label="Conversation" tabindex="-1">
+        <div class="thread-inner" id="messages"></div>
+      </section>
+
+      <button class="to-bottom" type="button" id="to-bottom" data-action="scroll-bottom" aria-label="Aller au dernier message" hidden><svg class="ico"><use href="#i-arrow-down"/></svg></button>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="slash" id="slash" role="listbox" aria-label="Modèles de requêtes" hidden></div>
+        <div class="composer-box" id="composer-box">
+          <div class="attachments" id="attachments" aria-label="Pièces jointes" hidden></div>
+          <label class="sr-only" for="composer-input">Votre message</label>
+          <textarea id="composer-input" rows="1" placeholder="Écrivez à Nour… (/ pour les modèles de requêtes)" aria-autocomplete="list" aria-controls="slash" aria-expanded="false" enterkeyhint="send"></textarea>
+          <div class="composer-tools">
+            <div class="tools-left">
+              <button class="icon-btn" type="button" data-action="attach" aria-label="Joindre un fichier ou une image" title="Joindre (fichiers texte, code, images)"><svg class="ico"><use href="#i-clip"/></svg></button>
+              <input type="file" id="file-input" multiple hidden accept="image/*,text/*,.md,.markdown,.txt,.csv,.tsv,.json,.jsonl,.xml,.yaml,.yml,.toml,.ini,.env.example,.log,.html,.htm,.css,.scss,.js,.mjs,.cjs,.ts,.tsx,.jsx,.vue,.svelte,.py,.rb,.php,.java,.kt,.c,.h,.cpp,.hpp,.cc,.cs,.go,.rs,.swift,.sql,.sh,.bash,.zsh,.ps1,.bat,.lua,.r,.m,.dart,.tex,.srt,.vtt">
+              <button class="icon-btn" type="button" data-action="dictate" id="mic-btn" aria-label="Dicter un message" aria-pressed="false" title="Dictée vocale"><svg class="ico"><use href="#i-mic"/></svg></button>
+              <button class="icon-btn" type="button" data-action="open-slash" aria-label="Modèles de requêtes" title="Modèles de requêtes ( / )"><svg class="ico"><use href="#i-slash"/></svg></button>
+            </div>
+            <div class="tools-right">
+              <span class="token-est" id="token-est" title="Estimation du nombre de jetons envoyés (contexte compris)"></span>
+              <button class="send-btn" type="submit" id="send-btn" aria-label="Envoyer" title="Envoyer (Entrée)"><svg class="ico"><use href="#i-send"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <p class="composer-note" id="composer-note">Entrée pour envoyer · Maj+Entrée pour aller à la ligne · Nour peut se tromper, vérifiez les informations importantes.</p>
+      </form>
+    </main>
+  </div>
+
+  <div class="drop-zone" id="drop-zone" hidden aria-hidden="true"><div><svg class="ico"><use href="#i-upload"/></svg><p>Déposez vos fichiers ou images</p></div></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="live" aria-live="polite"></div>
+
+  <noscript><p class="noscript">Nour a besoin de JavaScript pour fonctionner.</p></noscript>
+</body>
+</html>
