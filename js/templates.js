@@ -3,6 +3,7 @@
 import { db } from './db.js';
 import { uid } from './util.js';
 import { norm } from './memory.js';
+import { bus } from './bus.js';
 
 export const DEFAULT_TEMPLATES = [
   { cmd: 'resumer', title: 'Résumer', body: 'Résume le texte suivant en 5 points clés, puis donne la phrase à retenir :\n\n{{texte}}' },
@@ -29,12 +30,13 @@ export const templates = {
     return list;
   },
   all() { return list; },
-  async save() { await db.kvSet(KEY, list); },
+  async save() { await db.kvSet(KEY, list); bus.post({ type: 'templates' }); },
   async upsert(t) {
     const cmd = cleanCmd(t.cmd);
     if (!cmd) throw new Error('Choisissez une commande (lettres et chiffres).');
     if (list.some((x) => x.cmd === cmd && x.id !== t.id)) throw new Error(`La commande /${cmd} existe déjà.`);
-    const item = { id: t.id || uid('t_'), cmd, title: String(t.title || cmd).trim(), body: String(t.body || '') };
+    if (typeof t.body !== 'string' || !t.body.trim()) throw new Error('Écrivez le texte de la requête.');
+    const item = { id: t.id || uid('t_'), cmd, title: (typeof t.title === 'string' && t.title.trim() ? t.title : cmd).trim().slice(0, 60), body: t.body.slice(0, 20000) };
     list = t.id && list.some((x) => x.id === t.id) ? list.map((x) => (x.id === t.id ? item : x)) : [...list, item];
     await this.save();
     return item;
@@ -42,7 +44,7 @@ export const templates = {
   async remove(id) { list = list.filter((x) => x.id !== id); await this.save(); },
   async reset() { list = DEFAULT_TEMPLATES.map((t) => ({ id: uid('t_'), ...t })); await this.save(); },
   async replaceAll(items) {
-    list = (Array.isArray(items) ? items : []).filter((t) => t && t.cmd && t.body).map((t) => ({ id: t.id || uid('t_'), cmd: cleanCmd(t.cmd), title: t.title || t.cmd, body: t.body }));
+    list = (Array.isArray(items) ? items : []).filter((t) => t && typeof t.cmd === 'string' && typeof t.body === 'string' && t.body).map((t) => ({ id: t.id || uid('t_'), cmd: cleanCmd(t.cmd), title: typeof t.title === 'string' ? t.title : t.cmd, body: t.body }));
     await this.save();
   },
   search(q) {
@@ -56,9 +58,18 @@ export function cleanCmd(s) {
   return norm(String(s || '').replace(/^\//, '')).replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 24);
 }
 
-/** Remplit le modèle ; renvoie le texte et la position du premier champ {{…}} à compléter. */
-export function applyTemplate(t) {
-  const text = t.body;
+/**
+ * Remplit le modèle ; renvoie le texte et la sélection du premier champ {{…}} à compléter.
+ * Un brouillon déjà saisi n'est jamais perdu : il remplace le premier champ du modèle,
+ * ou s'ajoute à la suite si le modèle n'en a pas.
+ */
+export function applyTemplate(t, draft = '') {
+  let text = t.body;
+  const d = String(draft || '').trim();
+  if (d) {
+    const first = /\{\{([^}]+)\}\}/.exec(text);
+    text = first ? text.slice(0, first.index) + d + text.slice(first.index + first[0].length) : `${text.replace(/\s+$/, '')}\n\n${d}`;
+  }
   const m = /\{\{([^}]+)\}\}/.exec(text);
   if (!m) return { text, selStart: text.length, selEnd: text.length };
   return { text, selStart: m.index, selEnd: m.index + m[0].length };

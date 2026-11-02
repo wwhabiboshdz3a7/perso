@@ -12,6 +12,10 @@
 //   ALLOWED_MODELS         liste de modèles autorisés, séparés par des virgules
 //   RATE_LIMIT_PER_MINUTE  requêtes par minute et par adresse IP (défaut 30)
 //   TOKEN_TTL_HOURS        durée de validité d'une session (défaut 12)
+//
+// Révocation : les jetons sont signés avec une clé dérivée de TOKEN_SECRET ET de l'empreinte du
+// mot de passe. Changer le mot de passe (ACCESS_PASSWORD_HASH) ou TOKEN_SECRET déconnecte donc
+// immédiatement tous les appareils.
 
 import { createHmac, timingSafeEqual, pbkdf2Sync, randomBytes } from 'node:crypto';
 
@@ -102,18 +106,23 @@ export function verifyPassword(password, stored) {
 const b64url = (buf) => Buffer.from(buf).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const fromB64url = (s) => Buffer.from(String(s).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
 
-export function signToken(secret, ttlMs, now = Date.now()) {
+/** Clé de signature : liée au secret et, si fourni, à l'empreinte du mot de passe (révocation). */
+function signingKey(secret, binding) {
+  return binding ? createHmac('sha256', secret).update(`nour-session\n${binding}`).digest() : secret;
+}
+
+export function signToken(secret, ttlMs, now = Date.now(), binding = '') {
   const payload = { v: 1, iat: now, exp: now + ttlMs, n: b64url(randomBytes(9)) };
   const body = b64url(JSON.stringify(payload));
-  const sig = b64url(createHmac('sha256', secret).update(body).digest());
+  const sig = b64url(createHmac('sha256', signingKey(secret, binding)).update(body).digest());
   return { token: `${body}.${sig}`, expiresAt: payload.exp };
 }
 
-export function verifyToken(secret, token, now = Date.now()) {
+export function verifyToken(secret, token, now = Date.now(), binding = '') {
   if (!token || typeof token !== 'string' || token.length > 512) return null;
   const [body, sig] = token.split('.');
   if (!body || !sig) return null;
-  const expected = createHmac('sha256', secret).update(body).digest();
+  const expected = createHmac('sha256', signingKey(secret, binding)).update(body).digest();
   const given = fromB64url(sig);
   if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null;
   try {
@@ -210,13 +219,13 @@ export default async function handler(req, context) {
       return fail(401, 'Mot de passe incorrect.', 'bad_password');
     }
     const ttl = Math.min(Math.max(Number(env('TOKEN_TTL_HOURS', '12')) || 12, 0.1), 24 * 30) * 3600 * 1000;
-    const { token, expiresAt } = signToken(secret, ttl);
+    const { token, expiresAt } = signToken(secret, ttl, Date.now(), env('ACCESS_PASSWORD_HASH'));
     return json(200, { token, expiresAt });
   }
 
   const auth = req.headers.get('authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  const session = verifyToken(secret, token);
+  const session = verifyToken(secret, token, Date.now(), env('ACCESS_PASSWORD_HASH'));
   if (!session) return fail(401, 'Session absente ou expirée : reconnectez-vous.', 'session');
 
   const perMinute = Math.max(1, Number(env('RATE_LIMIT_PER_MINUTE', '30')) || 30);

@@ -2,6 +2,7 @@
 
 import { db } from './db.js';
 import { uid } from './util.js';
+import { bus } from './bus.js';
 
 const KEY = 'memory';
 let facts = [];
@@ -18,9 +19,10 @@ export const memory = {
   all() { return facts; },
   active() { return facts.filter((f) => f.enabled !== false); },
   on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
-  async save() { await db.kvSet(KEY, facts); emit(); },
+  async save() { await db.kvSet(KEY, facts); emit(); bus.post({ type: 'memory' }); },
   async add(text, source = 'manuel') {
-    const t = String(text || '').trim();
+    if (typeof text !== 'string') return null;
+    const t = text.trim().slice(0, 280);
     if (!t) return null;
     if (facts.some((f) => norm(f.text) === norm(t))) return null;
     const fact = { id: uid('m_'), text: t, enabled: true, createdAt: Date.now(), source };
@@ -37,7 +39,7 @@ export const memory = {
     await this.save();
   },
   async replaceAll(list) {
-    facts = (Array.isArray(list) ? list : []).filter((f) => f && f.text).map((f) => ({
+    facts = (Array.isArray(list) ? list : []).filter((f) => f && typeof f.text === 'string' && f.text.trim()).map((f) => ({
       id: f.id || uid('m_'), text: String(f.text), enabled: f.enabled !== false, createdAt: f.createdAt || Date.now(), source: f.source || 'import',
     }));
     await this.save();

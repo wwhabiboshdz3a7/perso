@@ -35,6 +35,7 @@ export function openDialog({ id, title, sub = '', body = '', foot = '', size = '
     setTimeout(() => d.remove(), 0);
   });
   d.showModal();
+  raiseToasts();
   return d;
 }
 
@@ -71,21 +72,47 @@ export function promptDialog({ title, label, value = '', confirm = 'Enregistrer'
   });
 }
 
-/* ---------- Notifications ---------- */
+/* ---------- Notifications ----------
+   Le conteneur est un « popover » : il passe dans la couche supérieure (top layer), donc
+   au-dessus des fenêtres modales ouvertes, au lieu d'être masqué par leur fond. */
+const popoverOK = typeof HTMLElement !== 'undefined' && 'showPopover' in HTMLElement.prototype;
+
+function toastBox() { return document.getElementById('toasts'); }
+
+/** Remet les notifications au premier plan (après l'ouverture d'une fenêtre modale). */
+export function raiseToasts() {
+  const box = toastBox();
+  if (!box || !popoverOK || !box.children.length) return;
+  try {
+    if (box.matches(':popover-open')) box.hidePopover();
+    box.showPopover();
+  } catch { /* popover indisponible */ }
+}
+
+function syncToastBox() {
+  const box = toastBox();
+  if (!box || !popoverOK) return;
+  try {
+    if (!box.children.length && box.matches(':popover-open')) box.hidePopover();
+  } catch { /* ignoré */ }
+}
+
 export function toast(message, { kind = 'info', action = null, timeout = 4200 } = {}) {
-  const box = document.getElementById('toasts');
+  const box = toastBox();
   const ico = kind === 'error' ? 'alert' : kind === 'ok' ? 'check' : 'info';
-  const t = html(`<div class="toast" data-kind="${kind}">${icon(ico)}<span>${esc(message)}</span></div>`);
+  const t = html(`<div class="toast" data-kind="${kind}" role="${kind === 'error' ? 'alert' : 'status'}">${icon(ico)}<span>${esc(message)}</span></div>`);
+  const remove = () => { t.remove(); syncToastBox(); };
   if (action) {
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = action.label;
-    b.addEventListener('click', () => { action.fn(); t.remove(); });
+    b.addEventListener('click', () => { remove(); action.fn(); });
     t.appendChild(b);
   }
   box.appendChild(t);
   while (box.children.length > 3) box.firstElementChild.remove();
-  if (timeout) setTimeout(() => t.remove(), timeout);
+  raiseToasts();
+  if (timeout) setTimeout(remove, timeout);
   return t;
 }
 
@@ -100,6 +127,8 @@ export function closeMenus() {
   openMenuState = null;
 }
 
+const ITEM = '[role="menuitem"]:not([hidden]):not(:disabled)';
+
 /** Ouvre un menu existant (élément [role=menu]) sous son bouton. */
 export function toggleMenu(button, menu) {
   if (openMenuState && openMenuState.menu === menu) { closeMenus(); return; }
@@ -107,7 +136,8 @@ export function toggleMenu(button, menu) {
   menu.hidden = false;
   button.setAttribute('aria-expanded', 'true');
   openMenuState = { menu, button, floating: false };
-  menu.querySelector('[role="menuitem"]:not([hidden])')?.focus();
+  // Le premier élément actif reçoit le focus (les actions indisponibles sont ignorées).
+  menu.querySelector(ITEM)?.focus();
 }
 
 /** Menu flottant construit à la volée : items = [{ label, icon, danger, onSelect }]. */
@@ -143,11 +173,13 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (!openMenuState) return;
-  const items = Array.from(openMenuState.menu.querySelectorAll('[role="menuitem"]:not([hidden])'));
+  const items = Array.from(openMenuState.menu.querySelectorAll(ITEM));
   const i = items.indexOf(document.activeElement);
   if (e.key === 'Escape') { const b = openMenuState.button; closeMenus(); b?.focus(); e.stopPropagation(); e.preventDefault(); }
   else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length]?.focus(); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length]?.focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[i <= 0 ? items.length - 1 : i - 1]?.focus(); }
+  else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+  else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
   else if (e.key === 'Tab') closeMenus();
 }, true);
 window.addEventListener('resize', () => closeMenus());

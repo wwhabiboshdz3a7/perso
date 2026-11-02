@@ -1,5 +1,5 @@
 // Tests unitaires de la fonction Netlify avec un fournisseur simulé.
-//   node --test tests/
+//   node --test tests/*.test.mjs
 
 import { test, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -191,6 +191,27 @@ test('rateLimit : la fenêtre se réinitialise', () => {
   assert.equal(rateLimit('k', 1, 1000, 0).ok, true);
   assert.equal(rateLimit('k', 1, 1000, 10).ok, false);
   assert.equal(rateLimit('k', 1, 1000, 1001).ok, true);
+});
+
+test('révocation : changer le mot de passe invalide les sessions existantes', async () => {
+  const { token } = await (await login()).json();
+  const call = () => handler(req('/api/session', { headers: { Authorization: `Bearer ${token}` } }), ctx);
+  assert.equal((await call()).status, 200);
+  const saved = process.env.ACCESS_PASSWORD_HASH;
+  process.env.ACCESS_PASSWORD_HASH = hashPassword('nouveau mot de passe', 20000);
+  const res = await call();
+  assert.equal(res.status, 401);
+  assert.equal((await res.json()).error.code, 'session');
+  process.env.ACCESS_PASSWORD_HASH = saved;
+  assert.equal((await call()).status, 200, 'le jeton redevient valable avec l’ancienne empreinte');
+});
+
+test('jeton lié : un jeton signé sans liaison est refusé quand la liaison est exigée', () => {
+  const { token } = signToken('s'.repeat(40), 60000, 1000);
+  assert.equal(verifyToken('s'.repeat(40), token, 2000, 'empreinte'), null);
+  const bound = signToken('s'.repeat(40), 60000, 1000, 'empreinte').token;
+  assert.ok(verifyToken('s'.repeat(40), bound, 2000, 'empreinte'));
+  assert.equal(verifyToken('s'.repeat(40), bound, 2000, 'autre'), null);
 });
 
 test('redact masque les clés', () => {

@@ -139,6 +139,7 @@
         <div class="top-actions">
           <button class="icon-btn only-mobile" type="button" data-action="new-chat" aria-label="Nouvelle conversation"><svg class="ico"><use href="#i-compose"/></svg></button>
           <button class="model-chip" type="button" id="model-chip" title="Changer de modèle">
+            <svg class="ico chip-empty-ico" aria-hidden="true"><use href="#i-sparkle"/></svg>
             <span class="model-chip-label" id="model-chip-label">Aucun modèle</span>
             <svg class="ico" aria-hidden="true"><use href="#i-chevron-down"/></svg>
           </button>
@@ -161,7 +162,7 @@
 
       <div class="offline-bar" id="offline-bar" role="status" hidden>
         <svg class="ico" aria-hidden="true"><use href="#i-wifi-off"/></svg>
-        Hors ligne — vos conversations restent consultables, l'envoi reprendra au retour du réseau.
+        Hors ligne — vos conversations restent consultables. Renvoyez votre message avec « Réessayer » une fois la connexion revenue.
       </div>
 
       <section class="thread" id="thread" aria-label="Conversation" tabindex="-1">
@@ -170,17 +171,17 @@
 
       <form class="composer" id="composer" autocomplete="off">
         <button class="to-bottom" type="button" id="to-bottom" data-action="scroll-bottom" aria-label="Aller au dernier message" hidden><svg class="ico"><use href="#i-arrow-down"/></svg></button>
-        <div class="slash" id="slash" role="listbox" aria-label="Modèles de requêtes" hidden></div>
+        <div class="slash" id="slash" role="listbox" aria-label="Requêtes enregistrées" tabindex="0" hidden></div>
         <div class="composer-box" id="composer-box">
           <div class="attachments" id="attachments" aria-label="Pièces jointes" hidden></div>
           <label class="sr-only" for="composer-input">Votre message</label>
-          <textarea id="composer-input" rows="1" placeholder="Écrivez à Nour… (/ pour les modèles de requêtes)" aria-autocomplete="list" aria-controls="slash" enterkeyhint="send"></textarea>
+          <textarea id="composer-input" rows="1" dir="auto" placeholder="Écrivez à Nour… (/ pour les requêtes enregistrées)" aria-autocomplete="list" aria-controls="slash" enterkeyhint="send"></textarea>
           <div class="composer-tools">
             <div class="tools-left">
               <button class="icon-btn" type="button" data-action="attach" aria-label="Joindre un fichier ou une image" title="Joindre (fichiers texte, code, images)"><svg class="ico"><use href="#i-clip"/></svg></button>
               <input type="file" id="file-input" multiple hidden accept="image/*,text/*,.md,.markdown,.txt,.csv,.tsv,.json,.jsonl,.xml,.yaml,.yml,.toml,.ini,.env.example,.log,.html,.htm,.css,.scss,.js,.mjs,.cjs,.ts,.tsx,.jsx,.vue,.svelte,.py,.rb,.php,.java,.kt,.c,.h,.cpp,.hpp,.cc,.cs,.go,.rs,.swift,.sql,.sh,.bash,.zsh,.ps1,.bat,.lua,.r,.m,.dart,.tex,.srt,.vtt">
               <button class="icon-btn" type="button" data-action="dictate" id="mic-btn" aria-label="Dicter un message" aria-pressed="false" title="Dictée vocale"><svg class="ico"><use href="#i-mic"/></svg></button>
-              <button class="icon-btn" type="button" data-action="open-slash" aria-label="Modèles de requêtes" title="Modèles de requêtes ( / )"><svg class="ico"><use href="#i-slash"/></svg></button>
+              <button class="icon-btn" type="button" data-action="open-slash" aria-label="Requêtes enregistrées" title="Requêtes enregistrées ( / )"><svg class="ico"><use href="#i-slash"/></svg></button>
             </div>
             <div class="tools-right">
               <span class="token-est" id="token-est" title="Estimation du nombre de jetons envoyés (contexte compris)"></span>
@@ -194,7 +195,7 @@
   </div>
 
   <div class="drop-zone" id="drop-zone" hidden aria-hidden="true"><div><svg class="ico"><use href="#i-upload"/></svg><p>Déposez vos fichiers ou images</p></div></div>
-  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  <div class="toasts" id="toasts" popover="manual" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 
   <noscript><p class="noscript">Nour a besoin de JavaScript pour fonctionner.</p></noscript>

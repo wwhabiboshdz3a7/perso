@@ -3,9 +3,12 @@
 //   node tests/mock-openai.mjs 9302   → http://127.0.0.1:9302/v1
 //
 // Clés reconnues : « cle-valide » (ou toute clé commençant par « sk-test »),
-// « cle-quota » (429), « cle-panne » (500) ; toute autre clé renvoie 401.
-// Le contenu de la réponse dépend du dernier message : « markdown », « xss », « lent »,
-// « raisonne », « think », « erreur-flux », image ou fichier joint, sinon un écho.
+// « cle-quota » (429), « cle-panne » (500) ; toute autre clé renvoie 401. Une clé de 32 caractères
+// alphanumériques (format Mistral, Together, DeepInfra) est recopiée en entier dans l'erreur 401,
+// comme le font certains fournisseurs.
+// Le contenu de la réponse dépend du dernier message : « markdown », « xss », « lent », « longue »,
+// « raisonne », « think », « erreur-flux », « coupure » (flux fermé sans fin), « muet » (aucune
+// réponse), image ou fichier joint, demande de suite, sinon un écho.
 
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
@@ -56,6 +59,27 @@ const XSS = `Voici des pièges : <img src=x onerror="window.__xss=1"> et <script
 
 <a href="#" onclick="window.__xss=5">clic</a> <svg onload="window.__xss=6"></svg> <b>gras autorisé</b>`;
 
+// Longue réponse (~25 Ko) : titres, paragraphes, code, tableaux et formules.
+const LONG = Array.from({ length: 24 }, (_, i) => `## Partie ${i + 1}
+
+Un paragraphe explicatif numéro ${i + 1} avec du **gras**, de l'*italique* et du \`code\`. Il est assez long pour occuper plusieurs lignes à l'écran, comme une vraie réponse détaillée.
+
+\`\`\`python
+def etape_${i + 1}(x):
+    total = 0
+    for k in range(x):
+        total += k * ${i + 1}  # accumulation
+    return total
+\`\`\`
+
+| Élément | Valeur |
+|---|---:|
+| Coût | ${(i + 1) * 120} € |
+| Délai | ${i + 2} jours |
+
+La formule $a_${i + 1} = ${i + 1}^2$ résume l'étape.
+`).join('\n');
+
 function textOf(content) {
   if (typeof content === 'string') return content;
   if (Array.isArray(content)) return content.filter((p) => p.type === 'text').map((p) => p.text).join('\n');
@@ -91,6 +115,7 @@ export function startMock({ port = 0, host = '127.0.0.1', log = false } = {}) {
     if (url.pathname.startsWith('/v1/')) {
       if (key === 'cle-quota') return send(429, { error: { message: 'Rate limit reached for requests. Please try again in 12s.', type: 'rate_limit_exceeded' } }, { 'Retry-After': '12' });
       if (key === 'cle-panne') return send(500, { error: { message: 'Internal server error', type: 'server_error' } });
+      if (/^[A-Za-z0-9]{32}$/.test(key)) return send(401, { error: { message: `Invalid API key provided: ${key}`, type: 'invalid_request_error', code: 'invalid_api_key' } });
       if (!(key === 'cle-valide' || key.startsWith('sk-test'))) return send(401, { error: { message: `Invalid API Key: ${key.slice(0, 4)}…`, type: 'invalid_request_error', code: 'invalid_api_key' } });
     }
 
@@ -118,6 +143,12 @@ export function startMock({ port = 0, host = '127.0.0.1', log = false } = {}) {
       let answer;
       let delay = 12;
       let breakStream = false;
+      let cutStream = false;
+      if (/^muet/i.test(text)) {
+        // Accepte la connexion mais ne répond jamais (fournisseur bloqué).
+        req.on('close', () => {});
+        return;
+      }
       if (/proposer des souvenirs/i.test(system)) {
         answer = '["Dirige l\'agence digitale NEXORA à Toulouse.", "Préfère des réponses courtes avec un exemple concret.", "Prépare une offre de sites pour les restaurants."]';
       } else if (/markdown/i.test(text)) answer = MARKDOWN;
@@ -126,6 +157,9 @@ export function startMock({ port = 0, host = '127.0.0.1', log = false } = {}) {
       else if (/raisonne/i.test(text)) { reasoning = 'Je décompose le problème en étapes. Ensuite je vérifie.'; answer = 'La réponse est **42**.'; }
       else if (/think/i.test(text)) answer = '<think>Réflexion cachée du modèle.</think>Voici la réponse finale.';
       else if (/erreur-flux/i.test(text)) { answer = 'Début de réponse '; breakStream = true; }
+      else if (/^Continue ta réponse/i.test(text)) answer = 'et voici la fin de la réponse.';
+      else if (/coupure/i.test(text)) { answer = 'Voici les trois étapes : 1) préparer le devis, 2) envoyer'; cutStream = true; }
+      else if (/^longue/i.test(text)) { answer = LONG; delay = 2; }
       else if (images) answer = `J'ai bien reçu ${images} image${images > 1 ? 's' : ''}.`;
       else if (/Fichier joint : (.+)/.test(text)) answer = `J'ai lu le fichier « ${/Fichier joint : ([^\n(]+)/.exec(text)[1].trim()} ».`;
       else answer = `Bonjour ! Vous avez écrit : « ${text.slice(0, 120)} ». Réponse n°${state.count}.`;
@@ -153,6 +187,7 @@ export function startMock({ port = 0, host = '127.0.0.1', log = false } = {}) {
         res.write(chunk({ content: piece }));
         await sleep(delay);
       }
+      if (cutStream) { res.end(); return; } // ni finish_reason ni [DONE]
       if (breakStream) {
         res.write(`data: ${JSON.stringify({ error: { message: 'Model overloaded, please retry', code: 503 } })}\n\n`);
         res.end();

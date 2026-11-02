@@ -1,11 +1,11 @@
 // Réglages : connexion, assistant, préférences, données.
 
-import { esc, icon, $, $$, readAsDataURL, formatBytes, formatTime } from '../util.js';
+import { esc, icon, $, $$, readAsDataURL, formatBytes, formatTime, formatDateTime } from '../util.js';
 import { settings } from '../settings.js';
 import { keystore } from '../keystore.js';
 import { cryptoAvailable } from '../crypto.js';
 import { PROVIDERS, providerById, localCorsHelp, suggestModel } from '../providers.js';
-import { listModels, serverLogin, session, ApiError } from '../client.js';
+import { listModels, serverLogin, session, ApiError, authState } from '../client.js';
 import { PERSONAS, TONES, personaById, buildSystemPrompt } from '../personas.js';
 import { frenchVoices, speak, speechSupported } from '../voice.js';
 import { openDialog, toast, confirmDialog } from './dialogs.js';
@@ -20,7 +20,19 @@ const TABS = [
   ['donnees', 'Données'],
 ];
 
-export function openSettings(app, { tab = 'connexion', provider = null } = {}) {
+/** Nombre décimal à la française : 0,7 · 1,0. */
+const dec = (n) => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+/** « aujourd’hui à 14:05 », « demain à 01:11 » ou date complète. */
+function formatExpiry(ts) {
+  const day = (x) => { const d = new Date(x); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const diff = Math.round((day(ts) - day(Date.now())) / 86400000);
+  if (diff === 0) return `aujourd’hui à ${formatTime(ts)}`;
+  if (diff === 1) return `demain à ${formatTime(ts)}`;
+  return `le ${formatDateTime(ts)}`;
+}
+
+export function openSettings(app, { tab = 'connexion', provider = null, focus = null } = {}) {
   const tabsHTML = `<div class="tabs" role="tablist" aria-label="Sections des réglages">${TABS.map(([id, label]) => `<button class="tab" role="tab" type="button" id="tab-${id}" aria-controls="panel-${id}" aria-selected="${id === tab}" tabindex="${id === tab ? 0 : -1}" data-tab="${id}">${label}</button>`).join('')}</div>`;
   const body = TABS.map(([id]) => `<section class="tab-panel" role="tabpanel" id="panel-${id}" aria-labelledby="tab-${id}" ${id === tab ? '' : 'hidden'} tabindex="0"></section>`).join('');
   const d = openDialog({
@@ -65,6 +77,19 @@ export function openSettings(app, { tab = 'connexion', provider = null } = {}) {
     if (e.key === 'Home') { e.preventDefault(); select(ids[0], true); }
     if (e.key === 'End') { e.preventDefault(); select(ids[ids.length - 1], true); }
   });
+
+  // Ouverture depuis une carte de l'accueil : on amène directement au champ à remplir.
+  let target = focus ? $(focus, d) : null;
+  if (!target && provider && tab === 'connexion') {
+    const p = providerById(provider);
+    target = $(p.custom ? '#base-url' : p.keyOptional ? '[data-test]' : '#api-key', d) || $('[data-unlock]', d);
+  }
+  if (target) {
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ block: 'center' });
+      target.focus({ preventScroll: true });
+    });
+  }
   return d;
 }
 
@@ -118,12 +143,12 @@ function drawBrowser(panel, app) {
       ${locked ? `<div class="notice warn">${icon('lock')}<div><p>Le coffre des clés est chiffré et verrouillé.</p><p><button class="btn btn-sm" type="button" data-unlock>${icon('lock')}Déverrouiller</button></p></div></div>` : `
       <div class="input-row">
         <div class="input-wrap">
-          <input type="password" id="api-key" class="mono" value="${esc(key)}" placeholder="${p.keyOptional ? 'Laisser vide si le serveur n’en demande pas' : 'Collez votre clé ici'}" autocomplete="off" spellcheck="false">
+          <input type="password" id="api-key" class="mono" value="${esc(key)}" placeholder="${p.keyOptional ? 'Facultative' : 'Collez votre clé'}" autocomplete="off" spellcheck="false">
           <button type="button" class="reveal" data-reveal aria-label="Afficher la clé" aria-pressed="false">${icon('eye')}</button>
         </div>
         ${p.keyUrl ? `<a class="btn" href="${esc(p.keyUrl)}" target="_blank" rel="noopener noreferrer">${p.local ? 'Télécharger' : 'Obtenir une clé'}${icon('external')}</a>` : ''}
       </div>
-      <p class="hint">${p.keyHint ? esc(p.keyHint) + ' ' : ''}La clé n'est envoyée qu'au fournisseur choisi.</p>`}
+      <p class="hint">${p.keyHint ? esc(p.keyHint) + ' ' : ''}${p.keyOptional ? 'Laissez vide si le serveur n’en demande pas. ' : ''}La clé n'est envoyée qu'au fournisseur choisi.</p>`}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
       <button class="btn btn-primary" type="button" data-test>${icon('refresh')}Tester et charger les modèles</button>
@@ -160,6 +185,7 @@ function drawBrowser(panel, app) {
     keyInput.addEventListener('change', async () => {
       try {
         await keystore.set(p.id, keyInput.value);
+        authState.ok();
         setStatus(keyInput.value.trim() ? 'Clé enregistrée.' : 'Clé effacée.', 'ok');
         app.refreshStatus();
       } catch (e) { setStatus(e.message, 'error'); }
@@ -264,6 +290,7 @@ function drawBrowser(panel, app) {
         if (keyInput && keyInput.value.trim() !== keystore.get(p.id)) await keystore.set(p.id, keyInput.value);
         await keystore.enableEncryption(a);
         toast('Clés chiffrées.', { kind: 'ok' });
+        setStatus('Clés chiffrées : la phrase secrète sera demandée à chaque ouverture.', 'ok');
         app.refreshStatus();
         drawBrowser(panel, app);
       } catch (e) { st.dataset.kind = 'error'; st.textContent = e.message; }
@@ -274,9 +301,12 @@ function drawBrowser(panel, app) {
   $('[data-forget]', panel).addEventListener('click', async () => {
     if (!await confirmDialog('Effacer toutes les clés API enregistrées dans ce navigateur ?', { confirm: 'Effacer', danger: true })) return;
     keystore.forgetAll();
+    authState.ok();
     toast('Clés effacées.');
     app.refreshStatus();
     drawBrowser(panel, app);
+    const st = $('[data-status]', panel);
+    if (st) { st.dataset.kind = 'ok'; st.innerHTML = `${icon('check')}<span>Toutes les clés de ce navigateur ont été effacées.</span>`; }
   });
 
   if (encrypted && locked) setStatus('Déverrouillez le coffre pour utiliser ou modifier la clé.', '');
@@ -304,7 +334,7 @@ function drawServer(panel, app, { autoload = false } = {}) {
   };
   const auth = $('[data-auth]', panel);
   if (s) {
-    auth.innerHTML = `<div class="row-item" style="margin-bottom:12px"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span><div class="grow"><b>Connecté</b><div class="hint">Session valable jusqu'à ${formatTime(s.expiresAt)}</div></div><button class="btn btn-sm" type="button" data-logout>${icon('logout')}Se déconnecter</button></div>`;
+    auth.innerHTML = `<div class="row-item session-row" style="margin-bottom:12px"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span><div class="grow"><b>Connecté</b><div class="hint">Session valable jusqu’à ${esc(formatExpiry(s.expiresAt))}</div></div><button class="btn btn-sm" type="button" data-logout>${icon('logout')}Se déconnecter</button></div>`;
     $('[data-logout]', auth).addEventListener('click', () => { session.clear(); app.refreshStatus(); drawServer(panel, app); });
   } else {
     auth.innerHTML = `<form class="field" data-login-form>
@@ -320,12 +350,13 @@ function drawServer(panel, app, { autoload = false } = {}) {
       try {
         await serverLogin(pass.value);
         settings.set('onboarded', true);
+        authState.ok();
         app.refreshStatus(true);
         drawServer(panel, app, { autoload: true });
       } catch (err) {
-        pass.setAttribute('aria-invalid', 'true');
+        if (err.kind === 'bad-password') pass.setAttribute('aria-invalid', 'true');
         const info = describeError(err);
-        setStatus(`${info.title}. ${info.text}`, 'error');
+        setStatus(`${info.title}. ${info.text}${info.detail && err.kind === 'config' ? ` ${info.detail}` : ''}`, 'error');
         btn.disabled = false;
       }
     });
@@ -515,12 +546,17 @@ function renderPreferences(root, app) {
     <h3 class="section-title">Génération</h3>
     <div class="field">
       <label for="pf-temp">Température <span class="hint" style="display:inline">— créativité des réponses</span></label>
-      <div class="range-row"><input type="range" id="pf-temp" min="0" max="2" step="0.1" value="${p.temperature}"><output for="pf-temp" data-temp>${Number(p.temperature).toFixed(1)}</output></div>
+      <div class="range-row"><input type="range" id="pf-temp" min="0" max="2" step="0.1" value="${p.temperature}" aria-valuetext="${dec(p.temperature)}"><output for="pf-temp" data-temp>${dec(p.temperature)}</output></div>
       <p class="hint">0 = précis et constant · 0,7 = équilibré · au-delà de 1,2 = très créatif, parfois incohérent.</p>
     </div>
     <div class="grid-2">
       <div class="field"><label for="pf-max">Longueur maximale de réponse (jetons)</label><input type="number" id="pf-max" min="16" max="200000" step="16" value="${esc(p.maxTokens)}" placeholder="Défaut du fournisseur"></div>
       <div class="field"><label for="pf-ctx">Contexte envoyé au maximum (jetons)</label><input type="number" id="pf-ctx" min="1000" max="1000000" step="1000" value="${esc(p.contextTokens)}"><p class="hint">Les plus anciens messages sont retirés au-delà.</p></div>
+    </div>
+    <div class="field">
+      <label for="pf-idle">Délai d’attente sans réponse (secondes)</label>
+      <input type="number" id="pf-idle" min="10" max="900" step="5" value="${esc(p.idleTimeout || 60)}" style="max-width:12rem">
+      <p class="hint">Au-delà, la requête est abandonnée avec un message clair. Les modèles locaux disposent d’au moins 3 minutes pour se charger.</p>
     </div>
 
     <h3 class="section-title">Saisie et mémoire</h3>
@@ -531,7 +567,7 @@ function renderPreferences(root, app) {
     ${speechSupported() ? `
     <div class="grid-2">
       <div class="field"><label for="pf-voice">Voix de lecture</label><select id="pf-voice"><option value="">Automatique (français)</option></select></div>
-      <div class="field"><label for="pf-rate">Vitesse</label><div class="range-row"><input type="range" id="pf-rate" min="0.6" max="1.6" step="0.1" value="${p.speechRate}"><output data-rate>${Number(p.speechRate).toFixed(1)}×</output></div></div>
+      <div class="field"><label for="pf-rate">Vitesse</label><div class="range-row"><input type="range" id="pf-rate" min="0.6" max="1.6" step="0.1" value="${p.speechRate}" aria-valuetext="${dec(p.speechRate)} fois"><output data-rate>${dec(p.speechRate)}×</output></div></div>
     </div>
     <button class="btn btn-sm" type="button" data-voice-test>${icon('volume')}Écouter un exemple</button>` : '<p class="hint">La lecture à voix haute n’est pas disponible dans ce navigateur.</p>'}`;
 
@@ -540,7 +576,8 @@ function renderPreferences(root, app) {
     app.applyPrefs();
   }));
   const temp = $('#pf-temp', root);
-  temp.addEventListener('input', () => { $('[data-temp]', root).textContent = Number(temp.value).toFixed(1); settings.set('prefs', { temperature: Number(temp.value) }); });
+  temp.addEventListener('input', () => { $('[data-temp]', root).textContent = dec(temp.value); temp.setAttribute('aria-valuetext', dec(temp.value)); settings.set('prefs', { temperature: Number(temp.value) }); });
+  $('#pf-idle', root).addEventListener('change', (e) => { const v = Math.min(900, Math.max(10, Math.round(Number(e.target.value) || 60))); e.target.value = v; settings.set('prefs', { idleTimeout: v }); });
   $('#pf-max', root).addEventListener('change', (e) => { const v = Number(e.target.value); settings.set('prefs', { maxTokens: v > 0 ? Math.round(v) : '' }); });
   $('#pf-ctx', root).addEventListener('change', (e) => { const v = Math.max(1000, Number(e.target.value) || 16000); e.target.value = v; settings.set('prefs', { contextTokens: v }); app.updateTokens(); });
   $$('[data-pref]', root).forEach((c) => c.addEventListener('change', () => { settings.set('prefs', { [c.dataset.pref]: c.checked }); app.refreshChrome(); }));
@@ -555,7 +592,7 @@ function renderPreferences(root, app) {
     speechSynthesis.addEventListener?.('voiceschanged', fill, { once: true });
     voiceSel.addEventListener('change', () => settings.set('prefs', { voiceURI: voiceSel.value }));
     const rate = $('#pf-rate', root);
-    rate.addEventListener('input', () => { $('[data-rate]', root).textContent = `${Number(rate.value).toFixed(1)}×`; settings.set('prefs', { speechRate: Number(rate.value) }); });
+    rate.addEventListener('input', () => { $('[data-rate]', root).textContent = `${dec(rate.value)}×`; rate.setAttribute('aria-valuetext', `${dec(rate.value)} fois`); settings.set('prefs', { speechRate: Number(rate.value) }); });
     $('[data-voice-test]', root).addEventListener('click', () => {
       const pr = settings.get().prefs;
       speak(`Bonjour ${settings.get().profile.name || ''}, je suis ${settings.get().assistant.name}. Voici ma voix.`, { voiceURI: pr.voiceURI, rate: pr.speechRate });
@@ -573,12 +610,13 @@ function renderData(root, app) {
       <button class="btn" type="button" data-export="json">${icon('download')}Tout exporter (JSON)</button>
       <button class="btn" type="button" data-export="md">${icon('download')}Tout exporter (Markdown)</button>
     </div>
-    <p class="hint" style="margin:-8px 0 18px">Le JSON contient conversations, mémoire, bibliothèque et réglages — jamais les clés API.</p>
+    <p class="hint" style="margin:-8px 0 18px">Le JSON contient conversations, mémoire, bibliothèque et réglages — jamais les clés API. Le Markdown est lisible partout et peut être réimporté.</p>
     <h3 class="section-title">Importer</h3>
     <div class="data-actions">
-      <button class="btn" type="button" data-import>${icon('upload')}Importer un fichier JSON</button>
-      <input type="file" accept="application/json,.json" data-import-file hidden>
+      <button class="btn" type="button" data-import>${icon('upload')}Importer (JSON ou Markdown)</button>
+      <input type="file" accept="application/json,.json,text/markdown,.md,.markdown" data-import-file hidden>
     </div>
+    <p class="status-line" role="status" data-import-status style="margin:-8px 0 18px"></p>
     <h3 class="section-title">Stockage</h3>
     <p class="hint" data-storage style="margin-bottom:18px">Calcul…</p>
     <div class="notice">${icon('info')}<div><p>Vos conversations restent dans ce navigateur (IndexedDB). Rien n'est envoyé ailleurs qu'au fournisseur d'IA choisi, au moment où vous envoyez un message.</p></div></div>
@@ -590,10 +628,20 @@ function renderData(root, app) {
   $$('[data-export]', root).forEach((b) => b.addEventListener('click', () => app.exportAll(b.dataset.export)));
   const file = $('[data-import-file]', root);
   $('[data-import]', root).addEventListener('click', () => file.click());
+  const importStatus = $('[data-import-status]', root);
   file.addEventListener('change', async () => {
     const f = file.files[0];
     file.value = '';
-    if (f) { await app.importFile(f); drawStorage(); }
+    if (!f) return;
+    importStatus.dataset.kind = '';
+    importStatus.innerHTML = `${icon('refresh')}<span>Import de ${esc(f.name)}…</span>`;
+    const r = await app.importFile(f);
+    if (r && r.restored) { openSettings(app, { tab: 'donnees' }); return; }
+    if (r) {
+      importStatus.dataset.kind = r.ok ? 'ok' : 'error';
+      importStatus.innerHTML = `${icon(r.ok ? 'check' : 'alert')}<span>${esc(r.message)}</span>`;
+    }
+    drawStorage();
   });
   $('[data-wipe]', root).addEventListener('click', async () => { if (await app.deleteAll()) drawStorage(); });
   $('[data-reset]', root).addEventListener('click', () => app.resetApp());

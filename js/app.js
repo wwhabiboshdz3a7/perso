@@ -5,17 +5,19 @@ import { db } from './db.js';
 import { settings } from './settings.js';
 import { keystore } from './keystore.js';
 import { providerById } from './providers.js';
-import { connection, streamChat, listModels, session } from './client.js';
+import { connection, streamChat, listModels, session, clientEvents, authState } from './client.js';
+import { bus } from './bus.js';
+import { mergeConversation } from './sync.js';
 import { buildSystemPrompt, PERSONAS, personaById } from './personas.js';
 import { memory, extractionMessages, parseFacts } from './memory.js';
 import { templates, applyTemplate } from './templates.js';
 import { processFiles, toApiContent } from './attachments.js';
 import { startDictation, stopDictation, dictationSupported, speak, stopSpeaking, speechSupported } from './voice.js';
-import { estimateMessages, conversationToMarkdown, buildExport, parseImport } from './exporter.js';
+import { estimateMessages, conversationToMarkdown, buildExport, parseImport, parseMarkdownImport, scrubForExport } from './exporter.js';
 import { onMathReady, splitThink } from './markdown.js';
 import { openDialog, confirmDialog, promptDialog, toast, toggleMenu, floatingMenu, closeMenus } from './ui/dialogs.js';
 import { openSettings } from './ui/settings-dialog.js';
-import { openMemory, openMemoryReview, openLibrary, openShortcuts, openUnlock } from './ui/panels.js';
+import { openMemory, openMemoryReview, openLibrary, openShortcuts, openUnlock, openImageViewer } from './ui/panels.js';
 import { userMessageEl, assistantMessageEl, fillAssistant, editBoxEl, welcomeEl, reasoningOpen } from './ui/thread.js';
 import { mountModelPicker } from './ui/model-picker.js';
 import { describeError } from './ui/errors.js';
@@ -138,6 +140,7 @@ function refreshStatus(fresh = false) {
     line1 = 'Serveur sécurisé';
     line2 = c.ready ? (c.model || 'Modèle par défaut du serveur') : 'Connexion requise';
     stateName = c.ready ? 'ok' : 'none';
+    if (c.ready && authState.failed(c)) { line2 = 'Clé du serveur refusée'; stateName = 'error'; }
   } else if (keystore.isLocked()) {
     line1 = c.provider.name; line2 = 'Coffre verrouillé'; stateName = 'locked';
   } else if (c.ready) {
@@ -145,12 +148,14 @@ function refreshStatus(fresh = false) {
   } else if (s.onboarded || c.provider) {
     line1 = c.provider.name; line2 = c.provider.keyOptional ? 'Adresse à vérifier' : 'Clé API manquante';
   }
+  if (c.mode === 'browser' && c.ready && !keystore.isLocked() && authState.failed(c)) { line2 = 'Clé refusée'; stateName = 'error'; }
   els.status.dataset.state = stateName;
   els.status.querySelector('.conn-provider').textContent = line1;
   els.status.querySelector('.conn-model').textContent = line2;
   els.status.setAttribute('aria-label', `Connexion : ${line1}, ${line2}. Ouvrir les réglages de connexion`);
   const model = c.model || (c.mode === 'server' && c.ready ? 'défaut serveur' : '');
   els.modelLabel.textContent = model ? model.split('/').pop() : 'Choisir un modèle';
+  els.modelChip.classList.toggle('is-empty', !model);
   els.modelChip.title = model ? `Modèle : ${model}` : 'Choisir un modèle';
   els.modelChip.setAttribute('aria-label', model ? `Modèle : ${model}. Changer de modèle` : 'Choisir un modèle');
 }
@@ -273,10 +278,40 @@ function markEnter(el, id) {
   return el;
 }
 
-function renderThread() {
+/* Le fil n'est jamais reconstruit en entier : chaque message garde son élément tant que ce qui
+   l'affiche ne change pas (clé de rendu), et seuls les PAGE derniers messages sont affichés. */
+const PAGE = 40;
+const view = { convId: null, from: 0 };
+const msgKeys = new WeakMap();
+
+function sameKey(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+function keyFor(m, conv, lastUser) {
+  if (m.role === 'user') return ['u', m.content, (m.attachments || []).length, m === lastUser, m.editedAt || 0];
+  const ctx = ctxFor(m, conv);
+  const e = m.error;
+  return ['a', m.status, m.content, m.reasoning || '', e ? `${e.kind}|${e.message}|${e.detail}|${e.retryAfter}` : '', m.finish || '', m.usage?.completion_tokens || 0, m.model || '',
+    m.versions?.length || 0, m.current ?? 0, ctx.isLast, ctx.speakingId === m.id, ctx.name, avatarSig(ctx.avatar), ctx.canSpeak];
+}
+function avatarSig(a) { return a ? `${a.type}:${String(a.value || '').length}:${String(a.value || '').slice(-24)}` : ''; }
+
+function firstShown(conv) {
+  const n = conv.messages.length;
+  if (n <= PAGE + 10) return 0;
+  let i = n - PAGE;
+  while (i > 0 && conv.messages[i].role !== 'user') i--;
+  return i;
+}
+
+function renderThread({ force = false } = {}) {
   const conv = state.current;
-  els.messages.innerHTML = '';
   if (!conv || !conv.messages.length) {
+    view.convId = null;
+    els.messages.innerHTML = '';
     const s = settings.get();
     els.messages.appendChild(welcomeEl({
       name: s.assistant.name,
@@ -288,20 +323,71 @@ function renderThread() {
     els.toBottom.hidden = true;
     return;
   }
-  const frag = document.createDocumentFragment();
+  if (view.convId !== conv.id) { view.from = firstShown(conv); force = true; }
+  if (force) els.messages.innerHTML = '';
+  view.convId = conv.id;
+  view.from = Math.min(view.from, conv.messages.length - 1);
+  els.messages.querySelector(':scope > .welcome')?.remove();
+
+  let older = els.messages.querySelector(':scope > .older');
+  if (view.from > 0) {
+    if (!older) {
+      older = html('<div class="older"><button class="btn btn-sm btn-ghost" type="button" data-older></button></div>');
+      els.messages.prepend(older);
+    }
+    const n = Math.min(PAGE, view.from);
+    older.firstElementChild.innerHTML = `${icon('chevron-down')}<span>Afficher ${n === view.from ? `les ${view.from} messages précédents` : `${n} messages précédents (${view.from} masqués)`}</span>`;
+  } else older?.remove();
+
+  const existing = new Map();
+  for (const el of els.messages.querySelectorAll(':scope > .msg')) existing.set(el.dataset.id, el);
   const lastUser = [...conv.messages].reverse().find((m) => m.role === 'user');
-  for (const m of conv.messages) {
-    if (m.role === 'user') frag.appendChild(markEnter(userMessageEl(m, { isLast: m === lastUser }), m.id));
-    else frag.appendChild(markEnter(assistantMessageEl(m, ctxFor(m, conv)), m.id));
+  let prev = view.from > 0 ? older : null;
+  for (let i = view.from; i < conv.messages.length; i++) {
+    const m = conv.messages[i];
+    const key = keyFor(m, conv, lastUser);
+    let el = existing.get(m.id);
+    if (el) existing.delete(m.id);
+    if (!el || !sameKey(msgKeys.get(el), key)) {
+      const fresh = markEnter(m.role === 'user' ? userMessageEl(m, { isLast: m === lastUser }) : assistantMessageEl(m, ctxFor(m, conv)), m.id);
+      msgKeys.set(fresh, key);
+      if (el) el.replaceWith(fresh);
+      el = fresh;
+    }
+    const want = prev ? prev.nextElementSibling : els.messages.firstElementChild;
+    if (want !== el) els.messages.insertBefore(el, want);
+    prev = el;
   }
-  els.messages.appendChild(frag);
+  existing.forEach((el) => el.remove());
+}
+
+function showOlder() {
+  const conv = state.current;
+  if (!conv || view.from <= 0) return;
+  const t = els.thread;
+  const fromBottom = t.scrollHeight - t.scrollTop;
+  const before = view.from;
+  view.from = Math.max(0, view.from - PAGE);
+  while (view.from > 0 && conv.messages[view.from].role !== 'user') view.from--;
+  renderThread();
+  t.scrollTop = t.scrollHeight - fromBottom;
+  // Le focus va au premier message nouvellement affiché.
+  const first = messageEl(conv.messages[view.from]?.id);
+  first?.setAttribute('tabindex', '-1');
+  first?.focus({ preventScroll: true });
+  announce(`${before - view.from} messages précédents affichés.`);
 }
 
 function messageEl(id) { return els.messages.querySelector(`[data-id="${CSS.escape(id)}"]`); }
 
 function updateMessage(msg) {
   const el = messageEl(msg.id);
-  if (el) fillAssistant(el, msg, ctxFor(msg, state.current));
+  if (!el) return;
+  fillAssistant(el, msg, ctxFor(msg, state.current));
+  if (msg.status !== 'streaming') {
+    const lastUser = [...state.current.messages].reverse().find((m) => m.role === 'user');
+    msgKeys.set(el, keyFor(msg, state.current, lastUser));
+  }
 }
 
 function nearBottom() {
@@ -326,11 +412,147 @@ function autoTitle(text, atts = []) {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-async function saveConversation(conv) {
-  // Une conversation supprimée entre-temps (génération interrompue) n'est pas recréée.
-  if (!state.conversations.includes(conv)) return;
-  try { await db.putConversation(conv); } catch (e) { toast('Enregistrement impossible : stockage plein ou indisponible.', { kind: 'error' }); }
+/* ---------- Enregistrement et synchronisation entre onglets ----------
+   Chaque conversation porte un numéro de révision. L'écriture relit la base dans la même
+   transaction : si un autre onglet a écrit entre-temps, les deux versions sont fusionnées ;
+   une conversation supprimée ailleurs n'est jamais recréée. */
+const metas = new WeakMap();
+function metaOf(conv) {
+  let m = metas.get(conv);
+  if (!m) { m = { persisted: false, rev: conv.rev || 0, baseIds: [], dirtyMsgs: new Set(), dirtyFields: new Set(), queue: Promise.resolve() }; metas.set(conv, m); }
+  return m;
 }
+function markSynced(conv, rec) {
+  const m = metaOf(conv);
+  m.persisted = true;
+  m.rev = rec.rev || 0;
+  m.baseIds = rec.messages.map((x) => x.id);
+}
+function touch(conv, { msg = null, field = null } = {}) {
+  const m = metaOf(conv);
+  if (msg) m.dirtyMsgs.add(msg.id);
+  if (field) m.dirtyFields.add(field);
+}
+function toRecord(conv) { return JSON.parse(JSON.stringify(conv)); }
+
+/** Remplace en place le contenu de `conv` par l'enregistrement `rec` (en gardant les messages modifiés ici). */
+function applyRecord(conv, rec, keep = new Set()) {
+  const local = new Map(conv.messages.map((m) => [m.id, m]));
+  const messages = rec.messages.map((m) => (keep.has(m.id) && local.has(m.id) ? local.get(m.id) : m));
+  Object.keys(conv).forEach((k) => { if (!(k in rec)) delete conv[k]; });
+  Object.assign(conv, rec, { messages });
+}
+
+function saveConversation(conv, { force = false } = {}) {
+  // Une conversation supprimée entre-temps (génération interrompue) n'est pas recréée.
+  if (!state.conversations.includes(conv)) return Promise.resolve();
+  const meta = metaOf(conv);
+  meta.queue = meta.queue.then(() => writeConversation(conv, meta, force)).catch(() => {});
+  return meta.queue;
+}
+
+async function writeConversation(conv, meta, force) {
+  if (!state.conversations.includes(conv)) return;
+  const dirtyMsgs = new Set(meta.dirtyMsgs);
+  if (state.gen && state.gen.convId === conv.id) dirtyMsgs.add(state.gen.msgId);
+  const dirtyFields = new Set(meta.dirtyFields);
+  let outcome;
+  try {
+    outcome = await db.updateConversation(conv.id, (stored) => {
+      if (!stored && meta.persisted && !force) return { gone: true };
+      let rec = toRecord(conv);
+      let merged = false;
+      if (stored && !force && (stored.rev || 0) !== meta.rev) {
+        rec = mergeConversation(stored, rec, { baseIds: meta.baseIds, dirtyMsgs, dirtyFields });
+        merged = true;
+      }
+      rec.rev = (stored ? stored.rev || 0 : 0) + 1;
+      return { put: rec, rec, merged };
+    });
+  } catch {
+    toast('Enregistrement impossible : stockage plein ou indisponible.', { kind: 'error' });
+    return;
+  }
+  if (!outcome) return;
+  if (outcome.gone) { removedElsewhere(conv.id); return; }
+  dirtyMsgs.forEach((id) => meta.dirtyMsgs.delete(id));
+  dirtyFields.forEach((f) => meta.dirtyFields.delete(f));
+  if (outcome.merged) {
+    const keep = new Set([...meta.dirtyMsgs, ...dirtyMsgs]);
+    if (state.gen && state.gen.convId === conv.id) keep.add(state.gen.msgId);
+    applyRecord(conv, outcome.rec, keep);
+    if (state.current === conv && !state.gen) renderThread();
+    renderSidebar();
+    renderHeader();
+  } else {
+    conv.rev = outcome.rec.rev;
+  }
+  markSynced(conv, outcome.rec);
+  bus.post({ type: 'conv', id: conv.id, rev: outcome.rec.rev });
+}
+
+/** La conversation n'existe plus en base (supprimée dans un autre onglet). */
+function removedElsewhere(id) {
+  const conv = state.conversations.find((c) => c.id === id);
+  if (!conv) return;
+  if (state.gen && state.gen.convId === id) state.gen.controller.abort();
+  state.conversations = state.conversations.filter((c) => c !== conv);
+  if (state.current === conv) {
+    newChat({ focus: false });
+    toast('Cette conversation a été supprimée dans un autre onglet.');
+  } else renderSidebar();
+}
+
+/** Une autre fenêtre a modifié une conversation : on recharge la version en base. */
+async function refreshFromDb(id, rev) {
+  const local = state.conversations.find((c) => c.id === id);
+  if (local) {
+    const meta = metaOf(local);
+    if (meta.rev >= rev) return;
+    if (state.gen && state.gen.convId === id) return; // fusion à la prochaine écriture
+    if (meta.dirtyMsgs.size || meta.dirtyFields.size) return; // écriture locale imminente : elle fusionnera
+  }
+  let rec;
+  try { rec = await db.getConversation(id); } catch { return; }
+  if (!rec) { removedElsewhere(id); return; }
+  const cur = state.conversations.find((c) => c.id === id);
+  if (cur) {
+    applyRecord(cur, rec);
+    markSynced(cur, rec);
+  } else {
+    state.conversations.push(rec);
+    markSynced(rec, rec);
+  }
+  sortConversations();
+  renderSidebar();
+  if (state.current && state.current.id === id) {
+    // Ne pas casser une modification de message en cours dans cet onglet.
+    if (!els.messages.querySelector('.edit-box')) renderThread();
+    renderHeader();
+    updateTokens();
+  }
+}
+
+bus.on(async (msg) => {
+  if (msg.type === 'conv' && msg.id) refreshFromDb(msg.id, msg.rev || 0);
+  else if (msg.type === 'delete' && msg.id) removedElsewhere(msg.id);
+  else if (msg.type === 'clear') {
+    if (state.gen) state.gen.controller.abort();
+    const had = !!state.current;
+    state.conversations = [];
+    if (had) { newChat({ focus: false }); toast('Les conversations ont été supprimées dans un autre onglet.'); } else renderSidebar();
+  } else if (msg.type === 'memory') {
+    try { await memory.load(); } catch { /* ignoré */ }
+  } else if (msg.type === 'templates') {
+    try { await templates.load(); } catch { /* ignoré */ }
+  }
+});
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'nour.settings') { settings.reload(); applyPrefs(); app.refreshChrome(); }
+  else if (e.key === 'nour.keys' || e.key === 'nour.keys.enc' || e.key === 'nour.session' || e.key === 'nour.authFail') refreshStatus();
+});
+clientEvents.addEventListener('status', () => refreshStatus());
 
 function sortConversations() { state.conversations.sort((a, b) => b.updatedAt - a.updatedAt); }
 
@@ -372,6 +594,7 @@ async function deleteConversation(id) {
   if (!await confirmDialog(`Supprimer « ${conv.title} » ? Cette action est définitive.`, { title: 'Supprimer la conversation', confirm: 'Supprimer', danger: true })) return;
   if (state.gen && state.gen.convId === id) stopGeneration();
   await db.deleteConversation(id);
+  bus.post({ type: 'delete', id });
   state.conversations = state.conversations.filter((c) => c.id !== id);
   if (state.current?.id === id) newChat({ focus: false });
   else renderSidebar();
@@ -384,6 +607,10 @@ async function renameConversation(id) {
   const name = await promptDialog({ title: 'Renommer', label: 'Titre de la conversation', value: conv.title, maxLength: 120 });
   if (!name) return;
   conv.title = name;
+  // Un titre choisi à la main n'est plus remplacé automatiquement.
+  conv.customTitle = true;
+  touch(conv, { field: 'title' });
+  touch(conv, { field: 'customTitle' });
   await saveConversation(conv);
   renderSidebar();
   renderHeader();
@@ -393,6 +620,7 @@ async function togglePin(id) {
   const conv = state.conversations.find((c) => c.id === id);
   if (!conv) return;
   conv.pinned = !conv.pinned;
+  touch(conv, { field: 'pinned' });
   await saveConversation(conv);
   renderSidebar();
   renderHeader();
@@ -457,7 +685,9 @@ async function send() {
     state.current = conv;
     history.replaceState(null, '', `#/c/${encodeURIComponent(conv.id)}`);
   }
-  conv.messages.push({ id: uid('msg_'), role: 'user', content: text, attachments: atts.length ? atts : undefined, createdAt: now });
+  const userMsg = { id: uid('msg_'), role: 'user', content: text, attachments: atts.length ? atts : undefined, createdAt: now };
+  conv.messages.push(userMsg);
+  touch(conv, { msg: userMsg });
   els.input.value = '';
   state.attachments = [];
   renderAttachments();
@@ -468,38 +698,67 @@ async function send() {
   await generate(conv, reply);
 }
 
+/* Rendu du flux : l'intervalle s'adapte au coût du dernier rendu (au plus ~20 % du temps). */
 let renderTimer = 0;
+let renderFrame = 0;
 let lastRender = 0;
+let renderCost = 0;
 function scheduleStreamRender(msg) {
-  if (renderTimer) return;
-  const wait = Math.max(0, 50 - (performance.now() - lastRender));
+  if (renderTimer || renderFrame) return;
+  const gap = Math.min(1000, Math.max(60, renderCost * 4));
+  const wait = Math.max(0, gap - (performance.now() - lastRender));
   renderTimer = setTimeout(() => {
     renderTimer = 0;
-    requestAnimationFrame(() => {
+    renderFrame = requestAnimationFrame(() => {
+      renderFrame = 0;
+      if (!(state.current && state.current.messages.includes(msg)) || msg.status !== 'streaming') return;
+      const t0 = performance.now();
+      updateMessage(msg);
+      scrollToBottom();
       lastRender = performance.now();
-      if (state.current && state.current.messages.includes(msg)) {
-        updateMessage(msg);
-        scrollToBottom();
-      }
+      renderCost = lastRender - t0;
+      // Coût réel, mise en page et peinture comprises : mesuré à l'image suivante.
+      requestAnimationFrame(() => { renderCost = Math.max(renderCost, performance.now() - t0 - 16); });
     });
   }, wait);
+}
+function cancelStreamRender() {
+  clearTimeout(renderTimer);
+  cancelAnimationFrame(renderFrame);
+  renderTimer = 0;
+  renderFrame = 0;
+  renderCost = 0;
 }
 
 function snapshot(msg) {
   return { content: msg.content, reasoning: msg.reasoning || '', model: msg.model || '', status: msg.status, createdAt: msg.createdAt, finish: msg.finish || null, usage: msg.usage || null, error: msg.error || null };
 }
 
-async function generate(conv, msg) {
+const CONTINUE_PROMPT = 'Continue ta réponse précédente exactement là où elle s’est arrêtée, sans rien répéter ni ajouter d’introduction.';
+const SAVE_EVERY = 5000;
+
+async function generate(conv, msg, { continueFrom = null } = {}) {
   const idx = conv.messages.indexOf(msg);
   const conn = connection();
   const model = conn.model;
   const prefs = settings.get().prefs;
-  const messages = apiMessagesFor(conv, idx);
-  Object.assign(msg, { content: '', reasoning: '', status: 'streaming', error: null, finish: null, usage: null, model: model || (conn.mode === 'server' ? 'serveur' : ''), createdAt: Date.now() });
+  let messages = apiMessagesFor(conv, idx);
+  const prefix = continueFrom ? continueFrom.content : '';
+  const prevReasoning = continueFrom ? continueFrom.reasoning || '' : '';
+  if (continueFrom) {
+    messages = [...messages, { role: 'assistant', content: splitThink(prefix).answer || prefix }, { role: 'user', content: CONTINUE_PROMPT }];
+  }
+  Object.assign(msg, {
+    content: prefix, reasoning: prevReasoning, status: 'streaming', error: null, finish: null, usage: null,
+    model: model || (conn.mode === 'server' ? 'serveur' : ''), createdAt: continueFrom ? msg.createdAt : Date.now(),
+  });
+  touch(conv, { msg });
   conv.model = model;
   conv.updatedAt = Date.now();
+  touch(conv, { field: 'model' });
+  touch(conv, { field: 'updatedAt' });
   const controller = new AbortController();
-  state.gen = { convId: conv.id, msgId: msg.id, controller };
+  state.gen = { convId: conv.id, msgId: msg.id, controller, startedAt: performance.now() };
   sortConversations();
   renderSidebar();
   renderHeader();
@@ -513,23 +772,24 @@ async function generate(conv, msg) {
     const out = await streamChat({
       messages, model, temperature: Number(prefs.temperature), maxTokens: prefs.maxTokens, signal: controller.signal,
       onDelta: (o) => {
-        msg.content = o.content;
-        msg.reasoning = o.reasoning;
+        msg.content = joinContinuation(prefix, o.content);
+        msg.reasoning = prevReasoning + o.reasoning;
         scheduleStreamRender(msg);
-        if (Date.now() - lastSave > 1500) { lastSave = Date.now(); saveConversation(conv); }
+        if (Date.now() - lastSave > SAVE_EVERY) { lastSave = Date.now(); saveConversation(conv); }
       },
     });
-    msg.content = out.content;
-    msg.reasoning = out.reasoning;
+    msg.content = joinContinuation(prefix, out.content);
+    msg.reasoning = prevReasoning + out.reasoning;
     msg.status = 'done';
-    msg.finish = out.finish;
+    // Flux fermé sans « [DONE] » ni finish_reason : la réponse est probablement coupée.
+    msg.finish = out.complete ? out.finish : 'incomplete';
     msg.usage = out.usage;
     if (out.model) msg.model = out.model;
-    if (!out.content && !out.reasoning) {
+    if (!msg.content && !msg.reasoning) {
       msg.status = 'error';
       msg.error = { kind: 'stream', message: 'Réponse vide', detail: 'Le modèle n’a renvoyé aucun texte.' };
     }
-    announce(msg.status === 'done' ? 'Réponse terminée.' : 'Réponse vide.');
+    announce(msg.status !== 'done' ? 'Réponse vide.' : msg.finish === 'incomplete' ? 'Réponse incomplète : le flux s’est arrêté avant la fin.' : 'Réponse terminée.');
   } catch (e) {
     if (e && e.name === 'AbortError') {
       msg.status = 'stopped';
@@ -540,11 +800,11 @@ async function generate(conv, msg) {
       announce(describeError(msg.error).title);
     }
   } finally {
-    clearTimeout(renderTimer);
-    renderTimer = 0;
+    cancelStreamRender();
     if (msg.versions) msg.versions[msg.current] = snapshot(msg);
     state.gen = null;
     conv.updatedAt = Date.now();
+    touch(conv, { msg });
     await saveConversation(conv);
     if (state.current === conv) {
       renderThread();
@@ -554,6 +814,25 @@ async function generate(conv, msg) {
     updateComposerState();
     updateTokens();
   }
+}
+
+/** Raccorde la suite d'une réponse coupée (espace ajoutée si nécessaire). */
+function joinContinuation(prefix, more) {
+  if (!prefix) return more;
+  if (!more) return prefix;
+  return /[\s([{«'"-]$/.test(prefix) || /^[\s.,;:!?)\]}»]/.test(more) ? prefix + more : `${prefix} ${more}`;
+}
+
+async function continueReply(msgId) {
+  if (state.gen) return;
+  const conv = state.current;
+  const msg = conv?.messages.find((m) => m.id === msgId);
+  if (!msg || msg.role !== 'assistant' || !msg.content) return;
+  if (conv.messages[conv.messages.length - 1] !== msg) return;
+  if (keystore.isLocked() && connection().mode === 'browser' && !await unlock()) return;
+  if (!isConfigured()) { openSettings(app, { tab: 'connexion' }); return; }
+  state.stick = true;
+  await generate(conv, msg, { continueFrom: { content: msg.content, reasoning: msg.reasoning } });
 }
 
 function stopGeneration() {
@@ -587,6 +866,7 @@ async function switchVersion(msgId, delta) {
   const next = Math.min(Math.max(0, (msg.current ?? 0) + delta), msg.versions.length - 1);
   msg.current = next;
   Object.assign(msg, msg.versions[next]);
+  touch(conv, { msg });
   updateMessage(msg);
   messageEl(msg.id)?.querySelector(`[data-act="${delta < 0 ? 'prev' : 'next'}"]:not([disabled])`)?.focus();
   await saveConversation(conv);
@@ -616,8 +896,9 @@ function startEdit(msgId) {
     const idx = conv.messages.indexOf(msg);
     msg.content = text;
     msg.editedAt = Date.now();
+    touch(conv, { msg });
     conv.messages = conv.messages.slice(0, idx + 1);
-    if (idx === 0) conv.title = autoTitle(text, msg.attachments || []);
+    if (idx === 0 && !conv.customTitle) { conv.title = autoTitle(text, msg.attachments || []); touch(conv, { field: 'title' }); }
     const reply = { id: uid('msg_'), role: 'assistant', content: '', reasoning: '', status: 'streaming', createdAt: Date.now() };
     conv.messages.push(reply);
     state.stick = true;
@@ -626,12 +907,18 @@ function startEdit(msgId) {
   box.addEventListener('click', (e) => {
     const b = e.target.closest('[data-edit]');
     if (!b) return;
-    if (b.dataset.edit === 'cancel') renderThread(); else commit();
+    if (b.dataset.edit === 'cancel') cancelEdit(el); else commit();
   });
   ta.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); renderThread(); }
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelEdit(el); }
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && (settings.get().prefs.enterToSend || e.ctrlKey || e.metaKey)) { e.preventDefault(); commit(); }
   });
+}
+
+function cancelEdit(el) {
+  msgKeys.delete(el);
+  renderThread();
+  messageEl(el.dataset.id)?.querySelector('[data-act="edit"]')?.focus();
 }
 
 function announce(text) {
@@ -664,9 +951,10 @@ els.messages.addEventListener('click', async (e) => {
     els.input.focus();
     return;
   }
+  if (e.target.closest('[data-older]')) { showOlder(); return; }
   const prov = e.target.closest('[data-setup-provider]');
   if (prov) { openSettings(app, { tab: 'connexion', provider: prov.dataset.setupProvider }); return; }
-  if (e.target.closest('[data-setup-server]')) { settings.set('connection', { mode: 'server' }); openSettings(app, { tab: 'connexion' }); return; }
+  if (e.target.closest('[data-setup-server]')) { settings.set('connection', { mode: 'server' }); openSettings(app, { tab: 'connexion', focus: '#srv-pass' }); return; }
 
   const btn = e.target.closest('[data-act]');
   if (!btn) return;
@@ -674,10 +962,20 @@ els.messages.addEventListener('click', async (e) => {
   const conv = state.current;
   const msg = conv?.messages.find((m) => m.id === art?.dataset.id);
   const act = btn.dataset.act;
-  if (act === 'settings') { openSettings(app, { tab: 'connexion' }); return; }
+  if (act === 'settings') {
+    const kind = msg?.error?.kind;
+    openSettings(app, { tab: 'connexion', focus: kind === 'session' ? '#srv-pass' : kind === 'auth' ? '#api-key' : null });
+    return;
+  }
   if (act === 'unlock') { await unlock(); return; }
   if (!msg) return;
+  if (act === 'view-image') {
+    const att = (msg.attachments || []).find((a) => a.id === btn.dataset.att);
+    if (att) openImageViewer(att, btn);
+    return;
+  }
   if (act === 'copy') { if (await copyText(msg.content)) flash(btn); }
+  else if (act === 'continue') continueReply(msg.id);
   else if (act === 'edit') startEdit(msg.id);
   else if (act === 'regenerate' || act === 'retry') regenerate(msg.id);
   else if (act === 'prev') switchVersion(msg.id, -1);
@@ -717,6 +1015,7 @@ function setPersona(id) {
   const p = personaById(id);
   if (state.current) {
     state.current.persona = p.id;
+    touch(state.current, { field: 'persona' });
     saveConversation(state.current);
   } else {
     state.draftPersona = p.id;
@@ -743,7 +1042,7 @@ function updateComposerState() {
   els.send.title = busy ? 'Arrêter (Échap)' : 'Envoyer';
   els.send.disabled = !busy && !has;
   const name = settings.get().assistant.name;
-  els.input.placeholder = mobileMQ.matches ? `Écrivez à ${name}…` : `Écrivez à ${name}… (/ pour les modèles de requêtes)`;
+  els.input.placeholder = mobileMQ.matches ? `Écrivez à ${name}…` : `Écrivez à ${name}… (/ pour les requêtes enregistrées)`;
 }
 
 const updateTokens = debounce(() => {
@@ -790,22 +1089,44 @@ els.input.addEventListener('keydown', (e) => {
 
 els.composer.addEventListener('submit', (e) => {
   e.preventDefault();
-  if (state.gen) stopGeneration(); else send();
+  if (state.gen) {
+    // Un double-clic sur « Envoyer » ne doit pas arrêter aussitôt la réponse.
+    if (performance.now() - state.gen.startedAt > 450) stopGeneration();
+    return;
+  }
+  send();
 });
 
 els.input.addEventListener('paste', async (e) => {
   const files = Array.from(e.clipboardData?.files || []);
   if (!files.length) return;
+  const text = e.clipboardData.getData('text/plain');
+  if (text && text.trim()) {
+    // Excel, Word, Sheets… copient le texte ET une image de la sélection : on colle le texte
+    // (comportement par défaut) et l'image reste disponible à la demande.
+    const images = files.filter((f) => /^image\//.test(f.type));
+    if (images.length) {
+      const copies = images.map((f) => new File([f], f.name || 'image.png', { type: f.type }));
+      toast('Texte collé. Le presse-papiers contenait aussi une image.', { timeout: 7000, action: { label: 'Joindre l’image', fn: () => addFiles(copies) } });
+    }
+    return;
+  }
   e.preventDefault();
   await addFiles(files);
 });
 
 /* Pièces jointes */
+const MAX_ATTACHMENTS = 10;
 async function addFiles(files) {
   const { items, errors } = await processFiles(files);
   errors.forEach((m) => toast(m, { kind: 'error', timeout: 6000 }));
   if (!items.length) return;
-  state.attachments = [...state.attachments, ...items].slice(0, 10);
+  const all = [...state.attachments, ...items];
+  if (all.length > MAX_ATTACHMENTS) {
+    const dropped = all.length - MAX_ATTACHMENTS;
+    toast(`${MAX_ATTACHMENTS} pièces jointes maximum par message : ${dropped} fichier${dropped > 1 ? 's' : ''} non ajouté${dropped > 1 ? 's' : ''}.`, { kind: 'error', timeout: 6000 });
+  }
+  state.attachments = all.slice(0, MAX_ATTACHMENTS);
   renderAttachments();
   updateComposerState();
   updateTokens();
@@ -904,9 +1225,9 @@ function updateSlash() {
 function renderSlash() {
   const { items, index } = state.slash;
   els.slash.hidden = false;
-  els.slash.innerHTML = `<div class="slash-head" aria-hidden="true"><span>Modèles de requêtes</span><span>↑↓ · Entrée</span></div>`
+  els.slash.innerHTML = `<div class="slash-head" aria-hidden="true"><span>Requêtes enregistrées</span><span>↑↓ · Entrée</span></div>`
     + (items.length ? items.map((t, i) => `<div class="slash-item" role="option" id="slash-opt-${i}" data-i="${i}" aria-selected="${i === index}"><code>/${esc(t.cmd)}</code><b>${esc(t.title)}</b><span>${esc(t.body.replace(/\s+/g, ' '))}</span></div>`).join('')
-      : '<div class="slash-empty">Aucun modèle. Créez-en dans la Bibliothèque.</div>');
+      : '<div class="slash-empty" role="option" aria-disabled="true" aria-selected="false">Aucune requête. Créez-en dans la Bibliothèque.</div>');
   if (items.length) els.input.setAttribute('aria-activedescendant', `slash-opt-${index}`);
   else els.input.removeAttribute('aria-activedescendant');
   els.slash.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
@@ -940,7 +1261,10 @@ els.slash.addEventListener('mousedown', (e) => {
 });
 
 function insertTemplate(t) {
-  const { text, selStart, selEnd } = applyTemplate(t);
+  // Le brouillon en cours (hors commande « /… ») est placé dans le premier champ du modèle.
+  const current = els.input.value;
+  const draft = /^\/[\w-]*$/.test(current.trim()) ? '' : current;
+  const { text, selStart, selEnd } = applyTemplate(t, draft);
   els.input.value = text;
   autoGrow();
   updateComposerState();
@@ -981,7 +1305,7 @@ function exportConversation(id, fmt) {
   if (fmt === 'md') {
     download(`${slugify(conv.title)}.md`, conversationToMarkdown(conv, s.assistant.name, s.profile.name || 'Vous'), 'text/markdown;charset=utf-8');
   } else {
-    download(`${slugify(conv.title)}.json`, JSON.stringify(buildExport({ conversations: [conv] }), null, 2), 'application/json');
+    download(`${slugify(conv.title)}.json`, JSON.stringify(scrubForExport(buildExport({ conversations: [conv] })), null, 2), 'application/json');
   }
   toast('Export prêt.', { kind: 'ok' });
 }
@@ -994,7 +1318,7 @@ function exportAll(fmt) {
     const body = state.conversations.map((c) => conversationToMarkdown(c, s.assistant.name, s.profile.name || 'Vous')).join('\n\n\n');
     download(`nour-conversations-${stamp}.md`, body, 'text/markdown;charset=utf-8');
   } else {
-    const data = buildExport({ conversations: state.conversations, memory: memory.all(), templates: templates.all(), settings: s });
+    const data = scrubForExport(buildExport({ conversations: state.conversations, memory: memory.all(), templates: templates.all(), settings: s }));
     download(`nour-sauvegarde-${stamp}.json`, JSON.stringify(data, null, 2), 'application/json');
   }
   toast('Export prêt.', { kind: 'ok' });
@@ -1002,14 +1326,21 @@ function exportAll(fmt) {
 
 async function importFile(file) {
   try {
+    if (file.size > 60 * 1024 * 1024) throw new Error('Fichier trop volumineux (60 Mo maximum).');
     const text = await file.text();
-    const { conversations, memory: mem, templates: tpl } = parseImport(text);
+    const isMd = /\.(md|markdown|txt)$/i.test(file.name || '') || (!/^\s*[[{]/.test(text) && /^\s*(<!--|#)/.test(text));
+    const s0 = settings.get();
+    const parsed = isMd
+      ? { conversations: parseMarkdownImport(text, { assistantName: s0.assistant.name, userName: s0.profile.name }), memory: null, templates: null, settings: null }
+      : parseImport(text);
+    const { conversations, memory: mem, templates: tpl } = parsed;
+    if (isMd && !conversations.length) throw new Error('Aucune conversation reconnue dans ce fichier Markdown.');
     let added = 0;
     let updated = 0;
     for (const c of conversations) {
       const existing = state.conversations.find((x) => x.id === c.id);
       if (existing) {
-        if (c.updatedAt > existing.updatedAt) { Object.assign(existing, c); await saveConversation(existing); updated++; }
+        if (c.updatedAt > existing.updatedAt) { applyRecord(existing, { ...c, rev: existing.rev }); await saveConversation(existing, { force: true }); updated++; }
       } else {
         state.conversations.push(c);
         await saveConversation(c);
@@ -1017,18 +1348,37 @@ async function importFile(file) {
       }
     }
     let memAdded = 0;
-    if (mem) for (const f of mem) { if (f && f.text && await memory.add(f.text, 'import')) memAdded++; }
+    if (mem) for (const f of mem) { if (f && typeof f.text === 'string' && await memory.add(f.text, 'import')) memAdded++; }
+    let tplAdded = 0;
     if (tpl && tpl.length) {
       for (const t of tpl) {
-        if (!templates.all().some((x) => x.cmd === t.cmd)) { try { await templates.upsert({ cmd: t.cmd, title: t.title, body: t.body }); } catch { /* commande invalide */ } }
+        if (!t || typeof t.cmd !== 'string' || typeof t.body !== 'string') continue;
+        if (!templates.all().some((x) => x.cmd === t.cmd)) { try { await templates.upsert({ cmd: t.cmd, title: t.title, body: t.body }); tplAdded++; } catch { /* commande invalide */ } }
       }
     }
     sortConversations();
     renderSidebar();
     renderHeader();
-    toast(`Import terminé : ${added} conversation${added > 1 ? 's' : ''} ajoutée${added > 1 ? 's' : ''}${updated ? `, ${updated} mise${updated > 1 ? 's' : ''} à jour` : ''}${memAdded ? `, ${memAdded} souvenir${memAdded > 1 ? 's' : ''}` : ''}.`, { kind: 'ok', timeout: 6000 });
+    const parts = [`${added} conversation${added > 1 ? 's' : ''} ajoutée${added > 1 ? 's' : ''}`];
+    if (updated) parts.push(`${updated} mise${updated > 1 ? 's' : ''} à jour`);
+    if (memAdded) parts.push(`${memAdded} souvenir${memAdded > 1 ? 's' : ''}`);
+    if (tplAdded) parts.push(`${tplAdded} requête${tplAdded > 1 ? 's' : ''} enregistrée${tplAdded > 1 ? 's' : ''}`);
+    const message = `Import terminé : ${parts.join(', ')}.`;
+    toast(message, { kind: 'ok', timeout: 6000 });
+    let restored = false;
+    if (parsed.settings && await confirmDialog('Ce fichier contient aussi des réglages : votre profil, l’assistant (nom, avatar, ton, invites) et les préférences d’affichage. Les restaurer ?', { title: 'Restaurer les réglages', confirm: 'Restaurer', detail: 'La connexion et les clés API ne sont pas modifiées.' })) {
+      const cur = settings.get();
+      settings.replace({ ...cur, profile: parsed.settings.profile || cur.profile, assistant: parsed.settings.assistant || cur.assistant, prefs: parsed.settings.prefs || cur.prefs });
+      applyPrefs();
+      app.refreshChrome();
+      restored = true;
+      toast('Réglages restaurés.', { kind: 'ok' });
+    }
+    return { ok: true, message, restored };
   } catch (e) {
-    toast(e.message || 'Import impossible.', { kind: 'error', timeout: 6000 });
+    const message = e.message || 'Import impossible.';
+    toast(message, { kind: 'error', timeout: 6000 });
+    return { ok: false, message };
   }
 }
 
@@ -1037,6 +1387,7 @@ async function deleteAll() {
   if (!await confirmDialog(`Supprimer définitivement les ${state.conversations.length} conversations ?`, { title: 'Tout supprimer', confirm: 'Tout supprimer', danger: true, detail: 'Pensez à exporter une sauvegarde avant.' })) return false;
   stopGeneration();
   await db.clearConversations();
+  bus.post({ type: 'clear' });
   state.conversations = [];
   newChat({ focus: false });
   toast('Toutes les conversations ont été supprimées.');
@@ -1202,9 +1553,16 @@ els.search.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { const first = els.list.querySelector('.conv-item a'); if (first) { e.preventDefault(); first.click(); } }
 });
 
-window.addEventListener('hashchange', () => {
+/** Identifiant de conversation contenu dans l'ancre (#/c/…), ou '' si l'ancre est invalide. */
+function hashConversationId() {
   const m = /^#\/c\/(.+)$/.exec(location.hash);
-  if (m) selectConversation(decodeURIComponent(m[1]));
+  if (!m) return '';
+  try { return decodeURIComponent(m[1]); } catch { return ''; }
+}
+
+window.addEventListener('hashchange', () => {
+  const id = hashConversationId();
+  if (id) selectConversation(id);
 });
 
 /* ---------- Raccourcis clavier ---------- */
@@ -1237,10 +1595,19 @@ document.addEventListener('keydown', (e) => {
 
 /* ---------- Réseau ---------- */
 function updateOnline() { els.offline.hidden = navigator.onLine !== false; }
-window.addEventListener('online', updateOnline);
+window.addEventListener('online', () => {
+  updateOnline();
+  // Dernière réponse en échec faute de réseau : proposer de la relancer.
+  const conv = state.current;
+  const last = conv?.messages[conv.messages.length - 1];
+  if (last && last.role === 'assistant' && last.status === 'error' && ['offline', 'network'].includes(last.error?.kind) && !state.gen) {
+    toast('Connexion rétablie.', { kind: 'ok', timeout: 8000, action: { label: 'Réessayer', fn: () => regenerate(last.id) } });
+  }
+});
 window.addEventListener('offline', updateOnline);
 
 /* ---------- Service worker ---------- */
+let updateOffered = false;
 function registerSW() {
   if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
   navigator.serviceWorker.register('sw.js').then((reg) => {
@@ -1248,7 +1615,8 @@ function registerSW() {
       const w = reg.installing;
       if (!w) return;
       w.addEventListener('statechange', () => {
-        if (w.state === 'installed' && navigator.serviceWorker.controller) {
+        if (w.state === 'installed' && navigator.serviceWorker.controller && !updateOffered) {
+          updateOffered = true;
           toast('Une nouvelle version de Nour est disponible.', {
             timeout: 0,
             action: { label: 'Mettre à jour', fn: () => { sessionStorage.setItem('nour.sw-update', '1'); w.postMessage('skip-waiting'); } },
@@ -1257,6 +1625,12 @@ function registerSW() {
       });
     });
   }).catch(() => { /* hors HTTPS ou navigation privée */ });
+  // Un fichier de l'interface a changé sur le serveur (revalidation en arrière-plan).
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data?.type !== 'update-available' || updateOffered) return;
+    updateOffered = true;
+    toast('Une nouvelle version de Nour est disponible.', { timeout: 0, action: { label: 'Recharger', fn: () => location.reload() } });
+  });
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (reloading || !sessionStorage.getItem('nour.sw-update')) return;
@@ -1264,6 +1638,13 @@ function registerSW() {
     reloading = true;
     location.reload();
   });
+}
+
+/* Hauteur de la zone de saisie : les notifications s'affichent juste au-dessus. */
+if ('ResizeObserver' in window) {
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--composer-h', `${Math.round(els.composer.getBoundingClientRect().height)}px`);
+  }).observe(els.composer);
 }
 
 /* ---------- Démarrage ---------- */
@@ -1283,6 +1664,7 @@ async function init() {
         }
       }
     }
+    for (const c of all) markSynced(c, c);
     state.conversations = all;
   } catch {
     toast('Le stockage local est indisponible : les conversations ne seront pas conservées.', { kind: 'error', timeout: 8000 });
@@ -1290,17 +1672,18 @@ async function init() {
   memory.on(() => renderHeader());
   refreshStatus();
   renderHeader();
-  const m = /^#\/c\/(.+)$/.exec(location.hash);
-  if (m && state.conversations.some((c) => c.id === decodeURIComponent(m[1]))) {
-    selectConversation(decodeURIComponent(m[1]));
+  const hashId = hashConversationId();
+  if (hashId && state.conversations.some((c) => c.id === hashId)) {
+    selectConversation(hashId);
   } else {
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     renderSidebar();
     renderThread();
   }
   updateComposerState();
   updateTokens();
   autoGrow();
-  onMathReady(() => { if (state.current) renderThread(); });
+  onMathReady(() => { if (state.current) renderThread({ force: true }); });
   if (!mobileMQ.matches) els.input.focus({ preventScroll: true });
   registerSW();
   if (keystore.isLocked() && settings.get().connection.mode === 'browser') setTimeout(() => unlock(), 200);

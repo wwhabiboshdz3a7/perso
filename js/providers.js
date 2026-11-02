@@ -50,12 +50,14 @@ export const PROVIDERS = [
 export const providerById = (id) => PROVIDERS.find((p) => p.id === id) || PROVIDERS[PROVIDERS.length - 1];
 
 /** Familles de modèles ouverts : servent à suggérer et filtrer, sans figer d'identifiants. */
+// L'ordre compte : la première famille reconnue l'emporte. DeepSeek passe avant Llama et Qwen
+// (« deepseek-r1-distill-llama-70b » est un modèle DeepSeek) ; « nemotron » n'est pas Mistral.
 export const FAMILIES = [
   { id: 'gpt-oss', label: 'gpt-oss', re: /gpt-oss/i, note: 'OpenAI, poids ouverts — raisonnement solide' },
+  { id: 'deepseek', label: 'DeepSeek', re: /deepseek/i, note: 'Raisonnement et code' },
   { id: 'llama', label: 'Llama', re: /llama/i, note: 'Meta — polyvalent' },
   { id: 'qwen', label: 'Qwen', re: /qwen|qwq/i, note: 'Alibaba — excellent en code et en français' },
-  { id: 'mistral', label: 'Mistral', re: /mistral|mixtral|ministral|magistral|devstral|codestral|pixtral|nemo/i, note: 'Mistral AI — natif en français' },
-  { id: 'deepseek', label: 'DeepSeek', re: /deepseek/i, note: 'Raisonnement et code' },
+  { id: 'mistral', label: 'Mistral', re: /mistral|mixtral|ministral|magistral|devstral|codestral|pixtral|\bnemo\b(?!tron)/i, note: 'Mistral AI — natif en français' },
   { id: 'gemma', label: 'Gemma', re: /gemma/i, note: 'Google — léger, bon en local' },
   { id: 'kimi', label: 'Kimi', re: /kimi|moonshot/i, note: 'Moonshot — long contexte' },
   { id: 'glm', label: 'GLM', re: /glm/i, note: 'Zhipu — agents et code' },

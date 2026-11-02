@@ -46,8 +46,12 @@ export function createSSEParser(onEvent) {
   };
 }
 
-/** Lit un ReadableStream d'octets SSE et appelle onJSON pour chaque événement « data: {...} ». */
-export async function readSSE(stream, onJSON, { signal } = {}) {
+/**
+ * Lit un ReadableStream d'octets SSE et appelle onJSON pour chaque événement « data: {...} ».
+ * onChunk est appelé à chaque morceau reçu (délai d'inactivité). Renvoie { done } : done vaut
+ * true si le marqueur de fin « [DONE] » a été reçu.
+ */
+export async function readSSE(stream, onJSON, { signal, onChunk } = {}) {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let done = false;
@@ -66,6 +70,7 @@ export async function readSSE(stream, onJSON, { signal } = {}) {
       if (signal && signal.aborted) break;
       const r = await reader.read();
       if (r.done) { finished = true; break; }
+      onChunk?.();
       parser.feed(decoder.decode(r.value, { stream: true }));
     }
     if (!done) {
@@ -76,4 +81,5 @@ export async function readSSE(stream, onJSON, { signal } = {}) {
     if (!finished) { try { await reader.cancel(); } catch { /* flux déjà fermé */ } }
     try { reader.releaseLock(); } catch { /* déjà libéré */ }
   }
+  return { done };
 }

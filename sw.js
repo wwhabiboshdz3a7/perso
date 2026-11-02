@@ -1,7 +1,17 @@
 // Service worker de Nour : met l'interface en cache pour un fonctionnement hors ligne.
 // Les appels aux API d'IA ne sont jamais mis en cache.
+//
+// Stratégies :
+//  - page d'accueil (/ ou /index.html), scripts, styles, manifeste : « stale-while-revalidate ».
+//    La version en cache est servie immédiatement (démarrage instantané, hors ligne), puis le
+//    réseau la met à jour en arrière-plan ; si un fichier a changé, l'interface propose de
+//    recharger. Un déploiement n'exige donc pas de modifier VERSION : HTML et JS d'une même
+//    visite proviennent toujours du même instantané du cache.
+//  - polices, bibliothèques (vendor), icônes : cache d'abord (fichiers stables).
+//  - seule une réponse HTML 200 de la page d'accueil remplace la copie hors ligne d'index.html.
+// VERSION ne sert qu'à renouveler entièrement le cache (liste SHELL modifiée, par exemple).
 
-const VERSION = 'nour-v1';
+const VERSION = 'nour-v2';
 const SHELL = [
   './',
   './index.html',
@@ -19,6 +29,7 @@ const SHELL = [
   './js/app.js',
   './js/attachments.js',
   './js/boot.js',
+  './js/bus.js',
   './js/client.js',
   './js/crypto.js',
   './js/db.js',
@@ -30,6 +41,7 @@ const SHELL = [
   './js/providers.js',
   './js/settings.js',
   './js/sse.js',
+  './js/sync.js',
   './js/templates.js',
   './js/ui/avatar.js',
   './js/ui/dialogs.js',
@@ -43,10 +55,25 @@ const SHELL = [
   './vendor/marked/marked.esm.js',
   './vendor/dompurify/purify.es.mjs',
   './vendor/highlight/highlight.min.js',
+  // Formules : KaTeX et ses polices principales, pour qu'elles s'affichent aussi hors ligne.
+  './vendor/katex/katex.min.js',
+  './vendor/katex/katex.min.css',
+  './vendor/katex/fonts/KaTeX_Main-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Main-Italic.woff2',
+  './vendor/katex/fonts/KaTeX_Main-Bold.woff2',
+  './vendor/katex/fonts/KaTeX_Math-Italic.woff2',
+  './vendor/katex/fonts/KaTeX_AMS-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size1-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size2-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size3-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size4-Regular.woff2',
 ];
 
+const SCOPE = new URL('./', self.registration.scope).pathname;
+const SHELL_PAGES = new Set([SCOPE, `${SCOPE}index.html`]);
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (event) => {
@@ -65,6 +92,46 @@ function timeout(ms) {
   return new Promise((_, reject) => setTimeout(() => reject(new Error('délai dépassé')), ms));
 }
 
+const isHtml = (res) => /^text\/html/i.test(res.headers.get('content-type') || '');
+
+/** Le contenu a-t-il changé ? (ETag si disponible, sinon comparaison du texte) */
+async function differs(oldRes, newRes) {
+  if (!oldRes) return false;
+  const tag = (r) => r.headers.get('etag') || '';
+  if (tag(oldRes) && tag(newRes)) return tag(oldRes) !== tag(newRes);
+  try { return (await oldRes.clone().text()) !== (await newRes.clone().text()); } catch { return false; }
+}
+
+let notified = false;
+async function notifyUpdate() {
+  if (notified) return;
+  notified = true;
+  const clients = await self.clients.matchAll({ type: 'window' });
+  clients.forEach((c) => c.postMessage({ type: 'update-available' }));
+}
+
+/** Sert la copie en cache tout de suite et la rafraîchit depuis le réseau. */
+function staleWhileRevalidate(event, cacheKey, { accept = (res) => res.ok && res.type === 'basic' } = {}) {
+  const req = event.request;
+  const network = (async () => {
+    // Une requête de navigation ne peut pas être recopiée avec des options : elle part telle quelle.
+    const res = await (req.mode === 'navigate' ? fetch(req) : fetch(req, { cache: 'no-cache' }));
+    if (res && accept(res)) {
+      const cache = await caches.open(VERSION);
+      const old = await cache.match(cacheKey, { ignoreSearch: true });
+      if (await differs(old, res)) notifyUpdate();
+      await cache.put(cacheKey, res.clone());
+    }
+    return res;
+  })();
+  event.waitUntil(network.catch(() => {}));
+  return (async () => {
+    const cached = await caches.match(cacheKey, { ignoreSearch: true });
+    if (cached) return cached;
+    try { return await network; } catch { return new Response('', { status: 504, statusText: 'Hors ligne' }); }
+  })();
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -72,25 +139,31 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // fournisseurs d'IA, etc.
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/.netlify/')) return;
 
-  // Pages : réseau d'abord (version fraîche), cache en secours.
   if (req.mode === 'navigate') {
+    // Page de l'application : copie hors ligne d'index.html, mise à jour en arrière-plan.
+    if (SHELL_PAGES.has(url.pathname)) {
+      event.respondWith(staleWhileRevalidate(event, `${SCOPE}index.html`, { accept: (res) => res.status === 200 && res.type === 'basic' && isHtml(res) }));
+      return;
+    }
+    // Autres pages (manifeste ouvert dans un onglet, 404…) : réseau seulement, jamais mises en cache.
     event.respondWith((async () => {
       try {
-        const res = await Promise.race([fetch(req), timeout(4000)]);
-        if (res && res.ok) {
-          const cache = await caches.open(VERSION);
-          cache.put('./index.html', res.clone());
-        }
-        return res;
+        return await Promise.race([fetch(req), timeout(6000)]);
       } catch {
-        const cached = await caches.match('./index.html');
-        return cached || new Response('<h1>Hors ligne</h1>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+        const cached = await caches.match(req, { ignoreSearch: true }) || await caches.match(`${SCOPE}index.html`);
+        return cached || new Response('<!doctype html><meta charset="utf-8"><title>Hors ligne</title><h1>Hors ligne</h1>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
       }
     })());
     return;
   }
 
-  // Ressources statiques : cache d'abord, puis réseau (et mise en cache de KaTeX, polices, etc.).
+  // Code de l'interface : instantané du cache, revalidé en arrière-plan.
+  if (/\.(m?js|css|webmanifest)$/.test(url.pathname) && !url.pathname.includes('/vendor/')) {
+    event.respondWith(staleWhileRevalidate(event, url.pathname));
+    return;
+  }
+
+  // Ressources stables (polices, bibliothèques, icônes) : cache d'abord, puis réseau.
   event.respondWith((async () => {
     const cached = await caches.match(req, { ignoreSearch: true });
     if (cached) return cached;

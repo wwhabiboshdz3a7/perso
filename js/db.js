@@ -59,6 +59,31 @@ export const db = {
     const data = JSON.parse(JSON.stringify(conv));
     return tx('conversations', 'readwrite', (s) => reqP(s.put(data)));
   },
+  /**
+   * Lecture puis écriture dans une seule transaction (atomique, y compris entre onglets) :
+   * fn(enregistrement actuel ou null) renvoie { put } pour écrire, ou autre chose pour ne rien faire.
+   */
+  updateConversation(id, fn) {
+    return open().then((db) => new Promise((resolve, reject) => {
+      const t = db.transaction('conversations', 'readwrite');
+      const store = t.objectStore('conversations');
+      let result;
+      const r = store.get(id);
+      r.onsuccess = () => {
+        try {
+          result = fn(r.result || null);
+          if (result && result.put) store.put(result.put);
+        } catch (e) {
+          result = undefined;
+          try { t.abort(); } catch { /* déjà terminée */ }
+          reject(e);
+        }
+      };
+      t.oncomplete = () => resolve(result);
+      t.onerror = () => reject(t.error);
+      t.onabort = () => reject(t.error || new Error('Transaction annulée'));
+    }));
+  },
   deleteConversation(id) {
     return tx('conversations', 'readwrite', (s) => reqP(s.delete(id)));
   },

@@ -28,6 +28,7 @@ if (!password || password.length < 10) {
   console.error('Choisissez un mot de passe d’au moins 10 caractères.');
   process.exit(1);
 }
-console.log('\nÀ copier dans Netlify → Site configuration → Environment variables :\n');
+console.log('\nÀ copier dans les variables d’environnement du projet Netlify (Project configuration → Environment variables) :\n');
 console.log(`ACCESS_PASSWORD_HASH=${hashPassword(password)}`);
 console.log(`TOKEN_SECRET=${randomBytes(32).toString('base64url')}`);
+console.log('\nChanger plus tard le mot de passe (ou TOKEN_SECRET) déconnecte tous les appareils.');

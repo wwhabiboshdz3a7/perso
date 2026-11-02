@@ -2,27 +2,71 @@
 
 import { settings } from './settings.js';
 import { keystore } from './keystore.js';
-import { providerById, normalizeModels } from './providers.js';
+import { PROVIDERS, providerById, normalizeModels } from './providers.js';
 import { readSSE } from './sse.js';
 
 export class ApiError extends Error {
   constructor(kind, message, extra = {}) {
-    super(message);
+    super(redact(message, extra.secrets));
     this.name = 'ApiError';
     this.kind = kind;
     this.status = extra.status || 0;
-    this.detail = extra.detail ? redact(extra.detail) : '';
+    this.detail = extra.detail ? redact(extra.detail, extra.secrets) : '';
     this.retryAfter = extra.retryAfter || 0;
   }
 }
 
-/** Masque tout ce qui ressemble à une clé dans un texte destiné à l'affichage. */
-export function redact(text) {
-  return String(text || '')
-    .replace(/\b(sk-or-v1|sk-or|sk-proj|sk|gsk|hf|csk|xai|pk|nvapi)[-_][A-Za-z0-9_-]{6,}/g, '$1-••••')
+/** Toutes les clés connues de ce navigateur (coffre ouvert), pour les masquer dans les textes. */
+export function knownSecrets() {
+  const out = [];
+  try {
+    for (const p of PROVIDERS) { const k = keystore.get(p.id); if (k) out.push(k); }
+    const s = session.get();
+    if (s) out.push(s.token);
+  } catch { /* coffre indisponible */ }
+  return out;
+}
+
+/**
+ * Masque tout ce qui ressemble à une clé dans un texte destiné à l'affichage ou à l'export :
+ * les valeurs exactes connues (`secrets`), puis les formats de clés usuels.
+ */
+export function redact(text, secrets = []) {
+  let s = String(text || '');
+  for (const k of secrets || []) {
+    const v = String(k || '').trim();
+    if (v.length >= 6) s = s.split(v).join('••••');
+  }
+  return s
+    .replace(/\b(sk-or-v1|sk-or|sk-proj|sk-ant|sk|gsk|hf|csk|xai|pk|nvapi|tgp_v1|fw)[-_][A-Za-z0-9_-]{6,}/g, '$1-••••')
     .replace(/Bearer\s+[A-Za-z0-9._~+/=-]{6,}/gi, 'Bearer ••••')
     .slice(0, 400);
 }
+
+/* ---------- Événements et état de la connexion ---------- */
+export const clientEvents = new EventTarget();
+
+// Dernier refus de clé, mémorisé par connexion : la pastille de statut passe à « Clé refusée »
+// jusqu'au prochain appel réussi.
+const AUTH_FAIL = 'nour.authFail';
+export function connectionSignature(conn = connection()) {
+  return conn.mode === 'server' ? 'server' : `${conn.provider.id}|${conn.base}`;
+}
+export const authState = {
+  failed(conn = connection()) {
+    try { return localStorage.getItem(AUTH_FAIL) === connectionSignature(conn); } catch { return false; }
+  },
+  fail(conn) {
+    try { localStorage.setItem(AUTH_FAIL, connectionSignature(conn)); } catch { /* ignoré */ }
+    clientEvents.dispatchEvent(new Event('status'));
+  },
+  ok(conn) {
+    let had = false;
+    try { had = localStorage.getItem(AUTH_FAIL) !== null; localStorage.removeItem(AUTH_FAIL); } catch { /* ignoré */ }
+    if (had) clientEvents.dispatchEvent(new Event('status'));
+    void conn;
+  },
+};
 
 const SESSION_KEY = 'nour.session';
 
@@ -49,6 +93,7 @@ export function connection() {
       model: c.serverModel || '',
       ready: !!s,
       headers: s ? { Authorization: `Bearer ${s.token}` } : {},
+      secrets: s ? [s.token] : [],
     };
   }
   const provider = providerById(c.provider);
@@ -66,6 +111,7 @@ export function connection() {
     hasKey: !!key,
     ready: !!base && (!!key || !!provider.keyOptional),
     headers,
+    secrets: key ? [key] : [],
   };
 }
 
@@ -111,13 +157,21 @@ async function errorFromResponse(res, conn) {
   }
   let kind = kindForStatus(res.status, conn.mode);
   // Le proxy distingue l'absence de session de l'erreur du fournisseur.
-  if (conn.mode === 'server' && (res.status === 401 || res.status === 403) && code !== 'session') kind = code === 'upstream_auth' ? 'auth' : 'session';
+  if (conn.mode === 'server' && (res.status === 401 || res.status === 403)) kind = code === 'upstream_auth' ? 'auth' : 'session';
   if (conn.mode === 'server' && res.status === 404 && code !== 'upstream') kind = 'no-server';
+  if (conn.mode === 'server' && code === 'config') kind = 'config';
   if (/context|too long|maximum.*tokens|reduce the length/i.test(message) && (res.status === 400 || res.status === 413)) kind = 'context';
+  if (kind === 'session') {
+    // Jeton refusé (expiré, secret ou mot de passe changés) : on l'oublie pour proposer la connexion.
+    session.clear();
+    clientEvents.dispatchEvent(new Event('status'));
+  }
+  if (kind === 'auth') authState.fail(conn);
   return new ApiError(kind, message || `Erreur ${res.status}`, {
     status: res.status,
     detail: message,
     retryAfter: parseRetryAfter(res.headers.get('retry-after'), message),
+    secrets: conn.secrets,
   });
 }
 
@@ -150,12 +204,24 @@ export async function listModels() {
   if (!res.ok) throw await errorFromResponse(res, conn);
   let json;
   try { json = await res.json(); } catch { throw new ApiError('bad-response', 'Réponse illisible'); }
+  authState.ok(conn);
   return normalizeModels(json);
+}
+
+/** Délai d'inactivité : sans aucun octet reçu pendant ce temps, la requête est abandonnée. */
+function idleTimeouts(conn) {
+  let sec = Number(settings.get().prefs.idleTimeout);
+  if (!Number.isFinite(sec) || sec <= 0) sec = 60;
+  const idle = Math.min(Math.max(sec, 5), 900) * 1000;
+  // Un modèle local peut mettre du temps à se charger en mémoire avant le premier mot.
+  const first = conn.mode === 'browser' && conn.provider.local ? Math.max(idle, 180000) : idle;
+  return { idle, first };
 }
 
 /**
  * Envoie une requête de complétion en streaming.
  * onDelta reçoit l'état cumulé { content, reasoning } à chaque morceau.
+ * Le résultat indique `complete` : faux si le flux s'est fermé sans « [DONE] » ni finish_reason.
  */
 export async function streamChat({ messages, model, temperature, maxTokens, signal, onDelta }) {
   const conn = connection();
@@ -166,53 +232,87 @@ export async function streamChat({ messages, model, temperature, maxTokens, sign
   const max = Number(maxTokens);
   if (max > 0) body.max_tokens = Math.round(max);
 
+  // Délai d'inactivité combiné à l'arrêt demandé par l'utilisateur.
+  const { idle, first } = idleTimeouts(conn);
+  const ctl = new AbortController();
+  let timedOut = 0;
+  let timer = 0;
+  const arm = (ms) => { clearTimeout(timer); timer = setTimeout(() => { timedOut = ms; ctl.abort(); }, ms); };
+  const onAbort = () => ctl.abort();
+  if (signal) { if (signal.aborted) ctl.abort(); else signal.addEventListener('abort', onAbort, { once: true }); }
+  const timeoutError = () => new ApiError('timeout', 'Délai dépassé', { detail: `Aucune donnée reçue pendant ${Math.round(timedOut / 1000)} s.` });
+
   const url = conn.mode === 'server' ? 'api/chat' : `${conn.base}/chat/completions`;
-  const res = await doFetch(url, {
-    method: 'POST',
-    headers: { ...conn.headers, 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-    body: JSON.stringify(body),
-    signal,
-  }, conn);
-  if (!res.ok) throw await errorFromResponse(res, conn);
-
-  const out = { content: '', reasoning: '', finish: null, usage: null, model: null };
-  const type = res.headers.get('content-type') || '';
-  if (!type.includes('event-stream')) {
-    let j;
-    try { j = await res.json(); } catch { throw new ApiError('bad-response', 'Réponse illisible'); }
-    if (j.error) throw new ApiError('stream', j.error.message || 'Erreur du fournisseur', { detail: j.error.message });
-    const msg = (j.choices && j.choices[0] && (j.choices[0].message || j.choices[0].delta)) || {};
-    out.content = msg.content || '';
-    out.reasoning = msg.reasoning_content || msg.reasoning || '';
-    out.usage = j.usage || null;
-    out.model = j.model || null;
-    out.finish = j.choices?.[0]?.finish_reason || 'stop';
-    onDelta?.(out);
-    return out;
-  }
-
-  await readSSE(res.body, (json) => {
-    if (json.error) {
-      const e = json.error;
-      const status = Number(e.code) || Number(e.status) || 0;
-      const kind = status ? kindForStatus(status, 'browser') : 'stream';
-      throw new ApiError(kind, e.message || 'Erreur du fournisseur', { status, detail: e.message || '', retryAfter: parseRetryAfter('', e.message) });
+  const out = { content: '', reasoning: '', finish: null, usage: null, model: null, complete: false };
+  arm(first);
+  try {
+    let res;
+    try {
+      res = await doFetch(url, {
+        method: 'POST',
+        headers: { ...conn.headers, 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+        body: JSON.stringify(body),
+        signal: ctl.signal,
+      }, conn);
+    } catch (e) {
+      if (timedOut) throw timeoutError();
+      throw e;
     }
-    if (json.model) out.model = json.model;
-    if (json.usage) out.usage = json.usage;
-    const ch = json.choices && json.choices[0];
-    if (!ch) return;
-    const d = ch.delta || ch.message || {};
-    let changed = false;
-    if (typeof d.content === 'string' && d.content) { out.content += d.content; changed = true; }
-    const r = d.reasoning_content ?? d.reasoning;
-    if (typeof r === 'string' && r) { out.reasoning += r; changed = true; }
-    if (ch.finish_reason) out.finish = ch.finish_reason;
-    if (changed) onDelta?.(out);
-  }, { signal });
+    if (!res.ok) throw await errorFromResponse(res, conn);
+    arm(idle);
 
-  if (signal && signal.aborted) throw new DOMException('Génération interrompue', 'AbortError');
-  return out;
+    const type = res.headers.get('content-type') || '';
+    if (!type.includes('event-stream')) {
+      let j;
+      try { j = await res.json(); } catch { if (timedOut) throw timeoutError(); throw new ApiError('bad-response', 'Réponse illisible'); }
+      if (j.error) throw new ApiError('stream', j.error.message || 'Erreur du fournisseur', { detail: j.error.message, secrets: conn.secrets });
+      const msg = (j.choices && j.choices[0] && (j.choices[0].message || j.choices[0].delta)) || {};
+      out.content = msg.content || '';
+      out.reasoning = msg.reasoning_content || msg.reasoning || '';
+      out.usage = j.usage || null;
+      out.model = j.model || null;
+      out.finish = j.choices?.[0]?.finish_reason || 'stop';
+      out.complete = true;
+      authState.ok(conn);
+      onDelta?.(out);
+      return out;
+    }
+
+    let sse;
+    try {
+      sse = await readSSE(res.body, (json) => {
+        if (json.error) {
+          const e = json.error;
+          const status = Number(e.code) || Number(e.status) || 0;
+          const kind = status ? kindForStatus(status, 'browser') : 'stream';
+          throw new ApiError(kind, e.message || 'Erreur du fournisseur', { status, detail: e.message || '', retryAfter: parseRetryAfter('', e.message), secrets: conn.secrets });
+        }
+        if (json.model) out.model = json.model;
+        if (json.usage) out.usage = json.usage;
+        const ch = json.choices && json.choices[0];
+        if (!ch) return;
+        const d = ch.delta || ch.message || {};
+        let changed = false;
+        if (typeof d.content === 'string' && d.content) { out.content += d.content; changed = true; }
+        const r = d.reasoning_content ?? d.reasoning;
+        if (typeof r === 'string' && r) { out.reasoning += r; changed = true; }
+        if (ch.finish_reason) out.finish = ch.finish_reason;
+        if (changed) onDelta?.(out);
+      }, { signal: ctl.signal, onChunk: () => arm(idle) });
+    } catch (e) {
+      if (timedOut) throw timeoutError();
+      throw e;
+    }
+    if (timedOut) throw timeoutError();
+    if (signal && signal.aborted) throw new DOMException('Génération interrompue', 'AbortError');
+    out.complete = !!(sse && sse.done) || !!out.finish;
+    if (!out.finish && out.complete) out.finish = 'stop';
+    authState.ok(conn);
+    return out;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', onAbort);
+  }
 }
 
 /** Connexion au proxy serveur (mot de passe → jeton signé). */
@@ -229,9 +329,17 @@ export async function serverLogin(password) {
   }
   if (res.status === 404) throw new ApiError('no-server', 'Fonction absente');
   if (res.status === 401) throw new ApiError('bad-password', 'Mot de passe incorrect');
-  if (res.status === 429) throw new ApiError('quota', 'Trop de tentatives', { retryAfter: parseRetryAfter(res.headers.get('retry-after'), '') });
-  if (!res.ok) throw new ApiError('server', `Erreur ${res.status}`, { status: res.status });
-  const j = await res.json();
+  if (res.status === 429) throw new ApiError('login-limit', 'Trop de tentatives', { status: 429, retryAfter: parseRetryAfter(res.headers.get('retry-after'), '') });
+  if (!res.ok) {
+    let err = {};
+    try { err = (await res.json()).error || {}; } catch { /* corps illisible */ }
+    if (err.code === 'config') throw new ApiError('config', 'Fonction non configurée', { status: res.status, detail: err.message || '' });
+    throw new ApiError('server', `Erreur ${res.status}`, { status: res.status, detail: err.message || '' });
+  }
+  let j;
+  try { j = await res.json(); } catch { throw new ApiError('bad-response', 'Réponse illisible'); }
+  if (!j || !j.token) throw new ApiError('bad-response', 'Réponse illisible');
   session.set(j.token, j.expiresAt);
+  clientEvents.dispatchEvent(new Event('status'));
   return j;
 }

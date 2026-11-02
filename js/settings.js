@@ -37,6 +37,7 @@ export const DEFAULTS = {
     voiceURI: '',
     speechRate: 1,
     useMemory: true,
+    idleTimeout: 60,
   },
 };
 
@@ -72,6 +73,11 @@ export const settings = {
     state = { ...state, [section]: typeof patch === 'object' && !Array.isArray(patch) && patch !== null ? { ...state[section], ...patch } : patch };
     this.save();
     listeners.forEach((fn) => fn(state, section));
+  },
+  /** Relit le stockage (réglages modifiés dans un autre onglet). */
+  reload() {
+    state = load();
+    listeners.forEach((fn) => fn(state, '*'));
   },
   replace(next) {
     state = merge(DEFAULTS, next);

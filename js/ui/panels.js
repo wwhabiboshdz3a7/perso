@@ -1,11 +1,18 @@
 // Panneaux secondaires : mémoire, souvenirs proposés, bibliothèque, raccourcis, déverrouillage.
 
-import { esc, icon, $, $$, modKey } from '../util.js';
+import { esc, icon, html, $, $$, modKey, download, formatBytes } from '../util.js';
 import { memory } from '../memory.js';
 import { templates, cleanCmd } from '../templates.js';
 import { settings } from '../settings.js';
 import { keystore } from '../keystore.js';
 import { openDialog, toast, confirmDialog } from './dialogs.js';
+
+/* Champs de texte à hauteur automatique (souvenirs sur plusieurs lignes, lisibles sur mobile). */
+function fit(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = `${ta.scrollHeight + 2}px`;
+}
+function fitAll(root) { requestAnimationFrame(() => root.querySelectorAll('textarea').forEach(fit)); }
 
 /* ---------- Mémoire ---------- */
 export function openMemory(app) {
@@ -13,10 +20,10 @@ export function openMemory(app) {
     id: 'dlg-memory', title: 'Mémoire',
     sub: `Ce que ${esc(settings.get().assistant.name)} retient de vous. Ces faits sont ajoutés discrètement à chaque conversation, et vous gardez la main sur chacun.`,
     body: `
-      <label class="switch" style="padding-top:0"><span class="label"><b>Utiliser la mémoire</b><small>Désactivez-la pour une conversation « vierge ».</small></span><input type="checkbox" role="switch" data-use ${settings.get().prefs.useMemory ? 'checked' : ''}></label>
+      <label class="switch" style="padding-top:0"><span class="label"><b>Utiliser la mémoire</b><small>Désactivée, elle n’est plus ajoutée à aucune conversation (vos souvenirs restent enregistrés).</small></span><input type="checkbox" role="switch" data-use ${settings.get().prefs.useMemory ? 'checked' : ''}></label>
       <form class="field" data-add style="margin-top:16px">
         <label for="mem-new">Ajouter un souvenir</label>
-        <div class="input-row"><input type="text" id="mem-new" maxlength="280" placeholder="ex. Préfère des réponses avec un exemple concret." autocomplete="off"><button class="btn" type="submit">${icon('plus')}Ajouter</button></div>
+        <div class="input-row"><input type="text" id="mem-new" maxlength="280" placeholder="ex. Préfère des réponses avec un exemple concret." autocomplete="off" dir="auto"><button class="btn" type="submit">${icon('plus')}Ajouter</button></div>
       </form>
       <div class="list-rows" data-list></div>`,
     foot: `<button class="btn foot-wide" type="button" data-suggest ${app.currentConversation()?.messages?.length ? '' : 'disabled'}>${icon('sparkle')}Proposer des souvenirs depuis cette conversation</button><span class="spacer"></span><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
@@ -29,13 +36,19 @@ export function openMemory(app) {
       list.innerHTML = `<div class="empty-note">Aucun souvenir pour l’instant. Ajoutez-en un, ou laissez ${esc(settings.get().assistant.name)} vous en proposer à partir d’une conversation.</div>`;
       return;
     }
-    list.innerHTML = facts.map((f) => `<div class="row-item ${f.enabled === false ? 'off' : ''}" data-id="${esc(f.id)}">
-      <input type="checkbox" data-toggle ${f.enabled === false ? '' : 'checked'} aria-label="Utiliser ce souvenir" style="accent-color:var(--accent);width:16px;height:16px">
-      <div class="grow"><input type="text" value="${esc(f.text)}" maxlength="280" data-text aria-label="Texte du souvenir"></div>
-      <button class="icon-btn" type="button" data-del aria-label="Supprimer ce souvenir">${icon('trash')}</button>
+    list.innerHTML = facts.map((f, i) => `<div class="row-item mem-row ${f.enabled === false ? 'off' : ''}" data-id="${esc(f.id)}">
+      <input type="checkbox" data-toggle ${f.enabled === false ? '' : 'checked'} aria-label="Utiliser le souvenir ${i + 1}" class="mem-check">
+      <div class="grow"><textarea rows="1" maxlength="280" data-text dir="auto" aria-label="Texte du souvenir ${i + 1}">${esc(f.text)}</textarea></div>
+      <button class="icon-btn" type="button" data-del aria-label="Supprimer le souvenir ${i + 1}">${icon('trash')}</button>
     </div>`).join('');
+    fitAll(list);
   };
   draw();
+  list.addEventListener('input', (e) => { if (e.target.matches('textarea')) fit(e.target); });
+  list.addEventListener('keydown', (e) => {
+    // Entrée valide le texte (un souvenir tient sur une phrase).
+    if (e.key === 'Enter' && e.target.matches('textarea[data-text]') && !e.shiftKey) { e.preventDefault(); e.target.blur(); }
+  });
   list.addEventListener('change', async (e) => {
     const row = e.target.closest('.row-item');
     if (!row) return;
@@ -52,12 +65,14 @@ export function openMemory(app) {
     draw();
     $('#mem-new', d).focus();
   });
+  const addStatus = html('<p class="status-line" role="status" data-add-status></p>');
+  $('[data-add]', d).appendChild(addStatus);
   $('[data-add]', d).addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = $('#mem-new', d);
     const f = await memory.add(input.value);
-    if (!f && input.value.trim()) toast('Ce souvenir existe déjà.');
-    input.value = '';
+    addStatus.textContent = !f && input.value.trim() ? 'Ce souvenir existe déjà.' : '';
+    if (f) input.value = '';
     draw();
   });
   $('[data-use]', d).addEventListener('change', (e) => { settings.set('prefs', { useMemory: e.target.checked }); });
@@ -81,28 +96,35 @@ export function openMemoryReview(app, { loading = true } = {}) {
         box.innerHTML = '<div class="empty-note">Rien de nouveau à retenir dans cette conversation.</div>';
         return;
       }
-      box.innerHTML = `<div class="list-rows">${facts.map((f, i) => `<div class="row-item" data-i="${i}">
-        <div class="grow"><input type="text" value="${esc(f)}" maxlength="280" aria-label="Souvenir proposé ${i + 1}"></div>
-        <button class="btn btn-sm" type="button" data-keep>${icon('check')}Garder</button>
-        <button class="btn btn-sm btn-ghost" type="button" data-skip aria-label="Ignorer ce souvenir">${icon('x')}Ignorer</button>
+      box.innerHTML = `<div class="list-rows">${facts.map((f, i) => `<div class="row-item review-row" data-i="${i}">
+        <div class="grow"><textarea rows="1" maxlength="280" dir="auto" aria-label="Souvenir proposé ${i + 1}">${esc(f)}</textarea></div>
+        <div class="row-acts">
+          <button class="btn btn-sm" type="button" data-keep aria-label="Garder le souvenir ${i + 1}">${icon('check')}Garder</button>
+          <button class="btn btn-sm btn-ghost" type="button" data-skip aria-label="Ignorer le souvenir ${i + 1}">${icon('x')}Ignorer</button>
+        </div>
       </div>`).join('')}</div>`;
+      fitAll(box);
+      box.addEventListener('input', (e) => { if (e.target.matches('textarea')) fit(e.target); });
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && e.target.matches('textarea')) { e.preventDefault(); e.target.closest('.row-item')?.querySelector('[data-keep]')?.click(); }
+      });
       box.addEventListener('click', async (e) => {
         const row = e.target.closest('.row-item');
         if (!row || row.dataset.done) return;
+        const field = row.querySelector('textarea');
+        const acts = row.querySelector('.row-acts');
         if (e.target.closest('[data-keep]')) {
-          const text = row.querySelector('input').value;
+          const text = field.value;
           row.dataset.done = '1';
           row.classList.add('accepted');
-          row.querySelector('input').readOnly = true;
-          row.querySelectorAll('button').forEach((b) => b.remove());
-          row.insertAdjacentHTML('beforeend', `<span class="tag-done">${icon('check')}Gardé</span>`);
+          field.readOnly = true;
+          acts.innerHTML = `<span class="tag-done">${icon('check')}Gardé</span>`;
           memory.add(text, 'proposé');
         } else if (e.target.closest('[data-skip]')) {
           row.dataset.done = '1';
           row.classList.add('rejected');
-          row.querySelector('input').readOnly = true;
-          row.querySelectorAll('button').forEach((b) => b.remove());
-          row.insertAdjacentHTML('beforeend', '<span class="hint">Ignoré</span>');
+          field.readOnly = true;
+          acts.innerHTML = '<span class="hint">Ignoré</span>';
         }
         const next = box.querySelector('.row-item:not([data-done]) [data-keep]');
         if (next) next.focus(); else d.querySelector('.modal-foot [data-close]').focus();
@@ -119,9 +141,9 @@ export function openMemoryReview(app, { loading = true } = {}) {
 export function openLibrary(app) {
   const d = openDialog({
     id: 'dlg-library', title: 'Bibliothèque',
-    sub: 'Vos modèles de requêtes. Tapez <kbd>/</kbd> au début d’un message pour les utiliser.',
+    sub: 'Vos requêtes enregistrées. Tapez <kbd>/</kbd> au début d’un message pour les utiliser ; un texte déjà saisi est placé dans le premier champ.',
     body: '<div data-form></div><div class="list-rows" data-list></div>',
-    foot: `<button class="btn btn-ghost foot-wide" type="button" data-reset>${icon('refresh')}Rétablir les modèles d’origine</button><span class="spacer"></span><button class="btn" type="button" data-new>${icon('plus')}Nouveau modèle</button><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
+    foot: `<button class="btn btn-ghost foot-wide" type="button" data-reset>${icon('refresh')}Rétablir les requêtes d’origine</button><span class="spacer"></span><button class="btn" type="button" data-new>${icon('plus')}Nouvelle requête</button><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
   });
   const list = $('[data-list]', d);
   const formBox = $('[data-form]', d);
@@ -130,7 +152,7 @@ export function openLibrary(app) {
     list.innerHTML = all.length ? all.map((t) => `<div class="tpl-item" data-id="${esc(t.id)}">
       <div><code>/${esc(t.cmd)}</code><b>${esc(t.title)}</b></div>
       <div class="acts">
-        <button class="btn btn-sm" type="button" data-use>Utiliser</button>
+        <button class="btn btn-sm" type="button" data-use aria-label="Utiliser /${esc(t.cmd)}">Utiliser</button>
         <button class="icon-btn" type="button" data-edit aria-label="Modifier /${esc(t.cmd)}">${icon('edit')}</button>
         <button class="icon-btn" type="button" data-del aria-label="Supprimer /${esc(t.cmd)}">${icon('trash')}</button>
       </div>
@@ -143,7 +165,7 @@ export function openLibrary(app) {
         <div class="field"><label for="tpl-cmd">Commande</label><input type="text" id="tpl-cmd" required maxlength="24" value="${esc(t ? t.cmd : '')}" placeholder="ex. resume-reunion" autocomplete="off" spellcheck="false"></div>
         <div class="field"><label for="tpl-title">Titre</label><input type="text" id="tpl-title" maxlength="60" value="${esc(t ? t.title : '')}" placeholder="ex. Compte rendu de réunion" autocomplete="off"></div>
       </div>
-      <div class="field"><label for="tpl-body">Texte du modèle</label><textarea id="tpl-body" rows="5" required>${esc(t ? t.body : '')}</textarea><p class="hint">Écrivez <code>{{champ}}</code> là où le curseur doit se placer pour compléter.</p></div>
+      <div class="field"><label for="tpl-body">Texte de la requête</label><textarea id="tpl-body" rows="5" required>${esc(t ? t.body : '')}</textarea><p class="hint">Écrivez <code>{{champ}}</code> là où le curseur doit se placer pour compléter.</p></div>
       <p class="status-line" data-kind="error" data-err></p>
       <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" type="button" data-cancel>Annuler</button><button class="btn btn-primary" type="submit">Enregistrer</button></div>
     </form>`;
@@ -156,7 +178,7 @@ export function openLibrary(app) {
         await templates.upsert({ id: t ? t.id : null, cmd: cleanCmd($('#tpl-cmd', f).value), title: $('#tpl-title', f).value, body: $('#tpl-body', f).value });
         formBox.innerHTML = '';
         draw();
-        toast('Modèle enregistré.', { kind: 'ok' });
+        toast('Requête enregistrée.', { kind: 'ok' });
       } catch (err) { $('[data-err]', f).textContent = err.message; }
     });
   };
@@ -169,14 +191,14 @@ export function openLibrary(app) {
     if (e.target.closest('[data-use]')) { d.close(); app.insertTemplate(t); }
     if (e.target.closest('[data-edit]')) showForm(t);
     if (e.target.closest('[data-del]')) {
-      if (!await confirmDialog(`Supprimer le modèle /${t.cmd} ?`, { confirm: 'Supprimer', danger: true })) return;
+      if (!await confirmDialog(`Supprimer la requête /${t.cmd} ?`, { confirm: 'Supprimer', danger: true })) return;
       await templates.remove(t.id);
       draw();
     }
   });
   $('[data-new]', d).addEventListener('click', () => showForm());
   $('[data-reset]', d).addEventListener('click', async () => {
-    if (!await confirmDialog('Remplacer votre bibliothèque par les modèles d’origine ?', { confirm: 'Rétablir', danger: true })) return;
+    if (!await confirmDialog('Remplacer votre bibliothèque par les requêtes d’origine ?', { confirm: 'Rétablir', danger: true })) return;
     await templates.reset();
     draw();
   });
@@ -197,7 +219,7 @@ export function openShortcuts() {
     ['Exporter la conversation (Markdown)', [m, 'Maj', 'E']],
     ['Arrêter la génération', ['Échap']],
     ['Modifier votre dernier message', ['↑']],
-    ['Modèles de requêtes', ['/']],
+    ['Requêtes enregistrées', ['/']],
     ['Afficher cette aide', [m, '/']],
   ];
   openDialog({
@@ -234,6 +256,21 @@ export function openUnlock() {
         input.select();
       } finally { btn.disabled = false; }
     });
+  });
+}
+
+/* ---------- Visionneuse d'image (pièces jointes) ---------- */
+export function openImageViewer(att, returnFocus) {
+  const d = openDialog({
+    id: 'dlg-image', title: att.name || 'Image', size: 'lg',
+    sub: att.width ? `${att.width} × ${att.height} px${att.size ? ` · ${formatBytes(att.size)}` : ''}` : '',
+    body: `<figure class="viewer"><img src="${esc(att.dataUrl)}" alt="${esc(att.name || 'Image jointe')}"></figure>`,
+    foot: `<button class="btn" type="button" data-dl>${icon('download')}Télécharger</button><span class="spacer"></span><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
+    onClose: () => returnFocus?.focus?.(),
+  });
+  $('[data-dl]', d).addEventListener('click', async () => {
+    const blob = await (await fetch(att.dataUrl)).blob();
+    download(att.name || 'image', blob);
   });
 }
 

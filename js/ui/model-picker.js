@@ -4,6 +4,7 @@ import { esc, icon } from '../util.js';
 import { FAMILIES } from '../providers.js';
 
 let counter = 0;
+const MAX_SHOWN = 400;
 
 /**
  * Monte le sélecteur dans `root`.
@@ -24,6 +25,7 @@ export function mountModelPicker(root, opts) {
       <label class="check" style="margin:0"><input type="checkbox" data-all ${st.showAll ? 'checked' : ''}><span>Afficher aussi les modèles non conversationnels</span></label>
     </div>
     <div class="model-list" role="radiogroup" aria-label="Modèles disponibles" data-list></div>
+    <p class="hint mp-count" data-count aria-live="polite"></p>
     <div class="field" style="margin:12px 0 0">
       <label for="${uidp}-manual">Ou saisissez l'identifiant exact</label>
       <input type="text" id="${uidp}-manual" class="mono" placeholder="ex. famille/nom-du-modele" autocomplete="off" spellcheck="false">
@@ -34,6 +36,7 @@ export function mountModelPicker(root, opts) {
   const list = root.querySelector('[data-list]');
   const fams = root.querySelector('[data-fams]');
   const manual = root.querySelector(`#${uidp}-manual`);
+  const count = root.querySelector('[data-count]');
   manual.value = st.value;
 
   function renderFamilies() {
@@ -51,6 +54,7 @@ export function mountModelPicker(root, opts) {
   }
 
   function renderList() {
+    count.textContent = '';
     if (!st.models.length) {
       list.innerHTML = `<div class="empty-note" style="border:0">${icon('info')} Testez la connexion pour charger la liste des modèles.</div>`;
       return;
@@ -61,23 +65,32 @@ export function mountModelPicker(root, opts) {
       return;
     }
     const famLabel = (id) => FAMILIES.find((f) => f.id === id)?.label || '';
-    list.innerHTML = items.slice(0, 400).map((m) => `
-      <label class="model-opt" aria-selected="${m.id === st.value}">
+    // Au-delà de MAX_SHOWN, la liste est tronquée : on le dit, et la recherche affine.
+    if (items.length > MAX_SHOWN) count.textContent = `${MAX_SHOWN} premiers modèles affichés sur ${items.length.toLocaleString('fr-FR')} : affinez avec la recherche ou les familles.`;
+    const split = (id) => {
+      const i = id.lastIndexOf('/');
+      return i > 0 ? [id.slice(i + 1), id.slice(0, i + 1)] : [id, ''];
+    };
+    list.innerHTML = items.slice(0, MAX_SHOWN).map((m) => {
+      const [name, org] = split(m.id);
+      return `
+      <label class="model-opt" title="${esc(m.id)}">
         <input type="radio" name="${uidp}-model" value="${esc(m.id)}" ${m.id === st.value ? 'checked' : ''} class="sr-only">
-        <span class="id">${esc(m.id)}</span>
+        <span class="id"><span class="id-name">${esc(name)}</span>${org ? `<span class="id-org">${esc(org)}</span>` : ''}</span>
         <span class="tags">
           ${m.family ? `<span class="pill fam">${esc(famLabel(m.family))}</span>` : ''}
           ${m.free ? '<span class="pill free">Gratuit</span>' : ''}
           ${m.vision ? '<span class="pill vision">Vision</span>' : ''}
           ${m.context ? `<span class="pill">${Math.round(m.context / 1000)} k</span>` : ''}
         </span>
-      </label>`).join('');
+      </label>`;
+    }).join('');
   }
 
   function select(id) {
     st.value = id;
     manual.value = id;
-    list.querySelectorAll('.model-opt').forEach((o) => o.setAttribute('aria-selected', String(o.querySelector('input').value === id)));
+    list.querySelectorAll('.model-opt input').forEach((r) => { r.checked = r.value === id; });
     opts.onChange?.(id);
   }
 
