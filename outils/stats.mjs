@@ -62,6 +62,7 @@ for (const d of defis) {
   if (!d.wu || !(d.indices || []).length) erreurs.push(`CTF ${d.id} : writeup ou indices manquants`);
   collecter(ouvrir(d.ressources || [], d.id));
   if (d.calque) fichiers.add(d.calque);
+  if (d.miniature) fichiers.add(d.miniature);
 }
 const photos = JSON.parse(await readFile(path.join(RACINE, 'assets/ctf/photos/defis.json'), 'utf8'));
 const persos = normaliserPack(photos, 'photos');

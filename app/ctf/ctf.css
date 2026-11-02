@@ -9,7 +9,7 @@
 .btn.danger { background: var(--err); border-color: var(--err); color: #fff; }
 .ctf-check { display: inline-flex; gap: 8px; align-items: center; font-size: .92rem; cursor: pointer; }
 .ctf-check.small { font-size: .82rem; }
-.table-scroll { overflow-x: auto; max-width: 100%; }
+.table-scroll { position: relative; overflow-x: auto; max-width: 100%; }
 
 /* ----- kicker & mot « flag » ----- */
 .ctf-kicker { display: inline-flex; align-items: center; gap: 8px; font-family: var(--ctf-mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ctf-vert); margin: 0 0 12px; }
