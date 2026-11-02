@@ -30,7 +30,7 @@ animate('.carte', {
 - **Easings** : familles classiques, `Back` et `Elastic` paramétrables, `cubicBezier()`, `steps()`, **`spring()` à durée calculée**, chaînes comme `'outElastic(1, .5)'`, alias anime.js, GSAP et CSS.
 - **`timeline()`** : positions `'<'`, `'<<'`, `'+=200'`, `'-=100'`, libellés, timelines imbriquées, `call()`, `set()`.
 - **`stagger()`** : depuis le premier, le dernier, le centre, un index ou au hasard (à graine), en ligne ou en grille, par axe, avec easing.
-- **Texte** : `splitText()` accessible (lignes, mots, lettres, masques, `revert()`), `scramble()`, `typewriter()`, `odometer()`.
+- **Texte** : `splitText()` accessible (lignes, mots, lettres, masques, `revert()` ; `aria-label` sur les titres, copie masquée sur les éléments génériques), `scramble()`, `typewriter()`, `odometer()`.
 - **Défilement** : `onScroll()` (IntersectionObserver et progression liée au défilement, lissée), vitesse de défilement.
 - **SVG** : `drawable()` pour tracer les contours, `motionPath()` pour suivre un chemin.
 - **Accessible par défaut** : `prefers-reduced-motion` est respecté (les animations sautent à leur état final).

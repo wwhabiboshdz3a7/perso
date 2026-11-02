@@ -310,7 +310,7 @@ animate('.jeton', { x: 0, y: 0, ease: souple });`,
   {
     id: 'texte',
     title: 'Texte',
-    intro: 'Découpage accessible et effets typographiques. Le texte reste lisible par les lecteurs d’écran : le parent reçoit un `aria-label`, les morceaux sont `aria-hidden`.',
+    intro: 'Découpage accessible et effets typographiques. Le texte reste lisible par les lecteurs d’écran : les morceaux sont `aria-hidden`, et le parent reçoit un `aria-label` s’il peut en porter un (titre, lien, bouton, section…). Sur un élément générique (`p`, `div`, `span`), où ARIA interdit `aria-label`, Kinetika ajoute à la place une copie du texte masquée visuellement (`.kt-sr`).',
     items: [
       {
         id: 'texte-split',

@@ -18,7 +18,7 @@ Première version publique.
 - **Easings** : familles classiques en `in`, `out`, `inOut`, `outIn`, `Back` et `Elastic` paramétrables, `cubicBezier()`, `steps()`, `spring()` avec durée calculée, chaînes paramétrées et alias anime.js, GSAP et CSS.
 - **`timeline()`** : positions `<`, `<<`, `+=`, `-=`, libellés, timelines imbriquées, `call()`, `set()`, `seek()` sur un libellé.
 - **`stagger()`** : `from` (premier, dernier, centre, index, aléatoire à graine), grilles, axes, easing, départ, inversion.
-- **Texte** : `splitText()` accessible (lignes, mots, lettres, masques, `revert()`, `refresh()`), `scramble()`, `typewriter()`, `odometer()`.
+- **Texte** : `splitText()` accessible (lignes, mots, lettres, masques, `revert()`, `refresh()`), `scramble()`, `typewriter()`, `odometer()`. Les morceaux sont masqués aux lecteurs d’écran ; le texte complet reste lisible via `aria-label` (titres, liens, boutons) ou une copie masquée visuellement (éléments génériques).
 - **Défilement** : `onScroll()` avec déclenchement à l’entrée, actions `sync`, progression liée (`scrub`) et lissée, vitesse de défilement.
 - **SVG** : `drawable()` (tracé des contours) et `motionPath()` (position et angle le long d’un chemin).
 - **Utilitaires** : `clamp`, `lerp`, `mapRange`, `round`, `snap`, `wrap`, aléatoire à graine, `get`, `set`, `remove`.

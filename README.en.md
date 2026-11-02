@@ -30,7 +30,7 @@ animate('.card', {
 - **Easings**: classic families, tunable `Back` and `Elastic`, `cubicBezier()`, `steps()`, **`spring()` with computed duration**, strings like `'outElastic(1, .5)'`, anime.js, GSAP and CSS aliases.
 - **`timeline()`**: positions `'<'`, `'<<'`, `'+=200'`, `'-=100'`, labels, nested timelines, `call()`, `set()`.
 - **`stagger()`**: from the first, last, center, an index or random (seeded), on a line or a grid, per axis, with easing.
-- **Text**: accessible `splitText()` (lines, words, chars, masks, `revert()`), `scramble()`, `typewriter()`, `odometer()`.
+- **Text**: accessible `splitText()` (lines, words, chars, masks, `revert()`; `aria-label` on headings, a visually hidden copy on generic elements), `scramble()`, `typewriter()`, `odometer()`.
 - **Scroll**: `onScroll()` (IntersectionObserver plus smoothed scroll-linked progress), scroll velocity.
 - **SVG**: `drawable()` to draw strokes, `motionPath()` to follow a path.
 - **Accessible by default**: `prefers-reduced-motion` is honored (animations jump to their end state).
