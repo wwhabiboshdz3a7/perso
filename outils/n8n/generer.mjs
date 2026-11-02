@@ -700,3 +700,229 @@ ${v.points.map(x => `<h3 style="margin-bottom:4px">${esc(x.titre)}</h3><p style=
   f.relier('Mettre en forme', 'Envoyer la veille');
   f.exporter('05-veille-automatisee.json', 'Flux RSS hebdomadaires → tri et dédoublonnage → synthèse par Claude → email HTML.');
 }
+
+/* =====================================================================
+   6. Chaîne vidéo : scripts, voix et sous-titres (module 6)
+   ===================================================================== */
+{
+  const f = fabrique('Levier · 06 · Chaîne vidéo : scripts, voix et sous-titres');
+  note(f, 'Mode d\'emploi', [-460, -460], `## Chaîne vidéo automatisée\nChaque lundi, Claude écrit les scripts de la semaine (accroche, narration, découpage en plans avec prompts visuels, légende, hashtags). ElevenLabs génère la voix **avec horodatage** ; le code en tire des sous-titres SRT et un plan de montage minuté. Vous recevez un email par vidéo avec la voix en pièce jointe, et chaque vidéo est ajoutée au calendrier éditorial (Google Sheets).\n\n**Ensuite** : générez les plans visuels (Higgsfield, Kling, Veo, Runway…) avec les prompts fournis, puis montez avec HyperFrames, Remotion ou un modèle CapCut (module 6, leçons 5 et 6).\n\n**ElevenLabs** : créez une identification « Header Auth » : nom \`xi-api-key\`, valeur = votre clé ElevenLabs. Renseignez \`voice_id\` dans « Paramètres » (bibliothèque de voix ElevenLabs). Plan payant requis pour un usage commercial.\n\n**Transparence** : si une vidéo montre une personne ou une scène réaliste générée par IA, activez l'étiquette « contenu IA » de la plateforme et ajoutez la mention prévue (champ \`mention_ia\`).\n\n${NOTE_CLE}`, 560, 700);
+  f.ajouter('Chaque lundi', 'n8n-nodes-base.scheduleTrigger', 1.2, [0, 0], {
+    rule: { interval: [{ field: 'cronExpression', expression: '0 7 * * 1' }] }
+  });
+  parametres(f, [220, 0], [
+    ['marque', 'Nom de la chaîne ou du client'],
+    ['niche', 'Astuces d\'automatisation IA pour les commerces de proximité'],
+    ['public', 'Gérants de commerces et indépendants, 30-55 ans, peu de temps'],
+    ['ton', 'direct, concret, tutoiement, une idée par vidéo'],
+    ['piliers', 'astuce rapide ; erreur courante ; avant/après ; mini-tutoriel'],
+    ['nb_videos', 3, 'number'],
+    ['duree_secondes', 40, 'number'],
+    ['voice_id', ''],
+    ['modele_voix', 'eleven_multilingual_v2'],
+    ['modele', 'claude-opus-5-5'],
+    ['email_expediteur', 'automatisations@votre-domaine.fr'],
+    ['email_destinataire', 'vous@votre-domaine.fr']
+  ]);
+  code(f, 'Préparer la requête', [440, 0], function () {
+    const p = $('Paramètres').first().json;
+    const nb = Math.min(Math.max(Number(p.nb_videos) || 3, 1), 7);
+    const duree = Math.min(Math.max(Number(p.duree_secondes) || 40, 15), 90);
+    const mots = Math.round(duree * 2.4);
+    const systeme = [
+      `Tu es scénariste de vidéos courtes verticales (9:16) pour ${p.marque}.`,
+      `Niche : ${p.niche}. Public : ${p.public}. Ton : ${p.ton}.`,
+      `Piliers éditoriaux à alterner : ${p.piliers}.`,
+      'Règles :',
+      `- narration : environ ${mots} mots (durée visée ${duree} s), phrases courtes, écrites pour être dites à voix haute, sans emojis ni abréviations.`,
+      '- accroche : la première phrase de la narration, moins de 12 mots, qui crée une tension ou promet un bénéfice précis.',
+      '- scenes : 5 à 8 plans qui couvrent toute la narration ; visuel = prompt en anglais pour un générateur d\'images ou de vidéos (sujet, décor, lumière, cadrage, mouvement), sans marque déposée, sans personne réelle identifiable.',
+      '- texte_ecran : 6 mots maximum, ou chaîne vide.',
+      '- legende : 150 caractères maximum, avec un appel à l\'action ; hashtags : 3 à 5, pertinents, sans #fyp.',
+      '- mention_ia : true si un plan montre une personne, un lieu ou un événement réaliste généré par IA.',
+      '- N\'affirme aucun chiffre, aucune statistique ni aucun résultat client que tu ne peux pas sourcer.'
+    ].join('\n');
+    return [{
+      json: {
+        requete: {
+          model: p.modele,
+          max_tokens: 16000,
+          fallbacks: 'default',
+          output_config: {
+            effort: 'medium',
+            format: {
+              type: 'json_schema',
+              schema: {
+                type: 'object',
+                properties: {
+                  videos: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        titre: { type: 'string' },
+                        pilier: { type: 'string' },
+                        accroche: { type: 'string' },
+                        narration: { type: 'string' },
+                        scenes: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              visuel: { type: 'string' },
+                              texte_ecran: { type: 'string' },
+                              poids: { type: 'integer', description: 'Part relative de la durée, de 1 à 5' }
+                            },
+                            required: ['visuel', 'texte_ecran', 'poids'],
+                            additionalProperties: false
+                          }
+                        },
+                        legende: { type: 'string' },
+                        hashtags: { type: 'array', items: { type: 'string' } },
+                        mention_ia: { type: 'boolean' }
+                      },
+                      required: ['titre', 'pilier', 'accroche', 'narration', 'scenes', 'legende', 'hashtags', 'mention_ia'],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ['videos'],
+                additionalProperties: false
+              }
+            }
+          },
+          system: systeme,
+          messages: [{ role: 'user', content: `Écris ${nb} scripts différents pour la semaine du ${new Date().toLocaleDateString('fr-FR')}.` }]
+        }
+      }
+    }];
+  });
+  claude(f, 'Claude', [660, 0]);
+  code(f, 'Un item par vidéo', [880, 0], function () {
+    const r = $input.first().json;
+    if (r.stop_reason === 'refusal') throw new Error('Demande refusée par le modèle');
+    if (r.stop_reason === 'max_tokens') throw new Error('Réponse tronquée : augmentez max_tokens');
+    const d = JSON.parse((r.content || []).filter(b => b.type === 'text').map(b => b.text).join(''));
+    const slug = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+    const jour = new Date().toISOString().slice(0, 10);
+    return d.videos.map((v, i) => ({ json: { ...v, nom_fichier: `${jour}-${i + 1}-${slug(v.titre)}` } }));
+  });
+  f.ajouter('Voix ElevenLabs', 'n8n-nodes-base.httpRequest', 4.2, [1100, 0], {
+    method: 'POST',
+    url: "=https://api.elevenlabs.io/v1/text-to-speech/{{ $('Paramètres').first().json.voice_id }}/with-timestamps?output_format=mp3_44100_128",
+    authentication: 'genericCredentialType',
+    genericAuthType: 'httpHeaderAuth',
+    sendBody: true,
+    contentType: 'json',
+    specifyBody: 'json',
+    jsonBody: "={{ JSON.stringify({ text: $json.narration, model_id: $('Paramètres').first().json.modele_voix, voice_settings: { stability: 0.5, similarity_boost: 0.75 } }) }}",
+    options: { timeout: 120000 }
+  }, { retryOnFail: true, maxTries: 3, waitBetweenTries: 5000 });
+  code(f, 'Sous-titres et plan de montage', [1320, 0], function () {
+    const scripts = $('Un item par vidéo').all();
+    const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tc = t => {
+      const ms = Math.max(0, Math.round(t * 1000));
+      const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
+      const m = String(Math.floor(ms / 60000) % 60).padStart(2, '0');
+      const s = String(Math.floor(ms / 1000) % 60).padStart(2, '0');
+      return `${h}:${m}:${s},${String(ms % 1000).padStart(3, '0')}`;
+    };
+    return $input.all().map((item, i) => {
+      const v = scripts[i].json;
+      const a = item.json.alignment || item.json.normalized_alignment;
+      if (!a || !item.json.audio_base64) throw new Error('Réponse ElevenLabs inattendue pour « ' + v.titre + ' »');
+      // 1. Mots horodatés à partir des caractères
+      const motsH = [];
+      let courant = null;
+      a.characters.forEach((c, k) => {
+        if (/\s/.test(c)) { if (courant) { motsH.push(courant); courant = null; } return; }
+        if (!courant) courant = { texte: '', debut: a.character_start_times_seconds[k], fin: 0 };
+        courant.texte += c;
+        courant.fin = a.character_end_times_seconds[k];
+      });
+      if (courant) motsH.push(courant);
+      const duree = motsH.length ? motsH[motsH.length - 1].fin : 0;
+      // 2. Sous-titres : 3 mots ou 1,2 s maximum, coupure après la ponctuation
+      const blocs = [];
+      let bloc = [];
+      for (const m of motsH) {
+        bloc.push(m);
+        const long = bloc[bloc.length - 1].fin - bloc[0].debut;
+        if (bloc.length >= 3 || long >= 1.2 || /[.,;:!?…]$/.test(m.texte)) { blocs.push(bloc); bloc = []; }
+      }
+      if (bloc.length) blocs.push(bloc);
+      const srt = blocs.map((b, n) => `${n + 1}\n${tc(b[0].debut)} --> ${tc(b[b.length - 1].fin)}\n${b.map(m => m.texte).join(' ')}\n`).join('\n');
+      // 3. Plan de montage : durée de chaque plan proportionnelle à son poids
+      const total = v.scenes.reduce((s, x) => s + Math.min(Math.max(x.poids || 1, 1), 5), 0) || 1;
+      let t = 0;
+      const plan = v.scenes.map((x, n) => {
+        const d = duree * Math.min(Math.max(x.poids || 1, 1), 5) / total;
+        const ligne = { plan: n + 1, debut: Math.round(t * 10) / 10, duree: Math.round(d * 10) / 10, visuel: x.visuel, texte_ecran: x.texte_ecran };
+        t += d;
+        return ligne;
+      });
+      const html = `<div style="font-family:Arial,sans-serif;max-width:720px;color:#111;line-height:1.5">
+<h2>${esc(v.titre)}</h2><p><b>Pilier :</b> ${esc(v.pilier)} · <b>Durée de la voix :</b> ${duree.toFixed(1)} s</p>
+<h3>Narration</h3><p>${esc(v.narration)}</p>
+<h3>Plan de montage</h3><table cellpadding="6" style="border-collapse:collapse;font-size:13px" border="1">
+<tr><th>#</th><th>Début</th><th>Durée</th><th>Prompt visuel</th><th>Texte à l'écran</th></tr>
+${plan.map(p => `<tr><td>${p.plan}</td><td>${p.debut} s</td><td>${p.duree} s</td><td>${esc(p.visuel)}</td><td>${esc(p.texte_ecran)}</td></tr>`).join('\n')}
+</table>
+<h3>Légende</h3><p>${esc(v.legende)}<br>${v.hashtags.map(h => esc(h.startsWith('#') ? h : '#' + h)).join(' ')}</p>
+<p><b>Étiquette contenu IA à activer :</b> ${v.mention_ia ? 'OUI' : 'non (vérifiez au montage)'}</p>
+<h3>Sous-titres (SRT, à enregistrer sous ${esc(v.nom_fichier)}.srt)</h3><pre style="background:#f4f4f4;padding:10px;font-size:12px">${esc(srt)}</pre>
+<h3>Plan de montage (JSON pour HyperFrames ou Remotion)</h3><pre style="background:#f4f4f4;padding:10px;font-size:12px">${esc(JSON.stringify({ duree, plan, sous_titres: blocs.map(b => ({ texte: b.map(m => m.texte).join(' '), debut: b[0].debut, fin: b[b.length - 1].fin })) }, null, 2))}</pre>
+</div>`;
+      return {
+        json: {
+          date: new Date().toISOString().slice(0, 10),
+          titre: v.titre, pilier: v.pilier, legende: v.legende,
+          hashtags: v.hashtags.join(' '), mention_ia: v.mention_ia ? 'oui' : 'non',
+          duree_voix: Math.round(duree * 10) / 10, statut: 'à monter',
+          nom_fichier: v.nom_fichier, audio_base64: item.json.audio_base64, html
+        },
+        pairedItem: { item: i }
+      };
+    });
+  });
+  f.ajouter('Fichier audio', 'n8n-nodes-base.convertToFile', 1.1, [1540, -120], {
+    operation: 'toBinary',
+    sourceProperty: 'audio_base64',
+    binaryPropertyName: 'voix',
+    options: { encoding: 'base64', fileName: '={{ $json.nom_fichier }}.mp3', mimeType: 'audio/mpeg' }
+  });
+  f.ajouter('Envoyer le kit vidéo', 'n8n-nodes-base.emailSend', 2.1, [1760, -120], {
+    fromEmail: "={{ $('Paramètres').first().json.email_expediteur }}",
+    toEmail: "={{ $('Paramètres').first().json.email_destinataire }}",
+    subject: "=Kit vidéo : {{ $('Sous-titres et plan de montage').item.json.titre }}",
+    emailFormat: 'html',
+    html: "={{ $('Sous-titres et plan de montage').item.json.html }}",
+    options: { appendAttribution: false, attachments: 'voix' }
+  });
+  code(f, 'Ligne du calendrier', [1540, 120], function () {
+    return $input.all().map(item => {
+      const { audio_base64, html, ...ligne } = item.json;
+      return { json: ligne };
+    });
+  });
+  f.ajouter('Calendrier éditorial', 'n8n-nodes-base.googleSheets', 4.5, [1760, 120], {
+    resource: 'sheet',
+    operation: 'append',
+    documentId: { __rl: true, value: '', mode: 'url' },
+    sheetName: { __rl: true, value: 'Calendrier', mode: 'name' },
+    columns: { mappingMode: 'autoMapInputData', value: {}, matchingColumns: [], schema: [] },
+    options: {}
+  });
+  f.relier('Chaque lundi', 'Paramètres');
+  f.relier('Paramètres', 'Préparer la requête');
+  f.relier('Préparer la requête', 'Claude');
+  f.relier('Claude', 'Un item par vidéo');
+  f.relier('Un item par vidéo', 'Voix ElevenLabs');
+  f.relier('Voix ElevenLabs', 'Sous-titres et plan de montage');
+  f.relier('Sous-titres et plan de montage', 'Fichier audio');
+  f.relier('Sous-titres et plan de montage', 'Ligne du calendrier');
+  f.relier('Fichier audio', 'Envoyer le kit vidéo');
+  f.relier('Ligne du calendrier', 'Calendrier éditorial');
+  f.exporter('06-chaine-video.json', 'Scripts de la semaine par Claude → voix ElevenLabs horodatée → sous-titres SRT et plan de montage → email avec la voix + calendrier éditorial.');
+}

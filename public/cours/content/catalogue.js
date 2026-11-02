@@ -137,7 +137,8 @@ export const fichiers = {
   'n8n/02-reponses-avis-google.json': { module: 'm5', titre: 'Réponses aux avis Google' },
   'n8n/03-devis-automatiques.json': { module: 'm5', titre: 'Devis automatiques' },
   'n8n/04-chatbot-site.json': { module: 'm5', titre: 'Chatbot de site' },
-  'n8n/05-veille-automatisee.json': { module: 'm5', titre: 'Veille automatisée' }
+  'n8n/05-veille-automatisee.json': { module: 'm5', titre: 'Veille automatisée' },
+  'n8n/06-chaine-video.json': { module: 'm6', titre: 'Chaîne vidéo : scripts, voix et sous-titres' }
 };
 
 export function trouverModule(id) {
