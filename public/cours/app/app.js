@@ -32,7 +32,9 @@ export function toast(msg, type = '') {
   const t = document.createElement('div');
   t.className = 'toast ' + type;
   t.textContent = msg;
-  $('#toasts').appendChild(t);
+  const zone = $('#toasts');
+  while (zone.children.length >= 3) zone.firstElementChild.remove(); // trois messages visibles au plus
+  zone.appendChild(t);
   setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 3800);
 }
 function setTitre(t) { document.title = t ? `${t} · ${NOM_PRODUIT}` : `Espace membre · ${NOM_PRODUIT}`; }
@@ -274,7 +276,7 @@ async function vueModule(id, nav) {
   if (!estAccessible(id)) {
     main.innerHTML = `<div class="wrap narrow">${entete}
       <ul class="lessons locked">${meta.lecons.map((t, i) => `<li><span class="lk">${ICO.lock}<span class="n">${num(i + 1)}</span><span>${esc(t)}</span></span></li>`).join('')}</ul>
-      ${panneauDeblocage(meta)}</div>`;
+      ${panneauDeblocage(meta, offreActuelle() !== 'gratuit' ? `Votre accès ${NOMS_OFFRES[offreActuelle()]} est actif sur cet appareil.` : '')}</div>`;
     brancherFormulaireAcces($('#unlock'));
     return;
   }
