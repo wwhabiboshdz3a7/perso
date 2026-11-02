@@ -342,9 +342,10 @@ export class Assistant {
             this.reply('Réflexion…', { speak: false });
             document.body.classList.add('is-thinking');
             try {
-              const answer = await this.brain.ask(cmd.text || text);
+              // Réponse affichée et lue en texte brut (sans markdown).
+              const answer = forSpeech(await this.brain.ask(cmd.text || text));
               this.reply(answer);
-              app.ui.log('ia', forSpeech(answer).slice(0, 120));
+              app.ui.log('ia', answer.slice(0, 120));
             } catch (err) {
               this.reply(err.message || 'Le cerveau IA ne répond pas.');
             } finally {
