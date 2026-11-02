@@ -41,6 +41,9 @@ export class Playable {
     };
     this._promise = null;
     this._resolve = null;
+    this._reject = null;
+    this._error = null;
+    this._interrupted = false;
   }
 
   // —— Durées ——
@@ -57,6 +60,8 @@ export class Playable {
   get paused() { return this._paused; }
   get began() { return this._began; }
   get completed() { return this._completed; }
+  /** Vrai si l'animation a été entièrement reprise par une autre (composition « replace »). */
+  get interrupted() { return this._interrupted; }
   get reversed() { return this._dir < 0; }
   get currentTime() { return this._time; }
   set currentTime(t) { this.seek(t); }
@@ -93,6 +98,12 @@ export class Playable {
 
   play() {
     if (this._parent || this._cancelled) return this;
+    if (this._interrupted || this._error) {
+      // relancée après une reprise ou une erreur : nouvelle promesse
+      this._interrupted = false;
+      this._error = null;
+      this._resetPromise();
+    }
     if (this._completed) {
       this._completed = false;
       this._began = false;
@@ -153,7 +164,16 @@ export class Playable {
 
   /** Place la tête de lecture (ms, ou nom de libellé pour une timeline). */
   seek(time) {
-    if (typeof time === 'string' && this._labels) time = (this._labels[time] ?? 0) + this._delay;
+    if (typeof time === 'string') {
+      const key = time.trim();
+      if (this._labels && Object.prototype.hasOwnProperty.call(this._labels, key)) time = this._labels[key] + this._delay;
+      else if (key !== '' && Number.isFinite(+key)) time = +key;
+      else {
+        // libellé inconnu : la tête de lecture ne bouge pas
+        if (typeof console !== 'undefined') console.warn(`Kinetika : libellé inconnu « ${time} », seek() ignoré.`);
+        return this;
+      }
+    }
     const total = this._total();
     const t = clamp(+time || 0, 0, total);
     this._time = t;
@@ -198,16 +218,38 @@ export class Playable {
   /** Promesse résolue à la fin : `await animate(...)` ou `.then(() => …)`. */
   then(onFulfilled, onRejected) {
     if (!this._promise) {
-      this._promise = new Promise((res) => { this._resolve = res; });
-      if (this._completed) this._resolve();
+      this._promise = new Promise((res, rej) => { this._resolve = res; this._reject = rej; });
+      if (this._error) this._reject(this._error);
+      else if (this._completed || this._interrupted) this._resolve();
     }
     return this._promise.then(onFulfilled, onRejected);
   }
+
+  catch(onRejected) { return this.then(undefined, onRejected); }
+
+  finally(onFinally) { return this.then().finally(onFinally); }
 
   // —— Interne ——
   _resetPromise() {
     this._promise = null;
     this._resolve = null;
+    this._reject = null;
+  }
+
+  /** Reprise complète par une autre animation : arrêt, et la promesse se résout (sans onComplete). */
+  _interrupt() {
+    this._paused = true;
+    removeActive(this);
+    if (this._interrupted) return;
+    this._interrupted = true;
+    if (this._resolve) this._resolve();
+  }
+
+  /** Erreur levée par un rappel pendant une image : l'animation s'arrête, sa promesse est rejetée. */
+  _fail(err) {
+    this._paused = true;
+    this._error = err;
+    if (this._reject) this._reject(err);
   }
 
   _resetChildren() {}

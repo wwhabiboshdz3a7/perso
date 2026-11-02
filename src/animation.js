@@ -1,10 +1,10 @@
 // animate(cibles, paramètres) : pistes par cible et par propriété, keyframes, composition.
 import { isFn, isArr, isObj, isNum, isUndef, clamp, isEl } from './utils.js';
-import { engine, removeActive } from './engine.js';
+import { engine } from './engine.js';
 import { parseEase, linear } from './easings.js';
 import { parseValue, applyRelative, unify, interpolate, isCustom } from './values.js';
 import { propKind, normalizeProp, readValue, writeValue, captureOriginal, restoreOriginal, defaultUnit, flush } from './props.js';
-import { resolveTargets, targetId } from './targets.js';
+import { resolveTargets } from './targets.js';
 import { Playable, SCROLL } from './playable.js';
 
 // Paramètres qui ne sont pas des propriétés à animer.
@@ -12,7 +12,22 @@ export const RESERVED = new Set(['duration', 'delay', 'ease', 'loop', 'loopDelay
   'keyframes', 'composition', 'modifier', 'onBegin', 'onUpdate', 'onLoop', 'onComplete', 'onPause', 'reducedMotion', 'attr', 'id', 'defaults', 'playbackEase']);
 
 // Propriétaire courant de chaque (cible, propriété), pour la composition « replace ».
-const owners = new Map();
+// Indexé par la cible elle-même (WeakMap) : une cible retirée de la page peut être libérée
+// par le ramasse-miettes, même si l'animation qui l'a touchée en dernier n'a pas été annulée.
+const owners = new WeakMap();
+const primitiveOwners = new Map();
+const isRef = (t) => (t !== null && typeof t === 'object') || typeof t === 'function';
+function ownerMap(target, create) {
+  const store = isRef(target) ? owners : primitiveOwners;
+  let m = store.get(target);
+  if (!m && create) { m = new Map(); store.set(target, m); }
+  return m;
+}
+/** Piste qui possède actuellement (cible, propriété), ou undefined. */
+export function ownerOf(target, prop) {
+  const m = ownerMap(target, false);
+  return m ? m.get(prop) : undefined;
+}
 // Dernière valeur écrite par cible et propriété : évite les écritures DOM inutiles.
 const written = new WeakMap();
 
@@ -37,7 +52,6 @@ class Track {
     this.target = target;
     this.prop = prop;
     this.kind = kind;
-    this.key = targetId(target) + '|' + prop;
     this.segs = opts.segs;
     this.hasFrom = this.segs.length > 0 && this.segs[0].fromRaw !== undefined;
     this.modifier = opts.modifier;
@@ -71,10 +85,10 @@ class Track {
     for (const s of this.segs) {
       if (s.fromRaw !== undefined) {
         from = parseValue(s.fromRaw);
-        if (from.op) from = applyRelative(parseValue(readValue(this.target, this.prop, this.kind)), from);
+        if (from.op) from = applyRelative(parseValue(readValue(this.target, this.prop, this.kind)), from, ctx);
       }
       let to = parseValue(s.toRaw);
-      to = applyRelative(from, to);
+      to = applyRelative(from, to, ctx);
       const [f, t] = unify(from, to, ctx);
       s.from = f;
       s.to = t;
@@ -100,25 +114,27 @@ class Track {
   claim() {
     if (this.composition === 'none') return;
     this.overridden = false;
-    const cur = owners.get(this.key);
+    const map = ownerMap(this.target, true);
+    const cur = map.get(this.prop);
     if (cur && cur !== this && cur.composition !== 'none') {
       const rootA = cur.anim._root();
       const rootB = this.anim._root();
       if (rootA !== rootB) {
         cur.overridden = true;
-        // animation autonome entièrement reprise : on la retire de la boucle
+        // animation autonome entièrement reprise : elle s'arrête et sa promesse se résout
         const a = cur.anim;
-        if (!a._parent && a._tracks.every((t) => t.overridden || t.removed)) {
-          removeActive(a);
-          a._paused = true;
-        }
+        if (!a._parent && !a._completed && a._tracks.every((t) => t.overridden || t.removed)) a._interrupt();
       }
     }
-    owners.set(this.key, this);
+    map.set(this.prop, this);
   }
 
   release() {
-    if (owners.get(this.key) === this) owners.delete(this.key);
+    const map = ownerMap(this.target, false);
+    if (map && map.get(this.prop) === this) {
+      map.delete(this.prop);
+      if (!map.size) (isRef(this.target) ? owners : primitiveOwners).delete(this.target);
+    }
   }
 
   render(t, before) {
@@ -379,4 +395,4 @@ export function set(targets, props) {
   return a;
 }
 
-export { owners as _owners, Track };
+export { Track };

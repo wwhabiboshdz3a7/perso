@@ -48,8 +48,15 @@ function frame(t) {
     step(dt);
   } finally {
     inFrame = false;
+    // la boucle continue quoi qu'il arrive pendant l'image
+    if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
   }
-  if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+}
+
+/** Signale une erreur levée par du code utilisateur sans interrompre le moteur. */
+export function reportError(err) {
+  if (typeof globalThis.reportError === 'function') globalThis.reportError(err);
+  else if (typeof console !== 'undefined') console.error(err);
 }
 
 function step(dt) {
@@ -57,10 +64,21 @@ function step(dt) {
   elapsed += scaled;
   // copie : une animation peut se retirer (ou en ajouter une autre) pendant son tick
   const list = active.slice();
-  for (const t of list) {
-    if (t._engineActive) t._tick(scaled);
+  try {
+    for (const t of list) {
+      if (!t._engineActive) continue;
+      try {
+        t._tick(scaled);
+      } catch (err) {
+        // un rappel qui lève une exception arrête son animation, pas les autres
+        removeActive(t);
+        if (typeof t._fail === 'function') t._fail(err);
+        reportError(err);
+      }
+    }
+  } finally {
+    flush();
   }
-  flush();
 }
 
 function wake() {

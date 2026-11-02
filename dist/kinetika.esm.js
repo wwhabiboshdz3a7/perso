@@ -78,7 +78,7 @@ function wrap(v, min, max) {
 function createRandom(seed2 = Date.now()) {
   let s = (Math.floor(seed2) ^ 2654435769) >>> 0;
   if (s === 0) s = 1831565813;
-  const next2 = () => {
+  const next = () => {
     s ^= s << 13;
     s >>>= 0;
     s ^= s >>> 17;
@@ -90,7 +90,7 @@ function createRandom(seed2 = Date.now()) {
     return ((z ^ z >>> 15) >>> 0) / 4294967296;
   };
   const random3 = (min, max, decimals) => {
-    const r = next2();
+    const r = next();
     if (isUndef(min)) return r;
     if (isUndef(max)) {
       max = min;
@@ -100,11 +100,11 @@ function createRandom(seed2 = Date.now()) {
     return isUndef(decimals) ? v : round(v, decimals);
   };
   random3.int = (min, max) => Math.floor(random3(min, max + 1));
-  random3.pick = (list) => list[Math.floor(next2() * list.length)];
+  random3.pick = (list) => list[Math.floor(next() * list.length)];
   random3.shuffle = (list) => {
     const a = [...list];
     for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(next2() * (i + 1));
+      const j = Math.floor(next() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
@@ -402,17 +402,31 @@ function frame(t) {
     step(dt);
   } finally {
     inFrame = false;
+    if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
   }
-  if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+}
+function reportError(err) {
+  if (typeof globalThis.reportError === "function") globalThis.reportError(err);
+  else if (typeof console !== "undefined") console.error(err);
 }
 function step(dt) {
   const scaled = dt * state.timeScale;
   elapsed += scaled;
   const list = active.slice();
-  for (const t of list) {
-    if (t._engineActive) t._tick(scaled);
+  try {
+    for (const t of list) {
+      if (!t._engineActive) continue;
+      try {
+        t._tick(scaled);
+      } catch (err) {
+        removeActive(t);
+        if (typeof t._fail === "function") t._fail(err);
+        reportError(err);
+      }
+    }
+  } finally {
+    flush();
   }
-  flush();
 }
 function wake() {
   if (inFrame || frameId !== null || state.paused || state.manual || !raf || hidden && state.pauseOnHidden) return;
@@ -631,10 +645,12 @@ function steps(count = 10, jump = "end") {
   return jump === "start" ? (t) => t >= 1 ? 1 : Math.min(1, Math.ceil(t * n) / n) : (t) => t >= 1 ? 1 : Math.floor(t * n) / n;
 }
 var springCache = /* @__PURE__ */ new Map();
-function spring({ mass = 1, stiffness = 100, damping = 10, velocity = 0 } = {}) {
-  const m = Math.max(0.01, mass);
-  const k = Math.max(0.01, stiffness);
-  const c = Math.max(0, damping);
+function spring({ mass, stiffness, damping, velocity } = {}) {
+  const num2 = (v, d) => v !== null && v !== "" && Number.isFinite(+v) ? +v : d;
+  const m = Math.max(0.01, num2(mass, 1));
+  const k = Math.max(0.01, num2(stiffness, 100));
+  const c = Math.max(0, num2(damping, 10));
+  velocity = num2(velocity, 0);
   const key = `${m}|${k}|${c}|${velocity}`;
   if (springCache.has(key)) return springCache.get(key);
   const w0 = Math.sqrt(k / m);
@@ -681,7 +697,7 @@ var cssKeywords = {
 var gsapPower = { power1: "Quad", power2: "Cubic", power3: "Quart", power4: "Quint", quad: "Quad", cubic: "Cubic", quart: "Quart", quint: "Quint", strong: "Quint", sine: "Sine", expo: "Expo", circ: "Circ", back: "Back", elastic: "Elastic", bounce: "Bounce" };
 var parseCache = /* @__PURE__ */ new Map();
 function parseArgs(s) {
-  return s.split(",").map((x) => x.trim()).filter(Boolean).map(Number);
+  return s.split(",").map((x) => x.trim()).filter(Boolean).map((x) => Number.isFinite(+x) ? +x : void 0);
 }
 function parseEase(ease) {
   if (isFn(ease)) return ease;
@@ -714,46 +730,20 @@ function parseEase(ease) {
 var easeNames = Object.keys(eases);
 
 // src/color.js
-var NAMED = {
-  transparent: [0, 0, 0, 0],
-  black: [0, 0, 0, 1],
-  white: [255, 255, 255, 1],
-  red: [255, 0, 0, 1],
-  green: [0, 128, 0, 1],
-  lime: [0, 255, 0, 1],
-  blue: [0, 0, 255, 1],
-  yellow: [255, 255, 0, 1],
-  cyan: [0, 255, 255, 1],
-  aqua: [0, 255, 255, 1],
-  magenta: [255, 0, 255, 1],
-  fuchsia: [255, 0, 255, 1],
-  orange: [255, 165, 0, 1],
-  purple: [128, 0, 128, 1],
-  pink: [255, 192, 203, 1],
-  gray: [128, 128, 128, 1],
-  grey: [128, 128, 128, 1],
-  silver: [192, 192, 192, 1],
-  navy: [0, 0, 128, 1],
-  teal: [0, 128, 128, 1],
-  maroon: [128, 0, 0, 1],
-  olive: [128, 128, 0, 1],
-  gold: [255, 215, 0, 1],
-  coral: [255, 127, 80, 1],
-  tomato: [255, 99, 71, 1],
-  crimson: [220, 20, 60, 1],
-  indigo: [75, 0, 130, 1],
-  violet: [238, 130, 238, 1],
-  hotpink: [255, 105, 180, 1],
-  turquoise: [64, 224, 208, 1],
-  salmon: [250, 128, 114, 1],
-  chocolate: [210, 105, 30, 1]
-};
+var NAMED_SRC = "aliceblue f0f8ff antiquewhite faebd7 aqua 00ffff aquamarine 7fffd4 azure f0ffff beige f5f5dc bisque ffe4c4 black 000000 blanchedalmond ffebcd blue 0000ff blueviolet 8a2be2 brown a52a2a burlywood deb887 cadetblue 5f9ea0 chartreuse 7fff00 chocolate d2691e coral ff7f50 cornflowerblue 6495ed cornsilk fff8dc crimson dc143c cyan 00ffff darkblue 00008b darkcyan 008b8b darkgoldenrod b8860b darkgray a9a9a9 darkgreen 006400 darkgrey a9a9a9 darkkhaki bdb76b darkmagenta 8b008b darkolivegreen 556b2f darkorange ff8c00 darkorchid 9932cc darkred 8b0000 darksalmon e9967a darkseagreen 8fbc8f darkslateblue 483d8b darkslategray 2f4f4f darkslategrey 2f4f4f darkturquoise 00ced1 darkviolet 9400d3 deeppink ff1493 deepskyblue 00bfff dimgray 696969 dimgrey 696969 dodgerblue 1e90ff firebrick b22222 floralwhite fffaf0 forestgreen 228b22 fuchsia ff00ff gainsboro dcdcdc ghostwhite f8f8ff gold ffd700 goldenrod daa520 gray 808080 green 008000 greenyellow adff2f grey 808080 honeydew f0fff0 hotpink ff69b4 indianred cd5c5c indigo 4b0082 ivory fffff0 khaki f0e68c lavender e6e6fa lavenderblush fff0f5 lawngreen 7cfc00 lemonchiffon fffacd lightblue add8e6 lightcoral f08080 lightcyan e0ffff lightgoldenrodyellow fafad2 lightgray d3d3d3 lightgreen 90ee90 lightgrey d3d3d3 lightpink ffb6c1 lightsalmon ffa07a lightseagreen 20b2aa lightskyblue 87cefa lightslategray 778899 lightslategrey 778899 lightsteelblue b0c4de lightyellow ffffe0 lime 00ff00 limegreen 32cd32 linen faf0e6 magenta ff00ff maroon 800000 mediumaquamarine 66cdaa mediumblue 0000cd mediumorchid ba55d3 mediumpurple 9370db mediumseagreen 3cb371 mediumslateblue 7b68ee mediumspringgreen 00fa9a mediumturquoise 48d1cc mediumvioletred c71585 midnightblue 191970 mintcream f5fffa mistyrose ffe4e1 moccasin ffe4b5 navajowhite ffdead navy 000080 oldlace fdf5e6 olive 808000 olivedrab 6b8e23 orange ffa500 orangered ff4500 orchid da70d6 palegoldenrod eee8aa palegreen 98fb98 paleturquoise afeeee palevioletred db7093 papayawhip ffefd5 peachpuff ffdab9 peru cd853f pink ffc0cb plum dda0dd powderblue b0e0e6 purple 800080 rebeccapurple 663399 red ff0000 rosybrown bc8f8f royalblue 4169e1 saddlebrown 8b4513 salmon fa8072 sandybrown f4a460 seagreen 2e8b57 seashell fff5ee sienna a0522d silver c0c0c0 skyblue 87ceeb slateblue 6a5acd slategray 708090 slategrey 708090 snow fffafa springgreen 00ff7f steelblue 4682b4 tan d2b48c teal 008080 thistle d8bfd8 tomato ff6347 turquoise 40e0d0 violet ee82ee wheat f5deb3 white ffffff whitesmoke f5f5f5 yellow ffff00 yellowgreen 9acd32";
+var NAMED = { transparent: [0, 0, 0, 0] };
+{
+  const parts = NAMED_SRC.split(" ");
+  for (let i = 0; i < parts.length; i += 2) {
+    const n = parseInt(parts[i + 1], 16);
+    NAMED[parts[i]] = [n >> 16 & 255, n >> 8 & 255, n & 255, 1];
+  }
+}
 var COLOR_RE = /#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})\b|(?:rgba?|hsla?)\([^)]*\)/gi;
-var NAMED_RE = new RegExp(`^(${Object.keys(NAMED).join("|")})$`, "i");
 function isColor(s) {
   if (typeof s !== "string") return false;
   const t = s.trim();
-  return /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(t) || /^(rgba?|hsla?)\(/i.test(t) || NAMED_RE.test(t);
+  return /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(t) || /^(rgba?|hsla?)\(/i.test(t) || Object.prototype.hasOwnProperty.call(NAMED, t.toLowerCase());
 }
 function hslToRgb(h, s, l) {
   h = (h % 360 + 360) % 360;
@@ -777,7 +767,6 @@ function angle(part) {
   if (part.endsWith("grad")) return v * 0.9;
   return v;
 }
-var probe = null;
 function parseColor(input) {
   if (typeof input !== "string") return null;
   const s = input.trim().toLowerCase();
@@ -800,17 +789,7 @@ function parseColor(input) {
     const [r, g, b] = hslToRgb(angle(body[0]), num(body[1], 1) / (body[1].includes("%") ? 1 : 100), num(body[2], 1) / (body[2].includes("%") ? 1 : 100));
     return [r, g, b, alpha];
   }
-  if (NAMED[s]) return [...NAMED[s]];
-  if (hasDOM && /^[a-z]+$/.test(s)) {
-    probe = probe || document.createElement("i");
-    probe.style.color = "";
-    probe.style.color = s;
-    if (!probe.style.color) return null;
-    document.body.appendChild(probe);
-    const c = getComputedStyle(probe).color;
-    probe.remove();
-    return c && c.startsWith("rgb") ? parseColor(c) : null;
-  }
+  if (Object.prototype.hasOwnProperty.call(NAMED, s)) return [...NAMED[s]];
   return null;
 }
 var toLin = (c) => {
@@ -913,10 +892,22 @@ function parseComplex(s) {
   if (!tokens.length) return { type: "raw", s };
   return { type: "complex", strings, tokens, s };
 }
-function applyRelative(from, to) {
-  if (!to.op || from.type !== "num") return to;
-  const n = to.op === "+" ? from.n + to.n : to.op === "-" ? from.n - to.n : to.op === "*" ? from.n * to.n : from.n / (to.n || 1);
-  return numValue(n, to.unit || from.unit);
+function applyRelative(from, to, ctx = {}) {
+  if (!to.op) return to;
+  if (from.type === "complex" && from.tokens.length === 1 && from.tokens[0].type === "num" && !from.strings.join("").trim()) from = from.tokens[0];
+  if (from.type !== "num") return { ...to, op: void 0 };
+  if (to.op === "*" || to.op === "/") {
+    const n2 = to.op === "*" ? from.n * to.n : from.n / (to.n || 1);
+    return numValue(n2, from.unit || to.unit);
+  }
+  let delta = to;
+  const fromUnit = from.unit;
+  const toUnit = to.unit || (fromUnit ? ctx.defaultUnit || "" : "");
+  if (fromUnit && toUnit && toUnit !== fromUnit) {
+    delta = convertUnit(numValue(to.n, toUnit), fromUnit, ctx.el, ctx.prop, ctx.isTransform);
+  }
+  const n = to.op === "+" ? from.n + delta.n : from.n - delta.n;
+  return numValue(n, fromUnit || to.unit);
 }
 var ANGLE = { deg: 1, rad: 180 / Math.PI, turn: 360, grad: 0.9 };
 var VERTICAL = /^(height|top|bottom|y|translateY|marginTop|marginBottom|paddingTop|paddingBottom|minHeight|maxHeight|rowGap|borderTopWidth|borderBottomWidth)$/;
@@ -963,13 +954,13 @@ function pxPer(unit, el, prop, isTransform) {
 function measure(unit, el, prop) {
   if (!isEl(el)) return 1;
   const p = parentOf(el);
-  const probe2 = document.createElement(el.tagName === "svg" ? "div" : el.tagName);
-  probe2.style.position = "absolute";
-  probe2.style.visibility = "hidden";
-  probe2.style.width = "100" + unit;
-  p.appendChild(probe2);
-  const w = probe2.getBoundingClientRect().width;
-  probe2.remove();
+  const probe = document.createElement(el.tagName === "svg" ? "div" : el.tagName);
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.width = "100" + unit;
+  p.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  probe.remove();
   return w ? w / 100 : 1;
 }
 function convertUnit(v, unit, el, prop, isTransform = false) {
@@ -1061,17 +1052,6 @@ function customValue(get2, unit = "") {
 var isCustom = (v) => isObj(v) && !!v[CUSTOM];
 
 // src/targets.js
-var ids = /* @__PURE__ */ new WeakMap();
-var next = 0;
-function targetId(t) {
-  if (!isObj(t) && typeof t !== "function") return String(t);
-  let id = ids.get(t);
-  if (!id) {
-    id = ++next;
-    ids.set(t, id);
-  }
-  return id;
-}
 function isListLike(v) {
   if (!v || isStr(v) || typeof v !== "object") return false;
   if (isArr(v)) return true;
@@ -1146,6 +1126,9 @@ var Playable = class {
     };
     this._promise = null;
     this._resolve = null;
+    this._reject = null;
+    this._error = null;
+    this._interrupted = false;
   }
   // —— Durées ——
   /** Durée d'une itération (ms). */
@@ -1169,6 +1152,10 @@ var Playable = class {
   }
   get completed() {
     return this._completed;
+  }
+  /** Vrai si l'animation a été entièrement reprise par une autre (composition « replace »). */
+  get interrupted() {
+    return this._interrupted;
   }
   get reversed() {
     return this._dir < 0;
@@ -1214,6 +1201,11 @@ var Playable = class {
   }
   play() {
     if (this._parent || this._cancelled) return this;
+    if (this._interrupted || this._error) {
+      this._interrupted = false;
+      this._error = null;
+      this._resetPromise();
+    }
     if (this._completed) {
       this._completed = false;
       this._began = false;
@@ -1271,8 +1263,15 @@ var Playable = class {
   }
   /** Place la tête de lecture (ms, ou nom de libellé pour une timeline). */
   seek(time) {
-    var _a;
-    if (typeof time === "string" && this._labels) time = ((_a = this._labels[time]) != null ? _a : 0) + this._delay;
+    if (typeof time === "string") {
+      const key = time.trim();
+      if (this._labels && Object.prototype.hasOwnProperty.call(this._labels, key)) time = this._labels[key] + this._delay;
+      else if (key !== "" && Number.isFinite(+key)) time = +key;
+      else {
+        if (typeof console !== "undefined") console.warn(`Kinetika : libell\xE9 inconnu \xAB ${time} \xBB, seek() ignor\xE9.`);
+        return this;
+      }
+    }
     const total = this._total();
     const t = clamp(+time || 0, 0, total);
     this._time = t;
@@ -1316,17 +1315,40 @@ var Playable = class {
   /** Promesse résolue à la fin : `await animate(...)` ou `.then(() => …)`. */
   then(onFulfilled, onRejected) {
     if (!this._promise) {
-      this._promise = new Promise((res) => {
+      this._promise = new Promise((res, rej) => {
         this._resolve = res;
+        this._reject = rej;
       });
-      if (this._completed) this._resolve();
+      if (this._error) this._reject(this._error);
+      else if (this._completed || this._interrupted) this._resolve();
     }
     return this._promise.then(onFulfilled, onRejected);
+  }
+  catch(onRejected) {
+    return this.then(void 0, onRejected);
+  }
+  finally(onFinally) {
+    return this.then().finally(onFinally);
   }
   // —— Interne ——
   _resetPromise() {
     this._promise = null;
     this._resolve = null;
+    this._reject = null;
+  }
+  /** Reprise complète par une autre animation : arrêt, et la promesse se résout (sans onComplete). */
+  _interrupt() {
+    this._paused = true;
+    removeActive(this);
+    if (this._interrupted) return;
+    this._interrupted = true;
+    if (this._resolve) this._resolve();
+  }
+  /** Erreur levée par un rappel pendant une image : l'animation s'arrête, sa promesse est rejetée. */
+  _fail(err) {
+    this._paused = true;
+    this._error = err;
+    if (this._reject) this._reject(err);
   }
   _resetChildren() {
   }
@@ -1467,7 +1489,18 @@ var RESERVED = /* @__PURE__ */ new Set([
   "defaults",
   "playbackEase"
 ]);
-var owners = /* @__PURE__ */ new Map();
+var owners = /* @__PURE__ */ new WeakMap();
+var primitiveOwners = /* @__PURE__ */ new Map();
+var isRef = (t) => t !== null && typeof t === "object" || typeof t === "function";
+function ownerMap(target, create) {
+  const store2 = isRef(target) ? owners : primitiveOwners;
+  let m = store2.get(target);
+  if (!m && create) {
+    m = /* @__PURE__ */ new Map();
+    store2.set(target, m);
+  }
+  return m;
+}
 var written = /* @__PURE__ */ new WeakMap();
 var resolveEase = (e) => parseEase(e) || (isFn(e) ? e : null);
 function fnValue(v, target, i, total) {
@@ -1482,7 +1515,6 @@ var Track = class {
     this.target = target;
     this.prop = prop;
     this.kind = kind;
-    this.key = targetId(target) + "|" + prop;
     this.segs = opts.segs;
     this.hasFrom = this.segs.length > 0 && this.segs[0].fromRaw !== void 0;
     this.modifier = opts.modifier;
@@ -1515,10 +1547,10 @@ var Track = class {
     for (const s of this.segs) {
       if (s.fromRaw !== void 0) {
         from = parseValue(s.fromRaw);
-        if (from.op) from = applyRelative(parseValue(readValue(this.target, this.prop, this.kind)), from);
+        if (from.op) from = applyRelative(parseValue(readValue(this.target, this.prop, this.kind)), from, ctx);
       }
       let to = parseValue(s.toRaw);
-      to = applyRelative(from, to);
+      to = applyRelative(from, to, ctx);
       const [f, t] = unify(from, to, ctx);
       s.from = f;
       s.to = t;
@@ -1545,23 +1577,25 @@ var Track = class {
   claim() {
     if (this.composition === "none") return;
     this.overridden = false;
-    const cur = owners.get(this.key);
+    const map = ownerMap(this.target, true);
+    const cur = map.get(this.prop);
     if (cur && cur !== this && cur.composition !== "none") {
       const rootA = cur.anim._root();
       const rootB = this.anim._root();
       if (rootA !== rootB) {
         cur.overridden = true;
         const a = cur.anim;
-        if (!a._parent && a._tracks.every((t) => t.overridden || t.removed)) {
-          removeActive(a);
-          a._paused = true;
-        }
+        if (!a._parent && !a._completed && a._tracks.every((t) => t.overridden || t.removed)) a._interrupt();
       }
     }
-    owners.set(this.key, this);
+    map.set(this.prop, this);
   }
   release() {
-    if (owners.get(this.key) === this) owners.delete(this.key);
+    const map = ownerMap(this.target, false);
+    if (map && map.get(this.prop) === this) {
+      map.delete(this.prop);
+      if (!map.size) (isRef(this.target) ? owners : primitiveOwners).delete(this.target);
+    }
   }
   render(t, before) {
     if (this.removed) return;
@@ -1864,17 +1898,29 @@ var Timeline = class extends Playable {
     if (isFn(pos)) return this._position(pos(this));
     if (!isStr(pos)) return end;
     const s = pos.trim();
-    const m = s.match(/^(<<|<|[^+\-*]*?)?\s*(?:([+-])=\s*(-?\d*\.?\d+))?$/);
-    if (!m) return end;
-    const anchor = m[1] || "";
-    const off = m[2] ? (m[2] === "+" ? 1 : -1) * parseFloat(m[3]) : 0;
+    const labels = this._labels;
+    const has = (k) => Object.prototype.hasOwnProperty.call(labels, k);
+    if (has(s)) return Math.max(0, labels[s]);
+    let anchor = s;
+    let off = 0;
+    const idx = Math.max(s.lastIndexOf("+="), s.lastIndexOf("-="));
+    if (idx >= 0) {
+      const amount = s.slice(idx + 2).trim();
+      if (amount !== "" && Number.isFinite(+amount)) {
+        anchor = s.slice(0, idx).trim();
+        off = (s[idx] === "+" ? 1 : -1) * +amount;
+      }
+    }
     let base;
     if (anchor === "<") base = this._last ? this._last.end : 0;
     else if (anchor === "<<") base = this._last ? this._last.start : 0;
     else if (anchor === "") base = end;
-    else if (/^-?\d*\.?\d+$/.test(anchor)) base = parseFloat(anchor);
-    else if (anchor in this._labels) base = this._labels[anchor];
-    else base = end;
+    else if (Number.isFinite(+anchor)) base = +anchor;
+    else if (has(anchor)) base = labels[anchor];
+    else {
+      if (typeof console !== "undefined") console.warn(`Kinetika : position ou libell\xE9 inconnu \xAB ${pos} \xBB, ajout en fin de timeline.`);
+      base = end;
+    }
     return Math.max(0, base + off);
   }
   _insert(child, start) {
@@ -1969,16 +2015,23 @@ var Timeline = class extends Playable {
     if (!this._linkDirty) return;
     const tracks = [];
     this._allTracks(tracks, 0);
-    const groups = /* @__PURE__ */ new Map();
+    const byTarget = /* @__PURE__ */ new Map();
+    const groups = [];
     for (const t of tracks) {
-      let g = groups.get(t.key);
+      let props = byTarget.get(t.target);
+      if (!props) {
+        props = /* @__PURE__ */ new Map();
+        byTarget.set(t.target, props);
+      }
+      let g = props.get(t.prop);
       if (!g) {
         g = [];
-        groups.set(t.key, g);
+        props.set(t.prop, g);
+        groups.push(g);
       }
       g.push(t);
     }
-    for (const g of groups.values()) {
+    for (const g of groups) {
       g.sort((x, y) => x.absZero + x.start - (y.absZero + y.start));
       g.forEach((t, i) => {
         t.isFirst = i === 0;
@@ -2176,7 +2229,13 @@ var UNNAMEABLE_ROLES = /* @__PURE__ */ new Set([
   "time",
   "term"
 ]);
-var SR_STYLE = "position:absolute;left:0;top:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0";
+var SR_STYLE = "position:absolute;left:0;top:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;-webkit-user-select:none;user-select:none";
+var INTERACTIVE = 'a[href],button,input,select,textarea,summary,iframe,audio[controls],video[controls],[tabindex],[contenteditable]:not([contenteditable="false"])';
+var isInteractive = (n) => n.nodeType === 1 && n.matches(INTERACTIVE) && n.getAttribute("tabindex") !== "-1";
+var hasInteractive = (n) => isInteractive(n) || [...n.querySelectorAll(INTERACTIVE)].some(isInteractive);
+var splits = /* @__PURE__ */ new WeakMap();
+var typers = /* @__PURE__ */ new WeakMap();
+var originals = /* @__PURE__ */ new WeakMap();
 function visualHost(el, named, cls) {
   if (named) return el;
   let host = [...el.children].find((c) => c.classList.contains(cls));
@@ -2245,6 +2304,8 @@ function splitText(target, opts = {}) {
   };
   const result = { el, chars: [], words: [], lines: [], masks: [], revert, refresh };
   if (!el) return result;
+  const previous = splits.get(el);
+  if (previous) previous.revert();
   const original = el.innerHTML;
   const name = accessibleName(el);
   const text = el.textContent.replace(/\s+/g, " ").trim();
@@ -2292,8 +2353,14 @@ function splitText(target, opts = {}) {
         splitTextNode(node, frag);
         node.replaceWith(frag);
       } else if (node.nodeType === 1 && node.tagName !== "BR") {
-        walk(node);
-        if (!node.hasAttribute("aria-hidden")) node.setAttribute("aria-hidden", "true");
+        if (isInteractive(node)) {
+          const label = node.textContent.replace(/\s+/g, " ").trim();
+          if (label && !node.hasAttribute("aria-label") && !node.hasAttribute("aria-labelledby")) node.setAttribute("aria-label", label);
+          walk(node);
+        } else {
+          walk(node);
+          if (!node.hasAttribute("aria-hidden") && !hasInteractive(node)) node.setAttribute("aria-hidden", "true");
+        }
       }
     }
   }
@@ -2311,48 +2378,80 @@ function splitText(target, opts = {}) {
     if (text) name.set(text);
   }
   function groupLines() {
-    const top = [...el.childNodes];
     const words = new Set(result.words);
+    const withWords = /* @__PURE__ */ new Set();
+    for (const w of result.words) for (let p = w.parentNode; p && p !== el; p = p.parentNode) withWords.add(p);
+    const leaves = [];
+    const collect = (parent) => {
+      for (const n of [...parent.childNodes]) {
+        if (n.nodeType === 1 && !words.has(n) && n.tagName !== "BR" && withWords.has(n)) collect(n);
+        else if (n.nodeType === 1 || n.nodeType === 3) leaves.push(n);
+      }
+    };
+    collect(el);
     const rows = [];
     let current = null;
     let lastTop = null;
-    for (const node of top) {
-      let y = null;
-      let h = 0;
-      if (node.nodeType === 1) {
-        if (node.tagName === "BR") {
-          current = null;
-          lastTop = null;
-          continue;
-        }
-        const ref = words.has(node) ? node : result.words.find((w) => node.contains(w)) || node;
-        const r = ref.getBoundingClientRect();
-        y = r.top;
-        h = r.height;
+    for (const leaf of leaves) {
+      if (leaf.nodeType === 1 && leaf.tagName === "BR") {
+        current = null;
+        lastTop = null;
+        continue;
       }
-      if (!current || y !== null && lastTop !== null && y - lastTop > Math.max(2, h * 0.5)) {
+      if (words.has(leaf)) {
+        const r = leaf.getBoundingClientRect();
+        if (current && lastTop !== null && r.top - lastTop > Math.max(2, r.height * 0.5)) current = null;
+        lastTop = r.top;
+      }
+      if (!current) {
         current = [];
         rows.push(current);
       }
-      current.push(node);
-      if (y !== null) lastTop = y;
+      current.push(leaf);
     }
+    const blank = (n) => n.nodeType === 3 && !n.textContent.trim();
+    const cloned = /* @__PURE__ */ new Set();
     for (const row of rows) {
-      while (row.length && row[0].nodeType === 3 && !row[0].textContent.trim()) row.shift().remove();
-      while (row.length && row[row.length - 1].nodeType === 3 && !row[row.length - 1].textContent.trim()) row.pop().remove();
+      while (row.length && blank(row[0])) row.shift().remove();
+      while (row.length && blank(row[row.length - 1])) row.pop().remove();
       if (!row.length) continue;
       const line = span(cls.line);
       line.style.display = "block";
-      line.setAttribute("aria-hidden", "true");
-      row[0].before(line);
-      for (const n of row) line.appendChild(n);
+      let chain = [];
+      for (const leaf of row) {
+        const anc = [];
+        for (let p = leaf.parentNode; p && p !== el; p = p.parentNode) anc.unshift(p);
+        let k = 0;
+        while (k < chain.length && k < anc.length && chain[k].orig === anc[k]) k++;
+        chain = chain.slice(0, k);
+        for (let j = k; j < anc.length; j++) {
+          const orig = anc[j];
+          const copy = orig.cloneNode(false);
+          if (cloned.has(orig)) {
+            copy.removeAttribute("id");
+            if (isInteractive(orig)) {
+              copy.setAttribute("tabindex", "-1");
+              copy.setAttribute("aria-hidden", "true");
+            }
+          }
+          cloned.add(orig);
+          (j === 0 ? line : chain[j - 1].copy).appendChild(copy);
+          chain.push({ orig, copy });
+        }
+        (chain.length ? chain[chain.length - 1].copy : line).appendChild(leaf);
+      }
+      if (!hasInteractive(line)) line.setAttribute("aria-hidden", "true");
       result.lines.push(line);
     }
-    el.querySelectorAll(":scope > br").forEach((b) => b.remove());
+    el.textContent = "";
+    for (const line of result.lines) el.appendChild(line);
   }
   function revert() {
+    if (splits.get(el) !== result) return result;
     el.innerHTML = original;
     name.revert();
+    el.removeAttribute("data-kt-split");
+    splits.delete(el);
     result.chars.length = 0;
     result.words.length = 0;
     result.lines.length = 0;
@@ -2360,11 +2459,24 @@ function splitText(target, opts = {}) {
     return result;
   }
   function refresh() {
+    if (splits.get(el) !== result) return result;
     build();
     return result;
   }
+  splits.set(el, result);
+  el.setAttribute("data-kt-split", "");
   build();
   return result;
+}
+function rememberOriginal(el) {
+  if (!originals.has(el)) originals.set(el, el.innerHTML);
+  return originals.get(el);
+}
+function restoreOriginal2(el) {
+  if (originals.has(el)) {
+    el.innerHTML = originals.get(el);
+    originals.delete(el);
+  }
 }
 var GLYPHS = "!<>-_\\/[]{}\u2014=+*^?#01ABCDEFGHKXZ";
 function scramble(target, opts = {}) {
@@ -2373,9 +2485,12 @@ function scramble(target, opts = {}) {
   const chars = opts.chars || GLYPHS;
   const rng = createRandom((_a = opts.seed) != null ? _a : 7);
   const fps = (_b = opts.fps) != null ? _b : 24;
+  const names = [];
   const states = els.map((el) => {
     var _a2;
+    rememberOriginal(el);
     const name = accessibleName(el);
+    names.push(name);
     const host = visualHost(el, name.named, "kt-scramble");
     const finalText = graphemes((_a2 = opts.text) != null ? _a2 : host.textContent);
     const from = graphemes(host.textContent);
@@ -2390,7 +2505,7 @@ function scramble(target, opts = {}) {
   });
   const proxy = { p: 0 };
   const glyph = () => chars[Math.floor(rng() * chars.length)];
-  return animate(proxy, {
+  const anim = animate(proxy, {
     p: [0, 1],
     duration: (_c = opts.duration) != null ? _c : 1600,
     delay: (_d = opts.delay) != null ? _d : 0,
@@ -2425,11 +2540,24 @@ function scramble(target, opts = {}) {
       if (opts.onUpdate) opts.onUpdate(a);
     }
   });
+  const baseRevert = anim.revert.bind(anim);
+  anim.revert = () => {
+    baseRevert();
+    els.forEach((el, i) => {
+      restoreOriginal2(el);
+      names[i].revert();
+    });
+    return anim;
+  };
+  return anim;
 }
 function typewriter(target, opts = {}) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   const el = resolveTargets(target)[0];
   if (!el) return animate({}, { duration: 0 });
+  const running = typers.get(el);
+  if (running) running.revert();
+  const original = el.innerHTML;
   const texts = isArr(opts.text) ? opts.text : [(_a = opts.text) != null ? _a : el.textContent];
   const cps = (_b = opts.speed) != null ? _b : 22;
   const textNode = document.createTextNode("");
@@ -2463,13 +2591,28 @@ function typewriter(target, opts = {}) {
       }
     });
   };
+  const finish = (tl2) => {
+    tl2.caret = caret;
+    tl2.blink = blink;
+    const baseRevert = tl2.revert.bind(tl2);
+    tl2.revert = () => {
+      baseRevert();
+      if (blink) blink.revert();
+      if (typers.get(el) === tl2) {
+        el.innerHTML = original;
+        name.revert();
+        typers.delete(el);
+      }
+      return tl2;
+    };
+    typers.set(el, tl2);
+    return tl2;
+  };
   if (texts.length === 1) {
     const a = typeOne(texts[0], false);
     const tl2 = timeline({ delay: (_d = opts.delay) != null ? _d : 0, autoplay: (_e = opts.autoplay) != null ? _e : true, loop: opts.loop, onComplete: opts.onComplete, reducedMotion: opts.reducedMotion });
     tl2.add(a);
-    tl2.caret = caret;
-    tl2.blink = blink;
-    return tl2;
+    return finish(tl2);
   }
   const tl = timeline({
     delay: (_f = opts.delay) != null ? _f : 0,
@@ -2488,14 +2631,12 @@ function typewriter(target, opts = {}) {
     tl.call(() => {
     }, `+=${(_b2 = opts.gap) != null ? _b2 : 300}`);
   });
-  tl.caret = caret;
-  tl.blink = blink;
-  return tl;
+  return finish(tl);
 }
 function odometer(target, opts = {}) {
   var _a, _b, _c;
   const el = resolveTargets(target)[0];
-  const turns = (_a = opts.turns) != null ? _a : 1;
+  const turns = Math.max(0, Math.floor(+((_a = opts.turns) != null ? _a : 1) || 0));
   const N = 10 * (turns + 1);
   const cols = [];
   let current = String((_b = opts.from) != null ? _b : "");
@@ -2555,7 +2696,7 @@ function odometer(target, opts = {}) {
       s.forEach((ch, i) => {
         const c = cols[i];
         if (!c.digit) return;
-        const target2 = +ch + 10 * (1 + (s.length - i) % turns);
+        const target2 = +ch + (turns ? 10 * (1 + (s.length - i) % turns) : 0);
         const fromPos = c.pos % 10;
         tl.add(c.strip, { y: [`${-100 * fromPos / N}%`, `${-100 * target2 / N}%`], duration, ease }, (s.length - 1 - i) * each);
         c.pos = target2;
@@ -2801,10 +2942,10 @@ var ScrollObserver = class {
     if (this.scrub !== null && this.scrub > 0) {
       const target = this.rawProgress;
       const k = 1 - Math.exp(-dt / (this.scrub * 1e3 / 3));
-      const next2 = this.progress + (target - this.progress) * k;
-      if (Math.abs(target - next2) < 5e-4) this.progress = target;
+      const next = this.progress + (target - this.progress) * k;
+      if (Math.abs(target - next) < 5e-4) this.progress = target;
       else {
-        this.progress = next2;
+        this.progress = next;
         busy = true;
       }
       this._apply();

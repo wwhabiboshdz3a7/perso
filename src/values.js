@@ -65,11 +65,29 @@ export function parseComplex(s) {
   return { type: 'complex', strings, tokens, s };
 }
 
-/** Applique un opérateur relatif (+=, -=, *=, /=) à partir de la valeur de départ. */
-export function applyRelative(from, to) {
-  if (!to.op || from.type !== 'num') return to;
-  const n = to.op === '+' ? from.n + to.n : to.op === '-' ? from.n - to.n : to.op === '*' ? from.n * to.n : from.n / (to.n || 1);
-  return numValue(n, to.unit || from.unit);
+/**
+ * Applique un opérateur relatif (+=, -=, *=, /=) à partir de la valeur de départ.
+ * Pour + et -, l'écart est d'abord converti dans l'unité de départ : rotate 90deg puis
+ * '-=1turn' donne -270deg ; x 10px puis '+=2rem' donne 42px. Un écart sans unité prend
+ * l'unité par défaut de la propriété (deg pour rotate, px pour x ou width).
+ * Pour * et /, le nombre est un facteur sans unité.
+ */
+export function applyRelative(from, to, ctx = {}) {
+  if (!to.op) return to;
+  if (from.type === 'complex' && from.tokens.length === 1 && from.tokens[0].type === 'num' && !from.strings.join('').trim()) from = from.tokens[0];
+  if (from.type !== 'num') return { ...to, op: undefined };
+  if (to.op === '*' || to.op === '/') {
+    const n = to.op === '*' ? from.n * to.n : from.n / (to.n || 1);
+    return numValue(n, from.unit || to.unit);
+  }
+  let delta = to;
+  const fromUnit = from.unit;
+  const toUnit = to.unit || (fromUnit ? ctx.defaultUnit || '' : '');
+  if (fromUnit && toUnit && toUnit !== fromUnit) {
+    delta = convertUnit(numValue(to.n, toUnit), fromUnit, ctx.el, ctx.prop, ctx.isTransform);
+  }
+  const n = to.op === '+' ? from.n + delta.n : from.n - delta.n;
+  return numValue(n, fromUnit || to.unit);
 }
 
 // —— Unités ——

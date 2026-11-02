@@ -24,3 +24,7 @@ odometer('.prix', { value: 1290 }).set(4500);
 typewriter('.t', { text: ['a', 'b'] }).caret;
 scramble('.s', { text: 'ok', autoplay: false });
 (async () => { await animate({ v: 0 }, { v: 1 }); })();
+const reprise = animate({ v: 0 }, { v: 1 });
+const stoppee: boolean = reprise.interrupted;
+reprise.catch((e) => console.error(e)).finally(() => {});
+void stoppee;

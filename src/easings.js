@@ -119,10 +119,13 @@ const springCache = new Map();
  * Ressort physique amorti. La durée nécessaire pour se stabiliser est calculée
  * et exposée dans `.duration` (ms) : elle sert de durée par défaut à l'animation.
  */
-export function spring({ mass = 1, stiffness = 100, damping = 10, velocity = 0 } = {}) {
-  const m = Math.max(0.01, mass);
-  const k = Math.max(0.01, stiffness);
-  const c = Math.max(0, damping);
+export function spring({ mass, stiffness, damping, velocity } = {}) {
+  // paramètre absent ou invalide (NaN, texte) : valeur par défaut
+  const num = (v, d) => (v !== null && v !== '' && Number.isFinite(+v) ? +v : d);
+  const m = Math.max(0.01, num(mass, 1));
+  const k = Math.max(0.01, num(stiffness, 100));
+  const c = Math.max(0, num(damping, 10));
+  velocity = num(velocity, 0);
   const key = `${m}|${k}|${c}|${velocity}`;
   if (springCache.has(key)) return springCache.get(key);
 
@@ -176,8 +179,9 @@ const gsapPower = { power1: 'Quad', power2: 'Cubic', power3: 'Quart', power4: 'Q
 
 const parseCache = new Map();
 
+// Arguments numériques ; un argument illisible devient undefined (valeur par défaut).
 function parseArgs(s) {
-  return s.split(',').map((x) => x.trim()).filter(Boolean).map(Number);
+  return s.split(',').map((x) => x.trim()).filter(Boolean).map((x) => (Number.isFinite(+x) ? +x : undefined));
 }
 
 /**

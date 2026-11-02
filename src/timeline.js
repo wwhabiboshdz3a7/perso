@@ -54,17 +54,31 @@ export class Timeline extends Playable {
     if (isFn(pos)) return this._position(pos(this));
     if (!isStr(pos)) return end;
     const s = pos.trim();
-    const m = s.match(/^(<<|<|[^+\-*]*?)?\s*(?:([+-])=\s*(-?\d*\.?\d+))?$/);
-    if (!m) return end;
-    const anchor = m[1] || '';
-    const off = m[2] ? (m[2] === '+' ? 1 : -1) * parseFloat(m[3]) : 0;
+    const labels = this._labels;
+    const has = (k) => Object.prototype.hasOwnProperty.call(labels, k);
+    // un libellé exact l'emporte : 'intro-fin', 'étape+1'…
+    if (has(s)) return Math.max(0, labels[s]);
+    let anchor = s;
+    let off = 0;
+    // décalage relatif en fin de chaîne : '+=200', '<-=50', 'intro-fin+=100'
+    const idx = Math.max(s.lastIndexOf('+='), s.lastIndexOf('-='));
+    if (idx >= 0) {
+      const amount = s.slice(idx + 2).trim();
+      if (amount !== '' && Number.isFinite(+amount)) {
+        anchor = s.slice(0, idx).trim();
+        off = (s[idx] === '+' ? 1 : -1) * +amount;
+      }
+    }
     let base;
     if (anchor === '<') base = this._last ? this._last.end : 0;
     else if (anchor === '<<') base = this._last ? this._last.start : 0;
     else if (anchor === '') base = end;
-    else if (/^-?\d*\.?\d+$/.test(anchor)) base = parseFloat(anchor);
-    else if (anchor in this._labels) base = this._labels[anchor];
-    else base = end;
+    else if (Number.isFinite(+anchor)) base = +anchor;
+    else if (has(anchor)) base = labels[anchor];
+    else {
+      if (typeof console !== 'undefined') console.warn(`Kinetika : position ou libellé inconnu « ${pos} », ajout en fin de timeline.`);
+      base = end;
+    }
     return Math.max(0, base + off);
   }
 
@@ -166,13 +180,17 @@ export class Timeline extends Playable {
     if (!this._linkDirty) return;
     const tracks = [];
     this._allTracks(tracks, 0);
-    const groups = new Map();
+    // regroupement par cible puis par propriété
+    const byTarget = new Map();
+    const groups = [];
     for (const t of tracks) {
-      let g = groups.get(t.key);
-      if (!g) { g = []; groups.set(t.key, g); }
+      let props = byTarget.get(t.target);
+      if (!props) { props = new Map(); byTarget.set(t.target, props); }
+      let g = props.get(t.prop);
+      if (!g) { g = []; props.set(t.prop, g); groups.push(g); }
       g.push(t);
     }
-    for (const g of groups.values()) {
+    for (const g of groups) {
       g.sort((x, y) => (x.absZero + x.start) - (y.absZero + y.start));
       g.forEach((t, i) => {
         t.isFirst = i === 0;

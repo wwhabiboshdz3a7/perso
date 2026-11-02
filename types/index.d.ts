@@ -145,6 +145,8 @@ export interface Playable extends PromiseLike<void> {
   readonly paused: boolean;
   readonly began: boolean;
   readonly completed: boolean;
+  /** Vrai si l'animation a été entièrement reprise par une autre (composition « replace ») : arrêtée, promesse résolue, sans onComplete. */
+  readonly interrupted: boolean;
   readonly reversed: boolean;
   readonly iteration: number;
   play(): this;
@@ -159,6 +161,9 @@ export interface Playable extends PromiseLike<void> {
   /** Arrête et restaure les valeurs d'origine. */
   revert(): this;
   then<R1 = void, R2 = never>(onFulfilled?: ((value: void) => R1 | PromiseLike<R1>) | null, onRejected?: ((reason: any) => R2 | PromiseLike<R2>) | null): Promise<R1 | R2>;
+  /** Erreur levée par un rappel pendant une image : la promesse est rejetée. */
+  catch<R = never>(onRejected?: ((reason: any) => R | PromiseLike<R>) | null): Promise<void | R>;
+  finally(onFinally?: (() => void) | null): Promise<void>;
 }
 
 export declare class Animation implements Playable {
@@ -173,6 +178,8 @@ export declare class Animation implements Playable {
   readonly paused: boolean;
   readonly began: boolean;
   readonly completed: boolean;
+  /** Vrai si l'animation a été entièrement reprise par une autre (composition « replace ») : arrêtée, promesse résolue, sans onComplete. */
+  readonly interrupted: boolean;
   readonly reversed: boolean;
   readonly iteration: number;
   play(): this;
@@ -185,6 +192,9 @@ export declare class Animation implements Playable {
   cancel(): this;
   revert(): this;
   then<R1 = void, R2 = never>(onFulfilled?: ((value: void) => R1 | PromiseLike<R1>) | null, onRejected?: ((reason: any) => R2 | PromiseLike<R2>) | null): Promise<R1 | R2>;
+  /** Erreur levée par un rappel pendant une image : la promesse est rejetée. */
+  catch<R = never>(onRejected?: ((reason: any) => R | PromiseLike<R>) | null): Promise<void | R>;
+  finally(onFinally?: (() => void) | null): Promise<void>;
 }
 
 /** Position dans une timeline : ms, '<', '<<', '+=200', '-=100', 'libellé', 'libellé+=50', '<<+=100', ou fonction. */
@@ -217,6 +227,8 @@ export declare class Timeline implements Playable {
   readonly paused: boolean;
   readonly began: boolean;
   readonly completed: boolean;
+  /** Vrai si l'animation a été entièrement reprise par une autre (composition « replace ») : arrêtée, promesse résolue, sans onComplete. */
+  readonly interrupted: boolean;
   readonly reversed: boolean;
   readonly iteration: number;
   play(): this;
@@ -229,6 +241,9 @@ export declare class Timeline implements Playable {
   cancel(): this;
   revert(): this;
   then<R1 = void, R2 = never>(onFulfilled?: ((value: void) => R1 | PromiseLike<R1>) | null, onRejected?: ((reason: any) => R2 | PromiseLike<R2>) | null): Promise<R1 | R2>;
+  /** Erreur levée par un rappel pendant une image : la promesse est rejetée. */
+  catch<R = never>(onRejected?: ((reason: any) => R | PromiseLike<R>) | null): Promise<void | R>;
+  finally(onFinally?: (() => void) | null): Promise<void>;
 }
 
 /** Anime des cibles. */

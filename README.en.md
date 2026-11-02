@@ -81,11 +81,13 @@ Copy `dist/kinetika.esm.min.js` into your project and import it directly, or map
 
 ### Size
 
+<!-- tailles -->
 | File | Raw | gzip |
 |---|---|---|
-| `dist/kinetika.esm.min.js` | 54.5 kB | **20.5 kB** |
-| `dist/kinetika.umd.min.js` | 55.7 kB | 20.9 kB |
-| `dist/kinetika.esm.js` (unminified, commented) | 95.5 kB | 27.7 kB |
+| `dist/kinetika.esm.min.js` | 62.2 kB | **23.9 kB** |
+| `dist/kinetika.umd.min.js` | 63.5 kB | 24.2 kB |
+| `dist/kinetika.esm.js` (unminified, commented) | 108.0 kB | 31.8 kB |
+<!-- /tailles -->
 
 `npm run build` regenerates these files and `dist/sizes.json`. The package is marked side-effect free (`sideEffects: false`), so bundlers keep only what you import.
 
