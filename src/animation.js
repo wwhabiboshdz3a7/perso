@@ -1,6 +1,6 @@
 // animate(cibles, paramètres) : pistes par cible et par propriété, keyframes, composition.
 import { isFn, isArr, isObj, isNum, isUndef, clamp, isEl } from './utils.js';
-import { engine } from './engine.js';
+import { engine, removeActive } from './engine.js';
 import { parseEase, linear } from './easings.js';
 import { parseValue, applyRelative, unify, interpolate, isCustom } from './values.js';
 import { propKind, normalizeProp, readValue, writeValue, captureOriginal, restoreOriginal, defaultUnit, flush } from './props.js';
@@ -21,6 +21,14 @@ const resolveEase = (e) => parseEase(e) || (isFn(e) ? e : null);
 /** Évalue une valeur fonction (el, i, total) → valeur. */
 function fnValue(v, target, i, total) {
   return isFn(v) && !v.isSpring && !isCustom(v) ? v(target, i, total) : v;
+}
+
+/**
+ * Pour `ease`, une fonction à un seul paramètre est une courbe (t) => valeur ;
+ * une fonction (el, i, total) choisit une courbe par cible.
+ */
+function easeValue(v, target, i, total) {
+  return isFn(v) && !v.isSpring && v.length >= 2 ? v(target, i, total) : v;
 }
 
 class Track {
@@ -96,7 +104,15 @@ class Track {
     if (cur && cur !== this && cur.composition !== 'none') {
       const rootA = cur.anim._root();
       const rootB = this.anim._root();
-      if (rootA !== rootB) cur.overridden = true;
+      if (rootA !== rootB) {
+        cur.overridden = true;
+        // animation autonome entièrement reprise : on la retire de la boucle
+        const a = cur.anim;
+        if (!a._parent && a._tracks.every((t) => t.overridden || t.removed)) {
+          removeActive(a);
+          a._paused = true;
+        }
+      }
     }
     owners.set(this.key, this);
   }
@@ -158,7 +174,7 @@ function toSteps(value, ctx, local) {
     if (!isUndef(value.duration)) { o.duration = +ev(value.duration); o.durExplicit = true; }
     if (!isUndef(value.delay)) o.delay = +ev(value.delay);
     if (!isUndef(value.ease)) {
-      o.ease = resolveEase(ev(value.ease)) || o.ease;
+      o.ease = resolveEase(easeValue(value.ease, ctx.target, ctx.i, ctx.total)) || o.ease;
       if (!o.durExplicit && o.ease.isSpring) o.duration = o.ease.duration;
     }
     if (value.modifier) o.modifier = value.modifier;
@@ -177,7 +193,7 @@ function toSteps(value, ctx, local) {
         from: 'from' in k ? ev(k.from) : undefined,
         duration: isUndef(k.duration) ? undefined : +ev(k.duration),
         delay: isUndef(k.delay) ? 0 : +ev(k.delay),
-        ease: isUndef(k.ease) ? undefined : resolveEase(ev(k.ease)),
+        ease: isUndef(k.ease) ? undefined : resolveEase(easeValue(k.ease, ctx.target, ctx.i, ctx.total)),
       })), local };
     }
     const vals = value.map(ev);
@@ -274,7 +290,7 @@ export class Animation extends Playable {
 
     list.forEach((target, i) => {
       const ctx = { target, i, total };
-      const ease = resolveEase(fnValue(p.ease ?? d.ease, target, i, total)) || resolveEase(d.ease) || linear;
+      const ease = resolveEase(easeValue(p.ease ?? d.ease, target, i, total)) || resolveEase(d.ease) || linear;
       let dur = fnValue(baseDur, target, i, total);
       const durExplicit = !isUndef(dur);
       if (!durExplicit) dur = ease.isSpring ? ease.duration : d.duration;

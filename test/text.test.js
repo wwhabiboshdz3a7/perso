@@ -46,6 +46,27 @@ test('splitText : lignes et masques', () => {
   box.remove();
 });
 
+test('splitText : lignes mesurées sur les mots, même dans un élément en ligne', () => {
+  // jsdom ne calcule pas la mise en page : on simule les positions verticales.
+  const tops = { un: 0, deux: 4, trois: 40, quatre: 41 };
+  const proto = window.HTMLElement.prototype;
+  const original = proto.getBoundingClientRect;
+  proto.getBoundingClientRect = function () {
+    const key = this.textContent.trim();
+    const top = key in tops ? tops[key] : -6; // un <em> en ligne commence plus haut que ses mots
+    return { top, height: 30, left: 0, width: 10, right: 10, bottom: top + 30, x: 0, y: top };
+  };
+  try {
+    const box = html('<p>un <em>deux</em> trois quatre</p>');
+    const s = splitText(box.firstChild, { lines: true, words: true, chars: false });
+    assert.deepEqual(s.lines.map((l) => l.textContent.trim()), ['un deux', 'trois quatre']);
+    s.revert();
+    box.remove();
+  } finally {
+    proto.getBoundingClientRect = original;
+  }
+});
+
 test('splitText + stagger dans une animation', () => {
   const box = html('<h2>ABC</h2>');
   const s = splitText(box.firstChild, { chars: true });

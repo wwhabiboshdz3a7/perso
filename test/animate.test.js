@@ -311,3 +311,26 @@ test('engine.onFrame : rappel à chaque image, arrêt possible', () => {
   engine.tick(16);
   assert.deepEqual(deltas, [16, 20]);
 });
+
+test('ease : fonction (t) => v ou fonction (el, i) qui choisit une courbe par cible', () => {
+  const o = { v: 0 };
+  animate(o, { v: 100, duration: 100, ease: (t) => t * t });
+  engine.tick(50);
+  assert.equal(o.v, 25);
+  const list = [{ v: 0 }, { v: 0 }];
+  animate(list, { v: 100, duration: 100, ease: (el, i) => (i ? 'linear' : 'inQuad') });
+  engine.tick(50);
+  assert.deepEqual(list.map((x) => x.v), [25, 50]);
+  const q = { v: 0 };
+  animate(q, { v: { to: 100, ease: (t) => t * t * t }, duration: 100 });
+  engine.tick(50);
+  assert.equal(q.v, 12.5);
+});
+
+test('composition : une animation entièrement reprise quitte la boucle', () => {
+  const o = { v: 0 };
+  const a = animate(o, { v: 100, duration: 1000 });
+  engine.tick(10);
+  animate(o, { v: 0, duration: 100 });
+  assert.ok(a.paused);
+});

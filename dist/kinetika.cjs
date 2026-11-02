@@ -442,6 +442,7 @@ var state = {
     composition: "replace"
   }
 };
+var inFrame = false;
 function frame(t) {
   frameId = null;
   let dt = t - last;
@@ -449,8 +450,13 @@ function frame(t) {
   const lag = state.lagSmoothing;
   if (lag && dt > lag.threshold) dt = lag.adjusted;
   if (dt < 0) dt = 0;
-  step(dt);
-  if (active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+  inFrame = true;
+  try {
+    step(dt);
+  } finally {
+    inFrame = false;
+  }
+  if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
 }
 function step(dt) {
   const scaled = dt * state.timeScale;
@@ -462,7 +468,7 @@ function step(dt) {
   flush();
 }
 function wake() {
-  if (frameId !== null || state.paused || state.manual || !raf || hidden && state.pauseOnHidden) return;
+  if (inFrame || frameId !== null || state.paused || state.manual || !raf || hidden && state.pauseOnHidden) return;
   last = now();
   frameId = raf(frame);
 }
@@ -1520,6 +1526,9 @@ var resolveEase = (e) => parseEase(e) || (isFn(e) ? e : null);
 function fnValue(v, target, i, total) {
   return isFn(v) && !v.isSpring && !isCustom(v) ? v(target, i, total) : v;
 }
+function easeValue(v, target, i, total) {
+  return isFn(v) && !v.isSpring && v.length >= 2 ? v(target, i, total) : v;
+}
 var Track = class {
   constructor(anim, target, prop, kind, opts) {
     this.anim = anim;
@@ -1593,7 +1602,14 @@ var Track = class {
     if (cur && cur !== this && cur.composition !== "none") {
       const rootA = cur.anim._root();
       const rootB = this.anim._root();
-      if (rootA !== rootB) cur.overridden = true;
+      if (rootA !== rootB) {
+        cur.overridden = true;
+        const a = cur.anim;
+        if (!a._parent && a._tracks.every((t) => t.overridden || t.removed)) {
+          removeActive(a);
+          a._paused = true;
+        }
+      }
     }
     owners.set(this.key, this);
   }
@@ -1652,7 +1668,7 @@ function toSteps(value, ctx, local) {
     }
     if (!isUndef(value.delay)) o.delay = +ev(value.delay);
     if (!isUndef(value.ease)) {
-      o.ease = resolveEase(ev(value.ease)) || o.ease;
+      o.ease = resolveEase(easeValue(value.ease, ctx.target, ctx.i, ctx.total)) || o.ease;
       if (!o.durExplicit && o.ease.isSpring) o.duration = o.ease.duration;
     }
     if (value.modifier) o.modifier = value.modifier;
@@ -1671,7 +1687,7 @@ function toSteps(value, ctx, local) {
         from: "from" in k ? ev(k.from) : void 0,
         duration: isUndef(k.duration) ? void 0 : +ev(k.duration),
         delay: isUndef(k.delay) ? 0 : +ev(k.delay),
-        ease: isUndef(k.ease) ? void 0 : resolveEase(ev(k.ease))
+        ease: isUndef(k.ease) ? void 0 : resolveEase(easeValue(k.ease, ctx.target, ctx.i, ctx.total))
       })), local };
     }
     const vals = value.map(ev);
@@ -1776,7 +1792,7 @@ var Animation = class extends Playable {
     list.forEach((target, i) => {
       var _a2, _b2;
       const ctx = { target, i, total };
-      const ease = resolveEase(fnValue((_a2 = p.ease) != null ? _a2 : d.ease, target, i, total)) || resolveEase(d.ease) || linear;
+      const ease = resolveEase(easeValue((_a2 = p.ease) != null ? _a2 : d.ease, target, i, total)) || resolveEase(d.ease) || linear;
       let dur = fnValue(baseDur, target, i, total);
       const durExplicit = !isUndef(dur);
       if (!durExplicit) dur = ease.isSpring ? ease.duration : d.duration;
@@ -2277,28 +2293,31 @@ function splitText(target, opts = {}) {
     if (!hadLabel && text) el.setAttribute("aria-label", text);
   }
   function groupLines() {
-    var _a2;
     const top = [...el.childNodes];
+    const words = new Set(result.words);
     const rows = [];
     let current = null;
     let lastTop = null;
     for (const node of top) {
-      let y = lastTop;
+      let y = null;
+      let h = 0;
       if (node.nodeType === 1) {
-        const r = node.getBoundingClientRect();
-        y = (_a2 = node.offsetTop) != null ? _a2 : r.top;
         if (node.tagName === "BR") {
           current = null;
           lastTop = null;
           continue;
         }
+        const ref = words.has(node) ? node : result.words.find((w) => node.contains(w)) || node;
+        const r = ref.getBoundingClientRect();
+        y = r.top;
+        h = r.height;
       }
-      if (!current || y !== null && lastTop !== null && Math.abs(y - lastTop) > 2) {
+      if (!current || y !== null && lastTop !== null && y - lastTop > Math.max(2, h * 0.5)) {
         current = [];
         rows.push(current);
       }
       current.push(node);
-      if (node.nodeType === 1) lastTop = y;
+      if (y !== null) lastTop = y;
     }
     for (const row of rows) {
       while (row.length && row[0].nodeType === 3 && !row[0].textContent.trim()) row.shift().remove();

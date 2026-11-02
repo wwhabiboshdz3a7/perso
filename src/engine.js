@@ -33,6 +33,8 @@ const state = {
   },
 };
 
+let inFrame = false;
+
 function frame(t) {
   frameId = null;
   let dt = t - last;
@@ -40,8 +42,14 @@ function frame(t) {
   const lag = state.lagSmoothing;
   if (lag && dt > lag.threshold) dt = lag.adjusted;
   if (dt < 0) dt = 0;
-  step(dt);
-  if (active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+  // pendant l'image, wake() ne programme rien : c'est la fin de l'image qui s'en charge
+  inFrame = true;
+  try {
+    step(dt);
+  } finally {
+    inFrame = false;
+  }
+  if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
 }
 
 function step(dt) {
@@ -56,7 +64,7 @@ function step(dt) {
 }
 
 function wake() {
-  if (frameId !== null || state.paused || state.manual || !raf || (hidden && state.pauseOnHidden)) return;
+  if (inFrame || frameId !== null || state.paused || state.manual || !raf || (hidden && state.pauseOnHidden)) return;
   last = now();
   frameId = raf(frame);
 }

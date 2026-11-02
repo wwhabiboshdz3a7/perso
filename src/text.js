@@ -107,23 +107,30 @@ export function splitText(target, opts = {}) {
 
   function groupLines() {
     // regroupe les nœuds de premier niveau selon leur position verticale
+    // On mesure le premier mot de chaque nœud (un <em> en ligne n'a pas le même haut
+    // qu'un mot en inline-block) et on ne change de ligne que si l'on descend
+    // de plus de la moitié de la hauteur du mot.
     const top = [...el.childNodes];
+    const words = new Set(result.words);
     const rows = [];
     let current = null;
     let lastTop = null;
     for (const node of top) {
-      let y = lastTop;
+      let y = null;
+      let h = 0;
       if (node.nodeType === 1) {
-        const r = node.getBoundingClientRect();
-        y = node.offsetTop ?? r.top;
         if (node.tagName === 'BR') { current = null; lastTop = null; continue; }
+        const ref = words.has(node) ? node : result.words.find((w) => node.contains(w)) || node;
+        const r = ref.getBoundingClientRect();
+        y = r.top;
+        h = r.height;
       }
-      if (!current || (y !== null && lastTop !== null && Math.abs(y - lastTop) > 2)) {
+      if (!current || (y !== null && lastTop !== null && y - lastTop > Math.max(2, h * 0.5))) {
         current = [];
         rows.push(current);
       }
       current.push(node);
-      if (node.nodeType === 1) lastTop = y;
+      if (y !== null) lastTop = y;
     }
     for (const row of rows) {
       // les espaces en bord de ligne sont retirés
