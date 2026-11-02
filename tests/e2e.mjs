@@ -232,6 +232,41 @@ async function scenarios(navigateur, largeur) {
       await sansDebordement(page);
       await capture(page, `e2e-certificat-${suffixe}`);
     });
+    await etape('certificats : module payant refusé sans accès, import piégé neutralisé', async () => {
+      await page.goto(BASE + '/cours/#/certificat/m6');
+      await page.locator('#main h1').waitFor();
+      verifier(/pas encore disponible/.test(await page.locator('#main h1').innerText()) && (await page.locator('.certif').count()) === 0, 'certificat M6 refusé en gratuit');
+      await page.goto(BASE + '/cours/#/profil');
+      await page.locator('#importFile').setInputFiles({ name: 'piege.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ lecons: { m6: { 1: 1, 2: 1 } }, xp: '<b id="injecte">X</b>', quiz: { 'm0/1': { score: '<i id="inj2">9</i>', total: 1 } } })) });
+      await page.locator('.toast', { hasText: 'importée' }).waitFor();
+      verifier((await page.locator('#injecte, #inj2').count()) === 0, 'aucun balisage injecté');
+      await page.locator('#importFile').setInputFiles({ name: 'casse.json', mimeType: 'application/json', buffer: Buffer.from('{"lecons":null}') });
+      await page.locator('.toast', { hasText: 'Import impossible' }).waitFor();
+      await page.goto(BASE + '/cours/#/certificat/m6');
+      verifier((await page.locator('.certif').count()) === 0, 'toujours pas de certificat M6');
+    });
+    await etape('adresse mal formée et recherche : message en français, surlignage propre', async () => {
+      await page.goto(BASE + '/cours/#/recherche?q=%E0%A4%A');
+      await page.locator('#reessayer').waitFor();
+      verifier(/mal formée/.test(await page.locator('#main').innerText()), 'message adresse mal formée');
+      await page.goto(BASE + '/cours/#/recherche?q=' + encodeURIComponent('ma mark'));
+      await page.locator('.results li').first().waitFor();
+      verifier(!/<\/?mark|&lt;|&amp;/.test(await page.locator('.results').innerText()), 'ni balise ni entité visibles');
+    });
+    if (largeur < 600) await etape('sommaire de leçon (mobile) : s\'ouvre et se referme sans changer de leçon', async () => {
+      await page.goto(BASE + '/cours/#/lecon/m1/3');
+      await page.locator('#sbToggle').click();
+      await page.locator('#sidebar.open').waitFor();
+      verifier(await page.locator('#sbToggle').getAttribute('aria-expanded') === 'true', 'aria-expanded');
+      await page.mouse.click(370, 500);
+      await page.waitForTimeout(350);
+      verifier(!(await page.locator('#sidebar').evaluate(e => e.classList.contains('open'))), 'refermé par un clic à côté');
+      verifier(await page.locator('#sbToggle').getAttribute('aria-expanded') === 'false', 'aria-expanded remis à false');
+      await page.locator('#sbToggle').click();
+      await page.locator('#sbFermer').click();
+      verifier(await page.evaluate(() => document.activeElement?.id) === 'sbToggle', 'focus rendu au bouton Sommaire');
+      verifier(/lecon\/m1\/3/.test(page.url()), 'même leçon');
+    });
     tousLesErreurs.push(...erreurs);
     await ctx.close();
   }

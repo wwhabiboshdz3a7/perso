@@ -33,6 +33,7 @@ if (zoneGuide) {
   const sansGuide = (message = '') => {
     zoneGuide.hidden = true;
     $('#sansGuide').hidden = false;
+    $('.merci-hero .actions').hidden = true; // les deux appels à l'action sont dans l'encadré
     if (message) $('#sansGuide p').textContent = message;
     $('#merciSurtitre').textContent = 'Mini-guide offert';
     $('#merciTitre').innerHTML = 'Le mini-guide des <em>7 services IA.</em>';
@@ -97,6 +98,7 @@ if (form) {
         const p = $('#panneauCle');
         $('#cleTexte').textContent = v;
         form.hidden = true;
+        $('.chapo').textContent = 'Votre accès est activé sur cet appareil. Dernière étape : mettre votre clé en lieu sûr.';
         p.hidden = false;
         p.querySelector('h2').setAttribute('tabindex', '-1');
         p.querySelector('h2').focus();

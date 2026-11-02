@@ -45,7 +45,7 @@ document.querySelectorAll('[data-garantie]').forEach(el => { el.hidden = !g.acti
 document.querySelectorAll('[data-sans-garantie]').forEach(el => { el.hidden = !!g.active; });
 document.querySelectorAll('[data-garantie-jours]').forEach(el => { el.textContent = String(parseInt(g.jours, 10) || 14); });
 const gc = document.getElementById('garantieConditions');
-if (gc && g.conditions) gc.textContent = g.conditions;
+if (gc && g.conditions) gc.textContent = g.conditions.charAt(0).toLowerCase() + g.conditions.slice(1); // suit un deux-points
 
 // Bandeau pour le propriétaire tant que des informations obligatoires manquent.
 const bandeau = document.getElementById('bandeauCompleter');

@@ -15,7 +15,7 @@ const num = n => String(n).padStart(2, '0');
 const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
 /** Texte d'un fragment HTML, entités décodées (DOMParser n'exécute aucun script). */
 const analyseur = new DOMParser();
-const texteBrut = html => (analyseur.parseFromString(`<body>${String(html || '').replace(/<\/(p|li|h\d|td|th|pre|div)>/g, '$& ')}</body>`, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
+const texteBrut = html => (analyseur.parseFromString(`<body>${String(html || '').replace(/<\/(p|li|h\d|td|th|pre|div)>|<\/b>(?=[A-ZÀ-Ý])/g, '$& ')}</body>`, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
 /** Erreur dont le message, en français, peut être montré tel quel à l'élève. */
 class ErreurPage extends Error {}
 const nomFormateur = () => [CFG.formateur?.prenom, CFG.formateur?.nom].filter(Boolean).join(' ') || 'Le formateur';
@@ -133,10 +133,8 @@ function regionsDefilantes(racine = main) {
     if (defile && !el.hasAttribute('tabindex')) {
       el.tabIndex = 0;
       el.dataset.defile = '1';
-      if (el.tagName === 'PRE') { el.setAttribute('role', 'region'); el.setAttribute('aria-label', el.classList.contains('prompt') ? 'Texte du prompt (défilant)' : 'Bloc de code (défilant)'); }
     } else if (!defile && el.dataset.defile) {
       el.removeAttribute('tabindex'); delete el.dataset.defile;
-      if (el.tagName === 'PRE') { el.removeAttribute('role'); el.removeAttribute('aria-label'); }
     }
   }
 }
@@ -232,7 +230,7 @@ async function vueAccueil() {
           <a class="btn" href="#/module/m0">Plan d'action 30 jours</a>
         </div>
       </div>
-      <aside class="acces-card ${o}">
+      <div class="acces-card ${o}" role="group" aria-label="Votre accès">
         <p class="eyebrow">Votre accès</p>
         <p class="acces-offre">${o === 'gratuit' ? 'Gratuit' : esc(NOMS_OFFRES[o])}</p>
         <p class="muted">${o === 'gratuit' ? 'Modules 0 et 1 ouverts. Les modules 2 à 8 et les bonus se débloquent avec une offre.' : o === 'essentiel' ? 'Modules 0 à 3, 7, 8 et bonus. Les modules 4, 5 et 6 sont inclus dans l\'offre Pro.' : 'Toute la formation et les bonus sont ouverts.'}</p>
@@ -241,7 +239,7 @@ async function vueAccueil() {
           ${RANGS[o] < RANGS.pro ? `<a class="btn small primary" href="../#offres">Voir les offres</a>` : ''}
           <a class="btn small ghost" href="#/acces">${o === 'gratuit' ? 'J\'ai un code ou une licence' : 'Gérer mon accès'}</a>
         </div>
-      </aside>
+      </div>
     </section>
     <div class="section-title"><h2>Le programme</h2><span class="muted">${modules.length} modules · ${totalLecons} leçons</span></div>
     <div class="mgrid">${modules.map(carteModule).join('')}
