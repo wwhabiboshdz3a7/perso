@@ -136,6 +136,9 @@ export async function verifierDossierPublie() {
     const codeNoeud = wf.nodes.find(n => n.type === 'n8n-nodes-base.code');
     if (codeNoeud) extraits.push([nomWf, codeNoeud.parameters.jsCode.slice(0, 80)]);
   }
+  // Le mini-guide de l'aimant n'est servi qu'avec un jeton (fonction guide) : aucun passage dans public/.
+  const guide = await readFile(path.join(racine, 'prive', 'guide', '7-services.html'), 'utf8');
+  for (const m of guide.matchAll(/<(?:dd|p class="attention")>([^<]{40,})</g)) extraits.push(['mini-guide', m[1].slice(0, 60)]);
   for (const [ou, extrait] of extraits) {
     if (extrait.length < 30) continue;
     for (const [f, contenu] of textes) if (contenu.includes(extrait)) e.push(`contenu payant (${ou}) trouvé dans ${f}`);

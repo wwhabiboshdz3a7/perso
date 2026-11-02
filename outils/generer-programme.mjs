@@ -1,8 +1,12 @@
-// Met à jour, dans public/index.html, le programme détaillé et les chiffres clés à partir du catalogue.
+// Met à jour, dans public/index.html, le programme détaillé et les chiffres clés à partir du catalogue,
+// ainsi que les balises de partage (og:url, og:image en adresse absolue, lien canonique) à partir de
+// produit.url dans config.js : les robots des réseaux sociaux n'exécutent pas le JavaScript.
 // Usage : node outils/generer-programme.mjs [--verifier]
 // --verifier : n'écrit rien, échoue si la page n'est pas à jour (utilisé par les tests).
 // Le programme est écrit en HTML statique pour être lisible sans JavaScript et indexable.
 import { readFile, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { modules, bonus, fichiers, totalLecons, NOMS_OFFRES } from '../public/cours/content/catalogue.js';
@@ -38,10 +42,27 @@ export function htmlChiffres() {
   return `<!-- stats:debut -->\n      <ul class="chiffres" aria-label="La formation en chiffres">\n${items.map(([v, l]) => `        <li><b>${v}</b><span>${l}</span></li>`).join('\n')}\n      </ul>\n      <!-- stats:fin -->`;
 }
 
-export function mettreAJour(html) {
+/** Configuration du site (public/config.js), évaluée dans un bac à sable. */
+export function lireConfig() {
+  const bac = { window: {} };
+  vm.runInNewContext(readFileSync(path.join(racine, 'public', 'config.js'), 'utf8'), bac, { timeout: 1000 });
+  return bac.window.LEVIER_CONFIG || {};
+}
+
+export function htmlPartage(config = lireConfig()) {
+  const brut = String(config.produit?.url || '').trim().replace(/\/+$/, '');
+  const url = /^https:\/\/[^\s"'<>]+$/.test(brut) ? brut : '';
+  const lignes = url
+    ? [`<link rel="canonical" href="${esc(url)}/">`, `<meta property="og:url" content="${esc(url)}/">`, `<meta property="og:image" content="${esc(url)}/assets/img/partage.png">`, `<meta name="twitter:image" content="${esc(url)}/assets/img/partage.png">`]
+    : ['<!-- produit.url est vide dans config.js : renseignez-le puis lancez « npm run programme » pour obtenir des aperçus de partage (adresses absolues). -->', '<meta property="og:image" content="assets/img/partage.png">'];
+  return `<!-- partage:debut -->\n  ${lignes.join('\n  ')}\n  <!-- partage:fin -->`;
+}
+
+export function mettreAJour(html, config = lireConfig()) {
   return html
     .replace(/<!-- programme:debut -->[\s\S]*?<!-- programme:fin -->/, htmlProgramme())
-    .replace(/<!-- stats:debut -->[\s\S]*?<!-- stats:fin -->/, htmlChiffres());
+    .replace(/<!-- stats:debut -->[\s\S]*?<!-- stats:fin -->/, htmlChiffres())
+    .replace(/<!-- partage:debut -->[\s\S]*?<!-- partage:fin -->/, htmlPartage(config));
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

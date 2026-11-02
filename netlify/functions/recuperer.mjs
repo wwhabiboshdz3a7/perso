@@ -6,7 +6,7 @@
 // SITE_URL (facultatif : sinon l'adresse du site Netlify).
 import { json, lireEnv, ipClient } from '../lib/http.mjs';
 import { lireCorrespondances, requete } from '../lib/verificateurs.mjs';
-import { envoyerEmail, emailConfigure, lireExpediteur, ErreurEmail } from '../lib/email.mjs';
+import { envoyerEmail, emailConfigure, lireExpediteur, emailValide, ErreurEmail } from '../lib/email.mjs';
 import { NOMS_OFFRES } from '../../public/cours/content/catalogue.js';
 
 const FENETRE_MS = 15 * 60 * 1000;
@@ -24,7 +24,6 @@ export function reinitialiserLimitesRecuperation() { compteurs.clear(); }
 
 const MESSAGE = 'Si un achat correspond à cette adresse, vous recevrez dans quelques minutes un email avec votre lien d\'activation. Pensez à regarder dans les indésirables.';
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-export const emailValide = e => /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(e) && e.length <= 200;
 
 /** Sessions Checkout payées pour cet email, issues des liens de paiement de la formation. */
 export async function sessionsPayees(email, env, fetchImpl) {

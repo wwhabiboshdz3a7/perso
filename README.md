@@ -18,8 +18,8 @@ Trois noms ont été étudiés ; aucun ne doit laisser croire à un produit offi
 
 **Page de vente** (`public/index.html`)
 - Promesse, constat, méthode, pour qui / pas pour qui, programme détaillé module par module (généré depuis le catalogue), focus sur la chaîne vidéo, contenus fournis, formateur, offres, garantie, FAQ, appel à l'action.
-- Offres Essentiel / Pro / VIP, prix et liens de paiement (Stripe Payment Links, Lemon Squeezy, Gumroad) dans `config.js`. Sans lien, le bouton ouvre une **liste d'attente** (Netlify Forms).
-- **Aimant à prospects** : module gratuit + mini-guide « 7 services IA à proposer ce mois-ci » contre un email (Netlify Forms, consentement explicite, piège à robots), puis page `/merci/` avec le guide complet.
+- Offres Essentiel / Pro / VIP, prix et liens de paiement (Stripe Payment Links, Lemon Squeezy, Gumroad) dans `config.js`. Sans lien, le bouton ouvre une **liste d'attente** (Netlify Forms). L'offre VIP reste masquée (page de vente et CGV) tant que son accompagnement n'est pas décrit dans `config.js` : aucun engagement n'est inventé.
+- **Aimant à prospects** : le mini-guide « 7 services IA à proposer ce mois-ci » contre un email (Netlify Forms, consentement explicite, piège à robots), puis une série de 5 emails de conseils. Le guide n'est **pas** dans le dossier publié : la fonction `guide` le sert sur `/merci/` avec un jeton remis à l'inscription, et en envoie le lien personnel par email si l'envoi est configuré. Les modules 0 et 1 restent en accès libre, sans inscription.
 - Mention d'indépendance bien visible, avertissement sur les revenus, **aucun faux témoignage, compte à rebours ou stock** : la section témoignages est vide par défaut, donc masquée.
 - Identité forte (papier, encre, cobalt, citron ; Bricolage Grotesque, Instrument Serif, JetBrains Mono, servies localement), responsive jusqu'à 390 px, accessible (contrastes AA, clavier, focus visible, libellés), `prefers-reduced-motion` respecté, aucune dépendance externe.
 
@@ -53,8 +53,9 @@ public/                    dossier publié (aucun contenu payant)
   vendor/codemirror/       coloration syntaxique (licence MIT)
 prive/                     contenu payant (jamais publié)
   modules/                 m2.mjs … m8.mjs, bonus.mjs
+  guide/                   le mini-guide de l'aimant (servi par la fonction guide)
   n8n/                     01 à 06 : workflows à importer
-netlify/functions/         access.mjs (activation, renouvellement), content.mjs (contenu payant), recuperer.mjs (clé Stripe perdue)
+netlify/functions/         access.mjs (activation, renouvellement), content.mjs (contenu payant), recuperer.mjs (clé Stripe perdue), guide.mjs (mini-guide de l'aimant)
 netlify/lib/               jetons HMAC, vérificateurs de licences, révocation, envoi d'emails, lecture du contenu privé
 outils/                    serveur local, générateurs (codes, programme, workflows n8n), vérification du contenu
 tests/                     tests unitaires des fonctions, tests du contenu, tests de bout en bout (Playwright)
@@ -85,7 +86,7 @@ npm run verifier  # contrôle du contenu : leçons, exercices, bonus, workflows,
 npm run e2e       # Playwright, ordinateur 1440 px et mobile 390 px
 ```
 
-Les tests de bout en bout démarrent le serveur local et vérifient : page de vente, liste d'attente, aimant à prospects jusqu'au mini-guide, module gratuit (exercice, quiz, validation automatique), progression et certificat, refus d'un code invalide, offre Essentiel puis Pro, contenu payant introuvable dans le dossier publié (404) et refusé sans jeton (401), téléchargement d'un workflow n8n, bonus, recherche, activation après achat, pages légales, absence de défilement horizontal et **zéro erreur dans la console**. Playwright doit être disponible (`require('playwright')`).
+Les tests de bout en bout démarrent le serveur local (Stripe et l'envoi d'emails y sont simulés par `tests/simulation-fournisseurs.mjs`) et vérifient : page de vente, liste d'attente, aimant à prospects jusqu'au mini-guide et guide introuvable sans inscription, module gratuit (exercice, quiz, validation automatique), progression et certificat, refus d'un code invalide, offre Essentiel puis Pro, pas de rétrogradation, contenu payant introuvable dans le dossier publié (404) et refusé sans jeton (401), téléchargement d'un workflow n8n, bonus, recherche, activation après achat (code, session Stripe payée, session remboursée refusée, clé perdue renvoyée par email), pages légales, absence de défilement horizontal et **zéro erreur dans la console**. Playwright doit être disponible (`require('playwright')`).
 
 ## Déployer sur Netlify
 
@@ -102,11 +103,11 @@ Les tests de bout en bout démarrent le serveur local et vérifient : page de ve
 | `STRIPE_SECRET_KEY` et `STRIPE_LIENS` | Clé **restreinte**, en lecture seule sur *Checkout Sessions*, *PaymentIntents* et *Charges* (ces deux derniers servent à détecter un remboursement ou un litige), puis `essentiel:plink_…,pro:plink_…,vip:plink_…`. |
 | `REVOKED_KEYS` | Accès coupés immédiatement : clés (code `LEV-…`, licence, `cs_…`) ou références de vente (`gumroad:<sale_id>`, `lemonsqueezy:<n° de commande>`), séparées par des virgules. Pour une longue liste : `prive/revocations.txt` (une par ligne). |
 | `LICENCE_MAX_ACTIVATIONS` | Facultatif : nombre d'activations d'une licence Gumroad sur de nouveaux appareils (5 par défaut). |
-| `EMAIL_FOURNISSEUR`, `EMAIL_API_KEY`, `EMAIL_EXPEDITEUR` | Facultatif, pour la récupération d'une clé Stripe perdue : `brevo` ou `resend`, la clé d'API, et l'expéditeur `Levier <acces@votre-domaine.fr>` (domaine vérifié chez le prestataire). Sans ces variables, l'élève est invité à écrire au support. |
+| `EMAIL_FOURNISSEUR`, `EMAIL_API_KEY`, `EMAIL_EXPEDITEUR` | Facultatif mais conseillé : `brevo` ou `resend`, la clé d'API, et l'expéditeur `Levier <bonjour@votre-domaine.fr>` (domaine vérifié chez le prestataire). Servent à envoyer le lien du mini-guide aux inscrits et le lien d'activation d'une clé Stripe perdue. Sans ces variables, le guide s'affiche seulement sur `/merci/` après l'inscription, et l'élève qui a perdu sa clé est invité à écrire au support. |
 | `SITE_URL` | Facultatif : adresse publique du site dans les emails (sinon l'adresse Netlify du site). |
 | `TOKEN_TTL_DAYS` | Facultatif : durée de validité d'un jeton (30 jours par défaut, renouvelé automatiquement). Plus court, un remboursement est pris en compte plus vite sans révocation manuelle. |
 
-4. **Formulaires** : activez la détection des formulaires (Forms → Enable form detection), puis redéployez. Les formulaires `aimant` et `liste-attente` apparaissent ; branchez une notification ou un export vers votre outil d'emailing.
+4. **Formulaires** : activez la détection des formulaires (Forms → Enable form detection), puis redéployez. Les formulaires `aimant` et `liste-attente` apparaissent ; branchez une notification ou un export vers votre outil d'emailing (double opt-in conseillé). Avec les variables `EMAIL_*`, le premier email (lien personnel du mini-guide) part tout seul ; programmez les quatre suivants (VENTE.md, section 5) dans l'outil d'emailing.
 5. **Domaine** : ajoutez votre domaine, HTTPS est automatique.
 
 ### Brancher le paiement
@@ -144,8 +145,10 @@ Pour ajouter les vidéos des leçons : `cours.videos` dans `config.js` (`'m6-5':
 
 - [ ] `config.js` → `formateur.nom` (nom de famille), `formateur.photo` (photo carrée dans `public/assets/img/`), `parcours`, `liens` (site, LinkedIn, Instagram, TikTok, YouTube), `agence.url`.
 - [ ] `formateur.chiffres` : uniquement des chiffres vérifiables (aujourd'hui : « 150+ projets accompagnés »).
-- [ ] `contact.email` (support), `produit.url`.
-- [ ] `offres` : prix définitifs, contenu exact du VIP, `lienPaiement` de chaque offre ; `prixTTC` et `mentionTVA` selon votre régime de TVA.
+- [ ] `contact.email` (support), `produit.url` (adresse publique en `https://`), puis `npm run programme` : il écrit dans `index.html` l'image de partage en adresse absolue, `og:url` et le lien canonique (vérifiez ensuite l'aperçu avec l'inspecteur de publication LinkedIn ou le débogueur de partage Facebook).
+- [ ] `offres` : prix définitifs, `lienPaiement` de chaque offre ; `prixTTC` et `mentionTVA` selon votre régime de TVA.
+- [ ] Offre VIP : décrivez l'accompagnement réellement livré dans `offres[…].accompagnement` (sinon l'offre reste masquée) et ses conditions dans `legal.conditionsAccompagnement`.
+- [ ] `cours.scriptsVideo` : `'tous'` montre l'encart « Script vidéo » à chaque élève ; `'formateur'` le réserve à votre usage (`/cours/?formateur=1`) pour tourner les vidéos.
 - [ ] `garantie` : active ou non, durée et conditions.
 - [ ] `legal` : raison sociale, forme, adresse, SIRET, RCS ou capital si société, TVA intracommunautaire, directeur de publication, téléphone, **médiateur de la consommation**, outil d'emailing, conditions de l'accompagnement VIP. Vérifiez l'adresse de l'hébergeur.
 - [ ] Faire relire les CGV, les mentions légales et la politique de confidentialité par un professionnel.
@@ -153,7 +156,7 @@ Pour ajouter les vidéos des leçons : `cours.videos` dans `config.js` (`'m6-5':
 - [ ] Stripe : clé restreinte avec lecture des Checkout Sessions, PaymentIntents et Charges ; collecte de l'email activée sur les liens.
 - [ ] Récupération des clés Stripe : compte Brevo ou Resend, domaine d'envoi vérifié, variables `EMAIL_*` (sinon, procédure de support décrite ci-dessus).
 - [ ] Case de renonciation au droit de rétractation et email de confirmation chez le prestataire de paiement.
-- [ ] Formulaires Netlify détectés, notifications ou export vers l'outil d'emailing, double opt-in conseillé.
+- [ ] Formulaires Netlify détectés, notifications ou export vers l'outil d'emailing, double opt-in conseillé ; séquence de 5 emails programmée, au rythme annoncé dans la case de consentement (5 emails sur 9 jours, puis environ un par semaine).
 - [ ] `temoignages` : ne rien ajouter tant que vous n'avez pas d'avis réels avec accord écrit.
 - [ ] Mettre à jour `produit.miseAJour` à chaque révision du contenu.
 
@@ -162,7 +165,8 @@ Pour ajouter les vidéos des leçons : `cours.videos` dans `config.js` (`'m6-5':
 - Le jeton d'accès et la clé sont conservés dans le navigateur de l'élève (pour le renouvellement silencieux). Un code `LEV-…` peut être saisi sur plusieurs appareils : pour limiter le partage, préférez les licences Gumroad ou Lemon Squeezy (limite d'appareils, remboursements refusés). Un code partagé se coupe aussitôt en retirant son hachage ; une licence ou une session Stripe, en l'ajoutant à `REVOKED_KEYS`.
 - La limite d'appareils Gumroad repose sur le compteur `uses` de la licence, qui ne redescend pas : un élève qui change souvent de navigateur peut l'atteindre. Augmentez `LICENCE_MAX_ACTIVATIONS` ou donnez-lui un code `LEV-…`.
 - La limitation des essais est faite par instance de fonction (en mémoire) : suffisante contre les essais manuels, ce n'est pas un pare-feu.
-- La progression est stockée localement (pas de compte élève) : l'élève l'exporte et l'importe depuis son profil pour changer d'appareil.
+- La progression est stockée localement (pas de compte élève) : l'élève l'exporte et l'importe depuis son profil pour changer d'appareil. Le fichier importé est validé ; les certificats ne sont délivrés que pour les modules de l'offre active, quand chaque leçon a son exercice et son quiz réussis (au moins la moitié de bonnes réponses). Comme toute attestation produite dans le navigateur, ils restent déclaratifs : il n'existe pas de registre pour les vérifier.
+- Le mini-guide est remis contre un email, sans vérification de l'adresse (pas de double opt-in côté site) : activez le double opt-in dans l'outil d'emailing si vous voulez une liste propre.
 - Les tarifs et fonctionnalités des outils tiers évoluent vite : prévoyez une révision du contenu tous les trois mois.
 
 ## Licences

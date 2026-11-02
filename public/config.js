@@ -74,7 +74,7 @@ window.LEVIER_CONFIG = {
         'Module 4 : Claude Code et agents',
         'Module 5 : API et automatisations + 5 workflows n8n à importer',
         'Module 6 : automatisation vidéo IA (le plus complet), avec le workflow de la chaîne vidéo',
-        'Scripts vidéo de chaque leçon',
+        'Les scripts vidéo des leçons des modules 4 à 6',
         'Certificat de fin de formation'
       ],
       lienPaiement: ''            // À COMPLÉTER
@@ -82,13 +82,11 @@ window.LEVIER_CONFIG = {
     {
       id: 'vip', nom: 'VIP', prix: 497, prixBarre: null,
       resume: 'Le programme Pro et un accompagnement personnalisé.',
-      inclus: [
-        'Tout le programme Pro',
-        // À COMPLÉTER / AJUSTER : décrivez précisément ce que vous livrez réellement.
-        '2 séances individuelles en visio (1 h) avec Ibrahim',
-        'Revue de votre offre et de votre page de vente',
-        'Questions par email pendant 60 jours'
-      ],
+      inclus: ['Tout le programme Pro'],
+      // À COMPLÉTER : l'accompagnement que vous livrez réellement, une ligne par engagement, par exemple
+      // 'Deux séances individuelles en visio d\'une heure' ou 'Revue de votre offre et de votre page de vente'.
+      // Tant que cette liste est vide, l'offre VIP n'est affichée ni sur la page de vente ni dans les CGV.
+      accompagnement: [],
       lienPaiement: ''            // À COMPLÉTER
     }
   ],
@@ -110,7 +108,7 @@ window.LEVIER_CONFIG = {
   /* Aimant à prospects (Netlify Forms, formulaire « aimant »). */
   aimant: {
     titre: 'Le mini-guide : 7 services IA à proposer ce mois-ci',
-    description: 'Le module 0 et le module 1 de la formation, plus un guide de 7 services concrets à vendre avec Claude, avec pour chacun le livrable, les outils et la façon de le livrer.'
+    description: 'Sept prestations concrètes à vendre avec Claude, avec pour chacune le livrable, les outils, la façon de la livrer et le point de vigilance. Affiché aussitôt et envoyé par email, puis cinq conseils pratiques sur neuf jours.'
   },
 
   /* Espace membre. */
@@ -144,7 +142,8 @@ window.LEVIER_CONFIG = {
     outilEmailing: '',            // ex. 'Brevo (Sendinblue SAS, France)' si vous exportez les contacts vers un outil
     prestatairesPaiement: 'Stripe, Lemon Squeezy ou Gumroad selon l\'offre choisie',
     villeTribunal: '',            // facultatif : ville du tribunal compétent pour les litiges entre professionnels
-    // À AJUSTER : conditions de l'accompagnement VIP (réservation, délai, annulation).
-    conditionsAccompagnement: 'Les séances individuelles de l\'offre VIP se réservent par email et doivent être utilisées dans les 6 mois suivant l\'achat. Une séance annulée moins de 24 h à l\'avance est due.'
+    // À COMPLÉTER si l'offre VIP est proposée : conditions de l'accompagnement (réservation, délai
+    // d'utilisation, annulation), par exemple « Les séances se réservent par email… ».
+    conditionsAccompagnement: ''
   }
 };

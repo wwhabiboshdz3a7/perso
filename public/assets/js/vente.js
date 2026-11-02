@@ -25,13 +25,15 @@ if (annee) annee.textContent = String(new Date().getFullYear());
   const f = CFG.formateur || {};
   const nom = [f.prenom, f.nom].filter(Boolean).join(' ');
   $$('[data-formateur-nom]').forEach(el => { if (nom) el.textContent = nom; });
-  $$('[data-monogramme]').forEach(el => { if (f.prenom) el.textContent = f.prenom.trim()[0].toUpperCase(); });
+  const initiales = [f.prenom, f.nom].filter(x => x && x.trim()).map(x => x.trim()[0].toUpperCase()).join('');
+  $$('[data-monogramme]').forEach(el => { if (initiales) el.textContent = initiales; });
+  // Sans photo : un médaillon à initiales à côté du titre. Avec photo : le grand portrait en regard du texte.
   if (f.photo) {
     const img = new Image();
     img.alt = nom ? `Portrait de ${nom}` : 'Portrait du formateur';
     img.width = 440; img.height = 440; img.loading = 'lazy'; img.decoding = 'async';
     img.src = f.photo;
-    img.addEventListener('load', () => { const p = $('#portrait'); p.textContent = ''; p.appendChild(img); });
+    img.addEventListener('load', () => { const p = $('#portrait'); p.textContent = ''; p.appendChild(img); p.hidden = false; $('#formateur').classList.add('avec-photo'); });
   }
   if (Array.isArray(f.presentation) && f.presentation.length) {
     $('#formateurFaits').innerHTML = f.presentation.map(x => `<li>${esc(x)}</li>`).join('');
@@ -61,11 +63,14 @@ if (annee) annee.textContent = String(new Date().getFullYear());
 })();
 
 /* ---------- offres ---------- */
-const offres = Array.isArray(CFG.offres) ? CFG.offres : [];
+// Une offre qui prévoit un accompagnement (VIP) n'est affichée que si cet accompagnement est décrit.
+const offreVisible = o => o && (!Array.isArray(o.accompagnement) || o.accompagnement.some(x => String(x).trim()));
+const offres = (Array.isArray(CFG.offres) ? CFG.offres : []).filter(offreVisible);
 (function rendreOffres() {
   if (!offres.length) return;
   const ttc = CFG.prixTTC !== false;
   const noteTVA = CFG.mentionTVA ? esc(CFG.mentionTVA) : (ttc ? 'Prix TTC' : 'Prix HT');
+  $('#offresListe').dataset.nombre = String(offres.length);
   $('#offresListe').innerHTML = offres.map(o => {
     const lien = urlSure(o.lienPaiement) ? o.lienPaiement.trim() : '';
     const cta = lien
@@ -78,7 +83,7 @@ const offres = Array.isArray(CFG.offres) ? CFG.offres : [];
       <p class="resume">${esc(o.resume || '')}</p>
       <p class="prix">${prixBarre}<b>${euros(o.prix)}</b></p>
       <p class="prix-note">${noteTVA} · paiement unique</p>
-      <ul>${(o.inclus || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+      <ul>${[...(o.inclus || []), ...(o.accompagnement || [])].filter(i => String(i).trim()).map(i => `<li>${esc(i)}</li>`).join('')}</ul>
       ${cta}
       <p class="offre-pied">${lien ? 'Accès immédiat après paiement' : 'Inscriptions bientôt ouvertes'}</p>
     </article>`;
@@ -136,11 +141,21 @@ formAimant?.addEventListener('submit', async e => {
   if (!verifier(formAimant, msg)) return;
   btn.disabled = true; msg.textContent = 'Envoi…';
   try {
+    // 1. Jeton du mini-guide (fonction `guide`, qui l'envoie aussi par email si c'est configuré).
+    const rep = await fetch('/.netlify/functions/guide', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: formAimant.email.value.trim(), prenom: formAimant.prenom.value.trim(), consentement: formAimant.consentement.checked ? 'oui' : '', 'bot-field': formAimant['bot-field']?.value || '' })
+    });
+    const d = await rep.json().catch(() => ({}));
+    if (!rep.ok || !d.ok || !d.jeton) throw new Error(d.erreur || '');
+    // 2. Inscription enregistrée dans Netlify Forms (export vers l'outil d'emailing).
     await envoyer(formAimant);
+    try { localStorage.setItem('levier.guide', d.jeton); } catch { /* */ }
     try { sessionStorage.setItem('levier.prenom', formAimant.prenom.value.trim().slice(0, 60)); } catch { /* */ }
     location.href = formAimant.getAttribute('action') || '/merci/';
-  } catch {
-    msg.textContent = 'L\'envoi a échoué. Vérifiez votre connexion et réessayez.'; msg.className = 'form-msg ko'; btn.disabled = false;
+  } catch (err) {
+    msg.textContent = err instanceof TypeError || !err?.message ? 'L\'envoi a échoué. Vérifiez votre connexion et réessayez.' : err.message;
+    msg.className = 'form-msg ko'; btn.disabled = false;
   }
 });
 
@@ -195,7 +210,7 @@ majNav();
 /* ---------- apparition au défilement ---------- */
 const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!reduit && 'IntersectionObserver' in window) {
-  const cibles = $$('.section h2, .constats li, .piliers li, .carte, .chaine li, .video-plus > div, .recus li, .offre, .portrait, .faq details');
+  const cibles = $$('.section h2, .constats li, .piliers li, .carte, .chaine li, .video-plus > div, .recus li, .offre, .medaillon, .faq details');
   const obs = new IntersectionObserver(entrees => {
     entrees.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); obs.unobserve(en.target); } });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });

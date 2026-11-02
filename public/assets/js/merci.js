@@ -18,6 +18,48 @@ try {
 
 $('#imprimer')?.addEventListener('click', () => window.print());
 
+// Mini-guide : servi par la fonction `guide` sur présentation du jeton reçu à l'inscription
+// (mémorisé sur cet appareil, ou présent dans le lien envoyé par email : /merci/?g=…).
+const zoneGuide = $('#guide');
+if (zoneGuide) {
+  const CLE_GUIDE = 'levier.guide';
+  const params = new URLSearchParams(location.search);
+  let jeton = params.get('g') || '';
+  try {
+    if (jeton) localStorage.setItem(CLE_GUIDE, jeton);
+    else jeton = localStorage.getItem(CLE_GUIDE) || '';
+  } catch { /* stockage indisponible */ }
+  if (params.has('g')) history.replaceState(null, '', location.pathname);
+  const sansGuide = (message = '') => {
+    zoneGuide.hidden = true;
+    $('#sansGuide').hidden = false;
+    if (message) $('#sansGuide p').textContent = message;
+    $('#merciSurtitre').textContent = 'Mini-guide offert';
+    $('#merciTitre').innerHTML = 'Le mini-guide des <em>7 services IA.</em>';
+    $('#merciChapo').textContent = 'Sept prestations concrètes à vendre avec Claude, avec pour chacune le livrable, les outils et la façon de la livrer.';
+  };
+  const charger = async () => {
+    if (!jeton) return sansGuide();
+    $('#guideEtat').textContent = 'Chargement du mini-guide…';
+    try {
+      const rep = await fetch('/.netlify/functions/guide?g=' + encodeURIComponent(jeton), { headers: { Accept: 'application/json' } });
+      const d = await rep.json();
+      if (!rep.ok) throw new Error(d.erreur || 'indisponible');
+      if (!d.ok) { try { localStorage.removeItem(CLE_GUIDE); } catch { /* */ } return sansGuide(d.erreur); }
+      zoneGuide.innerHTML = d.html; // contenu servi par la fonction du site (fichier de prive/guide/)
+      $('#imprimer').hidden = false;
+    } catch {
+      $('#guideEtat').innerHTML = '';
+      $('#guideEtat').append('Le guide n\'a pas pu être chargé (connexion ?). ');
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'bouton contour'; b.textContent = 'Réessayer';
+      b.addEventListener('click', charger);
+      $('#guideEtat').append(b);
+    }
+  };
+  charger();
+}
+
 const email = CFG.contact?.email;
 if (email && $('#supportAchat')) {
   const a = document.createElement('a');

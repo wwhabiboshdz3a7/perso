@@ -6,6 +6,11 @@ const lire = chemin => chemin.split('.').reduce((o, k) => (o == null ? undefined
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const euros = n => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: CFG.produit?.devise || 'EUR' }).format(n);
 let manquants = 0;
+// Offre VIP (accompagnement) : présentée seulement si son accompagnement est décrit dans config.js.
+const offreVisible = o => o && (!Array.isArray(o.accompagnement) || o.accompagnement.some(x => String(x).trim()));
+const offres = (Array.isArray(CFG.offres) ? CFG.offres : []).filter(offreVisible);
+const avecAccompagnement = offres.some(o => Array.isArray(o.accompagnement));
+document.querySelectorAll('[data-si-accompagnement]').forEach(el => { if (!avecAccompagnement) el.remove(); });
 
 document.querySelectorAll('[data-champ]').forEach(el => {
   const v = lire(el.dataset.champ);
@@ -26,10 +31,10 @@ document.querySelectorAll('[data-email]').forEach(el => {
 
 // Offres et prix (CGV).
 const t = document.getElementById('tableOffres');
-if (t && Array.isArray(CFG.offres)) {
+if (t && offres.length) {
   const ttc = CFG.prixTTC !== false;
-  t.innerHTML = `<thead><tr><th>Offre</th><th>Contenu</th><th>Prix ${ttc ? 'TTC' : 'HT'}</th></tr></thead><tbody>${CFG.offres.map(o =>
-    `<tr><td><b>${esc(o.nom)}</b></td><td>${(o.inclus || []).map(esc).join(' ; ')}</td><td>${euros(o.prix)}</td></tr>`).join('')}</tbody>`;
+  t.innerHTML = `<thead><tr><th scope="col">Offre</th><th scope="col">Contenu</th><th scope="col">Prix ${ttc ? 'TTC' : 'HT'}</th></tr></thead><tbody>${offres.map(o =>
+    `<tr><td><b>${esc(o.nom)}</b></td><td>${[...(o.inclus || []), ...(o.accompagnement || [])].map(esc).join(' ; ')}</td><td>${euros(o.prix)}</td></tr>`).join('')}</tbody>`;
   const m = document.getElementById('mentionTVA');
   if (m && CFG.mentionTVA) m.textContent = CFG.mentionTVA + '.';
 }
@@ -48,3 +53,13 @@ if (bandeau && manquants) {
   bandeau.hidden = false;
   bandeau.querySelector('b').textContent = String(manquants);
 }
+
+// Tableaux qui débordent (mobile) : atteignables au clavier pour pouvoir les faire défiler.
+const regions = () => document.querySelectorAll('main table').forEach(tb => {
+  const defile = tb.scrollWidth > tb.clientWidth + 1;
+  if (defile) { tb.tabIndex = 0; tb.setAttribute('aria-label', (tb.querySelector('caption, th')?.textContent || 'Tableau') + ' (tableau défilant)'); }
+  else if (tb.hasAttribute('tabindex')) { tb.removeAttribute('tabindex'); tb.removeAttribute('aria-label'); }
+});
+regions();
+let minuterie = 0;
+window.addEventListener('resize', () => { clearTimeout(minuterie); minuterie = setTimeout(regions, 200); });

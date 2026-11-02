@@ -4,6 +4,9 @@ import { requete } from './verificateurs.mjs';
 
 export class ErreurEmail extends Error {}
 
+/** Adresse email plausible (contrôle de forme seulement). */
+export const emailValide = e => typeof e === 'string' && e.length <= 200 && /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(e);
+
 /** « Levier <acces@domaine.fr> » → { nom: 'Levier', adresse: 'acces@domaine.fr' } */
 export function lireExpediteur(brut) {
   const t = String(brut || '').trim();

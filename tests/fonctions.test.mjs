@@ -7,6 +7,7 @@ import { lireRevocations } from '../netlify/lib/revocation.mjs';
 import access, { reinitialiserLimites } from '../netlify/functions/access.mjs';
 import content from '../netlify/functions/content.mjs';
 import recuperer, { reinitialiserLimitesRecuperation } from '../netlify/functions/recuperer.mjs';
+import guide, { reinitialiserLimitesGuide } from '../netlify/functions/guide.mjs';
 
 const SECRET = 'secret-de-test-0123456789-abcdefghijklmnop';
 const CODE_PRO = 'LEV-TESTP-RO234-56789';
@@ -43,6 +44,7 @@ const refus = async req => { const r = await access(req, ctx()); const d = await
 beforeEach(() => {
   reinitialiserLimites();
   reinitialiserLimitesRecuperation();
+  reinitialiserLimitesGuide();
   definirEnv({ TOKEN_SECRET: SECRET, ACCESS_CODE_HASHES: `pro:${hacherCode(CODE_PRO)},essentiel:${hacherCode(CODE_ESS)}` });
 });
 afterEach(() => { globalThis.fetch = fetchOriginal; });
@@ -395,6 +397,46 @@ describe('récupération d\'un achat Stripe par email', () => {
     assert.equal((await (await recuperer(reqRec('pas-un-email'), ctx())).json()).ok, false);
     for (let i = 0; i < 3; i++) assert.equal((await recuperer(reqRec('ana@example.com'), ctx('9.9.9.9'))).status, 200);
     assert.equal((await recuperer(reqRec('ana@example.com'), ctx('9.9.9.8'))).status, 429, 'trop de demandes pour cette adresse');
+  });
+});
+
+describe('mini-guide de l\'aimant (fonction guide)', () => {
+  const inscrire = corps => guide(new Request('http://localhost/.netlify/functions/guide', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps) }), ctx());
+  const lire = g => guide(new Request('http://localhost/.netlify/functions/guide?g=' + encodeURIComponent(g)), ctx());
+
+  test('email et consentement exigés, robots écartés', async () => {
+    assert.equal((await (await inscrire({ email: 'pas-un-email', consentement: 'oui' })).json()).ok, false);
+    assert.equal((await (await inscrire({ email: 'ana@example.com' })).json()).ok, false);
+    assert.equal((await (await inscrire({ email: 'ana@example.com', consentement: 'oui', 'bot-field': 'x' })).json()).ok, false);
+  });
+  test('inscription : jeton qui ouvre le guide complet ; sans jeton valide, rien', async () => {
+    const d = await (await inscrire({ email: 'ana@example.com', consentement: 'oui', prenom: 'Ana' })).json();
+    assert.equal(d.ok, true);
+    assert.equal(d.envoye, false, 'pas d\'envoi sans configuration EMAIL_*');
+    const g = await (await lire(d.jeton)).json();
+    assert.equal(g.ok, true);
+    assert.equal((g.html.match(/class="service"/g) || []).length, 7);
+    assert.equal((await (await lire('faux.jeton')).json()).ok, false);
+    const jetonAcces = creerJeton({ offre: 'pro', source: 'code', empreinte: 'x' }, SECRET, 3600).jeton;
+    assert.equal((await (await lire(jetonAcces)).json()).ok, false, 'un jeton d\'accès n\'ouvre pas le guide');
+    assert.equal((await content(get('module=m2', d.jeton))).status, 401, 'un jeton de guide n\'ouvre pas la formation');
+  });
+  test('envoi du lien du guide par email quand c\'est configuré', async () => {
+    Object.assign(process.env, { EMAIL_FOURNISSEUR: 'brevo', EMAIL_API_KEY: 'xkeysib-test', EMAIL_EXPEDITEUR: 'Levier <bonjour@exemple.fr>', SITE_URL: 'https://formation.exemple.fr' });
+    simulerFetch(() => ({ statut: 201, corps: { messageId: 'm' } }));
+    const d = await (await inscrire({ email: 'ana@example.com', consentement: 'oui', prenom: 'Ana' })).json();
+    assert.equal(d.envoye, true);
+    const corps = JSON.parse(appels[0].options.body);
+    assert.deepEqual(corps.to, [{ email: 'ana@example.com' }]);
+    assert.ok(corps.textContent.includes('https://formation.exemple.fr/merci/?g=' + d.jeton));
+    assert.match(corps.textContent, /^Bonjour Ana,/);
+  });
+  test('email injoignable : le guide reste accessible par le jeton', async () => {
+    Object.assign(process.env, { EMAIL_FOURNISSEUR: 'resend', EMAIL_API_KEY: 're_test', EMAIL_EXPEDITEUR: 'bonjour@exemple.fr' });
+    simulerFetch(() => new TypeError('fetch failed'));
+    const d = await (await inscrire({ email: 'ana@example.com', consentement: 'oui' })).json();
+    assert.equal(d.ok, true);
+    assert.equal(d.envoye, false);
   });
 });
 

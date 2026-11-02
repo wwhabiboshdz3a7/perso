@@ -119,7 +119,9 @@ async function scenarios(navigateur, largeur) {
       verifier(/votre levier/i.test(await page.locator('h1').innerText()), 'titre principal');
       verifier(await page.locator('#mentionIndependance').isVisible(), 'mention d\'indépendance visible');
       verifier((await page.locator('.prog > li').count()) === 10, 'programme : 9 modules + bonus');
-      verifier((await page.locator('#offresListe .offre').count()) === 3, '3 offres');
+      verifier((await page.locator('#offresListe .offre').count()) === 2, '2 offres (VIP masquée tant que son accompagnement n\'est pas décrit)');
+      verifier(!/VIP/.test(await page.locator('#offresListe').innerText()), 'pas d\'engagement VIP inventé');
+      verifier(/og:image" content="assets/.test(await page.content()) && /npm run programme/.test(await (await page.request.get(BASE + '/')).text()), 'rappel produit.url pour le partage');
       verifier(await page.locator('#temoignages').isHidden(), 'témoignages masqués (aucun avis réel)');
       verifier(await page.locator('#garantie').isVisible(), 'garantie affichée');
       verifier(/Ibrahim/.test(await page.locator('#titreFormateur').innerText()), 'formateur');
@@ -167,11 +169,25 @@ async function scenarios(navigateur, largeur) {
       await page.locator('#aimantConsent').check();
       await Promise.all([page.waitForURL(/\/merci\/$/), page.locator('#formAimant button[type=submit]').click()]);
       verifier(/C'est noté, Ana/.test(await page.locator('h1').innerText()), 'prénom repris');
-      verifier((await page.locator('.service').count()) === 7, '7 services du guide');
+      await page.locator('.service').first().waitFor();
+      verifier((await page.locator('.service').count()) === 7, '7 services du guide (servis par la fonction guide)');
       const f = await formulaires(page);
       verifier(f.some(x => x['form-name'] === 'aimant' && x.email === `ana-${suffixe}@example.com` && x.consentement === 'oui'), 'inscription enregistrée avec consentement');
       await sansDebordement(page);
       await capture(page, `e2e-merci-${suffixe}`);
+    });
+    await etape('mini-guide introuvable sans inscription (page directe, dossier publié)', async () => {
+      const autre = await navigateur.newContext({ viewport: { width: largeur, height: 844 } });
+      const p2 = await autre.newPage();
+      surveiller(p2, erreurs);
+      await p2.goto(BASE + '/merci/', { waitUntil: 'networkidle' });
+      await p2.locator('#sansGuide').waitFor();
+      verifier((await p2.locator('.service').count()) === 0, 'aucun service affiché');
+      verifier(!(await (await p2.request.get(BASE + '/merci/')).text()).includes('Les réponses aux avis Google, chaque matin'), 'guide absent du HTML publié');
+      verifier((await p2.request.get(BASE + '/guide/7-services.html')).status() === 404 && (await p2.request.get(BASE + '/prive/guide/7-services.html')).status() === 404, 'fichier du guide non publié');
+      await sansDebordement(p2);
+      await capture(p2, `e2e-merci-sans-guide-${suffixe}`);
+      await autre.close();
     });
     await etape('du mini-guide au module gratuit', async () => {
       await page.locator('a[href="../cours/#/module/m0"]').first().click();
@@ -358,7 +374,8 @@ async function scenarios(navigateur, largeur) {
       }
       await page.goto(`${BASE}/legal/cgv.html`);
       verifier(/renonce expressément à son droit de rétractation/.test(await page.locator('main').innerText()), 'renonciation au droit de rétractation');
-      verifier((await page.locator('#tableOffres tbody tr').count()) === 3, 'offres dans les CGV');
+      verifier((await page.locator('#tableOffres tbody tr').count()) === 2, 'offres affichées dans les CGV (sans VIP)');
+      verifier(!/offre VIP sont réalisées/.test(await page.locator('main').innerText()), 'pas de conditions VIP sans offre VIP');
     });
     tousLesErreurs.push(...erreurs);
     await ctx.close();

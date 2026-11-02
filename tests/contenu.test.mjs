@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { verifierTout, verifierLecon, verifierWorkflow, racine } from '../outils/verifier-contenu.mjs';
-import { mettreAJour } from '../outils/generer-programme.mjs';
+import { mettreAJour, htmlPartage } from '../outils/generer-programme.mjs';
 import { modules, fichiers, totalLecons } from '../public/cours/content/catalogue.js';
 
 const lireJson = async f => JSON.parse(await readFile(path.join(racine, f), 'utf8'));
@@ -100,6 +100,22 @@ describe('quiz et QCM : aucune réponse devinable à sa position ou à sa longue
       assert.equal(new Set(q.options).size, q.options.length, q.q);
       assert.equal(q.options.length, 4, q.q);
       assert.ok(q.explication, q.q);
+    }
+  });
+});
+
+describe('partage social', () => {
+  test('avec produit.url : og:image et og:url absolues, lien canonique', () => {
+    const h = htmlPartage({ produit: { url: 'https://formation.exemple.fr/' } });
+    assert.match(h, /<meta property="og:image" content="https:\/\/formation\.exemple\.fr\/assets\/img\/partage\.png">/);
+    assert.match(h, /<meta property="og:url" content="https:\/\/formation\.exemple\.fr\/">/);
+    assert.match(h, /<link rel="canonical" href="https:\/\/formation\.exemple\.fr\/">/);
+  });
+  test('adresse vide ou non HTTPS : pas d\'adresse inventée, rappel dans le code source', () => {
+    for (const url of ['', 'http://exemple.fr', 'javascript:alert(1)']) {
+      const h = htmlPartage({ produit: { url } });
+      assert.ok(!h.includes('og:url') && !h.includes('canonical'), url);
+      assert.match(h, /npm run programme/);
     }
   });
 });

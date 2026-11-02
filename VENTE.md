@@ -97,6 +97,8 @@ Les tarifs et conditions ci-dessous sont indicatifs (novembre 2026) : vérifiez-
 
 **30 idées prêtes à scripter**
 
+Les accroches tutoient : c'est l'usage sur TikTok et Reels, face caméra. Le site, l'espace membre et les emails, eux, vouvoient.
+
 | # | Pilier | Accroche |
 |---|---|---|
 | 1 | Démonstration | « Je réponds à 20 avis Google en une minute. Regarde. » |
@@ -136,51 +138,53 @@ Les tarifs et conditions ci-dessous sont indicatifs (novembre 2026) : vérifiez-
 
 ## 5. Séquence de 5 emails (inscrits au mini-guide)
 
-Chaque email : expéditeur identifiable, lien de désinscription, une seule action demandée. Remplacez les crochets.
+Chaque email : expéditeur identifiable, lien de désinscription, une seule action demandée. Remplacez les crochets. Le rythme (J0, J+2, J+4, J+6, J+8, puis environ un email par semaine) est celui annoncé dans la case de consentement du formulaire : si vous le changez, changez aussi ce texte dans `public/index.html` et dans la politique de confidentialité. Comme le site, les emails vouvoient.
 
-### Email 1 (immédiat) : « Ton mini-guide (et par où commencer) »
+Le premier email est envoyé automatiquement par le site si l'envoi d'emails est configuré (variables `EMAIL_*`, fonction `guide`) : il contient le lien personnel du mini-guide. Programmez les quatre suivants dans votre outil d'emailing, à partir de l'export des inscrits du formulaire « aimant » (Netlify Forms).
+
+### Email 1 (immédiat) : « Votre mini-guide (et par où commencer) »
 > Bonjour [prénom],
 >
-> Merci pour ton inscription. Ton mini-guide « 7 services IA à proposer ce mois-ci » est ici : [lien /merci/]. Garde-le dans tes favoris.
+> Merci pour votre inscription. Votre mini-guide « 7 services IA à proposer ce mois-ci » est ici : [lien personnel du guide, /merci/?g=…]. Gardez cet email : le lien reste valable un an.
 >
-> Mon conseil : ne lis pas les sept. Choisis **un** service, celui qui ressemble le plus à ce que tu sais déjà faire, et ouvre le module 0 de la formation (gratuit) : le plan d'action sur 30 jours te mène jusqu'à ta première proposition.
+> Mon conseil : ne lisez pas les sept. Choisissez **un** service, celui qui ressemble le plus à ce que vous savez déjà faire, puis ouvrez le module 0 de la formation (en accès libre) : le plan d'action sur 30 jours vous mène jusqu'à votre première proposition.
 >
 > → [Commencer le module 0]
 >
-> Je suis Ibrahim, fondateur de l'agence NEXORA. Dans les prochains jours, je t'envoie quatre emails courts, concrets, sans blabla.
+> Je suis Ibrahim, fondateur de l'agence NEXORA. Dans les prochains jours, je vous envoie quatre emails courts et concrets.
 >
 > Ibrahim
 
 ### Email 2 (J+2) : « L'erreur que je vois chez presque tout le monde »
 > Bonjour [prénom],
 >
-> On utilise Claude comme un moteur de recherche : une question, une réponse, on recommence. Résultat : des réponses moyennes, et l'impression que « l'IA, c'est surfait ».
+> On utilise souvent Claude comme un moteur de recherche : une question, une réponse, on recommence. Résultat : des réponses moyennes, et l'impression que « l'IA, c'est surfait ».
 >
 > Ce qui change tout : donner un contexte durable. Un Projet par client, avec ses documents et ses règles. Les réponses deviennent spécifiques, dans le bon ton, réutilisables.
 >
-> La leçon complète est dans le module 1, gratuit : [lien leçon Projets].
+> La leçon complète est dans le module 1, en accès libre : [lien leçon Projets].
 >
 > Ibrahim
 
 ### Email 3 (J+4) : « Une vidéo sans logiciel de montage »
 > Bonjour [prénom],
 >
-> Cette semaine, je t'ai montré [ou : je te montre] une vidéo montée entièrement par le code : le script vient de Claude, la voix d'ElevenLabs, les sous-titres d'un horodatage, et le montage d'une page HTML rendue en MP4.
+> Cette semaine, je vous montre [ou : je vous ai montré] une vidéo montée entièrement par le code : le script vient de Claude, la voix d'ElevenLabs, les sous-titres d'un horodatage, et le montage d'une page HTML rendue en MP4.
 >
-> C'est le cœur du module 6 de la formation : une chaîne qui produit les scripts, les voix, les sous-titres et le plan de montage de la semaine, et que tu peux vendre à des commerces ou utiliser pour ta propre chaîne.
+> C'est le cœur du module 6 de la formation : une chaîne qui produit les scripts, les voix, les sous-titres et le plan de montage de la semaine, que vous pouvez vendre à des commerces ou utiliser pour votre propre chaîne.
 >
 > → [Voir le programme du module 6]
 >
 > Ibrahim
 
-### Email 4 (J+6) : « Tu te poses sûrement ces trois questions »
+### Email 4 (J+6) : « Vous vous posez sûrement ces trois questions »
 > Bonjour [prénom],
 >
 > **« Je ne suis pas technique. »** Les modules 0 à 3, 7 et 8 ne demandent aucune compétence technique. Les autres avancent pas à pas, avec des fichiers prêts à l'emploi.
 >
-> **« Est-ce que je vais gagner de l'argent ? »** Honnêtement, je ne peux pas te le promettre, et personne ne devrait. La formation te donne la méthode, les modèles et les outils ; le reste dépend de ton travail et de ton marché.
+> **« Est-ce que je vais gagner de l'argent ? »** Honnêtement, je ne peux pas vous le promettre, et personne ne devrait. La formation vous donne la méthode, les modèles et les outils ; le reste dépend de votre travail et de votre marché.
 >
-> **« C'est une formation officielle ? »** Non : elle est indépendante, non affiliée à Anthropic. C'est aussi ce qui me permet de te parler des limites de l'outil.
+> **« C'est une formation officielle ? »** Non : elle est indépendante, non affiliée à Anthropic. C'est aussi ce qui me permet de vous parler des limites de l'outil.
 >
 > → [Lire la FAQ complète]
 >
@@ -195,11 +199,11 @@ Chaque email : expéditeur identifiable, lien de désinscription, une seule acti
 >
 > → [Choisir mon offre]
 >
-> [Si la garantie est active :] Tu as [14] jours pour changer d'avis : un email suffit, je te rembourse.
+> [Si la garantie est active :] Vous avez [14] jours pour changer d'avis : un email suffit, je vous rembourse.
 >
 > Ibrahim
 >
-> *PS : si ce n'est pas le bon moment, aucun problème. Tu continueras à recevoir mes conseils une fois par semaine, et tu peux te désinscrire en un clic.*
+> *PS : si ce n'est pas le bon moment, aucun problème. Vous continuerez à recevoir mes conseils environ une fois par semaine, et vous pouvez vous désinscrire en un clic.*
 
 ---
 
