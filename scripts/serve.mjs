@@ -8,8 +8,6 @@ import { join, extname, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(fileURLToPath(new URL('..', import.meta.url)));
-const port = Number(process.env.PORT) || 8080;
-const host = process.env.HOST || '127.0.0.1';
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -34,10 +32,16 @@ function netlifyHeaders() {
 }
 const rules = netlifyHeaders();
 
-createServer(async (req, res) => {
+/** Démarre le serveur ; port 0 = port libre choisi par le système. Renvoie le serveur http. */
+export function serve({ port = 8080, host = '127.0.0.1' } = {}) {
+  const server = createServer(handle);
+  return new Promise((resolve) => server.listen(port, host, () => resolve(server)));
+}
+
+async function handle(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
-    let path = decodeURIComponent(url.pathname);
+    const path = decodeURIComponent(url.pathname);
     let file = normalize(join(root, path));
     if (!file.startsWith(root) || file.split(sep).includes('node_modules') || file.split(sep).includes('.git')) {
       res.writeHead(403).end('Interdit');
@@ -58,4 +62,11 @@ createServer(async (req, res) => {
   } catch (e) {
     res.writeHead(500).end(String(e));
   }
-}).listen(port, host, () => console.log(`Kinetika : http://${host}:${port}/`));
+}
+
+// Lancé directement : node scripts/serve.mjs
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  const host = process.env.HOST || '127.0.0.1';
+  const server = await serve({ port: Number(process.env.PORT) || 8080, host });
+  console.log(`Kinetika : http://${host}:${server.address().port}/`);
+}

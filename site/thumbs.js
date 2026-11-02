@@ -51,7 +51,8 @@ function onLoad(frame, id) {
   if (!frame.getAttribute('src')) return;
   frame.parentNode.classList.add('is-ready');
   const ex = byId[id];
-  if (!ex || !ex.scroll) return;
+  // mouvement réduit : la vignette reste immobile (aucun défilement automatique)
+  if (!ex || !ex.scroll || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let t0 = performance.now();
   const step = (t) => {
     const w = frame.contentWindow;

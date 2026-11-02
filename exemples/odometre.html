@@ -30,7 +30,7 @@
 <div class="board">
   <div class="cell cell--main"><p class="num" id="n1"></p><p class="label">images rendues ce mois-ci</p></div>
   <div class="cell cell--hot"><p class="num" id="n2"></p><p class="label">animations simultanées</p></div>
-  <div class="cell cell--volt"><p class="num" id="n3"></p><p class="label">ko gzip, librairie complète</p></div>
+  <div class="cell cell--volt"><p class="num" id="n3"></p><p class="label">images par seconde, en moyenne</p></div>
   <div class="foot"><p class="label">odometer(el, { value }) · .set(nouvelleValeur)</p><button class="btn btn--hot" type="button">Nouveaux chiffres</button></div>
 </div>
 <!--/ex-->
@@ -41,7 +41,7 @@ const fr = (n, d = 0) => n.toLocaleString('fr-FR', { minimumFractionDigits: d, m
 const values = () => [
   fr(utils.random(1000000, 9999999) | 0),
   fr(utils.random(100, 999) | 0),
-  fr(utils.random(10, 99, 1), 1),
+  fr(utils.random(55, 60, 1), 1),
 ];
 
 const [a, b, c] = values();

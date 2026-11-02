@@ -11,6 +11,16 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduced = engine.prefersReducedMotion;
 const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+/** Appelle onShow / onHide quand l'élément entre dans l'écran ou en sort (rien ne tourne hors champ). */
+function whenVisible(el, onShow, onHide) {
+  if (!el) return;
+  new IntersectionObserver((entries) => {
+    for (const e of entries) (e.isIntersecting ? onShow : onHide)();
+  }, { rootMargin: '80px 0px' }).observe(el);
+}
+/** N'écrit le texte que s'il change (évite des écritures DOM à chaque image). */
+const setText = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+
 /* ——— Ouverture : le mot-titre ——— */
 const word = $('.hero__word');
 const split = splitText(word, { chars: true, words: false });
@@ -29,13 +39,16 @@ intro
   })
   .add(chars, { '--g': [800, 300, 800], duration: 1200, ease: 'inOutSine', delay: stagger(60) }, '-=1300');
 
-// Respiration continue : chaque lettre a sa propre phase
+// Respiration continue : chaque lettre a sa propre phase, en pause hors de l'écran
+let heroOn = true;
+const breaths = [];
 intro.then(() => {
   if (reduced) return;
   chars.forEach((c, i) => {
-    animate(c, { '--w': [100, i % 2 ? 140 : 62], duration: 2600, ease: 'inOutSine', loop: true, alternate: true, delay: i * 170 });
+    breaths.push(animate(c, { '--w': [100, i % 2 ? 140 : 62], duration: 2600, ease: 'inOutSine', loop: true, alternate: true, delay: i * 170, autoplay: heroOn }));
   });
 });
+whenVisible($('.hero'), () => { heroOn = true; breaths.forEach((a) => a.play()); }, () => { heroOn = false; breaths.forEach((a) => a.pause()); });
 
 // Les lettres prennent du poids près du pointeur
 if (!reduced && fine) {
@@ -63,18 +76,28 @@ const tRead = $('.ruler__t');
 const eRead = $('.ruler__e');
 const rulerEases = ['outElastic(1, .45)', 'inOutExpo', 'outBounce', 'spring(1, 90, 9)', 'inOutBack(1.7)', 'steps(8)', 'outCirc'];
 let ri = 0;
+let rulerOn = true;
+let rulerWaiting = false;
 const runRuler = () => {
+  rulerWaiting = false;
   const ease = rulerEases[ri++ % rulerEases.length];
-  eRead.textContent = ease;
+  setText(eRead, ease);
   animate(head, {
     left: ['0%', '100%'],
     duration: 2400,
     ease,
-    onUpdate: (a) => { tRead.textContent = `t = ${String(Math.round(a.currentTime)).padStart(4, '0')} ms`; },
-    onComplete: () => { if (!reduced) setTimeout(runRuler, 700); },
+    onUpdate: (a) => setText(tRead, `t = ${String(Math.round(a.currentTime)).padStart(4, '0')} ms`),
+    onComplete: () => {
+      if (reduced) return;
+      // hors de l'écran, la règle attend d'y revenir
+      if (rulerOn) setTimeout(runRuler, 700); else rulerWaiting = true;
+    },
   });
 };
-if (ruler) runRuler();
+if (ruler) {
+  runRuler();
+  whenVisible(ruler, () => { rulerOn = true; if (rulerWaiting) runRuler(); }, () => { rulerOn = false; });
+}
 
 /* ——— Bandeau : vitesse et inclinaison suivent le défilement ——— */
 const words = ['animate', 'timeline', 'stagger', 'spring', 'splitText', 'onScroll', 'drawable', 'motionPath', 'scramble', 'odometer'];
@@ -88,19 +111,19 @@ const bands = $$('.ticker__band').map((band, bi) => {
   return { band, track, uw, x: -uw * (bi ? 0.5 : 0), dir: bi ? 1 : -1, rot: bi ? 1.5 : -2 };
 });
 const pageScroll = onScroll();
-let tickerVisible = true;
-new IntersectionObserver((e) => { tickerVisible = e[0].isIntersecting; }).observe($('.ticker'));
+// le bandeau ne s'abonne au moteur que lorsqu'il est visible : hors champ, le moteur peut s'endormir
+let stopTicker = null;
+const tick = (dt) => {
+  const v = utils.clamp(pageScroll.velocity, -4000, 4000);
+  const skew = utils.clamp(v * 0.006, -14, 14);
+  for (const b of bands) {
+    b.x += b.dir * (60 + Math.abs(v) * 0.35) * (dt / 1000) * (v < 0 ? -1 : 1);
+    b.x = utils.wrap(b.x, -b.uw, 0);
+    b.track.style.transform = `translateX(${b.x.toFixed(1)}px) skewX(${(skew * b.dir).toFixed(2)}deg)`;
+  }
+};
 if (!reduced) {
-  engine.onFrame((dt) => {
-    if (!tickerVisible) return;
-    const v = utils.clamp(pageScroll.velocity, -4000, 4000);
-    const skew = utils.clamp(v * 0.006, -14, 14);
-    for (const b of bands) {
-      b.x += b.dir * (60 + Math.abs(v) * 0.35) * (dt / 1000) * (v < 0 ? -1 : 1);
-      b.x = utils.wrap(b.x, -b.uw, 0);
-      b.track.style.transform = `translateX(${b.x.toFixed(1)}px) skewX(${(skew * b.dir).toFixed(2)}deg)`;
-    }
-  });
+  whenVisible($('.ticker'), () => { if (!stopTicker) stopTicker = engine.onFrame(tick); }, () => { if (stopTicker) { stopTicker(); stopTicker = null; } });
 }
 
 /* ——— 01 animate() ——— */
@@ -127,11 +150,14 @@ addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setT
 
 /* ——— 02 timeline() : storyboard ——— */
 const sbTitle = splitText('.sb-card__title', { chars: true, mask: 'chars' });
+let sbReady = false;
 const sb = timeline({
   defaults: { ease: 'outExpo', duration: 700 },
   loop: true,
   loopDelay: 1400,
   autoplay: onScroll({ target: '.storyboard', sync: 'resume pause resume pause' }),
+  // la frise suit la timeline elle-même : aucun rappel par image quand elle est arrêtée
+  onUpdate: () => { if (sbReady) paintStoryboard(); },
 });
 sb.add('.sb-card', { scale: [0.8, 1], opacity: [0, 1] })
   .add(sbTitle.chars, { y: ['110%', 0], delay: stagger(40) }, '-=400')
@@ -144,7 +170,10 @@ const tracksEl = $('.sb__tracks');
 const names = ['carte', 'lettres', 'barre', 'points', 'badge'];
 const D = sb.iterationDuration;
 const pct = (t) => `${(t / D) * 100}%`;
-tracksEl.innerHTML = `<div class="sb__ruler">${[0, 0.25, 0.5, 0.75, 1].map((k) => `<span style="left:${k * 100}%">${Math.round(D * k)}</span>`).join('')}</div>`
+// graduations rondes : toutes les 500 ms
+const ticks = [];
+for (let t = 0; t <= D - 250; t += 500) ticks.push(t);
+tracksEl.innerHTML = `<div class="sb__ruler">${ticks.map((t) => `<span style="left:${(t / D) * 100}%">${t}</span>`).join('')}<span class="sb__ruler-unit" style="left:100%">ms</span></div>`
   + sb.children.map((c, i) => `<div class="sb__track"><span style="left:${pct(c.start)};width:${pct(c.end - c.start)}">${names[i]}</span></div>`).join('')
   + Object.entries(sb.labels).map(([n, t]) => `<span class="sb__label" style="left:calc(16px + (100% - 32px) * ${t / D})">◆ ${n}</span>`).join('')
   + '<i class="sb__head"></i>';
@@ -154,14 +183,15 @@ const sbRange = $('.sb__scrub input');
 const sbTime = $('.sb__time');
 const sbPlay = $('[data-sb="play"]');
 const kids = sb.children;
-const paintStoryboard = () => {
+function paintStoryboard() {
   const local = Math.min(D, Math.max(0, sb.progress * D));
-  sbHead.style.left = `calc(16px + (100% - 32px) * ${local / D})`;
+  const left = `calc(16px + (100% - 32px) * ${(local / D).toFixed(4)})`;
+  if (sbHead.style.left !== left) sbHead.style.left = left;
   sbBars.forEach((b, i) => b.classList.toggle('is-on', local >= kids[i].start && local <= kids[i].end));
-  sbRange.value = String(Math.round((local / D) * 1000));
-  sbTime.textContent = `${Math.round(local)} ms`;
-};
-engine.onFrame(paintStoryboard);
+  const v = String(Math.round((local / D) * 1000));
+  if (sbRange.value !== v) sbRange.value = v;
+  setText(sbTime, `${Math.round(local)} ms`);
+}
 sbRange.addEventListener('input', () => {
   sb.pause();
   sbPlay.textContent = 'Lecture';
@@ -172,6 +202,7 @@ sbPlay.addEventListener('click', () => {
   if (sb.paused) { sb.play(); sbPlay.textContent = 'Pause'; } else { sb.pause(); sbPlay.textContent = 'Lecture'; }
 });
 $('[data-sb="reverse"]').addEventListener('click', () => { sb.reverse(); sbPlay.textContent = 'Pause'; });
+sbReady = true;
 paintStoryboard();
 
 /* ——— 03 stagger() : grille ——— */
@@ -280,7 +311,10 @@ onScroll({ target: '.textgrid', enter: 'top 85%', onEnter: () => { playSplit(); 
 $('[data-replay="split"]').addEventListener('click', playSplit);
 $('[data-replay="scramble"]').addEventListener('click', playScramble);
 $('[data-replay="odometer"]').addEventListener('click', () => playOdo(false));
-typewriter('.tcard__type', { text: ['Ça bouge.', 'Ça respire.', 'Ça réagit.', 'Ça se lit.'], speed: 14, hold: 1500 });
+const tw = typewriter('.tcard__type', { text: ['Ça bouge.', 'Ça respire.', 'Ça réagit.', 'Ça se lit.'], speed: 14, hold: 1500 });
+if (!reduced) {
+  whenVisible($('.tcard__type'), () => { tw.play(); if (tw.blink) tw.blink.play(); }, () => { tw.pause(); if (tw.blink) tw.blink.pause(); });
+}
 
 /* ——— 06 défilement ——— */
 const rng = utils.createRandom(11);
@@ -289,7 +323,7 @@ const pctEl = $('.scrub__pct');
 const scrub = timeline({
   autoplay: onScroll({ target: '.scrub', enter: 'top top', leave: 'bottom bottom', scrub: 0.6 }),
   defaults: { ease: 'outQuad' },
-  onUpdate: (tl) => { pctEl.textContent = `${String(Math.round(tl.progress * 100)).padStart(3, '0')}%`; },
+  onUpdate: (tl) => setText(pctEl, `${String(Math.round(tl.progress * 100)).padStart(3, '0')}%`),
 });
 scrub
   .add(sws, {

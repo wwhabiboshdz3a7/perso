@@ -49,11 +49,15 @@ addEventListener('pointermove', (e) => {
   if (last) boost = Math.min(3, boost + Math.hypot(e.clientX - last.x, e.clientY - last.y) / 160);
   last = { x: e.clientX, y: e.clientY };
 });
-engine.onFrame((dt) => {
-  boost *= Math.exp(-dt / engine.timeScale / 500);
-  engine.timeScale = 1 + boost;
-  ts.textContent = utils.round(engine.timeScale, 2).toFixed(2);
-});
+if (!engine.prefersReducedMotion) {
+  engine.onFrame((dt) => {
+    boost *= Math.exp(-dt / engine.timeScale / 500);
+    engine.timeScale = 1 + boost;
+    // on n'écrit dans la page que si l'affichage change
+    const text = utils.round(engine.timeScale, 2).toFixed(2);
+    if (ts.textContent !== text) ts.textContent = text;
+  });
+}
 </script>
 </body>
 </html>

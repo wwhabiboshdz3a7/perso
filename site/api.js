@@ -71,6 +71,8 @@ main.querySelectorAll('.api-sec').forEach((s) => io.observe(s));
 
 // Ancre demandée dans l'URL : le contenu vient d'être généré, on s'y rend
 if (location.hash) {
-  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  let id = location.hash.slice(1);
+  try { id = decodeURIComponent(id); } catch (e) { /* fragment malformé : valeur brute */ }
+  const target = document.getElementById(id);
   if (target) requestAnimationFrame(() => target.scrollIntoView());
 }

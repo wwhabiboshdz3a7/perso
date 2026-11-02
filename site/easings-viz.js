@@ -45,20 +45,32 @@ function current() {
 }
 
 // —— Graphique ——
-const W = 600, H = 375, PAD = { l: 44, r: 20, t: 22, b: 30 };
+const W = 600, H = 375;
+const PAD = { l: 44, r: 20, t: 22, b: 30 };
 let range = [0, 1];
 const X = (t) => PAD.l + t * (W - PAD.l - PAD.r);
 const Y = (v) => PAD.t + (1 - (v - range[0]) / (range[1] - range[0])) * (H - PAD.t - PAD.b);
 const sample = (fn, n = 240) => Array.from({ length: n + 1 }, (_, i) => fn(i / n));
 
+// Le graphique est mis à l'échelle : les étiquettes gardent au moins 11 px à l'écran.
+let labelSize = 11;
+function fitLabels() {
+  const svg = $('ez-grid').ownerSVGElement;
+  const k = svg ? svg.getBoundingClientRect().width / W : 1;
+  labelSize = k > 0 ? Math.max(11, Math.round((11 / k) * 10) / 10) : 11;
+  PAD.l = Math.round(16 + labelSize * 2.6);
+  PAD.b = Math.round(12 + labelSize * 1.6);
+}
+
 function drawGraph(fn) {
+  fitLabels();
   const vals = sample(fn);
   range = [Math.min(0, ...vals) - 0.08, Math.max(1, ...vals) + 0.08];
   const grid = [0, 0.25, 0.5, 0.75, 1];
-  $('ez-grid').innerHTML = grid.map((g) => `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(g)}" y2="${Y(g)}"/><text x="${PAD.l - 10}" y="${Y(g) + 4}" text-anchor="end">${g}</text>`).join('')
+  $('ez-grid').innerHTML = grid.map((g) => `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(g)}" y2="${Y(g)}"/><text x="${PAD.l - 10}" y="${Y(g) + labelSize * 0.36}" text-anchor="end" style="font-size:${labelSize}px">${g}</text>`).join('')
     + grid.map((g) => `<line x1="${X(g)}" x2="${X(g)}" y1="${Y(range[0])}" y2="${Y(range[1])}"/>`).join('')
     + `<line class="axis" x1="${X(0)}" x2="${X(1)}" y1="${Y(0)}" y2="${Y(0)}"/><line class="axis" x1="${X(0)}" x2="${X(0)}" y1="${Y(range[0])}" y2="${Y(range[1])}"/>`
-    + `<text x="${X(1)}" y="${H - 8}" text-anchor="end">temps →</text>`;
+    + `<text x="${X(1)}" y="${H - 8}" text-anchor="end" style="font-size:${labelSize}px">temps →</text>`;
   $('ez-ref').setAttribute('d', `M${X(0)} ${Y(0)} L${X(1)} ${Y(1)}`);
   $('ez-curve').setAttribute('d', vals.map((v, i) => `${i ? 'L' : 'M'}${X(i / (vals.length - 1)).toFixed(1)} ${Y(v).toFixed(1)}`).join(' '));
 }
@@ -248,10 +260,13 @@ $('ez-all').addEventListener('click', (e) => {
 });
 
 // Lien direct : #outElastic, #spring…
-const fromHash = decodeURIComponent(location.hash.slice(1));
+// fragment malformé (« #% ») : on garde la valeur brute plutôt que d'échouer
+const safeDecode = (s) => { try { return decodeURIComponent(s); } catch (e) { return s; } };
+const fromHash = safeDecode(location.hash.slice(1));
 const m = fromHash.match(/^(in|out|inOut|outIn)([A-Z]\w+)$/);
 if (m && FAMILIES.includes(m[2])) { state.variant = m[1]; state.fam = m[2]; }
 else if (['linear', 'bezier', 'steps', 'spring'].includes(fromHash)) state.fam = fromHash;
 buildParams();
 update();
-addEventListener('resize', render);
+let resizeTimer = 0;
+addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { drawGraph(cur.fn); render(); }, 120); });

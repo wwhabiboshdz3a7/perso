@@ -64,7 +64,10 @@ kbd { font-size: .8em; padding: .1em .45em; border-radius: 5px; border: 1px soli
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 /* —— En-tête —— */
-.hd { position: sticky; top: 0; z-index: 100; height: var(--header); border-bottom: 1px solid var(--line);
+/* Le flou est porté par un pseudo-élément : un backdrop-filter sur .hd ferait de l'en-tête
+   le bloc conteneur du menu mobile (position: fixed), réduit alors à la hauteur de l'en-tête. */
+.hd { position: sticky; top: 0; z-index: 100; height: var(--header); }
+.hd::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-bottom: 1px solid var(--line);
   background: rgba(13, 12, 11, .78); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
 .hd__in { height: 100%; display: flex; align-items: center; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; flex: none; }
@@ -94,6 +97,8 @@ kbd { font-size: .8em; padding: .1em .45em; border-radius: 5px; border: 1px soli
   .ver { display: none; }
   .nav { position: fixed; inset: var(--header) 0 0 0; z-index: 99; margin: 0; padding: 28px var(--gutter) 40px; display: none; flex-direction: column; align-items: stretch; gap: 0; background: var(--ink); overflow-y: auto; }
   .menu-open .nav { display: flex; }
+  body.menu-open { overflow: hidden; }
+  .menu-open .hd::before { background: var(--ink); }
   .nav a { padding: 16px 4px; border-radius: 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-size: clamp(28px, 8vw, 44px); font-weight: 800; text-transform: uppercase; color: var(--paper); letter-spacing: -.01em; }
   .nav a:hover { background: none; color: var(--flare); }
   .nav a[aria-current="page"] { color: var(--flare); }

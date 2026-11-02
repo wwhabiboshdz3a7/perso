@@ -94,9 +94,15 @@ animate('.point', {
 
 function sync() {
   const n = total();
-  const o = options();
-  const fn = stagger(S.each, o);
-  values = dots.map((d, i) => fn(d, i, n));
+  let o = options();
+  values = dots.map((d, i) => stagger(S.each, o)(d, i, n));
+  // Avec un axe, les distances sont signées : des délais négatifs feraient démarrer des
+  // éléments en cours d'animation. On ajoute alors `start` pour que le plus petit vaille 0.
+  const shift = Math.min(...values) < 0 ? -Math.min(...values) : 0;
+  if (shift) {
+    o = { ...o, start: Math.round((S.start || 0) + shift) };
+    values = dots.map((d, i) => stagger(S.each, o)(d, i, n));
+  }
   const min = Math.min(...values);
   const max = Math.max(...values);
   dots.forEach((d, i) => {
@@ -107,7 +113,7 @@ function sync() {
     d.classList.toggle('is-from', S.from === 'index' && i === S.index);
     d.setAttribute('aria-label', `Point ${i + 1} : ${Math.round(v)} ms${S.from === 'index' && i === S.index ? ', origine' : ''}`);
   });
-  $('st-stats').textContent = `${n} éléments · de ${Math.round(min)} à ${Math.round(max)} ms`;
+  $('st-stats').textContent = `${n} éléments · de ${Math.round(min)} à ${Math.round(max)} ms${shift ? ` · start: ${o.start} ajouté (pas de délai négatif)` : ''}`;
   pressed($('st-from'), S.from);
   pressed($('st-axis'), S.axis);
   $('st-axis-g').hidden = S.mode !== 'grid';
