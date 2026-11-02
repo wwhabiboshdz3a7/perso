@@ -40,3 +40,6 @@ button, input, textarea, select { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+
+/* Code : pas de ligatures (=> et --> restent lisibles tels qu'ils se tapent). */
+code, pre, kbd, samp, textarea, .prompt { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
