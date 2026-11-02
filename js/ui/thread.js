@@ -111,6 +111,9 @@ export function fillAssistant(el, msg, ctx) {
     out += `<div class="err-card" role="alert">${icon('alert')}<strong>${esc(info.title)}</strong><p>${esc(info.text)}</p>${info.detail ? `<p class="err-detail">Détail : ${esc(info.detail)}</p>` : ''}
       <div class="row">${info.action === 'settings' ? `<button class="btn btn-sm btn-primary" type="button" data-act="settings">${icon('settings')}Ouvrir les réglages</button>` : ''}${info.action === 'unlock' ? `<button class="btn btn-sm btn-primary" type="button" data-act="unlock">${icon('lock')}Déverrouiller</button>` : ''}${ctx.isLast ? `<button class="btn btn-sm" type="button" data-act="retry">${icon('refresh')}Réessayer</button>` : ''}${ctx.isLast && answer && info.continuable ? `<button class="btn btn-sm" type="button" data-act="continue">${icon('chevron-right')}Continuer</button>` : ''}</div></div>`;
   }
+  if (msg.status === 'stopped' && !answer && !reasoning) {
+    out += `<div class="cut-note" role="note">${icon('info')}<span>Génération arrêtée avant le premier mot.${ctx.isLast ? ' Utilisez « Régénérer » pour relancer la demande.' : ''}</span></div>`;
+  }
   const incomplete = msg.status === 'done' && (msg.finish === 'incomplete' || msg.finish === 'length');
   if (incomplete && ctx.isLast && answer) {
     out += `<div class="cut-note" role="note">${icon('info')}<span>${msg.finish === 'length' ? 'La réponse a atteint la longueur maximale.' : 'Le flux s’est arrêté avant la fin : la réponse est peut-être incomplète.'}</span><button class="btn btn-sm" type="button" data-act="continue">${icon('chevron-right')}Continuer</button><button class="btn btn-sm btn-ghost" type="button" data-act="retry">${icon('refresh')}Réessayer</button></div>`;

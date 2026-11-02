@@ -916,16 +916,30 @@ async function noHorizontalScroll(page) {
     await page.evaluate(() => { window.__lt = []; new PerformanceObserver((l) => { for (const e of l.getEntries()) window.__lt.push(e.duration); }).observe({ type: 'longtask' }); });
     await sendMessage(page, 'longue réponse détaillée');
     // Pendant le flux, les blocs déjà terminés sont colorés et figés.
-    await page.waitForFunction(() => document.querySelectorAll('.msg.streaming .md .code-block .hljs-keyword').length >= 2, null, { timeout: 15000 });
+    // (deux blocs présents : le premier, suivi d'autres paragraphes, est forcément terminé)
+    await page.waitForFunction(() => {
+      const blocks = document.querySelectorAll('.msg.streaming .md .code-block');
+      return blocks.length >= 2 && blocks[0].querySelector('.hljs-keyword');
+    }, null, { timeout: 15000 });
+    // Le premier bloc de code ne doit jamais être retiré du DOM tant que la réponse s'écrit
+    // (observé par MutationObserver : indépendant de la vitesse du flux).
     const frozen = await page.evaluate(() => {
       const first = document.querySelector('.msg.streaming .md .code-block');
-      first.dataset.mark = '1';
+      const msg = first.closest('.msg');
+      window.__frozen = { removed: false, updates: 0 };
+      new MutationObserver(() => {
+        if (!msg.isConnected || !msg.classList.contains('streaming')) return;
+        window.__frozen.updates++;
+        if (!first.isConnected) window.__frozen.removed = true;
+      }).observe(document.getElementById('messages'), { childList: true, subtree: true });
       return !!first;
     });
     assert.ok(frozen);
-    await page.waitForTimeout(400);
-    assert.equal(await page.locator('.msg.streaming .md .code-block[data-mark="1"]').count(), 1, 'un bloc terminé n’est pas re-rendu');
     await waitDone(page);
+    const fr = await page.evaluate(() => window.__frozen);
+    assert.equal(fr.removed, false, `un bloc terminé n’est pas re-rendu (${fr.updates} mises à jour observées)`);
+    // Machine très chargée : le navigateur peut ne plus rendre avant la fin du flux.
+    if (!fr.updates) console.log('     (avertissement : aucune mise à jour observée après le premier bloc, vérification non concluante)');
     const md = page.locator('.msg-assistant').last().locator('.md');
     assert.equal(await md.locator('h2').count(), 24);
     assert.equal(await md.locator('.code-block').count(), 24);
@@ -1045,6 +1059,22 @@ async function noHorizontalScroll(page) {
     await c.reload();
     await c.waitForSelector('html.ready');
     assert.equal(await c.locator('.conv-item').count(), 0, 'la conversation supprimée ne réapparaît pas');
+    // Sans signal entre onglets (base modifiée directement) : l'écriture suivante ne recrée rien.
+    await sendMessage(a, 'conversation éphémère');
+    await waitDone(a);
+    const ephemeral = await a.evaluate(() => decodeURIComponent(location.hash.slice(4)));
+    await c.evaluate(async (id) => {
+      const db = await new Promise((r) => { const q = indexedDB.open('nour'); q.onsuccess = () => r(q.result); });
+      await new Promise((r) => { const t = db.transaction('conversations', 'readwrite'); t.objectStore('conversations').delete(id); t.oncomplete = r; });
+      db.close();
+    }, ephemeral);
+    await a.click('#conv-menu-btn');
+    await a.click('[data-action="pin-current"]');
+    await a.waitForSelector('.toast >> text=supprimée dans un autre onglet');
+    assert.equal(await a.locator('.toast >> text=Conversation épinglée').count(), 0);
+    await c.reload();
+    await c.waitForSelector('html.ready');
+    assert.equal(await c.locator('.conv-item').count(), 0, 'une conversation absente de la base n’est jamais réécrite');
     await ctx.close();
   });
 

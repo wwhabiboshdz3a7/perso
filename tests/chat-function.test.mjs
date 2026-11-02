@@ -92,6 +92,9 @@ test('modèles : relais de la liste du fournisseur', async () => {
   assert.equal(res.status, 200);
   const j = await res.json();
   assert.ok(j.data.some((m) => m.id === 'qwen/qwen3-32b'));
+  // Le schéma « Bearer » est insensible à la casse.
+  const lower = await handler(req('/api/models', { headers: { Authorization: `bearer ${token}` } }), ctx);
+  assert.equal(lower.status, 200);
 });
 
 test('chat : le flux SSE est relayé morceau par morceau, clé ajoutée côté serveur', async () => {

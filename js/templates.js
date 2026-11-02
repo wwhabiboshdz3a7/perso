@@ -1,4 +1,4 @@
-// Bibliothèque de modèles de requêtes, appelés avec « / » dans la zone de saisie.
+// Bibliothèque de requêtes enregistrées, appelées avec « / » dans la zone de saisie.
 
 import { db } from './db.js';
 import { uid } from './util.js';

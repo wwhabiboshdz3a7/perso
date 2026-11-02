@@ -612,6 +612,7 @@ async function renameConversation(id) {
   touch(conv, { field: 'title' });
   touch(conv, { field: 'customTitle' });
   await saveConversation(conv);
+  if (!state.conversations.includes(conv)) return; // supprimée dans un autre onglet
   renderSidebar();
   renderHeader();
 }
@@ -622,6 +623,7 @@ async function togglePin(id) {
   conv.pinned = !conv.pinned;
   touch(conv, { field: 'pinned' });
   await saveConversation(conv);
+  if (!state.conversations.includes(conv)) return; // supprimée dans un autre onglet
   renderSidebar();
   renderHeader();
   toast(conv.pinned ? 'Conversation épinglée.' : 'Conversation désépinglée.');
@@ -1210,7 +1212,7 @@ function toggleDictation() {
   });
 }
 
-/* Modèles de requêtes « / » */
+/* Requêtes enregistrées « / » */
 function updateSlash() {
   const v = els.input.value;
   const caret = els.input.selectionStart;

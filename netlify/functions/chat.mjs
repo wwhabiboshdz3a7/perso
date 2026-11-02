@@ -224,7 +224,9 @@ export default async function handler(req, context) {
   }
 
   const auth = req.headers.get('authorization') || '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+  // Le nom du schéma d'authentification est insensible à la casse (RFC 9110).
+  const m = /^bearer\s+(.+)$/i.exec(auth.trim());
+  const token = m ? m[1].trim() : '';
   const session = verifyToken(secret, token, Date.now(), env('ACCESS_PASSWORD_HASH'));
   if (!session) return fail(401, 'Session absente ou expirée : reconnectez-vous.', 'session');
 
