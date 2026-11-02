@@ -19,7 +19,7 @@ export function openMemory(app) {
         <div class="input-row"><input type="text" id="mem-new" maxlength="280" placeholder="ex. Préfère des réponses avec un exemple concret." autocomplete="off"><button class="btn" type="submit">${icon('plus')}Ajouter</button></div>
       </form>
       <div class="list-rows" data-list></div>`,
-    foot: `<button class="btn" type="button" data-suggest ${app.currentConversation()?.messages?.length ? '' : 'disabled'}>${icon('sparkle')}Proposer des souvenirs depuis cette conversation</button><span class="spacer"></span><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
+    foot: `<button class="btn foot-wide" type="button" data-suggest ${app.currentConversation()?.messages?.length ? '' : 'disabled'}>${icon('sparkle')}Proposer des souvenirs depuis cette conversation</button><span class="spacer"></span><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
     onClose: () => app.refreshChrome(),
   });
   const list = $('[data-list]', d);
@@ -121,7 +121,7 @@ export function openLibrary(app) {
     id: 'dlg-library', title: 'Bibliothèque',
     sub: 'Vos modèles de requêtes. Tapez <kbd>/</kbd> au début d’un message pour les utiliser.',
     body: '<div data-form></div><div class="list-rows" data-list></div>',
-    foot: `<button class="btn btn-ghost" type="button" data-reset>${icon('refresh')}Rétablir les modèles d’origine</button><span class="spacer"></span><button class="btn" type="button" data-new>${icon('plus')}Nouveau modèle</button><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
+    foot: `<button class="btn btn-ghost foot-wide" type="button" data-reset>${icon('refresh')}Rétablir les modèles d’origine</button><span class="spacer"></span><button class="btn" type="button" data-new>${icon('plus')}Nouveau modèle</button><button class="btn btn-primary" type="button" data-close>Fermer</button>`,
   });
   const list = $('[data-list]', d);
   const formBox = $('[data-form]', d);

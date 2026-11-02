@@ -619,7 +619,7 @@ mark { background: var(--accent-soft); color: inherit; border-radius: 3px; paddi
 .status-line[data-kind="ok"] { color: var(--ok); }
 .status-line[data-kind="error"] { color: var(--danger); }
 .status-line .ico { width: 16px; height: 16px; }
-.status-line:empty { min-height: 0; margin: 0; }
+#dlg-model .status-line:empty { min-height: 0; margin: 0; }
 
 /* ---------- Boîtes de dialogue ---------- */
 dialog.modal {
@@ -688,6 +688,7 @@ dialog.modal::backdrop { background: var(--scrim); backdrop-filter: blur(3px); }
 .row-item.rejected { opacity: .55; }
 .row-item .tag-done { font-size: .78rem; font-weight: 600; color: var(--ok); white-space: nowrap; }
 .empty-note { padding: 22px; text-align: center; color: var(--muted); font-size: .9rem; border: 1px dashed var(--line); border-radius: 12px; }
+.empty-note > .ico { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin-right: 6px; }
 .tpl-item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-soft); background: var(--surface-2); }
 .tpl-item code { font: 500 .82rem/1.3 var(--font-mono); color: var(--accent); }
 .tpl-item b { font-weight: 600; font-size: .9rem; margin-left: 8px; }
@@ -771,6 +772,7 @@ dialog.modal::backdrop { background: var(--scrim); backdrop-filter: blur(3px); }
   .modal-body { padding: 16px; }
   .modal-foot { padding: 10px 16px calc(10px + var(--safe-b)); }
   .modal-foot .btn { flex: 1; }
+  .modal-foot .btn.foot-wide { flex: 1 1 100%; }
   .modal-foot > .hint { display: none; }
   .modal-foot .spacer { display: none; }
   .persona-list { grid-template-columns: minmax(0, 1fr); }
