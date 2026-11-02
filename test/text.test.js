@@ -4,6 +4,10 @@ import { load, html } from './_dom.js';
 
 const { splitText, scramble, typewriter, odometer, engine, animate, stagger } = await load();
 const flushMicro = () => new Promise((r) => setTimeout(r, 0));
+// Nom accessible : aria-label (titres, liens…) ou copie masquée .kt-sr (éléments génériques)
+const nameOf = (el) => el.getAttribute('aria-label') ?? el.querySelector(':scope > .kt-sr')?.textContent;
+// Texte visible (hors copie masquée)
+const visible = (el) => [...el.childNodes].filter((n) => !(n.classList && n.classList.contains('kt-sr'))).map((n) => n.textContent).join('');
 
 test('splitText : mots et lettres, accessibilité, revert()', () => {
   const box = html('<h1 id="t">Bonjour le monde</h1>');
@@ -28,6 +32,10 @@ test('splitText : graphèmes (accents composés, émojis) et éléments imbriqu�
   const s = splitText(el, { chars: true });
   assert.deepEqual(s.chars.map((c) => c.textContent), ['É', 't', 'é', 'd', 'é', 'j', 'à', '👋🏽']);
   assert.ok(el.querySelector('em .kt-word'), 'l’élément em est conservé');
+  // un <p> n'accepte pas aria-label : le texte est lu dans une copie masquée
+  assert.equal(el.hasAttribute('aria-label'), false);
+  assert.equal(nameOf(el), 'Été déjà 👋🏽');
+  assert.equal(el.querySelector('.kt-sr').getAttribute('aria-hidden'), null);
   s.revert();
   assert.equal(el.innerHTML, 'Été <em>déjà</em> 👋🏽');
   box.remove();
@@ -83,12 +91,30 @@ test('scramble : texte final garanti et nom accessible stable', async () => {
   const box = html('<p>xxxx</p>');
   const el = box.firstChild;
   const a = scramble(el, { text: 'SENS', duration: 400 });
-  assert.equal(el.getAttribute('aria-label'), 'SENS');
+  assert.equal(nameOf(el), 'SENS');
   engine.tick(200);
-  assert.equal(el.textContent.length, 4);
+  assert.equal(visible(el).length, 4);
   engine.tick(300);
-  assert.equal(el.textContent, 'SENS');
+  assert.equal(visible(el), 'SENS');
   await a;
+  // un second décodage réutilise la même structure et met le nom à jour
+  scramble(el, { text: 'FOND', duration: 100 });
+  engine.tick(200);
+  assert.equal(el.querySelectorAll('.kt-sr').length, 1);
+  assert.equal(nameOf(el), 'FOND');
+  box.remove();
+});
+
+test('scramble sur un titre : aria-label qui suit le texte final', () => {
+  const box = html('<h2>xxxx</h2>');
+  const el = box.firstChild;
+  scramble(el, { text: 'UN', duration: 100 });
+  engine.tick(200);
+  assert.equal(el.getAttribute('aria-label'), 'UN');
+  assert.equal(el.textContent, 'UN');
+  scramble(el, { text: 'DEUX', duration: 100 });
+  engine.tick(200);
+  assert.equal(el.getAttribute('aria-label'), 'DEUX');
   box.remove();
 });
 
@@ -98,11 +124,12 @@ test('typewriter : frappe progressive puis curseur', async () => {
   const tl = typewriter(el, { text: 'Salut', speed: 10 });
   await flushMicro();
   engine.tick(250);
-  assert.ok(el.textContent.startsWith('Sa'), el.textContent);
+  assert.ok(visible(el).startsWith('Sa'), visible(el));
   engine.tick(400);
-  assert.equal(el.firstChild.data, 'Salut');
+  assert.equal(el.querySelector('.kt-type').firstChild.data, 'Salut');
+  assert.equal(el.querySelector('.kt-type').getAttribute('aria-hidden'), 'true');
   assert.ok(el.querySelector('.kt-caret'));
-  assert.equal(el.getAttribute('aria-label'), 'Salut');
+  assert.equal(nameOf(el), 'Salut');
   tl.blink.pause();
   box.remove();
 });
@@ -111,12 +138,12 @@ test('odometer : rouleaux par chiffre, séparateurs conservés, état final', as
   const box = html('<div></div>');
   const el = box.firstChild;
   const od = odometer(el, { value: '12,5', duration: 100, stagger: 0, autoplay: false });
-  assert.equal(el.getAttribute('aria-label'), '00,0');
+  assert.equal(nameOf(el), '00,0');
   const wins = el.querySelectorAll('.kt-odo-win');
   assert.equal(wins.length, 3);
   assert.equal(el.querySelector('.kt-odo-sep').textContent, ',');
   od.set('12,5', { autoplay: false });
-  assert.equal(el.getAttribute('aria-label'), '12,5');
+  assert.equal(nameOf(el), '12,5');
   od.animation.complete();
   const strips = [...el.querySelectorAll('.kt-odo-strip')];
   // chiffre 5 sur une bande de 20 (1 tour) : ≥ 10 + 5
@@ -135,7 +162,7 @@ test('mouvement réduit : effets texte directement à l’état final', () => {
   const box = html('<p>abc</p><p></p>');
   const [p1] = box.children;
   scramble(p1, { text: 'FIN' });
-  assert.equal(p1.textContent, 'FIN');
+  assert.equal(visible(p1), 'FIN');
   engine.reducedMotion = 'auto';
   box.remove();
 });
@@ -146,7 +173,7 @@ test('typewriter en boucle : en mouvement réduit, la première phrase reste aff
   const el = box.firstChild;
   typewriter(el, { text: ['Un', 'Deux'] });
   await flushMicro();
-  assert.equal(el.firstChild.data, 'Un');
+  assert.equal(el.querySelector('.kt-type').firstChild.data, 'Un');
   engine.reducedMotion = 'auto';
   box.remove();
 });

@@ -2158,6 +2158,78 @@ function span(cls, text) {
 function className(opt, fallback) {
   return isStr(opt) ? opt : fallback;
 }
+var NAMEABLE = /^(H[1-6]|A|BUTTON|LI|NAV|MAIN|ARTICLE|ASIDE|SECTION|FIGURE|FORM|DIALOG|SUMMARY|TD|TH|BLOCKQUOTE)$/;
+var UNNAMEABLE_ROLES = /* @__PURE__ */ new Set([
+  "generic",
+  "paragraph",
+  "presentation",
+  "none",
+  "code",
+  "emphasis",
+  "strong",
+  "deletion",
+  "insertion",
+  "subscript",
+  "superscript",
+  "caption",
+  "mark",
+  "time",
+  "term"
+]);
+var SR_STYLE = "position:absolute;left:0;top:0;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0";
+function visualHost(el, named, cls) {
+  if (named) return el;
+  let host = [...el.children].find((c) => c.classList.contains(cls));
+  if (!host) {
+    host = span(cls, el.textContent);
+    host.setAttribute("aria-hidden", "true");
+    el.textContent = "";
+    el.appendChild(host);
+  }
+  return host;
+}
+function canBeNamed(el) {
+  const role = el.getAttribute("role");
+  if (role) return !UNNAMEABLE_ROLES.has(role.trim().split(/\s+/)[0]);
+  return NAMEABLE.test(el.tagName.toUpperCase());
+}
+function accessibleName(el) {
+  if (canBeNamed(el)) {
+    const ours = el.hasAttribute("data-kt-label");
+    const had = el.hasAttribute("aria-label") && !ours;
+    const prev = el.getAttribute("aria-label");
+    return {
+      named: true,
+      set(text) {
+        if (had) return;
+        el.setAttribute("aria-label", text);
+        el.setAttribute("data-kt-label", "");
+      },
+      revert() {
+        el.removeAttribute("data-kt-label");
+        if (had) el.setAttribute("aria-label", prev);
+        else el.removeAttribute("aria-label");
+      }
+    };
+  }
+  const find = () => [...el.children].find((c) => c.classList.contains("kt-sr"));
+  return {
+    named: false,
+    set(text) {
+      let sr = find();
+      if (!sr) {
+        sr = span("kt-sr", "");
+        sr.style.cssText = SR_STYLE;
+        el.appendChild(sr);
+      }
+      sr.textContent = text;
+    },
+    revert() {
+      const sr = find();
+      if (sr) sr.remove();
+    }
+  };
+}
 function splitText(target, opts = {}) {
   var _a, _b;
   const el = resolveTargets(target)[0];
@@ -2174,8 +2246,7 @@ function splitText(target, opts = {}) {
   const result = { el, chars: [], words: [], lines: [], masks: [], revert, refresh };
   if (!el) return result;
   const original = el.innerHTML;
-  const hadLabel = el.hasAttribute("aria-label");
-  const label = el.getAttribute("aria-label");
+  const name = accessibleName(el);
   const text = el.textContent.replace(/\s+/g, " ").trim();
   function wrapMask(node, kind) {
     const m = span(cls.mask);
@@ -2237,7 +2308,7 @@ function splitText(target, opts = {}) {
     if (mask === "chars") result.chars.forEach((c) => wrapMask(c, "chars"));
     if (mask === "words") result.words.forEach((w) => wrapMask(w, "words"));
     if (mask === "lines") result.lines.forEach((l) => wrapMask(l, "lines"));
-    if (!hadLabel && text) el.setAttribute("aria-label", text);
+    if (text) name.set(text);
   }
   function groupLines() {
     const top = [...el.childNodes];
@@ -2281,8 +2352,7 @@ function splitText(target, opts = {}) {
   }
   function revert() {
     el.innerHTML = original;
-    if (!hadLabel) el.removeAttribute("aria-label");
-    else el.setAttribute("aria-label", label);
+    name.revert();
     result.chars.length = 0;
     result.words.length = 0;
     result.lines.length = 0;
@@ -2305,16 +2375,18 @@ function scramble(target, opts = {}) {
   const fps = (_b = opts.fps) != null ? _b : 24;
   const states = els.map((el) => {
     var _a2;
-    const finalText = graphemes((_a2 = opts.text) != null ? _a2 : el.textContent);
-    const from = graphemes(el.textContent);
-    if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", finalText.join(""));
+    const name = accessibleName(el);
+    const host = visualHost(el, name.named, "kt-scramble");
+    const finalText = graphemes((_a2 = opts.text) != null ? _a2 : host.textContent);
+    const from = graphemes(host.textContent);
+    name.set(finalText.join(""));
     const n = finalText.length || 1;
     const order = opts.reveal === "random" ? rng.shuffle([...Array(n).keys()]) : [...Array(n).keys()];
     const thresholds = [];
     order.forEach((idx, rank) => {
       thresholds[idx] = 0.2 + 0.8 * (rank / n);
     });
-    return { el, finalText, from, thresholds, last: -1 };
+    return { el: host, finalText, from, thresholds, last: -1 };
   });
   const proxy = { p: 0 };
   const glyph = () => chars[Math.floor(rng() * chars.length)];
@@ -2363,13 +2435,19 @@ function typewriter(target, opts = {}) {
   const textNode = document.createTextNode("");
   const caret = opts.cursor === false ? null : span("kt-caret", (_c = opts.cursorChar) != null ? _c : "\u258D");
   el.textContent = "";
-  el.appendChild(textNode);
+  const name = accessibleName(el);
+  const host = name.named ? el : span("kt-type");
+  if (host !== el) {
+    host.setAttribute("aria-hidden", "true");
+    el.appendChild(host);
+  }
+  host.appendChild(textNode);
   if (caret) {
     caret.setAttribute("aria-hidden", "true");
     caret.style.marginLeft = "0.05em";
-    el.appendChild(caret);
+    host.appendChild(caret);
   }
-  if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", texts.join(" "));
+  name.set(texts.join(" "));
   let blink = null;
   if (caret) blink = animate(caret, { opacity: [1, 0, 1], duration: 1060, ease: "steps(1)", loop: true });
   const typeOne = (str, erase) => {
@@ -2429,6 +2507,7 @@ function odometer(target, opts = {}) {
     el.textContent = "";
     el.appendChild(row);
   }
+  const name = el && row ? accessibleName(el) : null;
   const layout = (str) => {
     const s = [...str];
     if (cols.length === s.length && cols.every((c, i) => c.digit === /\d/.test(s[i]))) return;
@@ -2467,7 +2546,7 @@ function odometer(target, opts = {}) {
       const str = String(value);
       if (!el) return null;
       layout(str);
-      el.setAttribute("aria-label", str);
+      name.set(str);
       const tl = timeline({ autoplay: (_a2 = o.autoplay) != null ? _a2 : true, reducedMotion: (_b2 = o.reducedMotion) != null ? _b2 : opts.reducedMotion });
       const s = [...str];
       const duration = (_d = (_c2 = o.duration) != null ? _c2 : opts.duration) != null ? _d : 1800;
@@ -2487,13 +2566,13 @@ function odometer(target, opts = {}) {
     },
     revert() {
       if (el) el.textContent = current;
-      if (el) el.removeAttribute("aria-label");
+      if (name) name.revert();
     }
   };
   if (el && (opts.value !== void 0 || opts.from !== void 0)) {
     current = String((_c = opts.from) != null ? _c : String(opts.value).replace(/\d/g, "0"));
     layout(current);
-    el.setAttribute("aria-label", current);
+    name.set(current);
     if (opts.value !== void 0 && opts.autoplay !== false) api.set(opts.value);
   }
   return api;
