@@ -32,6 +32,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header) + 16px); }
 body {
   margin: 0; min-height: 100vh; background: var(--ink); color: var(--paper);
@@ -120,7 +121,7 @@ kbd { font-size: .8em; padding: .1em .45em; border-radius: 5px; border: 1px soli
 
 /* —— Blocs de code —— */
 .code { position: relative; margin: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); overflow: hidden; }
-.code__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px 8px 16px; border-bottom: 1px solid var(--line); }
+.code__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 49px; padding: 8px 10px 8px 16px; border-bottom: 1px solid var(--line); }
 .code__bar .label { font-size: 11px; }
 .code pre { margin: 0; padding: 16px 18px; overflow-x: auto; font-size: 14px; line-height: 1.65; tab-size: 2; color: var(--paper-2); }
 .code pre code { font-family: var(--f-mono); }

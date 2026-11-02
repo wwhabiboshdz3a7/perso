@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Venir d’anime.js ou de GSAP — Kinetika</title>
+<meta name="description" content="Correspondances d’API entre anime.js, GSAP et Kinetika : animations, timelines et positions, stagger, easings, défilement, texte, SVG et utilitaires.">
+<meta name="theme-color" content="#0d0c0b">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../site/site.css">
+<link rel="stylesheet" href="../site/pages.css">
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="hd">
+  <div class="wrap hd__in">
+    <a class="brand" href="../" aria-label="Kinetika, accueil">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#ff5b2b"/><path d="M10.5 8v16M22 8.5l-8.5 7.5 8.5 7.5" fill="none" stroke="#0d0c0b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24.6" cy="16" r="2.1" fill="#0d0c0b"/></svg>
+      <span class="brand__word" aria-hidden="true"><span style="--w:130%">K</span><span style="--w:70%">I</span><span style="--w:115%">N</span><span style="--w:90%">E</span><span style="--w:125%">T</span><span style="--w:70%">I</span><span style="--w:120%">K</span><span style="--w:100%">A</span></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="../exemples/">Galerie</a>
+      <a href="../bac-a-sable/">Bac à sable</a>
+      <a href="../api/">API</a>
+      <a href="../easings/">Easings</a>
+      <a href="../stagger/">Stagger</a>
+      <a href="../migration/" aria-current="page">Migration</a>
+    </nav>
+    <div class="hd__tools">
+      <span class="ver">v0.1.0</span>
+      <a class="gh" href="https://github.com/wwhabiboshdz3a7/kinetika" aria-label="Kinetika sur GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Ouvrir le menu"><i></i><i></i></button>
+    </div>
+  </div>
+</header>
+<div class="grain" aria-hidden="true"></div>
+<main id="main">
+  <section class="page-hero page-hero--tight">
+    <div class="wrap">
+      <p class="label"><b>Migration</b> · anime.js · GSAP</p>
+      <h1>Vous savez <em>déjà</em> animer</h1>
+      <p>Kinetika reprend les idées qui ont fait leurs preuves : des cibles, des paramètres, des timelines. Cette page met les écritures côte à côte pour passer d’une librairie à l’autre sans réapprendre.</p>
+    </div>
+  </section>
+
+  <div class="wrap mig">
+    <section aria-labelledby="m-base">
+      <h2 class="sub-title" id="m-base">Trois différences à retenir</h2>
+      <div class="mig__intro">
+        <div class="panel"><p class="label"><b>01</b> · temps</p><h3>Millisecondes</h3><p>Comme anime.js, toutes les durées sont en <strong>millisecondes</strong>. Depuis GSAP : <code>duration: 1</code> devient <code>duration: 1000</code>, <code>'+=0.5'</code> devient <code>'+=500'</code>.</p></div>
+        <div class="panel"><p class="label"><b>02</b> · positions</p><h3>&lt; et &lt;&lt;</h3><p>Dans une timeline, <code>'&lt;'</code> désigne la <strong>fin</strong> de l’élément précédent et <code>'&lt;&lt;'</code> son <strong>début</strong>. Le <code>'&lt;'</code> de GSAP s’écrit donc <code>'&lt;&lt;'</code>.</p></div>
+        <div class="panel"><p class="label"><b>03</b> · cibles</p><h3>Premier argument</h3><p>Les cibles sont toujours le premier argument : <code>animate(cibles, paramètres)</code> et <code>tl.add(cibles, paramètres, position)</code>.</p></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="m-anime">
+      <h2 class="sub-title" id="m-anime">Depuis anime.js</h2>
+      <div class="mig__pair">
+        <div class="code"><div class="code__bar"><span class="label">anime.js (v3)</span></div><pre><code data-lang="js">anime({
+  targets: '.carte',
+  translateX: 250,
+  rotate: '1turn',
+  delay: anime.stagger(100),
+  easing: 'easeOutElastic(1, .6)',
+  direction: 'alternate',
+  loop: true,
+});</code></pre></div>
+        <div class="code"><div class="code__bar"><span class="label">Kinetika</span><button class="copy" type="button" data-copy-target="#c-anime"><span class="copy__l">Copier</span></button></div><pre><code data-lang="js" id="c-anime">animate('.carte', {
+  x: 250,
+  rotate: '1turn',
+  delay: stagger(100),
+  ease: 'outElastic(1, .6)', // 'easeOutElastic' accepté aussi
+  alternate: true,
+  loop: true,
+});</code></pre></div>
+      </div>
+      <div class="tbl-wrap" style="margin-top: 18px">
+        <table class="tbl">
+          <thead><tr><th scope="col">Sujet</th><th scope="col">anime.js</th><th scope="col">Kinetika</th></tr></thead>
+          <tbody>
+            <tr><td>Animer</td><td><code>anime({ targets, … })</code> · v4 : <code>animate(targets, {…})</code></td><td><code>animate(cibles, {…})</code></td></tr>
+            <tr><td>Transformations</td><td><code>translateX</code>, <code>translateY</code>, <code>rotate</code>, <code>scale</code></td><td><code>x</code>, <code>y</code>, <code>rotate</code>, <code>scale</code> (les noms <code>translateX/Y/Z</code> restent acceptés)</td></tr>
+            <tr><td>Easing</td><td><code>easing: 'easeInOutQuad'</code> · v4 : <code>ease: 'inOutQuad'</code></td><td><code>ease: 'inOutQuad'</code> (l’ancienne écriture est convertie)</td></tr>
+            <tr><td>Sens</td><td><code>direction: 'alternate'</code> / <code>'reverse'</code></td><td><code>alternate: true</code> / <code>reversed: true</code></td></tr>
+            <tr><td>Rappels</td><td><code>begin</code>, <code>update</code>, <code>complete</code>, <code>loopComplete</code></td><td><code>onBegin</code>, <code>onUpdate</code>, <code>onComplete</code>, <code>onLoop</code></td></tr>
+            <tr><td>Fin</td><td><code>animation.finished.then(…)</code></td><td><code>animation.then(…)</code> ou <code>await animation</code></td></tr>
+            <tr><td>Timeline</td><td><code>anime.timeline({ … }).add({ targets, … }, '-=200')</code></td><td><code>timeline({ defaults: { … } }).add(cibles, { … }, '-=200')</code></td></tr>
+            <tr><td>Valeurs par cible</td><td><code>(el, i, total) =&gt; …</code></td><td>Identique.</td></tr>
+            <tr><td>Keyframes</td><td><code>keyframes: [{ … }, { … }]</code></td><td>Identique, plus les pourcentages : <code>keyframes: { '50%': { … } }</code></td></tr>
+            <tr><td>Stagger</td><td><code>anime.stagger(50, { grid, from, axis })</code></td><td><code>stagger(50, { grid, from, axis })</code></td></tr>
+            <tr><td>Ressort</td><td><code>'spring(1, 80, 10, 0)'</code> · v4 : <code>createSpring()</code></td><td><code>spring({ mass, stiffness, damping, velocity })</code> ou <code>'spring(1, 80, 10, 0)'</code></td></tr>
+            <tr><td>Valeurs immédiates</td><td><code>anime.set(cibles, {…})</code></td><td><code>set(cibles, {…})</code></td></tr>
+            <tr><td>Arrêter</td><td><code>anime.remove(cibles)</code></td><td><code>remove(cibles, propriétés?)</code></td></tr>
+            <tr><td>Tracé SVG</td><td><code>strokeDashoffset: [anime.setDashoffset, 0]</code> · v4 : <code>svg.createDrawable()</code></td><td><code>animate(drawable('path'), { draw: [0, 1] })</code></td></tr>
+            <tr><td>Chemin</td><td><code>anime.path('#chemin')</code> · v4 : <code>svg.createMotionPath()</code></td><td><code>{ ...motionPath('#chemin') }</code></td></tr>
+            <tr><td>Aléatoire</td><td><code>anime.random(0, 10)</code></td><td><code>utils.random(0, 10)</code>, ou à graine : <code>utils.createRandom(42)</code></td></tr>
+            <tr><td>Moteur</td><td><code>anime.speed</code>, <code>anime.suspendWhenDocumentHidden</code></td><td><code>engine.timeScale</code>, <code>engine.pauseOnHidden</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="m-gsap">
+      <h2 class="sub-title" id="m-gsap">Depuis GSAP</h2>
+      <div class="mig__pair">
+        <div class="code"><div class="code__bar"><span class="label">GSAP</span></div><pre><code data-lang="js">const tl = gsap.timeline({ defaults: { duration: 0.8, ease: 'power3.out' } });
+tl.from('.titre', { yPercent: 110 })
+  .to('.photo', { scale: 1, autoAlpha: 1 }, '&lt;')
+  .to('.barre', { scaleX: 1, stagger: 0.08 }, '+=0.2')
+  .addLabel('fin')
+  .call(() =&gt; console.log('fini'), null, 'fin');</code></pre></div>
+        <div class="code"><div class="code__bar"><span class="label">Kinetika</span><button class="copy" type="button" data-copy-target="#c-gsap"><span class="copy__l">Copier</span></button></div><pre><code data-lang="js" id="c-gsap">const tl = timeline({ defaults: { duration: 800, ease: 'outQuart' } });
+tl.add('.titre', { y: { from: '110%' } })
+  .add('.photo', { scale: 1, opacity: 1 }, '&lt;&lt;')
+  .add('.barre', { scaleX: 1, delay: stagger(80) }, '+=200')
+  .label('fin')
+  .call(() =&gt; console.log('fini'), 'fin');</code></pre></div>
+      </div>
+      <p class="mig__note" style="margin-top: 18px"><strong>À noter :</strong> <code>'power3.out'</code> fonctionne tel quel (il est converti en <code>'outQuart'</code>), mais les durées et décalages doivent passer en millisecondes.</p>
+      <div class="tbl-wrap" style="margin-top: 18px">
+        <table class="tbl">
+          <thead><tr><th scope="col">Sujet</th><th scope="col">GSAP</th><th scope="col">Kinetika</th></tr></thead>
+          <tbody>
+            <tr><td>Vers une valeur</td><td><code>gsap.to(el, { x: 100, duration: 1 })</code></td><td><code>animate(el, { x: 100, duration: 1000 })</code></td></tr>
+            <tr><td>Depuis une valeur</td><td><code>gsap.from(el, { opacity: 0 })</code></td><td><code>animate(el, { opacity: { from: 0 } })</code></td></tr>
+            <tr><td>De… à…</td><td><code>gsap.fromTo(el, { x: 0 }, { x: 100 })</code></td><td><code>animate(el, { x: [0, 100] })</code></td></tr>
+            <tr><td>Immédiat</td><td><code>gsap.set(el, { x: 0 })</code></td><td><code>set(el, { x: 0 })</code></td></tr>
+            <tr><td>Répéter</td><td><code>repeat: -1</code>, <code>repeat: 2</code>, <code>repeatDelay</code>, <code>yoyo: true</code></td><td><code>loop: true</code>, <code>loop: 2</code>, <code>loopDelay</code>, <code>alternate: true</code></td></tr>
+            <tr><td>Easing</td><td><code>'power2.inOut'</code>, <code>'back.out(2)'</code>, <code>'elastic.out(1, .3)'</code>, <code>'steps(5)'</code></td><td>Mêmes chaînes acceptées, ou <code>'inOutCubic'</code>, <code>'outBack(2)'</code>, <code>'outElastic(1, .3)'</code></td></tr>
+            <tr><td>Décalage</td><td><code>stagger: 0.1</code> ou <code>stagger: { each: 0.1, from: 'center', grid: [8, 4] }</code></td><td><code>delay: stagger(100)</code> ou <code>delay: stagger(100, { from: 'center', grid: [8, 4] })</code></td></tr>
+            <tr><td>Positions</td><td><code>'&lt;'</code> (début du précédent), <code>'&gt;'</code> (fin du précédent), <code>'+=1'</code>, <code>'label'</code></td><td><code>'&lt;&lt;'</code>, <code>'&lt;'</code>, <code>'+=1000'</code>, <code>'label'</code></td></tr>
+            <tr><td>Rappels</td><td><code>onStart</code>, <code>onUpdate</code>, <code>onRepeat</code>, <code>onComplete</code></td><td><code>onBegin</code>, <code>onUpdate</code>, <code>onLoop</code>, <code>onComplete</code></td></tr>
+            <tr><td>Contrôle</td><td><code>.play()</code>, <code>.pause()</code>, <code>.reverse()</code>, <code>.seek(1.2)</code>, <code>.progress(0.5)</code>, <code>.timeScale(2)</code></td><td><code>.play()</code>, <code>.pause()</code>, <code>.reverse()</code>, <code>.seek(1200)</code>, <code>.progress = 0.5</code>, <code>.speed = 2</code></td></tr>
+            <tr><td>Nettoyer</td><td><code>.revert()</code>, <code>.kill()</code></td><td><code>.revert()</code>, <code>.cancel()</code></td></tr>
+            <tr><td>Défilement</td><td><code>scrollTrigger: { trigger, start: 'top 80%', end, scrub: 1, toggleActions: 'play none none reverse' }</code></td><td><code>autoplay: onScroll({ target, enter: 'top 80%', leave, scrub: 1, sync: 'play none none reverse' })</code></td></tr>
+            <tr><td>Texte</td><td><code>SplitText.create(el, { type: 'lines,words', mask: 'lines' })</code></td><td><code>splitText(el, { lines: true, words: true, mask: 'lines' })</code></td></tr>
+            <tr><td>Décodage</td><td><code>scrambleText: { text: 'Bonjour' }</code></td><td><code>scramble(el, { text: 'Bonjour' })</code></td></tr>
+            <tr><td>Tracé SVG</td><td><code>drawSVG: '0% 100%'</code></td><td><code>animate(drawable(el), { draw: [0, 1] })</code>, et <code>drawStart</code> pour le début du segment</td></tr>
+            <tr><td>Chemin</td><td><code>motionPath: { path: '#route', autoRotate: true }</code></td><td><code>{ ...motionPath('#route') }</code> (rotation incluse)</td></tr>
+            <tr><td>Boucle globale</td><td><code>gsap.ticker.add(fn)</code>, <code>gsap.globalTimeline.timeScale(0.5)</code></td><td><code>engine.onFrame(fn)</code>, <code>engine.timeScale = 0.5</code></td></tr>
+            <tr><td>Suivi rapide</td><td><code>gsap.quickTo(el, 'x')</code></td><td><code>animate(el, { x, duration: 400 })</code> à chaque mouvement : la composition « replace » reprend la valeur en cours.</td></tr>
+            <tr><td>Utilitaires</td><td><code>gsap.utils.clamp</code>, <code>mapRange</code>, <code>wrap</code>, <code>snap</code>, <code>random</code></td><td><code>utils.clamp</code>, <code>mapRange</code>, <code>wrap</code>, <code>snap</code>, <code>random</code></td></tr>
+            <tr><td>Mouvement réduit</td><td><code>gsap.matchMedia()</code> et conditions</td><td>Automatique : <code>engine.reducedMotion = 'auto'</code> fait sauter les animations à leur état final.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="m-more">
+      <h2 class="sub-title" id="m-more">Et ensuite</h2>
+      <div class="mig__intro">
+        <a class="panel" href="../bac-a-sable/" style="text-decoration:none"><p class="label"><b>→</b> essayer</p><h3>Bac à sable</h3><p>Collez votre ancien code, adaptez-le, voyez le résultat en direct.</p></a>
+        <a class="panel" href="../api/" style="text-decoration:none"><p class="label"><b>→</b> vérifier</p><h3>Référence</h3><p>Tous les paramètres, avec leurs valeurs par défaut.</p></a>
+        <a class="panel" href="../exemples/" style="text-decoration:none"><p class="label"><b>→</b> s’inspirer</p><h3>Galerie</h3><p>34 exemples complets, du premier pas au scrub au défilement.</p></a>
+      </div>
+    </section>
+  </div>
+</main>
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft__top">
+      <div>
+        <p class="ft__big">Kinetika</p>
+        <p>Librairie d’animation JavaScript open source, légère et sans dépendance.</p>
+        <p class="ft__credit">Conçue et développée par <a href="https://github.com/wwhabiboshdz3a7">wwhabiboshdz3a7</a>.</p>
+      </div>
+      <div>
+        <h2>Apprendre</h2>
+        <ul>
+          <li><a href="../api/">Référence de l’API</a></li>
+          <li><a href="../migration/">Venir d’anime.js ou de GSAP</a></li>
+          <li><a href="../easings/">Visualiseur d’easings</a></li>
+          <li><a href="../stagger/">Visualiseur de stagger</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Pratiquer</h2>
+        <ul>
+          <li><a href="../exemples/">Galerie d’exemples</a></li>
+          <li><a href="../bac-a-sable/">Bac à sable</a></li>
+          <li><a href="https://www.npmjs.com/package/kinetika">Paquet npm</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Projet</h2>
+        <ul>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika">Dépôt GitHub</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7">Profil de l’auteur</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika/blob/main/CHANGELOG.md">Journal des versions</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika/blob/main/CONTRIBUTING.md">Contribuer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft__bottom"><span>MIT © 2026 wwhabiboshdz3a7</span><span>Kinetika v0.1.0 · fait à la main, image par image</span></div>
+  </div>
+</footer>
+<script type="module" src="../site/site.js"></script>
+</body>
+</html>
