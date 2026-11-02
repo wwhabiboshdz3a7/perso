@@ -1,18 +1,20 @@
 // Bac à sable : éditeur CodeMirror, aperçu en direct, exemples chargeables, partage par lien.
+// L'aperçu tourne dans une iframe sandbox="allow-scripts" (origine opaque) et ses boucles sont
+// gardées : un code partagé ne peut pas toucher la page, une boucle infinie ne gèle pas l'onglet.
 import { examples, categories, byId } from '../exemples/catalogue.js';
 import { toast, copyText } from './site.js';
+import { buildDoc, libForPreview, syntaxError, encode, decode, LIB_URL, BASE } from './sandbox-doc.js';
 
 const CM = window.CodeMirror;
 const $ = (id) => document.getElementById(id);
 const els = {
   select: $('ex'), prev: $('prev'), next: $('next'), run: $('run'), auto: $('auto'), share: $('share'), reset: $('reset'),
   download: $('download'), open: $('open'), notice: $('notice'), trust: $('trust'), frame: $('frame'), editor: $('editor'),
-  log: $('clog'), count: $('ccount'), clear: $('cclear'),
+  log: $('clog'), count: $('ccount'), clear: $('cclear'), status: $('status'),
+  draft: $('draft'), draftAge: $('draft-age'), draftRestore: $('draft-restore'), draftDrop: $('draft-drop'),
 };
 const tabs = [...document.querySelectorAll('.play__tabs [role="tab"]')];
 
-const LIB = new URL('../dist/kinetika.esm.js', import.meta.url).href;
-const BASE = new URL('../exemples/', import.meta.url).href;
 const SHARED = '__partage';
 const LABELS = { js: 'Code JavaScript', html: 'Code HTML', css: 'Code CSS' };
 const MODES = { js: 'javascript', html: 'htmlmixed', css: 'css' };
@@ -97,8 +99,13 @@ tabs.forEach((t, i) => {
 // —— Lecture d'un exemple ——
 const pick = (text, re) => ((text.match(re) || [])[1] || '').replace(/^\n+|\s+$/g, '');
 async function fetchExample(id) {
-  const res = await fetch(`${BASE}${id}.html`);
-  if (!res.ok) throw new Error(`Exemple introuvable : ${id}`);
+  let res;
+  try {
+    res = await fetch(`${BASE}${id}.html`);
+  } catch (e) {
+    throw new Error('Exemple indisponible : vérifiez votre connexion, puis réessayez.');
+  }
+  if (!res.ok) throw new Error(`Exemple indisponible (erreur ${res.status}) : réessayez plus tard.`);
   const text = await res.text();
   return {
     css: pick(text, /<style data-ex>([\s\S]*?)<\/style>/),
@@ -124,41 +131,6 @@ function fill(code) {
 }
 
 // —— Aperçu ——
-// Pont console : les messages et erreurs de l'aperçu remontent dans le panneau.
-const BRIDGE = `(() => {
-  const fmt = (v) => { if (v instanceof Error) return v.message; if (typeof v === 'object') { try { return JSON.stringify(v); } catch (e) { return String(v); } } return String(v); };
-  const send = (type, args) => { try { parent.postMessage({ __kt: 1, type, text: args.map(fmt).join(' ') }, '*'); } catch (e) {} };
-  for (const k of ['log', 'info', 'warn', 'error']) { const o = console[k].bind(console); console[k] = (...a) => { send(k, a); o(...a); }; }
-  addEventListener('error', (e) => send('error', [e.message + (e.lineno ? ' (ligne ' + e.lineno + ')' : '')]));
-  addEventListener('unhandledrejection', (e) => send('error', ['Promesse rejetée : ' + fmt(e.reason)]));
-})();`;
-
-const guard = (s, tag) => s.replace(new RegExp(`</${tag}`, 'gi'), `<\\/${tag}`);
-function buildDoc({ js, html, css }) {
-  return `<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aperçu — Kinetika</title>
-<base href="${BASE}">
-<link rel="stylesheet" href="_base.css">
-<script type="importmap">{ "imports": { "kinetika": "${LIB}" } }<\/script>
-<script>${BRIDGE}<\/script>
-<style>
-${guard(css, 'style')}
-</style>
-</head>
-<body>
-${html}
-<script type="module">
-${guard(js, 'script')}
-<\/script>
-</body>
-</html>
-`;
-}
-
 function clearConsole() {
   els.log.textContent = '';
   els.count.textContent = '0';
@@ -180,20 +152,45 @@ addEventListener('message', (e) => {
 });
 els.clear.addEventListener('click', clearConsole);
 
-function run(force) {
-  if (pendingTrust && !force) return;
-  if (pendingTrust) {
-    pendingTrust = false;
-    els.notice.hidden = true;
+function setStatus(text) {
+  els.status.textContent = text;
+  els.status.hidden = !text;
+}
+
+// Code partagé pas encore approuvé : rien ne s'exécute, ni ici ni en plein écran.
+function setPending(on) {
+  pendingTrust = on;
+  els.notice.hidden = !on;
+  for (const b of [els.open, els.download]) {
+    b.disabled = on;
+    if (on) b.title = 'Lancez d’abord le code partagé'; else b.removeAttribute('title');
   }
+}
+
+let runId = 0;
+async function run(force) {
+  if (pendingTrust && !force) return;
+  if (pendingTrust) setPending(false);
+  const code = current();
+  if (!force) {
+    // relance automatique : seulement pour un code qui se lit en entier
+    const err = syntaxError(code.js);
+    if (err) { setStatus(`Relance en attente : le code est incomplet (${err})`); return; }
+  }
+  setStatus('');
+  const id = ++runId;
+  const lib = await libForPreview();
+  if (id !== runId) return;
   clearConsole();
-  els.frame.srcdoc = buildDoc(current());
+  els.frame.srcdoc = buildDoc(code, { lib });
 }
 
 // —— Relance automatique ——
 let timer = 0;
 cm.on('changes', () => {
-  if (silent || !els.auto.checked || pendingTrust) return;
+  if (silent) return;
+  saveDraft();
+  if (!els.auto.checked || pendingTrust) return;
   clearTimeout(timer);
   timer = setTimeout(() => run(false), 700);
 });
@@ -204,15 +201,54 @@ addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(true); }
 });
 
+// —— Brouillon : la dernière modification d'un exemple survit au rechargement ——
+const DRAFT = 'kt-sb-brouillon';
+let draftTimer = 0;
+const same = (a, b) => a.js === b.js && a.html === b.html && a.css === b.css;
+function readDraft() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT) || 'null');
+    return d && byId[d.id] && d.code ? d : null;
+  } catch (e) { return null; }
+}
+function dropDraft() {
+  try { localStorage.removeItem(DRAFT); } catch (e) { /* stockage indisponible */ }
+}
+function saveDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    if (pendingTrust || !currentId) return;
+    const code = current();
+    if (same(code, original)) { dropDraft(); return; }
+    try { localStorage.setItem(DRAFT, JSON.stringify({ id: currentId, code, t: Date.now() })); } catch (e) { /* stockage plein ou indisponible */ }
+  }, 400);
+}
+function offerDraft(id) {
+  const d = readDraft();
+  els.draft.hidden = true;
+  if (!d || d.id !== id || same(d.code, original)) return;
+  const min = Math.round((Date.now() - d.t) / 60000);
+  els.draftAge.textContent = min < 1 ? 'il y a moins d’une minute' : min < 60 ? `il y a ${min} min` : `le ${new Date(d.t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}`;
+  els.draft.hidden = false;
+}
+els.draftRestore.addEventListener('click', () => {
+  const d = readDraft();
+  els.draft.hidden = true;
+  if (!d || d.id !== currentId) return;
+  fill(d.code);
+  run(true);
+  toast('Brouillon rétabli');
+});
+els.draftDrop.addEventListener('click', () => { dropDraft(); els.draft.hidden = true; });
+
 // —— Navigation entre exemples ——
-async function load(id, { push = true } = {}) {
+async function load(id, { push = true, draft = false } = {}) {
   if (!byId[id]) id = examples[0].id;
   try {
     const code = await fetchExample(id);
     currentId = id;
     original = code;
-    pendingTrust = false;
-    els.notice.hidden = true;
+    setPending(false);
     els.select.value = id;
     fill(code);
     document.title = `${byId[id].title} — Bac à sable Kinetika`;
@@ -222,8 +258,11 @@ async function load(id, { push = true } = {}) {
       url.searchParams.set('ex', id);
       history.replaceState(null, '', url);
     }
+    if (draft) offerDraft(id); else els.draft.hidden = true;
     run(true);
   } catch (err) {
+    // le sélecteur revient sur ce qui est réellement affiché
+    els.select.value = currentId || SHARED;
     toast(err.message);
   }
 }
@@ -236,39 +275,13 @@ els.prev.addEventListener('click', () => step(-1));
 els.next.addEventListener('click', () => step(1));
 els.reset.addEventListener('click', () => {
   fill(original);
-  run(true);
+  dropDraft();
+  // un code partagé non approuvé reste en attente : on remplit sans exécuter
+  if (!pendingTrust) run(true);
   toast('Code d’origine rétabli');
 });
 
 // —— Partage par lien : JSON compressé (deflate) puis base64 « url » dans le fragment ——
-const toB64 = (bytes) => {
-  let s = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-};
-const fromB64 = (str) => {
-  const s = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
-  return Uint8Array.from(s, (c) => c.charCodeAt(0));
-};
-async function encode(obj) {
-  const bytes = new TextEncoder().encode(JSON.stringify(obj));
-  if (typeof CompressionStream === 'function') {
-    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
-    return `z${toB64(new Uint8Array(await new Response(stream).arrayBuffer()))}`;
-  }
-  return `u${toB64(bytes)}`;
-}
-async function decode(str) {
-  const kind = str[0];
-  let bytes = fromB64(str.slice(1));
-  if (kind === 'z') {
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-    bytes = new Uint8Array(await new Response(stream).arrayBuffer());
-  } else if (kind !== 'u') throw new Error('format inconnu');
-  const obj = JSON.parse(new TextDecoder().decode(bytes));
-  return { js: String(obj.js || ''), html: String(obj.html || ''), css: String(obj.css || '') };
-}
-
 els.share.addEventListener('click', async () => {
   const code = current();
   const hash = await encode({ v: 1, ...code });
@@ -281,14 +294,24 @@ els.share.addEventListener('click', async () => {
 });
 
 // —— Plein écran et téléchargement ——
+// Plein écran : une page du site (apercu.html) place le code dans sa propre iframe isolée.
+// Le document lui est transmis par message, jamais par l'adresse : un lien ne peut rien y lancer.
+let popup = null;
+addEventListener('message', async (e) => {
+  if (!popup || e.source !== popup || e.origin !== location.origin || !e.data || e.data.__kt !== 'apercu-pret') return;
+  if (pendingTrust) return;
+  const lib = await libForPreview();
+  popup.postMessage({ __kt: 'apercu-code', doc: buildDoc(current(), { lib, bridge: false }), title: document.title }, location.origin);
+});
 els.open.addEventListener('click', () => {
-  const blob = new Blob([buildDoc(current())], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank', 'noopener');
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  if (pendingTrust) return;
+  popup = window.open(new URL('apercu.html', location.href).href, 'kinetika-apercu');
+  if (!popup) { toast('Fenêtre bloquée par le navigateur : autorisez les fenêtres pour ce site.'); return; }
+  popup.focus();
 });
 els.download.addEventListener('click', () => {
-  const blob = new Blob([buildDoc(current())], { type: 'text/html' });
+  if (pendingTrust) return;
+  const blob = new Blob([buildDoc(current(), { lib: LIB_URL, protect: false, bridge: false })], { type: 'text/html' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `kinetika-${currentId || 'bac-a-sable'}.html`;
@@ -309,15 +332,22 @@ async function start() {
       currentId = null;
       fill(code);
       els.select.value = SHARED;
-      pendingTrust = true;
-      els.notice.hidden = false;
-      els.frame.srcdoc = buildDoc({ js: '', html: '<p class="label" style="text-align:center">Aperçu en attente : lancez le code partagé.</p>', css: '' });
+      els.draft.hidden = true;
+      setPending(true);
+      setStatus('');
+      clearConsole();
+      els.frame.srcdoc = buildDoc({ js: '', html: '<p class="label" style="text-align:center">Aperçu en attente : lancez le code partagé.</p>', css: '' }, { protect: false, bridge: false });
       return;
     } catch (err) {
       toast('Lien de partage illisible : exemple par défaut chargé');
     }
   }
-  const id = new URLSearchParams(location.search).get('ex');
-  load(byId[id] ? id : 'premiers-pas', { push: !!id });
+  const asked = new URLSearchParams(location.search).get('ex');
+  // sans exemple demandé, on reprend celui du dernier brouillon
+  const draft = readDraft();
+  const id = byId[asked] ? asked : draft ? draft.id : 'premiers-pas';
+  load(id, { push: !!asked, draft: true });
 }
+// un lien de partage collé dans un onglet déjà ouvert ne change que le fragment
+addEventListener('hashchange', () => start());
 start();

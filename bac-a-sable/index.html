@@ -54,8 +54,15 @@
     </div>
   </div>
   <div class="play__notice" id="notice" hidden>
-    <p><strong>Code partagé.</strong> Il n’est pas lancé automatiquement : relisez-le, puis lancez-le si vous lui faites confiance.</p>
+    <p><strong>Code partagé.</strong> Il n’est pas lancé automatiquement : relisez-le, puis lancez-le si vous lui faites confiance. Il s’exécute dans un cadre isolé, sans accès à ce site.</p>
     <button class="btn btn--sm" type="button" id="trust">Lancer ce code</button>
+  </div>
+  <div class="play__notice play__notice--draft" id="draft" hidden>
+    <p><strong>Brouillon retrouvé.</strong> Vous aviez modifié cet exemple <span id="draft-age"></span>.</p>
+    <div class="play__notice-actions">
+      <button class="btn btn--sm" type="button" id="draft-restore">Restaurer</button>
+      <button class="btn btn--sm btn--ghost" type="button" id="draft-drop">Ignorer</button>
+    </div>
   </div>
   <div class="play__panes">
     <section class="play__editor" aria-label="Éditeur de code">
@@ -68,9 +75,9 @@
       <div class="play__cm" id="editor" role="tabpanel" aria-labelledby="tab-js"></div>
     </section>
     <section class="play__preview" aria-label="Aperçu">
-      <div class="play__frame"><iframe id="frame" title="Aperçu du code"></iframe></div>
+      <div class="play__frame"><iframe id="frame" title="Aperçu du code" sandbox="allow-scripts"></iframe></div>
       <div class="play__console">
-        <div class="play__console-bar"><span class="label">Console <b id="ccount">0</b></span><button class="copy" type="button" id="cclear">Effacer</button></div>
+        <div class="play__console-bar"><span class="label">Console <b id="ccount">0</b></span><span class="play__status" id="status" role="status" hidden></span><button class="copy" type="button" id="cclear">Effacer</button></div>
         <ol id="clog" aria-live="polite" aria-label="Messages de la console"></ol>
       </div>
     </section>

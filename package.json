@@ -35,8 +35,9 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test \"test/**/*.test.js\"",
-    "prepublishOnly": "npm test && npm run types && npm run build",
-    "types": "tsc -p test/tsconfig.json"
+    "serve": "node scripts/serve.mjs",
+    "types": "tsc -p test/tsconfig.json",
+    "prepublishOnly": "npm test && npm run types && npm run build"
   },
   "keywords": [
     "animation",

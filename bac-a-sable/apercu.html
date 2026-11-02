@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aperçu plein écran — Kinetika</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0d0c0b">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../site/site.css">
+<style>
+  html, body { height: 100%; }
+  body { display: flex; flex-direction: column; margin: 0; overflow: hidden; }
+  .ap__bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 6px 16px;
+    border-bottom: 1px solid var(--line); background: var(--ink-2); font-size: 13.5px; color: var(--paper-2); }
+  .ap__bar p { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ap__bar strong { color: var(--paper); font-weight: 600; }
+  .ap__frame { flex: 1; min-height: 0; position: relative; background: var(--ink); }
+  .ap__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .ap__empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--paper-2); }
+  .ap__empty[hidden] { display: none; }
+</style>
+</head>
+<body>
+<header class="ap__bar">
+  <p><strong>Aperçu plein écran</strong> · code exécuté dans un cadre isolé</p>
+  <a class="btn btn--sm btn--ghost" href="./">Bac à sable</a>
+</header>
+<main class="ap__frame">
+  <h1 class="sr-only">Aperçu plein écran du bac à sable</h1>
+  <iframe id="frame" title="Aperçu du code" sandbox="allow-scripts" hidden></iframe>
+  <p class="ap__empty" id="empty">Ouvrez cet aperçu avec le bouton « Plein écran » du bac à sable.</p>
+</main>
+<script type="module">
+  // Le document arrive par message depuis le bac à sable (même origine), jamais par l'adresse.
+  const frame = document.getElementById('frame');
+  const empty = document.getElementById('empty');
+  addEventListener('message', (e) => {
+    if (e.origin !== location.origin || e.source !== window.opener || !e.data || e.data.__kt !== 'apercu-code') return;
+    frame.srcdoc = String(e.data.doc);
+    frame.hidden = false;
+    empty.hidden = true;
+    if (e.data.title) document.title = `Plein écran · ${e.data.title}`;
+  });
+  if (window.opener) window.opener.postMessage({ __kt: 'apercu-pret' }, location.origin);
+</script>
+</body>
+</html>
