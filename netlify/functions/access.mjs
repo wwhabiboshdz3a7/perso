@@ -1,4 +1,5 @@
 // POST /.netlify/functions/access  { "cle": "…" }
+// Réponse : { valide: true, jeton, offre, source, expire } ou { valide: false, erreur }.
 // Vérifie un code d'accès ou une clé de licence et renvoie un jeton signé (HMAC, TOKEN_SECRET).
 import { creerJeton } from '../lib/jeton.mjs';
 import { verifierCle, ErreurFournisseur } from '../lib/verificateurs.mjs';
@@ -54,10 +55,11 @@ export default async function access(req, context) {
   }
   if (!resultat) {
     noterEchec(ip, maintenant);
-    return json(401, { erreur: 'Code ou clé de licence non reconnu. Vérifiez la saisie (copiez-collez depuis l\'email de confirmation).' });
+    // Réponse 200 : la requête a abouti, la clé est simplement refusée (le navigateur ne journalise pas d'erreur réseau).
+    return json(200, { valide: false, erreur: 'Code ou clé de licence non reconnu. Vérifiez la saisie (copiez-collez depuis l\'email de confirmation).' });
   }
 
   const jours = Math.min(Math.max(parseInt(env.TOKEN_TTL_DAYS || '180', 10) || 180, 1), 730);
   const { jeton, charge } = creerJeton(resultat, secret, jours * 86400, maintenant);
-  return json(200, { jeton, offre: charge.o, source: charge.s, expire: charge.exp });
+  return json(200, { valide: true, jeton, offre: charge.o, source: charge.s, expire: charge.exp });
 }

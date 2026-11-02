@@ -36,6 +36,7 @@ export async function activerCle(cle) {
   let d = {};
   try { d = await rep.json(); } catch { /* réponse non JSON */ }
   if (!rep.ok) throw new ErreurAcces(d.erreur || `Vérification impossible (erreur ${rep.status}).`, rep.status);
+  if (d.valide !== true || !d.jeton) throw new ErreurAcces(d.erreur || 'Code ou clé de licence non reconnu.', 401);
   const acces = { jeton: d.jeton, offre: d.offre, expire: d.expire, source: d.source, active: Date.now() };
   ecrire(acces);
   return acces;

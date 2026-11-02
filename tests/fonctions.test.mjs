@@ -35,6 +35,8 @@ const get = (query, jeton) => new Request(`http://localhost/.netlify/functions/c
   headers: jeton ? { Authorization: `Bearer ${jeton}` } : {}
 });
 const ctx = (ip = '10.0.0.1') => ({ ip });
+/** La clé est-elle refusée (réponse 200 avec valide: false, sans jeton) ? */
+const refus = async req => { const r = await access(req, ctx()); const d = await r.json(); return r.status === 200 && d.valide === false && !d.jeton; };
 
 beforeEach(() => {
   reinitialiserLimites();
@@ -82,15 +84,19 @@ describe('fonction access', () => {
     const r = await access(post({}), ctx());
     assert.equal(r.status, 400);
   });
-  test('code inconnu (401)', async () => {
+  test('code inconnu : refus explicite (valide: false)', async () => {
     const r = await access(post({ cle: 'LEV-FAUX0-FAUX0-FAUX0' }), ctx());
-    assert.equal(r.status, 401);
-    assert.match((await r.json()).erreur, /non reconnu/);
+    assert.equal(r.status, 200);
+    const d = await r.json();
+    assert.equal(d.valide, false);
+    assert.equal(d.jeton, undefined);
+    assert.match(d.erreur, /non reconnu/);
   });
   test('code valide : jeton pro, insensible à la casse et aux espaces', async () => {
     const r = await access(post({ cle: '  lev-testp-ro234-56789 ' }), ctx());
     assert.equal(r.status, 200);
     const d = await r.json();
+    assert.equal(d.valide, true);
     assert.equal(d.offre, 'pro');
     assert.equal(d.source, 'code');
     assert.ok(verifierJeton(d.jeton, SECRET));
@@ -106,7 +112,7 @@ describe('fonction access', () => {
     assert.equal(r.status, 500);
   });
   test('limitation : 429 après 10 échecs depuis la même IP', async () => {
-    for (let i = 0; i < 10; i++) assert.equal((await access(post({ cle: 'MAUVAIS-' + i }), ctx('1.2.3.4'))).status, 401);
+    for (let i = 0; i < 10; i++) assert.equal((await (await access(post({ cle: 'MAUVAIS-' + i }), ctx('1.2.3.4'))).json()).valide, false);
     assert.equal((await access(post({ cle: CODE_PRO }), ctx('1.2.3.4'))).status, 429);
     assert.equal((await access(post({ cle: CODE_PRO }), ctx('5.6.7.8'))).status, 200);
   });
@@ -134,7 +140,7 @@ describe('licences Gumroad', () => {
   });
   test('licence remboursée : refus', async () => {
     simulerFetch(() => ({ corps: { success: true, purchase: { product_id: 'prodEss==', refunded: true } } }));
-    assert.equal((await access(post({ cle: CLE }), ctx())).status, 401);
+    assert.equal(await refus(post({ cle: CLE })), true);
   });
   test('Gumroad injoignable : 502', async () => {
     simulerFetch(() => new TypeError('fetch failed'));
@@ -157,11 +163,11 @@ describe('licences Lemon Squeezy', () => {
   });
   test('licence d\'une autre boutique : refus', async () => {
     simulerFetch(() => reponse({ store_id: 999, product_id: 111, variant_id: 1 }));
-    assert.equal((await access(post({ cle: CLE }), ctx())).status, 401);
+    assert.equal(await refus(post({ cle: CLE })), true);
   });
   test('licence désactivée : refus', async () => {
     simulerFetch(() => ({ corps: { valid: false, error: 'license_key not found', license_key: { status: 'disabled' }, meta: { store_id: 1234, product_id: 111 } } }));
-    assert.equal((await access(post({ cle: CLE }), ctx())).status, 401);
+    assert.equal(await refus(post({ cle: CLE })), true);
   });
 });
 
@@ -180,7 +186,7 @@ describe('paiements Stripe (liens de paiement)', () => {
   });
   test('session non payée : refus', async () => {
     simulerFetch(() => ({ corps: { object: 'checkout.session', id: SESSION, status: 'open', payment_status: 'unpaid', payment_link: 'plink_PRO' } }));
-    assert.equal((await access(post({ cle: SESSION }), ctx())).status, 401);
+    assert.equal(await refus(post({ cle: SESSION })), true);
   });
 });
 
