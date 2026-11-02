@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Couleurs en OKLab — Exemples Kinetika</title>
+<meta name="description" content="Interpolation perceptuelle comparée au mélange sRGB naïf : plus de gris boueux au milieu.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.cmp { width: min(760px, 92vw); display: grid; gap: 22px; }
+.row { display: grid; gap: 10px; }
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.swatch { height: 92px; border-radius: 14px; }
+.strip { display: grid; grid-template-columns: repeat(11, 1fr); height: 26px; border-radius: 8px; overflow: hidden; }
+.pair { margin: 0; font-family: var(--mono); font-size: 14px; color: var(--paper-2); text-align: center; }
+.label b { color: var(--flare); font-weight: 500; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Couleurs en OKLab</h1>
+<!--ex-->
+<div class="cmp">
+  <div class="row">
+    <div class="top"><span class="label"><b>Kinetika</b> · OKLab perceptuel</span></div>
+    <div class="swatch ok"></div>
+    <div class="strip strip-ok"></div>
+  </div>
+  <div class="row">
+    <div class="top"><span class="label">sRGB naïf</span></div>
+    <div class="swatch naive"></div>
+    <div class="strip strip-naive"></div>
+  </div>
+  <p class="pair"></p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, timeline } from 'kinetika';
+
+const pairs = [['#1e3cff', '#ffe600'], ['#ff2d55', '#00d1a0'], ['#7a00ff', '#c6ff3c']];
+const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const naiveMix = (a, b, t) => `rgb(${rgb(a).map((v, i) => Math.round(v + (rgb(b)[i] - v) * t)).join(', ')})`;
+
+// Kinetika anime aussi les chaînes d'un objet JS : on s'en sert pour échantillonner le mélange OKLab.
+const okMix = (a, b, t) => {
+  const probe = { c: a };
+  animate(probe, { c: [a, b], duration: 1, ease: 'linear', autoplay: false }).seek(t);
+  return probe.c;
+};
+
+const strips = (a, b) => {
+  const steps = Array.from({ length: 11 }, (_, i) => i / 10);
+  document.querySelector('.strip-ok').innerHTML = steps.map((t) => `<i style="background:${okMix(a, b, t)}"></i>`).join('');
+  document.querySelector('.strip-naive').innerHTML = steps.map((t) => `<i style="background:${naiveMix(a, b, t)}"></i>`).join('');
+  document.querySelector('.pair').textContent = `${a}  →  ${b}`;
+};
+
+const naive = document.querySelector('.naive');
+const tl = timeline({ loop: true, defaults: { duration: 2200, ease: 'inOutSine' } });
+pairs.forEach(([a, b]) => {
+  const p = { t: 0 };
+  tl.call(() => strips(a, b))
+    .add('.ok', { backgroundColor: [a, b] })
+    .add(p, { t: [0, 1], onUpdate: () => { naive.style.backgroundColor = naiveMix(a, b, p.t); } }, '<<')
+    .add('.ok', { backgroundColor: a, duration: 900, ease: 'inOutQuad' }, '+=500')
+    .add(p, { t: 0, duration: 900, ease: 'inOutQuad', onUpdate: () => { naive.style.backgroundColor = naiveMix(a, b, p.t); } }, '<<');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cylindre 3D — Exemples Kinetika</title>
+<meta name="description" content="Des anneaux de lettres en 3D CSS qui tournent en sens contraires, éclairés selon leur angle.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.scene { position: fixed; inset: 0; perspective: 1500px; perspective-origin: 50% 45%; overflow: hidden; }
+.rig { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; }
+.ring { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.ring span { position: absolute; left: 0; top: 0; text-align: center; font-family: var(--display); font-weight: 900; line-height: 1;
+  text-transform: uppercase; font-stretch: 112%; backface-visibility: visible; }
+.ring.is-out span { color: transparent; -webkit-text-stroke: 1.5px var(--paper); }
+.ring.is-hot span { color: var(--flare); }
+.cap { position: fixed; left: 16px; right: 16px; bottom: 20px; margin: 0; text-align: center; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Cylindre 3D</h1>
+<!--ex-->
+<div class="scene" aria-hidden="true"><div class="rig"></div></div>
+<p class="cap label">animate({ a: 360, loop: true }) · onUpdate</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, utils } from 'kinetika';
+
+const rig = document.querySelector('.rig');
+const UNIT = [...'KINETIKA ✦ ANIME ✦ '];
+const styles = [{ cls: 'is-out', dir: 1 }, { cls: 'is-hot', dir: -1 }, { cls: '', dir: 1 }, { cls: 'is-out', dir: -1 }, { cls: 'is-hot', dir: 1 }];
+let rings = [];
+
+function build() {
+  const W = innerWidth, H = innerHeight;
+  const R0 = Math.min(W * 0.33, 430);
+  const fs0 = Math.min(H * 0.12, W * 0.11);
+  // nombre de motifs qui tiennent sur la circonférence, puis rayon ajusté
+  const reps = Math.max(1, Math.round((2 * Math.PI * R0) / (fs0 * 0.66 * UNIT.length)));
+  const N = reps * UNIT.length;
+  const cw = (2 * Math.PI * R0) / N;
+  const fs = Math.min(cw / 0.66, H * 0.13);
+  const R = (N * fs * 0.66) / (2 * Math.PI);
+  const rows = H > W * 1.1 ? 5 : 3;
+  rig.textContent = '';
+  rings = styles.slice(0, rows).map((st, r) => {
+    const ring = document.createElement('div');
+    ring.className = `ring ${st.cls}`;
+    const y = (r - (rows - 1) / 2) * fs * 1.04;
+    const glyphs = Array.from({ length: N }, (_, i) => {
+      const s = document.createElement('span');
+      s.textContent = UNIT[i % UNIT.length];
+      const a = (i / N) * 360;
+      s.style.cssText = `width:${fs * 0.66}px;margin-left:${-fs * 0.33}px;margin-top:${-fs / 2 + y}px;font-size:${fs}px;transform:rotateY(${a}deg) translateZ(${R}px)`;
+      ring.appendChild(s);
+      return { s, a: (a * Math.PI) / 180 };
+    });
+    rig.appendChild(ring);
+    return { ring, glyphs, dir: st.dir, off: r * 23 };
+  });
+  render();
+}
+
+// Un simple objet JS animé en boucle : il porte l'angle de rotation.
+const spin = { a: 0 };
+// L'inclinaison suit le pointeur, lissée par des animations successives (composition « replace »).
+const tilt = { x: -12, y: 0 };
+
+function render() {
+  rig.style.transform = `rotateX(${tilt.x}deg) rotateZ(${tilt.y * 0.2}deg)`;
+  for (const r of rings) {
+    const ang = spin.a * r.dir + r.off + tilt.y;
+    r.ring.style.transform = `rotateY(${ang}deg)`;
+    const rad = (ang * Math.PI) / 180;
+    for (const g of r.glyphs) {
+      // éclairage : pleine opacité face à nous, pénombre derrière
+      const c = Math.cos(g.a + rad);
+      g.s.style.opacity = (0.14 + 0.86 * Math.max(0, c) ** 1.4).toFixed(2);
+    }
+  }
+}
+
+animate(spin, { a: 360, duration: 26000, ease: 'linear', loop: true, onUpdate: render });
+
+addEventListener('pointermove', (e) => {
+  animate(tilt, {
+    x: utils.mapRange(e.clientY, 0, innerHeight, 12, -30),
+    y: utils.mapRange(e.clientX, 0, innerWidth, -40, 40),
+    duration: 1200,
+    ease: 'outQuint',
+    onUpdate: render,
+  });
+});
+
+let timer = 0;
+addEventListener('resize', () => { clearTimeout(timer); timer = setTimeout(build, 150); });
+build();
+</script>
+</body>
+</html>

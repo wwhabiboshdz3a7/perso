@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Police variable — Exemples Kinetika</title>
+<meta name="description" content="Graisse et chasse en vagues sur chaque lettre, comme la scène « Il bouge » du showreel.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.vf { display: grid; justify-items: center; gap: clamp(6px, 1.5vw, 16px); padding: 0 3vw; text-align: center; }
+.row { margin: 0; line-height: .95; white-space: nowrap; }
+.row--a { font-family: var(--display); font-weight: 500; text-transform: uppercase; letter-spacing: -.01em; font-size: min(11vw, 19vh); }
+.row--b { font-family: var(--serif); font-style: italic; font-weight: 300; color: var(--flare); font-size: min(10vw, 17vh); }
+.row .kt-char { will-change: font-variation-settings; }
+.cap { margin: 18px 0 0; }
+.cap b { color: var(--volt); font-weight: 500; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Police variable</h1>
+<!--ex-->
+<div class="vf">
+  <p class="row row--a">Il bouge</p>
+  <p class="row row--b">il respire</p>
+  <p class="cap label">fontWeight · fontStretch · <b>engine.timeScale = <span class="ts">1.00</span></b></p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, splitText, stagger, engine, utils } from 'kinetika';
+
+const a = splitText('.row--a', { chars: true });
+const b = splitText('.row--b', { chars: true });
+
+// Une animation par lettre : le délai devient un décalage de phase permanent.
+const wave = (chars, params, step) => {
+  const phase = stagger(step, { from: 'center' });
+  chars.forEach((el, i) => animate(el, { ...params, delay: phase(el, i, chars.length), loop: true, alternate: true }));
+};
+wave(a.chars, { fontWeight: [200, 900], fontStretch: ['55%', '150%'], duration: 1300, ease: 'inOutSine' }, 120);
+wave(b.chars, { fontWeight: [120, 900], y: [6, -6], duration: 1100, ease: 'inOutQuad' }, 90);
+
+// La vitesse du pointeur accélère toute la boucle via l'échelle de temps globale.
+const ts = document.querySelector('.ts');
+let boost = 0;
+let last = null;
+addEventListener('pointermove', (e) => {
+  if (last) boost = Math.min(3, boost + Math.hypot(e.clientX - last.x, e.clientY - last.y) / 160);
+  last = { x: e.clientX, y: e.clientY };
+});
+engine.onFrame((dt) => {
+  boost *= Math.exp(-dt / engine.timeScale / 500);
+  engine.timeScale = 1 + boost;
+  ts.textContent = utils.round(engine.timeScale, 2).toFixed(2);
+});
+</script>
+</body>
+</html>

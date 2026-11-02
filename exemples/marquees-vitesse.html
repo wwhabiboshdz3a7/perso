@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marquees à la vitesse du défilement — Exemples Kinetika</title>
+<meta name="description" content="Des bandes croisées qui accélèrent et se penchent selon la vitesse de défilement.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+body { display: block; place-items: normal; overflow-x: hidden; overflow-y: auto; }
+.scroller { height: 600vh; }
+.stage { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; }
+.band { position: absolute; left: -10vw; width: 120vw; padding: clamp(10px, 1.6vw, 18px) 0; overflow: hidden; }
+.band--a { top: 34%; background: var(--flare); color: var(--ink); transform: rotate(-5deg); }
+.band--b { top: 52%; background: var(--paper); color: var(--ink); transform: rotate(4deg); }
+.band--c { top: 70%; background: var(--ink-3); color: var(--paper); transform: rotate(-2deg); border-block: 1px solid var(--line-2); }
+.track { display: flex; width: max-content; will-change: transform; }
+.chunk { display: flex; align-items: center; gap: .5em; padding-right: .5em; white-space: nowrap; font-family: var(--display); font-weight: 900;
+  text-transform: uppercase; letter-spacing: -.01em; font-size: clamp(34px, 7vw, 92px); line-height: 1; font-stretch: 120%; }
+.chunk em { font-family: var(--serif); font-weight: 300; text-transform: none; font-stretch: 100%; letter-spacing: -.02em; }
+.chunk i { font-style: normal; font-size: .55em; }
+.hud { position: absolute; top: clamp(18px, 6vh, 56px); left: 0; right: 0; display: grid; justify-items: center; gap: 8px; text-align: center; padding: 0 16px; }
+.hud h2 { margin: 0; font-family: var(--display); font-weight: 850; font-size: clamp(24px, 4vw, 44px); text-transform: uppercase; letter-spacing: -.01em; line-height: 1; }
+.hud p { margin: 0; }
+.speed { font-family: var(--mono); font-size: 14px; color: var(--paper-2); font-variant-numeric: tabular-nums; }
+.gauge { width: min(280px, 60vw); height: 4px; border-radius: 4px; background: var(--ink-4); overflow: hidden; }
+.gauge i { display: block; height: 100%; background: var(--volt); transform-origin: 0 50%; transform: scaleX(0); }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Marquees à la vitesse du défilement</h1>
+<!--ex-->
+<main class="scroller">
+  <div class="stage">
+    <div class="hud">
+      <h2>Défilez</h2>
+      <p class="label">la vitesse de défilement pilote les bandes</p>
+      <p class="speed"><span class="v">0</span> px/s</p>
+      <div class="gauge"><i></i></div>
+    </div>
+    <div class="band band--a" aria-hidden="true"><div class="track"></div></div>
+    <div class="band band--b" aria-hidden="true"><div class="track"></div></div>
+    <div class="band band--c" aria-hidden="true"><div class="track"></div></div>
+  </div>
+</main>
+<!--/ex-->
+<script type="module" data-ex>
+import { onScroll, engine, utils } from 'kinetika';
+
+const words = [
+  ['Kinetika', '<em>élan</em>', 'Vitesse', '<em>inertie</em>'],
+  ['onScroll', '<em>velocity</em>', 'scrub', '<em>sync</em>'],
+  ['Il accélère', '<em>il se penche</em>', 'il ralentit'],
+];
+const bands = [...document.querySelectorAll('.band')].map((band, i) => {
+  const track = band.querySelector('.track');
+  const chunk = `<div class="chunk">${words[i].map((w) => `${w} <i>✦</i>`).join(' ')}</div>`;
+  track.innerHTML = chunk.repeat(4);
+  return { track, dir: i % 2 ? -1 : 1, x: 0, skew: 0, w: 0 };
+});
+const measure = () => bands.forEach((b) => { b.w = b.track.firstElementChild.offsetWidth; });
+measure();
+addEventListener('resize', measure);
+document.fonts.ready.then(measure);
+
+// onScroll sans cible : suit toute la page et expose une vitesse lissée (px/s).
+const scroll = onScroll({});
+const out = document.querySelector('.v');
+const gauge = document.querySelector('.gauge i');
+
+if (!engine.prefersReducedMotion) {
+  engine.onFrame((dt) => {
+    const v = scroll.velocity;
+    const boost = Math.min(Math.abs(v) / 900, 7);
+    for (const b of bands) {
+      const speed = (70 + boost * 420) * b.dir * scroll.direction;
+      b.x = utils.wrap(b.x - (speed * dt) / 1000, -b.w, 0);
+      b.skew = utils.lerp(b.skew, utils.clamp(v / 140, -16, 16) * -b.dir, 0.1);
+      utils.set(b.track, { x: b.x, skewX: b.skew });
+    }
+    out.textContent = Math.round(Math.abs(v)).toLocaleString('fr-FR');
+    utils.set(gauge, { scaleX: utils.clamp(Math.abs(v) / 4000) });
+  });
+}
+</script>
+</body>
+</html>

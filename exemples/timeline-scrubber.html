@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timeline au curseur — Exemples Kinetika</title>
+<meta name="description" content="La tête de lecture suit un curseur ; les rappels call() se déclenchent dans les deux sens.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.wrap { width: min(720px, 92vw); display: grid; gap: 22px; }
+.scene { position: relative; height: 200px; border-radius: 18px; border: 1px solid var(--line); background: var(--ink-2); overflow: hidden; }
+.dot { position: absolute; left: 24px; top: 50%; width: 46px; height: 46px; margin-top: -23px; border-radius: 50%; background: var(--flare); }
+.gate { position: absolute; top: 20px; bottom: 20px; width: 2px; background: var(--line-2); }
+.gate span { position: absolute; top: -4px; left: 8px; font-family: var(--mono); font-size: 11px; color: var(--mute); white-space: nowrap; }
+.gate.on { background: var(--volt); }
+.gate.on span { color: var(--volt); }
+.bar { position: relative; }
+input[type=range] { width: 100%; accent-color: var(--flare); }
+.log { margin: 0; padding: 0; list-style: none; font-family: var(--mono); font-size: 13px; color: var(--paper-2); height: 6.5em; overflow: hidden; display: flex; flex-direction: column-reverse; }
+.log li:first-child { color: var(--paper); }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Timeline au curseur</h1>
+<!--ex-->
+<div class="wrap">
+  <div class="scene">
+    <div class="gate" style="left:25%"><span>étape 1</span></div>
+    <div class="gate" style="left:50%"><span>étape 2</span></div>
+    <div class="gate" style="left:75%"><span>étape 3</span></div>
+    <div class="dot"></div>
+  </div>
+  <label class="bar"><span class="kt-sr">Tête de lecture</span><input type="range" min="0" max="1000" value="0"></label>
+  <ol class="log" aria-live="polite"><li>Faites glisser le curseur, dans un sens puis dans l’autre.</li></ol>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline } from 'kinetika';
+
+const scene = document.querySelector('.scene');
+const gates = [...document.querySelectorAll('.gate')];
+const log = document.querySelector('.log');
+let last = 0;
+const note = (i) => {
+  const forward = tl.progress >= last;
+  gates[i].classList.toggle('on', forward);
+  log.insertAdjacentHTML('afterbegin', `<li>${forward ? '→' : '←'} étape ${i + 1} à ${Math.round(tl.currentTime)} ms</li>`);
+};
+
+const tl = timeline({ autoplay: false, defaults: { ease: 'inOutSine' } });
+const w = () => scene.clientWidth - 70;
+tl.add('.dot', { x: () => [0, w()], duration: 3000 })
+  .add('.dot', { scale: [1, 1.6, 1], duration: 600 }, 1500 - 300)
+  .call(() => note(0), 750)
+  .call(() => note(1), 1500)
+  .call(() => note(2), 2250);
+
+document.querySelector('input').addEventListener('input', (e) => {
+  const p = e.target.valueAsNumber / 1000;
+  tl.progress = p;
+  last = p;
+});
+</script>
+</body>
+</html>

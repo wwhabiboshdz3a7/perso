@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Split élastique — Exemples Kinetika</title>
+<meta name="description" content="Les lettres tombent en 3D depuis le centre, avec un élastique et la largeur variable de la police.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.stage { display: grid; justify-items: center; gap: clamp(18px, 3vw, 34px); padding: 0 4vw; }
+.title { margin: 0; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .9; text-align: center; white-space: nowrap;
+  font-size: min(15vw, 26vh); letter-spacing: -.02em; font-stretch: 100%; }
+.title .kt-char { transform-origin: 50% 100%; }
+.title .kt-char:nth-child(1), .title .kt-char:nth-child(5) { color: var(--flare); }
+.title .kt-char:nth-child(8) { color: transparent; -webkit-text-stroke: 2px var(--paper); }
+.cap { margin: 0; text-align: center; }
+.cap b { color: var(--flare); font-weight: 500; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Split élastique</h1>
+<!--ex-->
+<div class="stage">
+  <h2 class="title">Élastique</h2>
+  <p class="cap label">splitText <b>·</b> stagger(70, { from: 'center' }) <b>·</b> outElastic(1, .42)</p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, splitText, stagger, utils, engine } from 'kinetika';
+
+const { chars } = splitText('.title', { chars: true });
+const rnd = utils.createRandom(12);
+// mouvement réduit : Kinetika saute à l'état final, on ne garde donc pas la sortie
+const calm = engine.prefersReducedMotion;
+
+// une perspective par lettre : chacune bascule dans son propre espace 3D
+utils.set(chars, { perspective: 700 });
+
+const tl = timeline({ loop: true, loopDelay: 250 })
+  // 1. les lettres tombent depuis le centre, en élastique
+  .add(chars, {
+    y: ['-120%', '0%'],
+    rotateX: [100, 0],
+    opacity: [0, 1],
+    duration: 1700,
+    delay: stagger(70, { from: 'center' }),
+    ease: 'outElastic(1, .42)',
+  })
+  // 2. une vague de chasse (largeur variable de la police)
+  .add(chars, {
+    fontStretch: [{ to: '135%', duration: 380, ease: 'outQuad' }, { to: '100%', duration: 1000, ease: 'outElastic(1, .5)' }],
+    delay: stagger(45),
+  }, '-=700');
+
+// 3. elles décollent en 3D, chacune dans sa direction
+if (!calm) {
+  tl.add(chars, {
+    z: () => rnd(240, 720),
+    y: () => `${rnd(-260, -90)}px`,
+    rotateX: () => rnd(-70, 70),
+    rotateY: () => rnd(-90, 90),
+    opacity: 0,
+    duration: 1100,
+    delay: stagger(45, { from: 'last' }),
+    ease: 'inQuart',
+  }, '+=1100');
+}
+</script>
+</body>
+</html>

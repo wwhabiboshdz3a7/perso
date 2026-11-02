@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morphing de formes — Exemples Kinetika</title>
+<meta name="description" content="L’attribut d d’un chemin interpolé point par point entre trois formes.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.lab { display: grid; justify-items: center; gap: 18px; }
+svg { width: min(62vh, 78vw); height: auto; overflow: visible; }
+.blob { fill: #ff5b2b; }
+.orbit { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 3 9; }
+.names { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.names li { padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--mute); transition: color .3s, border-color .3s, background .3s; }
+.names li.on { color: var(--ink); background: var(--paper); border-color: var(--paper); }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Morphing de formes</h1>
+<!--ex-->
+<div class="lab">
+  <svg viewBox="-220 -220 440 440" aria-hidden="true">
+    <circle class="orbit" r="200"/>
+    <path class="blob"/>
+  </svg>
+  <ul class="names" aria-hidden="true"><li>cercle</li><li>étoile</li><li>fleur</li><li>squircle</li><li>cœur</li></ul>
+  <p class="kt-sr">Une forme se transforme tour à tour en cercle, étoile, fleur, carré arrondi et cœur.</p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, animate } from 'kinetika';
+
+// Toutes les formes ont la même structure (M + 20 courbes C + Z) :
+// Kinetika interpole alors l'attribut d nombre par nombre.
+const N = 20;
+const TAU = Math.PI * 2;
+const r1 = (v) => Math.round(v * 10) / 10;
+
+function smooth(points, tension = 1) {
+  const n = points.length;
+  const P = (i) => points[(i + n) % n];
+  let d = `M${r1(P(0)[0])} ${r1(P(0)[1])}`;
+  for (let i = 0; i < n; i++) {
+    const [p0, p1, p2, p3] = [P(i - 1), P(i), P(i + 1), P(i + 2)];
+    const c1 = [p1[0] + ((p2[0] - p0[0]) / 6) * tension, p1[1] + ((p2[1] - p0[1]) / 6) * tension];
+    const c2 = [p2[0] - ((p3[0] - p1[0]) / 6) * tension, p2[1] - ((p3[1] - p1[1]) / 6) * tension];
+    d += ` C${r1(c1[0])} ${r1(c1[1])} ${r1(c2[0])} ${r1(c2[1])} ${r1(p2[0])} ${r1(p2[1])}`;
+  }
+  return `${d}Z`;
+}
+const polar = (r, tension) => smooth(Array.from({ length: N }, (_, i) => {
+  const a = (i / N) * TAU - Math.PI / 2;
+  const rr = r(a, i);
+  return [Math.cos(a) * rr, Math.sin(a) * rr];
+}), tension);
+
+const shapes = [
+  polar(() => 150),
+  polar((a, i) => [180, 118, 72, 118][i % 4], 0.25),
+  polar((a) => 128 + 46 * Math.cos(5 * (a + Math.PI / 2)), 1),
+  polar((a) => 152 / (Math.abs(Math.cos(a)) ** 4 + Math.abs(Math.sin(a)) ** 4) ** 0.25, 1),
+  smooth(Array.from({ length: N }, (_, i) => {
+    const t = (i / N) * TAU + Math.PI;
+    return [10.5 * 16 * Math.sin(t) ** 3, -10.5 * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) - 20];
+  }), 0.9),
+];
+const colors = ['#ff5b2b', '#d9ff42', '#b6a9ff', '#82d8ff', '#ff5b2b'];
+const names = document.querySelectorAll('.names li');
+const mark = (k) => names.forEach((li, j) => li.classList.toggle('on', j === k));
+
+const blob = document.querySelector('.blob');
+blob.setAttribute('d', shapes[0]);
+mark(0);
+
+const tl = timeline({ loop: true, defaults: { duration: 1100, ease: 'outElastic(1, .6)' } });
+[1, 2, 3, 4, 0].forEach((k) => {
+  tl.add(blob, { d: shapes[k], fill: colors[k], rotate: '+=72' }, '+=700')
+    .call(() => mark(k % shapes.length), '<<');
+});
+
+// la forme s'étire légèrement au rythme d'une respiration
+animate('svg', { scale: [1, 1.04], duration: 1800, ease: 'inOutSine', loop: true, alternate: true });
+</script>
+</body>
+</html>

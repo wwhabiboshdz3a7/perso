@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bouton magnétique — Exemples Kinetika</title>
+<meta name="description" content="Le bouton se laisse attirer par le pointeur, puis revient en ressort.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.zone { display: grid; place-items: center; width: 360px; height: 360px; border-radius: 50%; border: 1px dashed var(--line-2); }
+.magnet { display: grid; place-items: center; width: 168px; height: 168px; border: 0; border-radius: 50%; background: var(--flare); color: var(--ink); cursor: pointer; font-family: var(--display); font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: .02em; font-stretch: 120%; }
+.magnet span { display: block; pointer-events: none; }
+.hint { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0; white-space: nowrap; }
+@media (max-width: 420px) { .zone { width: 300px; height: 300px; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Bouton magnétique</h1>
+<!--ex-->
+<div class="zone"><button class="magnet" type="button"><span>Attirer</span></button></div>
+<p class="hint label">Approchez le pointeur du bouton</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, spring } from 'kinetika';
+
+const zone = document.querySelector('.zone');
+const btn = document.querySelector('.magnet');
+const label = btn.querySelector('span');
+const back = spring({ stiffness: 160, damping: 7 });
+
+zone.addEventListener('pointermove', (e) => {
+  const r = zone.getBoundingClientRect();
+  const x = e.clientX - (r.left + r.width / 2);
+  const y = e.clientY - (r.top + r.height / 2);
+  animate(btn, { x: x * 0.38, y: y * 0.38, scale: 1.06, duration: 400, ease: 'outQuad' });
+  animate(label, { x: x * 0.16, y: y * 0.16, duration: 400, ease: 'outQuad' });
+});
+zone.addEventListener('pointerleave', () => {
+  animate([btn, label], { x: 0, y: 0, scale: 1, ease: back });
+});
+btn.addEventListener('click', () => {
+  animate(btn, { scale: [0.86, 1], ease: spring({ stiffness: 300, damping: 9 }) });
+});
+</script>
+</body>
+</html>

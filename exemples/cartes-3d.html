@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartes inclinables — Exemples Kinetika</title>
+<meta name="description" content="Inclinaison 3D au survol, reflet qui suit le pointeur, retour en ressort.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.deck { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(16px, 3vw, 34px); padding: 0 4vw; perspective: 1100px; }
+.c { position: relative; width: clamp(200px, 25vw, 300px); aspect-ratio: 3 / 4; border-radius: 22px; padding: 22px; display: grid; align-content: space-between;
+  transform-style: preserve-3d; border: 1px solid rgba(255,255,255,.14); --gx: 50%; --gy: 0%; --glare: 0; }
+.c--a { background: radial-gradient(120% 80% at 20% 0%, #ffa27e, #ff5b2b 55%, #f04a1c); color: var(--ink); }
+.c--b { background: radial-gradient(120% 80% at 80% 0%, #f4ffc4, #d9ff42 55%, #c4ee1e); color: var(--ink); }
+.c--c { background: radial-gradient(120% 80% at 50% 0%, #ece8ff, #b6a9ff 55%, #9d8cf5); color: var(--ink); }
+.c::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glare);
+  background: radial-gradient(60% 50% at var(--gx) var(--gy), rgba(255,255,255,.55), transparent 70%); mix-blend-mode: soft-light; }
+.c .k { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+.c h3 { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(30px, 3.6vw, 46px); line-height: .9; text-transform: uppercase; letter-spacing: -.02em; font-stretch: 115%; transform: translateZ(40px); }
+.c p { margin: 0; font-size: 14px; line-height: 1.4; transform: translateZ(24px); }
+.cap { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; white-space: nowrap; }
+@media (max-width: 700px) { body { overflow-y: auto; place-items: start center; padding: 24px 0 64px; } .c { width: min(300px, 80vw); aspect-ratio: 4 / 3; } .cap { position: static; transform: none; margin-top: 20px; text-align: center; white-space: normal; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Cartes inclinables</h1>
+<!--ex-->
+<div class="deck">
+  <article class="c c--a"><span class="k">01 · animate</span><div><h3>Inclinez</h3><p>rotateX et rotateY suivent le pointeur.</p></div></article>
+  <article class="c c--b"><span class="k">02 · variables CSS</span><div><h3>Éclairez</h3><p>Le reflet suit --gx et --gy, animées comme le reste.</p></div></article>
+  <article class="c c--c"><span class="k">03 · spring</span><div><h3>Relâchez</h3><p>Le retour au repos se fait sur un ressort amorti.</p></div></article>
+</div>
+<p class="cap label">animate(carte, { rotateX, rotateY, '--gx': '30%' }) · spring()</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, spring, engine, utils } from 'kinetika';
+
+const cards = [...document.querySelectorAll('.c')];
+const settle = spring({ stiffness: 160, damping: 9 });
+
+const tilt = (card, nx, ny, quick = false) => animate(card, {
+  rotateY: nx * 18,
+  rotateX: -ny * 14,
+  scale: 1.04,
+  '--gx': `${50 + nx * 50}%`,
+  '--gy': `${50 + ny * 50}%`,
+  '--glare': 1,
+  duration: quick ? 120 : 450,
+  ease: 'outQuad',
+});
+const rest = (card) => animate(card, { rotateY: 0, rotateX: 0, scale: 1, '--glare': 0, ease: settle });
+
+let last = -1e4;
+for (const card of cards) {
+  card.addEventListener('pointermove', (e) => {
+    last = performance.now();
+    const r = card.getBoundingClientRect();
+    tilt(card, ((e.clientX - r.left) / r.width) * 2 - 1, ((e.clientY - r.top) / r.height) * 2 - 1);
+  });
+  card.addEventListener('pointerleave', () => rest(card));
+}
+
+// démonstration automatique quand personne ne touche aux cartes
+if (!engine.prefersReducedMotion) {
+  let acc = 0;
+  engine.onFrame((dt, t) => {
+    if (performance.now() - last < 3000) return;
+    acc += dt;
+    if (acc < 80) return;
+    acc = 0;
+    cards.forEach((card, i) => tilt(card, Math.sin(t / 900 + i * 1.7) * 0.8, Math.cos(t / 1300 + i) * 0.7, true));
+  });
+}
+</script>
+</body>
+</html>

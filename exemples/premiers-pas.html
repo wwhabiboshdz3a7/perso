@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premiers pas — Exemples Kinetika</title>
+<meta name="description" content="Translation, rotation, échelle et couleur sur une seule forme, en boucle aller-retour.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.stage { display: grid; gap: 40px; justify-items: center; }
+.square { width: 96px; height: 96px; border-radius: 18px; background: var(--flare); }
+.stage p { margin: 0; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Premiers pas</h1>
+<!--ex-->
+<div class="stage">
+  <div class="square"></div>
+  <p class="label">x · rotate · scale · couleur · rayon</p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate } from 'kinetika';
+
+animate('.square', {
+  x: [-140, 140],
+  rotate: [0, 180],
+  scale: [0.6, 1.2],
+  backgroundColor: ['#ff5b2b', '#82d8ff'],
+  borderRadius: ['18px', '50%'],
+  duration: 1400,
+  ease: 'inOutCubic',
+  loop: true,
+  alternate: true,
+});
+</script>
+</body>
+</html>

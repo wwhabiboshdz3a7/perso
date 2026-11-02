@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Objets JS et canvas — Exemples Kinetika</title>
+<meta name="description" content="Kinetika anime de simples objets JavaScript, dessinés à chaque image dans un canvas.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+canvas { width: 100vw; height: 100vh; display: block; }
+.ui { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Objets JS et canvas</h1>
+<!--ex-->
+<canvas aria-label="Points animés qui passent d'un cercle à une grille puis à une spirale" role="img"></canvas>
+<div class="ui"><span class="label shape-name">cercle</span></div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, stagger, engine, utils } from 'kinetika';
+
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+const N = 180;
+let W = 0, H = 0;
+const resize = () => {
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+};
+resize();
+addEventListener('resize', resize);
+
+// De simples objets JavaScript : Kinetika anime leurs propriétés numériques.
+const points = Array.from({ length: N }, () => ({ x: 0, y: 0, r: 2, hue: 15 }));
+
+const shapes = {
+  cercle: (i) => {
+    const a = (i / N) * Math.PI * 2;
+    const R = Math.min(W, H) * 0.32;
+    return { x: Math.cos(a) * R, y: Math.sin(a) * R, r: 3, hue: 15 };
+  },
+  grille: (i) => {
+    const c = 15, s = Math.min(W, H) * 0.05;
+    return { x: ((i % c) - (c - 1) / 2) * s, y: (Math.floor(i / c) - 5.5) * s, r: 2.5, hue: 75 };
+  },
+  spirale: (i) => {
+    const a = i * 0.35;
+    const R = (i / N) * Math.min(W, H) * 0.42;
+    return { x: Math.cos(a) * R, y: Math.sin(a) * R, r: 1.5 + (i / N) * 4, hue: 250 };
+  },
+};
+const names = Object.keys(shapes);
+let k = 0;
+const label = document.querySelector('.shape-name');
+
+const morph = () => {
+  const name = names[k++ % names.length];
+  label.textContent = name;
+  const target = points.map((_, i) => shapes[name](i));
+  animate(points, {
+    x: (p, i) => target[i].x,
+    y: (p, i) => target[i].y,
+    r: (p, i) => target[i].r,
+    hue: (p, i) => target[i].hue,
+    delay: stagger(5, { from: 'center' }),
+    duration: 1400,
+    ease: 'inOutExpo',
+    onComplete: () => setTimeout(morph, 900),
+  });
+};
+morph();
+
+// On dessine à chaque image, dans la même boucle que les animations.
+engine.onFrame(() => {
+  ctx.clearRect(0, 0, W, H);
+  for (const p of points) {
+    ctx.fillStyle = `hsl(${p.hue} 100% 62%)`;
+    ctx.beginPath();
+    ctx.arc(W / 2 + p.x, H / 2 + p.y, utils.clamp(p.r, 0.5, 8), 0, Math.PI * 2);
+    ctx.fill();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Révélation au défilement — Exemples Kinetika</title>
+<meta name="description" content="Des cartes qui entrent à l’écran et ressortent à rebours quand on remonte.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+body { display: block; place-items: normal; overflow-x: hidden; overflow-y: auto; }
+.intro { min-height: 78vh; display: grid; place-content: center; gap: 12px; text-align: center; padding: 0 6vw; }
+.intro h2 { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(40px, 8vw, 96px); line-height: .9; text-transform: uppercase; letter-spacing: -.02em; font-stretch: 112%; }
+.intro h2 em { font-family: var(--serif); font-weight: 300; text-transform: none; color: var(--flare); font-stretch: 100%; }
+.intro p { margin: 0; }
+.list { width: min(1040px, 92vw); margin: 0 auto 30vh; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2.4vw, 28px); }
+.card { position: relative; padding: clamp(20px, 3vw, 32px); min-height: 230px; border: 1px solid var(--line); border-radius: 20px; background: var(--ink-2); display: grid; align-content: space-between; gap: 18px; overflow: hidden; }
+.card:nth-child(4n + 2), .card:nth-child(4n + 3) { background: var(--ink-3); }
+.card .n { font-family: var(--mono); font-size: 13px; color: var(--flare); }
+.card h3 { margin: 6px 0 8px; font-family: var(--display); font-weight: 850; font-size: clamp(24px, 3vw, 34px); line-height: 1; text-transform: uppercase; font-stretch: 108%; }
+.card p { margin: 0; color: var(--paper-2); font-size: 15px; }
+.bars { display: flex; align-items: flex-end; gap: 6px; height: 56px; }
+.bars i { flex: 1; border-radius: 4px 4px 0 0; background: var(--paper); transform-origin: 50% 100%; }
+.card:nth-child(odd) .bars i:nth-child(3n) { background: var(--flare); }
+.card:nth-child(even) .bars i:nth-child(4n) { background: var(--volt); }
+@media (max-width: 640px) { .list { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Révélation au défilement</h1>
+<!--ex-->
+<header class="intro">
+  <p class="label">onScroll({ sync: 'play none none reverse' })</p>
+  <h2>Faites <em>défiler</em></h2>
+  <p class="label">les cartes entrent, puis repartent à rebours quand on remonte</p>
+</header>
+<section class="list" aria-label="Fonctions de Kinetika"></section>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, onScroll, stagger, utils } from 'kinetika';
+
+const items = [
+  ['animate()', 'Transformations, couleurs, variables CSS, attributs SVG, objets JS.'],
+  ['timeline()', 'Positions relatives, libellés, imbrication, rappels.'],
+  ['stagger()', 'Décalages depuis n’importe quel point, en ligne ou en grille.'],
+  ['spring()', 'Ressorts physiques, durée calculée automatiquement.'],
+  ['splitText()', 'Lignes, mots et lettres, nom accessible conservé.'],
+  ['onScroll()', 'Déclenchement à l’entrée ou progression liée au défilement.'],
+  ['drawable()', 'Tracé progressif des contours SVG.'],
+  ['motionPath()', 'Position et angle le long d’un chemin.'],
+];
+const rnd = utils.createRandom(3);
+const list = document.querySelector('.list');
+list.innerHTML = items.map(([t, d], i) => `<article class="card"><div><span class="n">${String(i + 1).padStart(2, '0')}</span><h3>${t}</h3><p>${d}</p></div><div class="bars" aria-hidden="true">${Array.from({ length: 14 }, () => `<i style="height:${Math.round(rnd(20, 100))}%"></i>`).join('')}</div></article>`).join('');
+
+document.querySelectorAll('.card').forEach((card, i) => {
+  // chaque carte a sa propre timeline, déclenchée quand son haut passe à 85 % de l'écran
+  timeline({ autoplay: onScroll({ target: card, enter: 'top 85%', sync: 'play none none reverse' }) })
+    .add(card, { y: [90, 0], rotate: [i % 2 ? 5 : -5, 0], opacity: [0, 1], duration: 900, ease: 'outExpo' })
+    .add(card.querySelectorAll('.bars i'), { scaleY: [0, 1], duration: 700, delay: stagger(30), ease: 'outBack(1.6)' }, '-=650')
+    .add(card.querySelector('h3'), { x: [-20, 0], opacity: [0, 1], duration: 600, ease: 'outQuart' }, '<<+=100');
+});
+</script>
+</body>
+</html>

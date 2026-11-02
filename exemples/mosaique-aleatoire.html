@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mosaïque aléatoire — Exemples Kinetika</title>
+<meta name="description" content="Ordre aléatoire à graine : même graine, même chorégraphie, à chaque chargement.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.wrap { display: grid; gap: 20px; justify-items: center; }
+.mosaic { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; width: min(640px, 92vw); }
+.mosaic i { aspect-ratio: 1; border-radius: 6px; }
+.bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.seed { font-family: var(--mono); font-size: 14px; color: var(--paper-2); min-width: 9ch; text-align: center; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Mosaïque aléatoire</h1>
+<!--ex-->
+<div class="wrap">
+  <div class="mosaic"></div>
+  <div class="bar">
+    <button class="btn" type="button" data-same>Même graine</button>
+    <span class="seed" aria-live="polite"></span>
+    <button class="btn btn--hot" type="button" data-new>Nouvelle graine</button>
+  </div>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, timeline, stagger, createRandom } from 'kinetika';
+
+const mosaic = document.querySelector('.mosaic');
+const N = 12 * 8;
+mosaic.innerHTML = '<i></i>'.repeat(N);
+const tiles = mosaic.querySelectorAll('i');
+const palette = ['#ff5b2b', '#d9ff42', '#b6a9ff', '#82d8ff', '#f3eee4', '#2a2724'];
+let seed = 7;
+let tl = null;
+
+const play = () => {
+  // même graine → mêmes couleurs et même ordre d'apparition
+  const rng = createRandom(seed);
+  tiles.forEach((t) => { t.style.background = rng.pick(palette); });
+  document.querySelector('.seed').textContent = `graine ${seed}`;
+  if (tl) tl.cancel();
+  tl = timeline()
+    .add(tiles, { scale: [0, 1], rotate: [-90, 0], borderRadius: ['50%', '6px'], duration: 700, ease: 'outBack(1.7)', delay: stagger(14, { from: 'random', seed }) })
+    .add(tiles, { opacity: [1, 0.25, 1], duration: 900, ease: 'inOutSine', delay: stagger(10, { from: 'random', seed: seed + 1 }) }, '+=400');
+};
+
+document.querySelector('[data-same]').addEventListener('click', play);
+document.querySelector('[data-new]').addEventListener('click', () => { seed = Math.floor(Math.random() * 999); play(); });
+play();
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glisser, relâcher — Exemples Kinetika</title>
+<meta name="description" content="Un jeton à lancer : la vitesse du geste devient la vitesse initiale du ressort.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.area { position: fixed; inset: 0; touch-action: none; }
+svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+line { stroke: var(--line-2); stroke-width: 2; stroke-dasharray: 4 6; }
+.anchor { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px; border-radius: 50%; border: 2px solid var(--mute); }
+.token { position: absolute; left: 50%; top: 50%; width: 88px; height: 88px; margin: -44px; border-radius: 50%; background: var(--flare); color: var(--ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 900; font-size: 34px; cursor: grab; touch-action: none; user-select: none; box-shadow: 0 18px 50px rgba(255, 91, 43, .35); }
+.token:active { cursor: grabbing; }
+.hint { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Glisser, relâcher</h1>
+<!--ex-->
+<div class="area">
+  <svg aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0" /></svg>
+  <span class="anchor"></span>
+  <div class="token" tabindex="0" role="button" aria-label="Jeton à lancer (Entrée pour un lancer automatique)">K</div>
+</div>
+<p class="hint label">Lancez le jeton, il revient en ressort</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, spring, engine, utils } from 'kinetika';
+
+const token = document.querySelector('.token');
+const line = document.querySelector('line');
+let drag = null;
+const pos = () => ({ x: parseFloat(utils.get(token, 'x')) || 0, y: parseFloat(utils.get(token, 'y')) || 0 });
+
+token.addEventListener('pointerdown', (e) => {
+  token.setPointerCapture(e.pointerId);
+  const p = pos();
+  drag = { ox: e.clientX - p.x, oy: e.clientY - p.y, vx: 0, vy: 0, lx: e.clientX, ly: e.clientY, lt: performance.now() };
+  utils.remove(token);
+});
+token.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const now = performance.now();
+  const dt = Math.max(1, now - drag.lt) / 1000;
+  drag.vx = utils.lerp(drag.vx, (e.clientX - drag.lx) / dt, 0.5);
+  drag.vy = utils.lerp(drag.vy, (e.clientY - drag.ly) / dt, 0.5);
+  drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
+  utils.set(token, { x: e.clientX - drag.ox, y: e.clientY - drag.oy });
+});
+const release = (vx, vy) => {
+  const p = pos();
+  // la vitesse du geste devient la vitesse initiale (normalisée) de chaque ressort
+  const v = (vel, d) => (Math.abs(d) > 1 ? utils.clamp(-vel / d, -40, 40) : 0);
+  animate(token, {
+    x: { to: 0, ease: spring({ stiffness: 90, damping: 7, velocity: v(vx, p.x) }) },
+    y: { to: 0, ease: spring({ stiffness: 90, damping: 7, velocity: v(vy, p.y) }) },
+  });
+};
+token.addEventListener('pointerup', () => { if (drag) { release(drag.vx, drag.vy); drag = null; } });
+token.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  utils.set(token, { x: utils.random(-160, 160), y: utils.random(-120, 120) });
+  release(utils.random(-900, 900), utils.random(-900, 900));
+});
+
+// l'élastique entre l'ancre et le jeton
+engine.onFrame(() => {
+  const p = pos();
+  const cx = innerWidth / 2, cy = innerHeight / 2;
+  line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+  line.setAttribute('x2', cx + p.x); line.setAttribute('y2', cy + p.y);
+});
+
+// petit lancer de démonstration au chargement
+utils.set(token, { x: -140, y: -90 });
+release(600, 900);
+</script>
+</body>
+</html>

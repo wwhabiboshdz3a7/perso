@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Décodage — Exemples Kinetika</title>
+<meta name="description" content="Journal de terminal, glyphes aléatoires et barre de progression : le sens se calcule.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.term { width: min(760px, 92vw); border: 1px solid var(--line-2); border-radius: 18px; background: var(--ink-2); overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, .55); }
+.term__bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.term__bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-4); }
+.term__bar i:first-child { background: var(--flare); }
+.term__bar span { margin-left: 10px; }
+.term__body { padding: clamp(18px, 4vw, 34px); display: grid; gap: clamp(16px, 3vw, 26px); }
+.log { list-style: none; margin: 0; padding: 0; height: 6.6em; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+  font-family: var(--mono); font-size: clamp(11px, 1.5vw, 13px); line-height: 1.1; color: var(--mute); }
+.log li { padding: .1em 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.log li.ok { color: var(--volt); }
+.big { margin: 0; min-height: 1.1em; font-family: var(--mono); font-weight: 800; text-transform: uppercase; letter-spacing: -.03em; line-height: 1;
+  font-size: clamp(30px, 7.4vw, 76px); color: var(--paper); white-space: nowrap; overflow: hidden; }
+.meter { display: flex; align-items: center; gap: 14px; }
+.meter__bar { flex: 1; height: 6px; border-radius: 6px; background: var(--ink-4); overflow: hidden; }
+.meter__fill { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--flare), var(--volt)); transform-origin: 0 50%; transform: scaleX(0); }
+.pct { margin: 0; min-width: 4.5ch; text-align: right; font-family: var(--mono); font-size: 13px; color: var(--paper-2); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Décodage</h1>
+<!--ex-->
+<div class="term" aria-hidden="true">
+  <div class="term__bar"><i></i><i></i><i></i><span class="label">kinetika — décodage</span></div>
+  <div class="term__body">
+    <ol class="log"></ol>
+    <p class="big">▒▒▒▒▒▒▒</p>
+    <div class="meter"><div class="meter__bar"><span class="meter__fill"></span></div><p class="pct">0 %</p></div>
+  </div>
+</div>
+<p class="kt-sr">Trois phrases se décodent tour à tour : le sens, se calcule, image par image.</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, scramble, animate, utils } from 'kinetika';
+
+const phrases = ['Le sens', 'se calcule', 'image/image'];
+const big = document.querySelector('.big');
+const log = document.querySelector('.log');
+const fill = document.querySelector('.meter__fill');
+const pct = document.querySelector('.pct');
+
+const write = (text, ok) => {
+  const li = document.createElement('li');
+  li.textContent = text;
+  if (ok) li.className = 'ok';
+  log.append(li);
+  while (log.children.length > 6) log.firstElementChild.remove();
+  animate(li, { opacity: [0, 1], x: [-14, 0], duration: 420, ease: 'outQuart' });
+};
+
+const meter = { v: 0 };
+utils.set(fill, { scaleX: 0 });
+const tl = timeline({ loop: true, loopDelay: 900, onUpdate: () => { pct.textContent = `${Math.round(meter.v)} %`; } });
+
+tl.call(() => { log.textContent = ''; write('$ kinetika decode --source flux.bin'); });
+phrases.forEach((p, i) => {
+  tl.call(() => write(`> bloc ${i + 1}/${phrases.length} · 0x${(0x3fa2 + i * 2741).toString(16)}`), '+=250')
+    // scramble() renvoie une animation : elle se place dans la timeline comme les autres
+    .add(scramble(big, { text: p.toUpperCase(), duration: 1500, reveal: 'random', seed: i + 3, autoplay: false }))
+    .add(meter, { v: ((i + 1) / phrases.length) * 100, duration: 1500, ease: 'inOutQuad' }, '<<')
+    .add(fill, { scaleX: (i + 1) / phrases.length, duration: 1500, ease: 'inOutQuad' }, '<<')
+    .call(() => write(`  ✓ « ${p} » décodé`, true))
+    .call(() => {}, '+=900');
+});
+</script>
+</body>
+</html>

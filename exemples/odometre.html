@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odomètre — Exemples Kinetika</title>
+<meta name="description" content="Des compteurs à rouleaux géants, chiffre par chiffre, avec séparateurs conservés.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.board { width: min(1100px, 92vw); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2.4vw, 26px); }
+.cell { position: relative; padding: clamp(18px, 3vw, 30px); border: 1px solid var(--line); border-radius: 18px; background: var(--ink-2); overflow: hidden; }
+.cell--main { grid-column: 1 / -1; }
+.num { margin: 0 0 6px; font-family: var(--display); font-weight: 900; line-height: 1.1; letter-spacing: -.02em; font-stretch: 105%;
+  font-size: clamp(40px, 8vw, 92px); font-variant-numeric: tabular-nums; }
+.cell--main .num { font-size: clamp(54px, 14vw, 172px); color: var(--paper); }
+.cell--hot .num { color: var(--flare); }
+.cell--volt .num { color: var(--volt); }
+.cell .label { margin: 0; }
+.kt-odo-sep { padding: 0 .04em; }
+.foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.foot p { margin: 0; }
+@media (max-width: 560px) { .board { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Odomètre</h1>
+<!--ex-->
+<div class="board">
+  <div class="cell cell--main"><p class="num" id="n1"></p><p class="label">images rendues ce mois-ci</p></div>
+  <div class="cell cell--hot"><p class="num" id="n2"></p><p class="label">animations simultanées</p></div>
+  <div class="cell cell--volt"><p class="num" id="n3"></p><p class="label">ko gzip, librairie complète</p></div>
+  <div class="foot"><p class="label">odometer(el, { value }) · .set(nouvelleValeur)</p><button class="btn btn--hot" type="button">Nouveaux chiffres</button></div>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { odometer, utils } from 'kinetika';
+
+const fr = (n, d = 0) => n.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const values = () => [
+  fr(utils.random(1000000, 9999999) | 0),
+  fr(utils.random(100, 999) | 0),
+  fr(utils.random(10, 99, 1), 1),
+];
+
+const [a, b, c] = values();
+const counters = [
+  odometer('#n1', { value: a, duration: 2200, stagger: 90 }),
+  odometer('#n2', { value: b, duration: 1800 }),
+  odometer('#n3', { value: c, duration: 1600 }),
+];
+
+const roll = () => values().forEach((v, i) => counters[i].set(v));
+let timer = setInterval(roll, 4200);
+document.querySelector('.btn').addEventListener('click', () => {
+  clearInterval(timer);
+  roll();
+  timer = setInterval(roll, 4200);
+});
+</script>
+</body>
+</html>

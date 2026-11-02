@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vague de barres — Exemples Kinetika</title>
+<meta name="description" content="Un égaliseur : chaque barre boucle avec son propre décalage de phase.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.eq { display: flex; align-items: center; gap: clamp(3px, .8vw, 8px); height: 60vh; width: min(900px, 92vw); }
+.eq i { flex: 1; height: 100%; border-radius: 99px; background: linear-gradient(var(--volt), var(--flare) 55%, #7a2a12); transform: scaleY(.15); }
+.cap { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); margin: 0; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Vague de barres</h1>
+<!--ex-->
+<div class="eq"></div>
+<p class="cap label">une animation par barre · phase = stagger(60, { from: 'center' })</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, stagger } from 'kinetika';
+
+const eq = document.querySelector('.eq');
+const n = innerWidth < 600 ? 22 : 40;
+eq.innerHTML = '<i></i>'.repeat(n);
+const bars = [...eq.children];
+
+// Une fonction stagger s'appelle aussi à la main : (cible, index, total).
+const phase = stagger(60, { from: 'center' });
+const height = stagger([1, 0.35], { from: 'center', ease: 'inOutSine' });
+
+bars.forEach((bar, i) => {
+  // une animation par barre : le délai initial devient un décalage de phase permanent
+  animate(bar, {
+    scaleY: [0.12, height(bar, i, n)],
+    duration: 700,
+    delay: phase(bar, i, n),
+    ease: 'inOutSine',
+    loop: true,
+    alternate: true,
+  });
+});
+</script>
+</body>
+</html>

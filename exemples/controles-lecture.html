@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contrôles de lecture — Exemples Kinetika</title>
+<meta name="description" content="Lecture, pause, sens inverse, vitesse et tête de lecture pilotée par un curseur.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.wrap { width: min(680px, 92vw); display: grid; gap: 26px; }
+.row { display: flex; justify-content: space-between; gap: 8px; height: 120px; align-items: flex-end; }
+.bar { flex: 1; height: 100%; border-radius: 10px; background: var(--ink-4); transform-origin: 50% 100%; }
+.bar:nth-child(odd) { background: var(--flare); }
+.ctrl { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+input[type=range] { width: 100%; accent-color: var(--flare); }
+select { min-height: 40px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line-2); background: var(--ink-3); color: var(--paper); font: inherit; font-size: 14px; }
+.stats { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 0; font-family: var(--mono); font-size: 13px; color: var(--paper-2); }
+.stats b { color: var(--paper); font-weight: 500; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Contrôles de lecture</h1>
+<!--ex-->
+<div class="wrap">
+  <div class="row"><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i></div>
+  <label><span class="kt-sr">Position de la tête de lecture</span><input type="range" min="0" max="1000" value="0"></label>
+  <div class="ctrl">
+    <button class="btn btn--hot" type="button" data-a="toggle">Pause</button>
+    <button class="btn" type="button" data-a="reverse">À rebours</button>
+    <button class="btn" type="button" data-a="restart">Recommencer</button>
+    <label><span class="kt-sr">Vitesse</span><select><option value="0.25">× 0,25</option><option value="0.5">× 0,5</option><option value="1" selected>× 1</option><option value="2">× 2</option></select></label>
+  </div>
+  <p class="stats"><span>progress <b class="s-p">0</b></span><span>currentTime <b class="s-t">0</b></span><span>reversed <b class="s-r">false</b></span></p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, stagger } from 'kinetika';
+
+const range = document.querySelector('input[type=range]');
+const toggle = document.querySelector('[data-a=toggle]');
+
+const anim = animate('.bar', {
+  scaleY: [0.1, 1],
+  rotate: [0, (el, i) => (i - 3) * 6],
+  delay: stagger(120),
+  duration: 1200,
+  ease: 'outElastic(1, .6)',
+  onUpdate: paint,
+  onComplete: () => { toggle.textContent = 'Lecture'; },
+});
+
+function paint(a) {
+  range.value = String(Math.round(a.progress * 1000));
+  document.querySelector('.s-p').textContent = a.progress.toFixed(2);
+  document.querySelector('.s-t').textContent = `${Math.round(a.currentTime)} ms`;
+  document.querySelector('.s-r').textContent = String(a.reversed);
+}
+
+document.querySelector('.ctrl').addEventListener('click', (e) => {
+  const act = e.target.closest('button')?.dataset.a;
+  if (act === 'toggle') {
+    if (anim.paused) { anim.play(); toggle.textContent = 'Pause'; } else { anim.pause(); toggle.textContent = 'Lecture'; }
+  }
+  if (act === 'reverse') { anim.reverse(); toggle.textContent = 'Pause'; }
+  if (act === 'restart') { anim.restart(); toggle.textContent = 'Pause'; }
+});
+range.addEventListener('input', () => {
+  anim.pause();
+  toggle.textContent = 'Lecture';
+  anim.progress = range.valueAsNumber / 1000;
+});
+document.querySelector('select').addEventListener('change', (e) => { anim.speed = +e.target.value; });
+</script>
+</body>
+</html>

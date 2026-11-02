@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lignes masquées — Exemples Kinetika</title>
+<meta name="description" content="Un paragraphe éditorial dont les lignes glissent hors de leur masque, puis les mots s’éclairent.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.ed { width: min(980px, 90vw); }
+.ed .label { margin: 0 0 22px; }
+.para { margin: 0; font-family: var(--text); font-weight: 500; letter-spacing: -.015em; line-height: 1.12; font-size: clamp(24px, 3.9vw, 48px); }
+.para .kt-word { color: #6b655c; }
+.para em { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Lignes masquées</h1>
+<!--ex-->
+<article class="ed">
+  <p class="label">splitText({ lines: true, words: true, mask: 'lines' })</p>
+  <p class="para">Une interface qui bouge bien ne se remarque pas : elle <em>guide</em> le regard, <em>explique</em> ce qui change et donne du <em>poids</em> à chaque geste. Le mouvement est une phrase de plus dans le texte.</p>
+</article>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, splitText, stagger, engine } from 'kinetika';
+
+const para = document.querySelector('.para');
+let split = null;
+let tl = null;
+
+function build() {
+  if (tl) tl.revert();
+  if (split) split.revert();
+  // les lignes dépendent de la largeur : on redécoupe après chaque redimensionnement
+  split = splitText(para, { lines: true, words: true, mask: 'lines' });
+  const keywords = split.words.filter((w) => w.closest('em'));
+  tl = timeline({ loop: true, loopDelay: 500 })
+    .add(split.lines, { y: ['108%', '0%'], rotate: [4, 0], duration: 1100, delay: stagger(110), ease: 'outExpo' })
+    .add(split.words, { color: ['#6b655c', '#f3eee4'], duration: 380, delay: stagger(42), ease: 'linear' }, '-=500')
+    .add(keywords, { color: '#ff5b2b', duration: 500, delay: stagger(160), ease: 'outQuad' }, '-=300');
+  // sortie par le haut, sauf en mouvement réduit (le texte reste lisible)
+  if (!engine.prefersReducedMotion) tl.add(split.lines, { y: '-108%', duration: 800, delay: stagger(70), ease: 'inExpo' }, '+=1600');
+}
+
+let timer = 0;
+let width = innerWidth;
+addEventListener('resize', () => {
+  if (innerWidth === width) return;
+  width = innerWidth;
+  clearTimeout(timer);
+  timer = setTimeout(build, 200);
+});
+document.fonts.ready.then(build);
+</script>
+</body>
+</html>

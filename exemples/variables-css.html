@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variables CSS — Exemples Kinetika</title>
+<meta name="description" content="Un dégradé conique piloté par trois variables CSS animées indépendamment.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.orb {
+  --a: 0; --spread: 40; --c1: #ff5b2b; --c2: #b6a9ff; --blur: 0;
+  width: min(62vmin, 420px); aspect-ratio: 1; border-radius: 50%;
+  background: conic-gradient(from calc(var(--a) * 1deg), var(--c1), var(--c2) calc(var(--spread) * 1%), var(--c1));
+  filter: blur(calc(var(--blur) * 1px));
+  box-shadow: 0 0 120px -20px var(--c1);
+}
+.vals { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0; font-family: var(--mono); font-size: 12px; color: var(--paper-2); white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Variables CSS</h1>
+<!--ex-->
+<div class="orb"></div>
+<p class="vals"></p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate } from 'kinetika';
+
+const orb = document.querySelector('.orb');
+const vals = document.querySelector('.vals');
+
+// Chaque variable a sa propre durée : leurs rythmes se croisent sans jamais se répéter tout à fait.
+animate(orb, { '--a': [0, 360], duration: 6000, ease: 'linear', loop: true });
+animate(orb, { '--spread': [20, 85], duration: 2300, ease: 'inOutSine', loop: true, alternate: true });
+animate(orb, { '--c1': ['#ff5b2b', '#d9ff42'], '--c2': ['#b6a9ff', '#1e3cff'], duration: 3100, ease: 'inOutQuad', loop: true, alternate: true });
+animate(orb, {
+  '--blur': [0, 18],
+  duration: 3700,
+  ease: 'inOutSine',
+  loop: true,
+  alternate: true,
+  onUpdate: () => {
+    const v = (n) => orb.style.getPropertyValue(n).trim();
+    vals.textContent = `--a: ${Math.round(parseFloat(v('--a')))}  --spread: ${Math.round(parseFloat(v('--spread')))}  --c1: ${v('--c1')}`;
+  },
+});
+</script>
+</body>
+</html>

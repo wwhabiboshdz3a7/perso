@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propriétés CSS — Exemples Kinetika</title>
+<meta name="description" content="Largeur, rayon, ombre portée, clip-path et filtre : les chaînes complexes sont interpolées nombre par nombre.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); gap: 24px; padding: 24px; width: 100%; justify-content: center; }
+figure { margin: 0; display: grid; gap: 14px; }
+.box { height: 200px; display: grid; place-items: center; border: 1px dashed var(--line-2); border-radius: 16px; }
+.a { height: 120px; background: var(--flare); }
+.b { width: 100%; height: 100%; border-radius: 12px; background: linear-gradient(135deg, #ff5b2b, #b6a9ff 60%, #82d8ff); }
+.c { width: 120px; height: 120px; border-radius: 30px; background: conic-gradient(#ff5b2b, #d9ff42, #82d8ff, #ff5b2b); }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--mute); text-align: center; }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; gap: 14px; } .box { height: 140px; } .a { height: 80px; } .c { width: 90px; height: 90px; } body { overflow-y: auto; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Propriétés CSS</h1>
+<!--ex-->
+<div class="grid">
+  <figure><div class="box"><div class="a"></div></div><figcaption>width · borderRadius · boxShadow</figcaption></figure>
+  <figure><div class="box"><div class="b"></div></div><figcaption>clipPath</figcaption></figure>
+  <figure><div class="box"><div class="c"></div></div><figcaption>filter</figcaption></figure>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate } from 'kinetika';
+
+const common = { duration: 1600, ease: 'inOutQuart', loop: true, alternate: true };
+
+// Les chaînes complexes sont interpolées nombre par nombre, couleurs comprises.
+animate('.a', {
+  width: ['30%', '100%'],
+  borderRadius: ['50%', '12px'],
+  boxShadow: ['0px 0px 0px 0px rgba(255, 91, 43, 0)', '0px 24px 60px -10px rgba(255, 91, 43, 0.7)'],
+  ...common,
+});
+
+animate('.b', {
+  clipPath: ['inset(42% 42% 42% 42% round 50%)', 'inset(0% 0% 0% 0% round 12px)'],
+  ...common,
+  delay: 200,
+});
+
+animate('.c', {
+  filter: ['blur(14px) hue-rotate(0deg) saturate(0.4)', 'blur(0px) hue-rotate(160deg) saturate(1.2)'],
+  rotate: [0, 90],
+  ...common,
+  delay: 400,
+});
+</script>
+</body>
+</html>

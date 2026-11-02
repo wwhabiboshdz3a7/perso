@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Révélation de logo — Exemples Kinetika</title>
+<meta name="description" content="Une séquence complète avec libellés, chevauchements « -= » et départs simultanés « &lt;&lt; ».">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.logo { display: grid; justify-items: center; gap: 18px; }
+.lockup { display: flex; align-items: center; gap: 22px; }
+.mark { width: 92px; height: 92px; border-radius: 26px; background: var(--flare); display: grid; place-items: center; }
+.mark svg { width: 60%; height: 60%; overflow: visible; }
+.mark path { fill: none; stroke: var(--ink); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.word { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(54px, 11vw, 120px); line-height: .9; text-transform: uppercase; letter-spacing: -.02em; font-stretch: 120%; }
+.rule { width: 100%; height: 2px; background: var(--line-2); transform-origin: 0 50%; }
+.tag { display: flex; gap: 14px; margin: 0; }
+.tag span { display: inline-block; }
+@media (max-width: 560px) { .lockup { gap: 12px; } .mark { width: 60px; height: 60px; border-radius: 18px; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Révélation de logo</h1>
+<!--ex-->
+<div class="logo">
+  <div class="lockup">
+    <div class="mark"><svg viewBox="0 0 60 60" aria-hidden="true"><path d="M18 10 V50 M44 11 L23 30 L44 49" /></svg></div>
+    <p class="word">Kinetika</p>
+  </div>
+  <div class="rule"></div>
+  <p class="tag label"><span>animate</span><span>·</span><span>timeline</span><span>·</span><span>stagger</span></p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { timeline, splitText, stagger, drawable } from 'kinetika';
+
+const split = splitText('.word', { chars: true, mask: 'chars' });
+
+const tl = timeline({ defaults: { ease: 'outExpo', duration: 900 }, loop: true, loopDelay: 800 });
+tl.add('.mark', { scale: [0, 1], rotate: [-120, 0], ease: 'outBack(1.8)' })
+  .add(drawable('.mark path'), { draw: [0, 1], duration: 700, ease: 'inOutQuad' }, '-=550')
+  .label('mot')
+  .add(split.chars, { y: ['110%', 0], delay: stagger(45) }, '-=300')
+  .add('.rule', { scaleX: [0, 1], duration: 1100, ease: 'inOutQuart' }, 'mot+=200')
+  .add('.tag span', { y: [16, 0], opacity: [0, 1], delay: stagger(70) }, '<<+=350')
+  .add('.logo', { opacity: [1, 0], y: [0, -20], duration: 600, ease: 'inQuad' }, '+=1600');
+</script>
+</body>
+</html>

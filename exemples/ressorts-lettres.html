@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lettres-ressorts — Exemples Kinetika</title>
+<meta name="description" content="Les lettres fuient le pointeur et reviennent sur des ressorts amortis.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.word { margin: 0; padding: 0 4vw; text-align: center; font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .9;
+  font-size: clamp(56px, 15vw, 210px); letter-spacing: -.02em; font-stretch: 105%; user-select: none; }
+.word .kt-char { will-change: transform; }
+.word .kt-char:nth-child(3n) { color: var(--flare); }
+.hint { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Lettres-ressorts</h1>
+<!--ex-->
+<h2 class="word">Il réagit</h2>
+<p class="hint label">Passez le pointeur sur les lettres</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, splitText, spring, engine, utils } from 'kinetika';
+
+const split = splitText('.word', { chars: true });
+const back = spring({ mass: 1, stiffness: 140, damping: 6 });
+const state = split.chars.map((el) => ({ el, tx: 0, ty: 0 }));
+
+let px = -1e4, py = -1e4, lastMove = -1e4;
+addEventListener('pointermove', (e) => { px = e.clientX; py = e.clientY; lastMove = performance.now(); });
+
+engine.onFrame((dt, t) => {
+  // sans pointeur (mobile, vignette) : une trajectoire automatique
+  if (performance.now() - lastMove > 2000) {
+    px = innerWidth / 2 + Math.sin(t / 900) * innerWidth * 0.38;
+    py = innerHeight / 2 + Math.sin(t / 650) * innerHeight * 0.12;
+  }
+  const R = Math.min(innerWidth, innerHeight) * 0.3;
+  for (const s of state) {
+    const r = s.el.getBoundingClientRect();
+    const cx = r.left + r.width / 2 - s.tx;
+    const cy = r.top + r.height / 2 - s.ty;
+    const dx = cx - px, dy = cy - py;
+    const d = Math.hypot(dx, dy) || 1;
+    const f = d < R ? (1 - d / R) ** 2 * R * 0.45 : 0;
+    const tx = (dx / d) * f, ty = (dy / d) * f;
+    if (Math.abs(tx - s.tx) < 2 && Math.abs(ty - s.ty) < 2) continue;
+    const leaving = f === 0;
+    s.tx = tx; s.ty = ty;
+    // chaque nouvelle cible remplace l'animation en cours (composition « replace »)
+    animate(s.el, {
+      x: tx,
+      y: ty,
+      rotate: utils.clamp(tx * 0.25, -25, 25),
+      scale: 1 + f / R,
+      ...(leaving ? { ease: back } : { duration: 260, ease: 'outQuad' }),
+    });
+  }
+});
+</script>
+</body>
+</html>

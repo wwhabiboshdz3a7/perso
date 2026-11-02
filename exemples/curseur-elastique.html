@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curseur élastique — Exemples Kinetika</title>
+<meta name="description" content="Un curseur et sa traîne de points qui se rattrapent avec des durées différentes.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+body { cursor: none; }
+.txt { margin: 0; text-align: center; font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: .88;
+  font-size: min(15vw, 22vh); font-stretch: 115%; user-select: none; }
+.txt em { display: block; font-family: var(--serif); font-weight: 300; text-transform: none; font-stretch: 100%; color: var(--paper-2); }
+.dot { position: fixed; left: 0; top: 0; border-radius: 50%; pointer-events: none; background: var(--flare); }
+.dot.lead { background: var(--paper); mix-blend-mode: difference; }
+.cap { position: fixed; left: 16px; right: 16px; bottom: 20px; margin: 0; text-align: center; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Curseur élastique</h1>
+<!--ex-->
+<p class="txt" aria-hidden="true">Suivez <em>le geste</em></p>
+<div class="trail" aria-hidden="true"></div>
+<p class="cap label">duration: stagger(45, { start: 90 }) · composition « replace »</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, stagger, engine, utils } from 'kinetika';
+
+const COUNT = 14;
+const trail = document.querySelector('.trail');
+trail.innerHTML = Array.from({ length: COUNT }, (_, i) => {
+  const s = i === 0 ? 120 : Math.max(6, 26 - i * 1.5);
+  return `<i class="dot${i === 0 ? ' lead' : ''}" style="width:${s}px;height:${s}px;margin:${-s / 2}px 0 0 ${-s / 2}px;opacity:${i === 0 ? 1 : 1 - i / (COUNT + 2)}"></i>`;
+}).join('');
+const dots = trail.querySelectorAll('.dot');
+utils.set(dots, { x: innerWidth / 2, y: innerHeight / 2 });
+
+// Chaque mouvement relance une animation ; elle remplace la précédente sur x et y.
+// Plus le point est loin dans la traîne, plus sa durée est longue : il « rattrape ».
+const follow = (x, y) => animate(dots, { x, y, duration: stagger(45, { start: 90 }), ease: 'outExpo' });
+
+let last = -1e4;
+addEventListener('pointermove', (e) => { last = performance.now(); follow(e.clientX, e.clientY); });
+addEventListener('pointerdown', () => animate(dots[0], { scale: [{ to: 0.6, duration: 120 }, { to: 1, duration: 700, ease: 'outElastic(1, .4)' }] }));
+
+// sans pointeur (écran tactile au repos, vignette) : une courbe de Lissajous
+if (!engine.prefersReducedMotion) {
+  let acc = 0;
+  engine.onFrame((dt, t) => {
+    if (performance.now() - last < 2500) return;
+    acc += dt;
+    if (acc < 50) return;
+    acc = 0;
+    follow(innerWidth / 2 + Math.sin(t / 700) * innerWidth * 0.32, innerHeight / 2 + Math.sin(t / 430) * innerHeight * 0.26);
+  });
+}
+</script>
+</body>
+</html>

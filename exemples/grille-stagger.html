@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grille en stagger — Exemples Kinetika</title>
+<meta name="description" content="Une onde part du point touché et se propage dans la grille, distance euclidienne et easing.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+body { cursor: crosshair; }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: var(--gap); width: 100vw; height: 100vh; padding: var(--gap); }
+.tile { display: grid; place-items: center; border-radius: 6px; background: var(--ink-3); }
+.tile i { width: 34%; aspect-ratio: 1; border-radius: 50%; background: var(--mute); opacity: .5; }
+.hint { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; padding: 8px 14px; border-radius: 99px; background: rgba(13, 12, 11, .85); pointer-events: none; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Grille en stagger</h1>
+<!--ex-->
+<div class="grid"></div>
+<p class="hint label">Cliquez ou touchez une case</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate, stagger, utils } from 'kinetika';
+
+const grid = document.querySelector('.grid');
+const size = innerWidth < 600 ? 34 : 46;
+const cols = Math.floor(innerWidth / size);
+const rows = Math.floor(innerHeight / size);
+grid.style.setProperty('--cols', cols);
+grid.style.setProperty('--gap', `${Math.max(3, size * 0.1)}px`);
+grid.innerHTML = '<div class="tile"><i></i></div>'.repeat(cols * rows);
+const tiles = grid.querySelectorAll('.tile');
+const dots = grid.querySelectorAll('.tile i');
+
+const ripple = (from) => {
+  const delay = stagger(32, { grid: [cols, rows], from });
+  animate(tiles, {
+    scale: [{ to: 0.35, duration: 260, ease: 'outQuad' }, { to: 1, duration: 1100, ease: 'outElastic(1, .45)' }],
+    rotate: [{ to: 45, duration: 260 }, { to: 0, duration: 900, ease: 'outBack(2)' }],
+    backgroundColor: [{ to: '#ff5b2b', duration: 160, ease: 'linear' }, { to: '#1d1b19', duration: 1400, ease: 'outQuad' }],
+    delay,
+  });
+  // les points s'écartent selon leur axe par rapport au point de départ
+  animate(dots, {
+    x: [{ to: stagger(-3, { grid: [cols, rows], from, axis: 'x' }), duration: 300 }, { to: 0, duration: 900, ease: 'outElastic(1, .5)' }],
+    y: [{ to: stagger(-3, { grid: [cols, rows], from, axis: 'y' }), duration: 300 }, { to: 0, duration: 900, ease: 'outElastic(1, .5)' }],
+    opacity: [{ to: 1, duration: 200 }, { to: 0.5, duration: 1200 }],
+    delay,
+  });
+};
+
+let lastClick = 0;
+grid.addEventListener('pointerdown', (e) => {
+  const tile = e.target.closest('.tile');
+  if (!tile) return;
+  lastClick = performance.now();
+  ripple([...tiles].indexOf(tile));
+});
+ripple(Math.floor(tiles.length / 2 + cols / 2));
+// sans interaction, une onde part d'un endroit au hasard toutes les trois secondes
+setInterval(() => { if (performance.now() - lastClick > 5000) ripple(utils.random(0, tiles.length - 1) | 0); }, 3000);
+</script>
+</body>
+</html>

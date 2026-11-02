@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine à écrire — Exemples Kinetika</title>
+<meta name="description" content="Plusieurs phrases tapées puis effacées, curseur clignotant, nom accessible stable.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.tw { width: min(1000px, 92vw); display: grid; gap: clamp(26px, 5vw, 56px); }
+.line { margin: 0; font-family: var(--display); font-weight: 850; text-transform: uppercase; letter-spacing: -.02em; line-height: .98; font-stretch: 110%;
+  font-size: clamp(38px, 7.6vw, 96px); min-height: 2em; }
+.line .typed { display: block; font-family: var(--serif); font-style: italic; font-weight: 340; text-transform: none; letter-spacing: -.02em; color: var(--flare); }
+.kt-caret { color: var(--volt); font-style: normal; font-weight: 400; }
+.term { border: 1px solid var(--line-2); border-radius: 14px; background: var(--ink-2); padding: 16px 18px; font-family: var(--mono); font-size: clamp(13px, 1.8vw, 16px); color: var(--paper-2); }
+.term .label { display: block; margin-bottom: 8px; }
+.term .p { color: var(--mute); }
+.term .code { color: var(--paper); }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Machine à écrire</h1>
+<!--ex-->
+<div class="tw">
+  <p class="line" aria-hidden="true">Kinetika anime <span class="typed">le DOM.</span></p>
+  <div class="term" aria-hidden="true"><span class="label">console</span><span class="p">&gt; </span><span class="code"></span></div>
+</div>
+<p class="kt-sr">Kinetika anime le DOM, le SVG, le texte, vos objets JS et le défilement.</p>
+<!--/ex-->
+<script type="module" data-ex>
+import { typewriter } from 'kinetika';
+
+// Une liste de phrases : chacune est tapée, tenue, puis effacée, en boucle.
+typewriter('.typed', {
+  text: ['le DOM.', 'le SVG.', 'le texte.', 'vos objets JS.', 'le défilement.'],
+  speed: 14,
+  hold: 1500,
+});
+
+typewriter('.code', {
+  text: [
+    "animate('.carte', { x: 240, rotate: '1turn' })",
+    "timeline().add('.a', { y: -40 }).add('.b', { y: -40 }, '<<')",
+    "splitText('h1', { chars: true, mask: true })",
+    'spring({ stiffness: 120, damping: 9 })',
+  ],
+  speed: 34,
+  hold: 1300,
+  cursorChar: '█',
+});
+</script>
+</body>
+</html>

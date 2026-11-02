@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keyframes : la balle — Exemples Kinetika</title>
+<meta name="description" content="Rebond, écrasement et étirement en keyframes exprimées en pourcentages.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.scene { position: relative; width: min(520px, 90vw); height: 360px; }
+.ball { position: absolute; left: 50%; bottom: 40px; width: 84px; height: 84px; margin-left: -42px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffb08f, var(--flare) 55%, #b8320c); transform-origin: 50% 100%; }
+.ground { position: absolute; left: 0; right: 0; bottom: 39px; height: 1px; background: var(--line-2); }
+.shadow { position: absolute; left: 50%; bottom: 30px; width: 90px; height: 16px; margin-left: -45px; border-radius: 50%; background: rgba(0, 0, 0, .55); filter: blur(4px); }
+.code { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; text-align: center; }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Keyframes : la balle</h1>
+<!--ex-->
+<div class="scene">
+  <div class="shadow"></div>
+  <div class="ground"></div>
+  <div class="ball"></div>
+  <p class="code label">keyframes : 0% · 45% · 52% · 60% · 100%</p>
+</div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate } from 'kinetika';
+
+// L'easing d'une étape s'applique jusqu'à l'étape suivante, comme en CSS.
+animate('.ball', {
+  keyframes: {
+    '0%': { y: -220, scaleX: 1, scaleY: 1, ease: 'inQuad' },
+    '45%': { y: 0, scaleX: 1, scaleY: 1 },
+    '52%': { y: 0, scaleX: 1.35, scaleY: 0.66, ease: 'outQuad' },
+    '62%': { y: -18, scaleX: 0.9, scaleY: 1.12, ease: 'outQuad' },
+    '100%': { y: -220, scaleX: 1, scaleY: 1 },
+  },
+  duration: 1500,
+  loop: true,
+});
+
+animate('.shadow', {
+  keyframes: {
+    '0%': { scale: 0.45, opacity: 0.25, ease: 'inQuad' },
+    '45%': { scale: 1, opacity: 1 },
+    '52%': { scale: 1.25, opacity: 1, ease: 'outQuad' },
+    '100%': { scale: 0.45, opacity: 0.25 },
+  },
+  duration: 1500,
+  loop: true,
+});
+</script>
+</body>
+</html>

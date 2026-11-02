@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course d’easings — Exemples Kinetika</title>
+<meta name="description" content="Huit billes, huit courbes, la même durée : la meilleure façon de sentir un easing.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_base.css">
+<script type="importmap">{ "imports": { "kinetika": "../dist/kinetika.esm.js" } }</script>
+<style data-ex>
+.race { width: min(820px, 94vw); display: grid; gap: 10px; }
+.lane { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 14px; }
+.lane code { font-family: var(--mono); font-size: 13px; color: var(--paper-2); text-align: right; }
+.track { position: relative; height: 34px; border-radius: 99px; background: var(--ink-2); border: 1px solid var(--line); }
+.ball { position: absolute; left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--flare); }
+.lane:nth-child(even) .ball { background: var(--volt); }
+@media (max-width: 560px) { .lane { grid-template-columns: 1fr; gap: 4px; } .lane code { text-align: left; } }
+</style>
+</head>
+<body>
+<h1 class="kt-sr">Course d’easings</h1>
+<!--ex-->
+<div class="race"></div>
+<!--/ex-->
+<script type="module" data-ex>
+import { animate } from 'kinetika';
+
+const eases = ['linear', 'inOutQuad', 'outExpo', 'inOutBack', 'outElastic(1, .4)', 'outBounce', 'steps(6)', 'spring(1, 80, 8)'];
+const race = document.querySelector('.race');
+race.innerHTML = eases.map((e) => `<div class="lane"><code>${e}</code><div class="track"><span class="ball"></span></div></div>`).join('');
+
+// même durée pour tous : seule la courbe change
+const balls = race.querySelectorAll('.ball');
+animate(balls, {
+  x: (el) => [0, el.parentNode.clientWidth - 32],
+  ease: (el, i) => eases[i],
+  duration: 1800,
+  loop: true,
+  alternate: true,
+  loopDelay: 500,
+});
+</script>
+</body>
+</html>
