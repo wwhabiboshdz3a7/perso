@@ -1,18 +1,18 @@
 {
   "kinetika.esm.js": {
-    "raw": "93.9 ko",
-    "gzip": "27.3 ko"
+    "raw": "94.7 ko",
+    "gzip": "27.5 ko"
   },
   "kinetika.esm.min.js": {
-    "raw": "53.8 ko",
-    "gzip": "20.3 ko"
+    "raw": "54.1 ko",
+    "gzip": "20.4 ko"
   },
   "kinetika.umd.min.js": {
-    "raw": "55.1 ko",
-    "gzip": "20.6 ko"
+    "raw": "55.4 ko",
+    "gzip": "20.7 ko"
   },
   "kinetika.cjs": {
-    "raw": "95.1 ko",
-    "gzip": "27.6 ko"
+    "raw": "95.9 ko",
+    "gzip": "27.8 ko"
   }
 }

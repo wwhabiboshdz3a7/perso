@@ -38,6 +38,14 @@ export class Timeline extends Playable {
   /** Libellés { nom: temps } */
   get labels() { return { ...this._labels }; }
 
+  /** Enfants dans l'ordre chronologique : { animation, start, end } (ms). */
+  get children() {
+    return this._children.map(({ child, start }) => {
+      const total = child._total();
+      return { animation: child, start, end: start + (total === Infinity ? child._delay + child._iterDur : total) };
+    });
+  }
+
   /** Calcule une position : nombre, '<', '<<', '+=200', '-=100', 'libellé', 'libellé+=100', '<<+=50'. */
   _position(pos) {
     const end = this._iterDur;

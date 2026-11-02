@@ -3,6 +3,7 @@ import { resolveTargets } from './targets.js';
 import { animate } from './animation.js';
 import { timeline } from './timeline.js';
 import { createRandom, isStr, isArr, hasDOM } from './utils.js';
+import { isReduced } from './engine.js';
 
 const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
 const graphemes = (s) => (segmenter ? [...segmenter.segment(s)].map((x) => x.segment) : [...s]);
@@ -64,6 +65,7 @@ export function splitText(target, opts = {}) {
       if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); continue; }
       const word = span(cls.word);
       word.style.display = 'inline-block';
+      word.style.whiteSpace = 'nowrap';
       word.setAttribute('aria-hidden', 'true');
       if (wantChars) {
         for (const g of graphemes(part)) {
@@ -100,12 +102,6 @@ export function splitText(target, opts = {}) {
     if (mask === 'chars') result.chars.forEach((c) => wrapMask(c, 'chars'));
     if (mask === 'words') result.words.forEach((w) => wrapMask(w, 'words'));
     if (mask === 'lines') result.lines.forEach((l) => wrapMask(l, 'lines'));
-    // les mots ne servent qu'à garder les lettres ensemble : on peut les aplatir
-    if (!wantWords && wantChars) {
-      for (const w of result.words) {
-        w.style.whiteSpace = 'nowrap';
-      }
-    }
     if (!hadLabel && text) el.setAttribute('aria-label', text);
   }
 
@@ -262,7 +258,17 @@ export function typewriter(target, opts = {}) {
     tl.caret = caret; tl.blink = blink;
     return tl;
   }
-  const tl = timeline({ delay: opts.delay ?? 0, autoplay: opts.autoplay ?? true, loop: opts.loop ?? true, onComplete: opts.onComplete, reducedMotion: opts.reducedMotion });
+  const tl = timeline({
+    delay: opts.delay ?? 0,
+    autoplay: opts.autoplay ?? true,
+    loop: opts.loop ?? true,
+    reducedMotion: opts.reducedMotion,
+    onComplete: (a) => {
+      // en mouvement réduit, on laisse la première phrase lisible plutôt qu'un texte effacé
+      if (isReduced() && opts.reducedMotion !== false) textNode.data = texts[0];
+      if (opts.onComplete) opts.onComplete(a);
+    },
+  });
   texts.forEach((t) => {
     tl.add(typeOne(t, false));
     tl.add(typeOne(t, true), `+=${opts.hold ?? 1400}`);
@@ -349,9 +355,12 @@ export function odometer(target, opts = {}) {
       if (el) el.removeAttribute('aria-label');
     },
   };
-  if (el && opts.value !== undefined) {
-    layout(String(opts.from ?? String(opts.value).replace(/\d/g, '0')));
-    api.set(opts.value, { autoplay: opts.autoplay });
+  if (el && (opts.value !== undefined || opts.from !== undefined)) {
+    // état affiché d'emblée : `from`, ou la valeur avec des zéros
+    current = String(opts.from ?? String(opts.value).replace(/\d/g, '0'));
+    layout(current);
+    el.setAttribute('aria-label', current);
+    if (opts.value !== undefined && opts.autoplay !== false) api.set(opts.value);
   }
   return api;
 }

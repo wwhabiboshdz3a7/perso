@@ -301,3 +301,13 @@ test('échelle de temps globale', () => {
   engine.tick(100);
   assert.equal(o.v, 100);
 });
+
+test('engine.onFrame : rappel à chaque image, arrêt possible', () => {
+  const deltas = [];
+  const stop = engine.onFrame((dt) => deltas.push(dt));
+  engine.tick(16);
+  engine.tick(20);
+  stop();
+  engine.tick(16);
+  assert.deepEqual(deltas, [16, 20]);
+});

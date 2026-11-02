@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kinetika — librairie d’animation JavaScript</title>
+<meta name="description" content="Kinetika : librairie d’animation JavaScript légère et sans dépendance. animate, timeline, stagger, ressorts, texte, défilement et SVG. Par wwhabiboshdz3a7.">
+<meta name="theme-color" content="#0d0c0b">
+<meta property="og:title" content="Kinetika — le mouvement, en une ligne">
+<meta property="og:description" content="Librairie d’animation JavaScript open source par wwhabiboshdz3a7.">
+<meta property="og:type" content="website">
+<link rel="icon" href="site/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="site/fonts/anybody.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site/site.css">
+<link rel="stylesheet" href="site/home.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="home">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="hd">
+  <div class="wrap hd__in">
+    <a class="brand" href="./" aria-label="Kinetika, accueil">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#ff5b2b"/><path d="M10.5 8v16M22 8.5l-8.5 7.5 8.5 7.5" fill="none" stroke="#0d0c0b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24.6" cy="16" r="2.1" fill="#0d0c0b"/></svg>
+      <span class="brand__word" aria-hidden="true"><span style="--w:130%">K</span><span style="--w:70%">I</span><span style="--w:115%">N</span><span style="--w:90%">E</span><span style="--w:125%">T</span><span style="--w:70%">I</span><span style="--w:120%">K</span><span style="--w:100%">A</span></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="exemples/">Galerie</a>
+      <a href="bac-a-sable/">Bac à sable</a>
+      <a href="api/">API</a>
+      <a href="easings/">Easings</a>
+      <a href="stagger/">Stagger</a>
+      <a href="migration/">Migration</a>
+    </nav>
+    <div class="hd__tools">
+      <span class="ver">v0.1.0</span>
+      <a class="gh" href="https://github.com/wwhabiboshdz3a7/kinetika" aria-label="Kinetika sur GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Ouvrir le menu"><i></i><i></i></button>
+    </div>
+  </div>
+</header>
+<div class="grain" aria-hidden="true"></div>
+
+<main id="main">
+
+  <!-- Ouverture -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero__meta">
+      <p class="label">Librairie d’animation JavaScript <b>·</b> zéro dépendance <b>·</b> MIT</p>
+      <a class="hero__by label" href="https://github.com/wwhabiboshdz3a7">par <span>wwhabiboshdz3a7</span> <span aria-hidden="true">↗</span></a>
+    </div>
+    <h1 class="hero__word" id="hero-title">Kinetika</h1>
+    <div class="wrap hero__row">
+      <p class="hero__lead">Le mouvement, <em>en une ligne.</em> Animez le DOM, le SVG, le texte et n’importe quel objet JavaScript : timelines à la milliseconde près, ressorts physiques, décalages en grille, défilement.</p>
+      <div class="hero__cta">
+        <div class="chip"><span>npm i kinetika</span><button class="copy" type="button" data-copy="npm i kinetika" aria-label="Copier la commande d’installation"><span class="copy__l">Copier</span></button></div>
+        <a class="btn" href="bac-a-sable/">Ouvrir le bac à sable <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="exemples/">Voir la galerie</a>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="ruler" aria-hidden="true">
+        <div class="ruler__ticks"></div>
+        <div class="ruler__head"><i></i></div>
+        <div class="ruler__read mono"><span class="ruler__t">t = 0000 ms</span><span class="ruler__e">outElastic(1, .45)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__band"><div class="ticker__track"></div></div>
+    <div class="ticker__band ticker__band--b"><div class="ticker__track"></div></div>
+  </div>
+
+  <!-- 01 animate -->
+  <section class="sec" id="animate" aria-labelledby="t-animate">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>01</b> animate()</p>
+          <h2 class="sec__title" id="t-animate">Tout ce qui <em>bouge</em></h2>
+        </div>
+        <p class="sec__lead">Transformations individuelles, couleurs interpolées en OKLab, unités converties, variables CSS, attributs SVG, objets JavaScript. Une seule fonction, des cibles au choix.</p>
+      </div>
+      <div class="demo">
+        <div class="demo__stage stage-anim" aria-label="Démonstration : trois formes glissent, tournent et changent de couleur" role="img">
+          <div class="lane"><span class="forme"></span></div>
+          <div class="lane"><span class="forme"></span></div>
+          <div class="lane"><span class="forme"></span></div>
+          <div class="stage-anim__axis mono" aria-hidden="true"><span>0</span><span>x</span><span>100%</span></div>
+        </div>
+        <figure class="code">
+          <figcaption class="code__bar"><span class="label">animate.js</span><button class="copy" type="button" data-copy-target="#code-animate" aria-label="Copier le code"><span class="copy__l">Copier</span></button></figcaption>
+<pre><code data-lang="js" id="code-animate">import { animate, stagger } from 'kinetika';
+
+animate('.forme', {
+  x: (el) => [0, el.parentNode.clientWidth - el.offsetWidth],
+  rotate: '1turn',
+  borderRadius: ['4px', '50%'],
+  backgroundColor: ['#ff5b2b', '#d9ff42'],
+  delay: stagger(140),
+  duration: 1600,
+  ease: 'inOutExpo',
+  loop: true,
+  alternate: true,
+});</code></pre>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 timeline -->
+  <section class="sec" id="timeline" aria-labelledby="t-timeline">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>02</b> timeline()</p>
+          <h2 class="sec__title" id="t-timeline">À la milliseconde <em>près</em></h2>
+        </div>
+        <p class="sec__lead">Enchaînez, superposez, imbriquez. Les positions <code>'&lt;'</code>, <code>'&lt;&lt;'</code>, <code>'+=200'</code> et les libellés placent chaque étape exactement où il faut. Faites glisser la tête de lecture.</p>
+      </div>
+      <div class="storyboard">
+        <div class="sb__stage">
+          <div class="sb-card">
+            <span class="sb-card__badge mono">nouveau</span>
+            <p class="sb-card__title">Bonjour.</p>
+            <div class="sb-card__bar"><i></i></div>
+            <div class="sb-card__dots"><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <div class="sb__panel">
+          <div class="sb__tracks" aria-hidden="true"></div>
+          <div class="sb__controls">
+            <button class="btn btn--sm" type="button" data-sb="play">Lecture</button>
+            <button class="btn btn--sm btn--ghost" type="button" data-sb="reverse">À rebours</button>
+            <label class="sb__scrub"><span class="sr-only">Position dans la timeline</span><input type="range" min="0" max="1000" value="0" step="1"></label>
+            <span class="sb__time mono" aria-live="off">0 ms</span>
+          </div>
+          <figure class="code code--flat">
+<pre><code data-lang="js">const tl = timeline({ defaults: { ease: 'outExpo', duration: 700 } });
+tl.add('.sb-card', { scale: [.8, 1], opacity: [0, 1] })
+  .add(split.chars, { y: ['110%', 0], delay: stagger(40) }, '-=400')
+  .label('barre')
+  .add('.sb-card__bar i', { scaleX: [0, 1], duration: 900 }, '&lt;&lt;+=150')
+  .add('.sb-card__dots i', { scale: [0, 1], delay: stagger(60) }, 'barre')
+  .add('.sb-card__badge', { rotate: [-30, -6], scale: [0, 1], ease: 'outBack(2)' }, '+=50');</code></pre>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 stagger -->
+  <section class="sec" id="stagger" aria-labelledby="t-stagger">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>03</b> stagger()</p>
+          <h2 class="sec__title" id="t-stagger">Des vagues, <em>pas des listes</em></h2>
+        </div>
+        <p class="sec__lead">Répartissez délais et valeurs depuis le premier, le dernier, le centre ou n’importe quel élément, sur une ligne ou une grille, avec un easing. Touchez un point.</p>
+      </div>
+      <div class="dots-wrap">
+        <div class="dots" role="group" aria-label="Grille interactive : choisissez un point pour lancer une onde"></div>
+        <p class="dots__code mono" aria-live="polite"><span class="t-f">stagger</span>(<span class="t-n">28</span>, { grid: [<span class="dots__g t-n">16, 9</span>], from: <span class="dots__from t-n">72</span> })</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 ressorts -->
+  <section class="sec" id="ressorts" aria-labelledby="t-spring">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>04</b> spring()</p>
+          <h2 class="sec__title" id="t-spring">De la <em>physique,</em> pas des durées</h2>
+        </div>
+        <p class="sec__lead">Masse, raideur, amortissement, vitesse initiale : Kinetika résout l’oscillateur et calcule seul la durée. Cliquez dans la zone, la balle s’y rend.</p>
+      </div>
+      <div class="springbox">
+        <div class="spring__stage" tabindex="0" role="application" aria-label="Zone de ressort : cliquez ou appuyez sur Entrée pour déplacer la balle">
+          <span class="spring__ball" aria-hidden="true"></span>
+          <span class="spring__target" aria-hidden="true"></span>
+          <p class="spring__hint mono" aria-hidden="true">cliquez n’importe où</p>
+        </div>
+        <div class="spring__panel">
+          <label class="field"><span>Masse <output class="v-mass">1</output></span><input type="range" min="0.2" max="5" step="0.1" value="1" data-k="mass"></label>
+          <label class="field"><span>Raideur <output class="v-stiffness">120</output></span><input type="range" min="10" max="500" step="5" value="120" data-k="stiffness"></label>
+          <label class="field"><span>Amortissement <output class="v-damping">8</output></span><input type="range" min="1" max="60" step="0.5" value="8" data-k="damping"></label>
+          <svg class="spring__curve" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path class="spring__base" d="M0 90 H300"/><path class="spring__path" d=""/></svg>
+          <p class="spring__out mono"><span class="t-f">spring</span>({ mass: <span class="o-mass t-n">1</span>, stiffness: <span class="o-stiffness t-n">120</span>, damping: <span class="o-damping t-n">8</span> }) <span class="t-c">// <span class="o-dur">0</span> ms</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 texte -->
+  <section class="sec" id="texte" aria-labelledby="t-text">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>05</b> splitText() · scramble() · odometer()</p>
+          <h2 class="sec__title" id="t-text">Le texte <em>a du jeu</em></h2>
+        </div>
+        <p class="sec__lead">Découpage en lignes, mots et lettres qui reste lisible par les lecteurs d’écran, décodage, machine à écrire, compteurs à rouleaux. Tout se range dans une timeline.</p>
+      </div>
+      <div class="textgrid">
+        <article class="card tcard">
+          <p class="label">splitText · masque par ligne</p>
+          <p class="tcard__split">Chaque ligne glisse hors de son masque, puis chaque lettre trouve sa graisse.</p>
+          <button class="btn btn--sm btn--ghost" type="button" data-replay="split">Rejouer</button>
+        </article>
+        <article class="card tcard">
+          <p class="label">scramble · décodage</p>
+          <p class="tcard__scr mono">SIGNAL → SENS</p>
+          <button class="btn btn--sm btn--ghost" type="button" data-replay="scramble">Décoder</button>
+        </article>
+        <article class="card tcard">
+          <p class="label">odometer · rouleaux</p>
+          <p class="tcard__odo">2026</p>
+          <button class="btn btn--sm btn--ghost" type="button" data-replay="odometer">Nouveau nombre</button>
+        </article>
+        <article class="card tcard">
+          <p class="label">typewriter · phrases en boucle</p>
+          <p class="tcard__type"></p>
+          <p class="tcard__note">Le curseur clignote, le texte complet reste annoncé une seule fois.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 défilement -->
+  <section class="scrub" id="defilement" aria-labelledby="t-scroll">
+    <div class="scrub__pin">
+      <div class="wrap scrub__head">
+        <p class="sec__num label"><b>06</b> onScroll({ scrub })</p>
+        <p class="scrub__pct mono" aria-hidden="true">000%</p>
+      </div>
+      <h2 class="scrub__words" id="t-scroll" aria-label="Le défilement devient une tête de lecture.">
+        <span class="sw" aria-hidden="true">Le</span>
+        <span class="sw" aria-hidden="true">défilement</span>
+        <span class="sw sw--o" aria-hidden="true">devient</span>
+        <span class="sw" aria-hidden="true">une tête</span>
+        <span class="sw sw--f" aria-hidden="true">de lecture.</span>
+      </h2>
+      <div class="wrap scrub__foot">
+        <div class="scrub__bar" aria-hidden="true"><i></i></div>
+        <p class="mono scrub__code">timeline({ autoplay: <span class="t-f">onScroll</span>({ scrub: <span class="t-n">0.6</span> }) })</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 SVG -->
+  <section class="sec" id="svg" aria-labelledby="t-svg">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>07</b> drawable() · motionPath()</p>
+          <h2 class="sec__title" id="t-svg">Tracer, <em>suivre</em></h2>
+        </div>
+        <p class="sec__lead">Les contours se dessinent, les objets suivent un chemin en s’orientant dans la courbe. Les coordonnées passent du SVG à l’écran sans calcul de votre côté.</p>
+      </div>
+      <div class="svgdemo card">
+        <svg class="svgdemo__art" viewBox="0 0 900 320" role="img" aria-label="Un logo en K se dessine, une flèche parcourt une courbe">
+          <path class="svg-k" d="M90 60 V260 M200 60 L110 160 L200 260" />
+          <circle class="svg-dot" cx="232" cy="160" r="0"/>
+          <path class="svg-road" id="road" d="M300 250 C 380 40, 470 40, 540 160 S 700 290, 760 140 S 850 60, 870 90" />
+          <g class="svg-arrow"><path d="M-14 -9 L14 0 L-14 9 L-8 0 Z"/></g>
+        </svg>
+        <div class="svgdemo__bar">
+          <code class="mono">animate(drawable('.svg-k'), { draw: [0, 1] })</code>
+          <button class="btn btn--sm btn--ghost" type="button" data-replay="svg">Rejouer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chiffres -->
+  <section class="sec stats" aria-labelledby="t-stats">
+    <div class="wrap">
+      <h2 class="sr-only" id="t-stats">Kinetika en chiffres</h2>
+      <ul class="stats__list">
+        <li><span class="stats__n" data-odo="20">20</span><span class="stats__u">ko gzip</span><span class="stats__l">tout compris, importable morceau par morceau</span></li>
+        <li><span class="stats__n" data-odo="0">0</span><span class="stats__u">dépendance</span><span class="stats__l">modules ES, types TypeScript inclus</span></li>
+        <li><span class="stats__n" data-odo="45">45</span><span class="stats__u">easings</span><span class="stats__l">plus cubicBezier, steps et ressorts</span></li>
+        <li><span class="stats__n" data-odo="34">34</span><span class="stats__u">exemples</span><span class="stats__l">à ouvrir et modifier dans le bac à sable</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Galerie -->
+  <section class="sec" id="galerie" aria-labelledby="t-gal">
+    <div class="wrap">
+      <div class="sec__head">
+        <div>
+          <p class="sec__num label"><b>08</b> Galerie</p>
+          <h2 class="sec__title" id="t-gal">Venu du <em>showreel</em></h2>
+        </div>
+        <p class="sec__lead">Les effets du showreel Motion Lab, réécrits avec Kinetika : split élastique, décodage, cylindre 3D, marquees à la vitesse du défilement, odomètre, ressorts. Ouvrez-les, cassez-les, partagez-les.</p>
+      </div>
+      <div class="teaser" data-ids="split-elastique,cylindre-3d,decodage,grille-stagger,marquees-vitesse,trace-svg"></div>
+      <p class="teaser__more"><a class="btn btn--ghost" href="exemples/">Les 34 exemples <span class="arr" aria-hidden="true">→</span></a></p>
+    </div>
+  </section>
+
+  <!-- Appel final -->
+  <section class="sec outro" aria-labelledby="t-outro">
+    <div class="wrap">
+      <h2 class="outro__t" id="t-outro">À vous de faire <em>bouger</em> les choses.</h2>
+      <div class="outro__grid">
+        <figure class="code">
+          <figcaption class="code__bar"><span class="label">Installation</span></figcaption>
+<pre><code data-lang="js">// npm i kinetika
+import { animate } from 'kinetika';
+
+// ou directement depuis un CDN, sans installation
+import { animate } from 'https://cdn.jsdelivr.net/npm/kinetika/+esm';
+
+animate('h1', { y: [40, 0], opacity: [0, 1], ease: 'outExpo' });</code></pre>
+        </figure>
+        <div class="outro__links">
+          <a class="olink" href="api/"><span class="label">Référence</span><b>L’API complète</b><span class="arr" aria-hidden="true">→</span></a>
+          <a class="olink" href="easings/"><span class="label">Outil</span><b>Visualiseur d’easings</b><span class="arr" aria-hidden="true">→</span></a>
+          <a class="olink" href="stagger/"><span class="label">Outil</span><b>Visualiseur de stagger</b><span class="arr" aria-hidden="true">→</span></a>
+          <a class="olink" href="migration/"><span class="label">Guide</span><b>Venir d’anime.js ou de GSAP</b><span class="arr" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft__top">
+      <div>
+        <p class="ft__big">Kinetika</p>
+        <p>Librairie d’animation JavaScript open source, légère et sans dépendance.</p>
+        <p class="ft__credit">Conçue et développée par <a href="https://github.com/wwhabiboshdz3a7">wwhabiboshdz3a7</a>.</p>
+      </div>
+      <div>
+        <h2>Apprendre</h2>
+        <ul>
+          <li><a href="api/">Référence de l’API</a></li>
+          <li><a href="migration/">Venir d’anime.js ou de GSAP</a></li>
+          <li><a href="easings/">Visualiseur d’easings</a></li>
+          <li><a href="stagger/">Visualiseur de stagger</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Pratiquer</h2>
+        <ul>
+          <li><a href="exemples/">Galerie d’exemples</a></li>
+          <li><a href="bac-a-sable/">Bac à sable</a></li>
+          <li><a href="https://www.npmjs.com/package/kinetika">Paquet npm</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Projet</h2>
+        <ul>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika">Dépôt GitHub</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7">Profil de l’auteur</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika/blob/main/CHANGELOG.md">Journal des versions</a></li>
+          <li><a href="https://github.com/wwhabiboshdz3a7/kinetika/blob/main/CONTRIBUTING.md">Contribuer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft__bottom"><span>MIT © 2026 wwhabiboshdz3a7</span><span>Kinetika v0.1.0 · fait à la main, image par image</span></div>
+  </div>
+</footer>
+<script type="module" src="site/site.js"></script>
+<script type="module" src="site/home.js"></script>
+</body>
+</html>

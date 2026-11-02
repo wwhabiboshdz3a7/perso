@@ -90,10 +90,12 @@ test('odometer : rouleaux par chiffre, séparateurs conservés, état final', as
   const box = html('<div></div>');
   const el = box.firstChild;
   const od = odometer(el, { value: '12,5', duration: 100, stagger: 0, autoplay: false });
-  assert.equal(el.getAttribute('aria-label'), '12,5');
+  assert.equal(el.getAttribute('aria-label'), '00,0');
   const wins = el.querySelectorAll('.kt-odo-win');
   assert.equal(wins.length, 3);
   assert.equal(el.querySelector('.kt-odo-sep').textContent, ',');
+  od.set('12,5', { autoplay: false });
+  assert.equal(el.getAttribute('aria-label'), '12,5');
   od.animation.complete();
   const strips = [...el.querySelectorAll('.kt-odo-strip')];
   // chiffre 5 sur une bande de 20 (1 tour) : ≥ 10 + 5
@@ -113,6 +115,17 @@ test('mouvement réduit : effets texte directement à l’état final', () => {
   const [p1] = box.children;
   scramble(p1, { text: 'FIN' });
   assert.equal(p1.textContent, 'FIN');
+  engine.reducedMotion = 'auto';
+  box.remove();
+});
+
+test('typewriter en boucle : en mouvement réduit, la première phrase reste affichée', async () => {
+  engine.reducedMotion = true;
+  const box = html('<p></p>');
+  const el = box.firstChild;
+  typewriter(el, { text: ['Un', 'Deux'] });
+  await flushMicro();
+  assert.equal(el.firstChild.data, 'Un');
   engine.reducedMotion = 'auto';
   box.remove();
 });

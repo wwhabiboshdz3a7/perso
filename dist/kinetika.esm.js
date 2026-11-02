@@ -485,6 +485,15 @@ var engine = {
   tick(ms = 1e3 / 60) {
     step(Math.max(0, ms));
   },
+  /**
+   * Appelle `callback(deltaMs, tempsMs)` à chaque image, dans la même boucle que les animations.
+   * Renvoie une fonction qui arrête l'appel.
+   */
+  onFrame(callback) {
+    const t = { _engineActive: false, _tick: (dt) => callback(dt, elapsed) };
+    addActive(t);
+    return () => removeActive(t);
+  },
   /** Met toute la boucle en pause / la relance. */
   pause() {
     state.paused = true;
@@ -1824,6 +1833,13 @@ var Timeline = class extends Playable {
   get labels() {
     return { ...this._labels };
   }
+  /** Enfants dans l'ordre chronologique : { animation, start, end } (ms). */
+  get children() {
+    return this._children.map(({ child, start }) => {
+      const total = child._total();
+      return { animation: child, start, end: start + (total === Infinity ? child._delay + child._iterDur : total) };
+    });
+  }
   /** Calcule une position : nombre, '<', '<<', '+=200', '-=100', 'libellé', 'libellé+=100', '<<+=50'. */
   _position(pos) {
     const end = this._iterDur;
@@ -2167,6 +2183,7 @@ function splitText(target, opts = {}) {
       }
       const word = span(cls.word);
       word.style.display = "inline-block";
+      word.style.whiteSpace = "nowrap";
       word.setAttribute("aria-hidden", "true");
       if (wantChars) {
         for (const g of graphemes(part)) {
@@ -2204,11 +2221,6 @@ function splitText(target, opts = {}) {
     if (mask === "chars") result.chars.forEach((c) => wrapMask(c, "chars"));
     if (mask === "words") result.words.forEach((w) => wrapMask(w, "words"));
     if (mask === "lines") result.lines.forEach((l) => wrapMask(l, "lines"));
-    if (!wantWords && wantChars) {
-      for (const w of result.words) {
-        w.style.whiteSpace = "nowrap";
-      }
-    }
     if (!hadLabel && text) el.setAttribute("aria-label", text);
   }
   function groupLines() {
@@ -2362,7 +2374,16 @@ function typewriter(target, opts = {}) {
     tl2.blink = blink;
     return tl2;
   }
-  const tl = timeline({ delay: (_f = opts.delay) != null ? _f : 0, autoplay: (_g = opts.autoplay) != null ? _g : true, loop: (_h = opts.loop) != null ? _h : true, onComplete: opts.onComplete, reducedMotion: opts.reducedMotion });
+  const tl = timeline({
+    delay: (_f = opts.delay) != null ? _f : 0,
+    autoplay: (_g = opts.autoplay) != null ? _g : true,
+    loop: (_h = opts.loop) != null ? _h : true,
+    reducedMotion: opts.reducedMotion,
+    onComplete: (a) => {
+      if (isReduced() && opts.reducedMotion !== false) textNode.data = texts[0];
+      if (opts.onComplete) opts.onComplete(a);
+    }
+  });
   texts.forEach((t) => {
     var _a2, _b2;
     tl.add(typeOne(t, false));
@@ -2450,9 +2471,11 @@ function odometer(target, opts = {}) {
       if (el) el.removeAttribute("aria-label");
     }
   };
-  if (el && opts.value !== void 0) {
-    layout(String((_c = opts.from) != null ? _c : String(opts.value).replace(/\d/g, "0")));
-    api.set(opts.value, { autoplay: opts.autoplay });
+  if (el && (opts.value !== void 0 || opts.from !== void 0)) {
+    current = String((_c = opts.from) != null ? _c : String(opts.value).replace(/\d/g, "0"));
+    layout(current);
+    el.setAttribute("aria-label", current);
+    if (opts.value !== void 0 && opts.autoplay !== false) api.set(opts.value);
   }
   return api;
 }

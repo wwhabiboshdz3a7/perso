@@ -104,6 +104,15 @@ export const engine = {
   get activeCount() { return active.length; },
   /** Avance toutes les animations de `ms` millisecondes (tests, rendu image par image). */
   tick(ms = 1000 / 60) { step(Math.max(0, ms)); },
+  /**
+   * Appelle `callback(deltaMs, tempsMs)` à chaque image, dans la même boucle que les animations.
+   * Renvoie une fonction qui arrête l'appel.
+   */
+  onFrame(callback) {
+    const t = { _engineActive: false, _tick: (dt) => callback(dt, elapsed) };
+    addActive(t);
+    return () => removeActive(t);
+  },
   /** Met toute la boucle en pause / la relance. */
   pause() { state.paused = true; sleep(); },
   resume() { state.paused = false; if (active.length) wake(); },

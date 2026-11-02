@@ -18,6 +18,7 @@ test('positions : fin par défaut, nombre, <, <<, +=, -=', () => {
   const starts = tl._children.map((c) => c.start).sort((x, y) => x - y);
   assert.deepEqual(starts, [0, 150, 150, 250, 330, 1000, 1010]);
   assert.equal(tl.duration, 1110);
+  assert.deepEqual(tl.children.slice(0, 2).map((c) => [c.start, c.end]), [[0, 100], [150, 250]]);
   void o;
 });
 
