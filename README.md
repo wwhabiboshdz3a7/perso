@@ -166,7 +166,7 @@ Les tests de bout en bout démarrent eux-mêmes un serveur local (`tests/e2e/ser
 - **commandes** au clavier, mot d’éveil avec une reconnaissance vocale simulée, réponses parlées en français, cerveau IA simulé, repli sans reconnaissance vocale, main virtuelle à la souris ;
 - **liaison réseau** : serveur cloud injoignable et serveur réellement fermé (pas de boucle, « Réessayer »), transfert WebRTC réel entre deux navigateurs via un serveur PeerJS local avec accord de l’appareil appelé, coupure puis retour du serveur (une seule notification), code inexistant, appareil fermé sans prévenir (retiré par le battement) ;
 - **démonstration tactile** (vrais évènements tactiles), réglages entre fenêtres, « Tout réinitialiser » avec une autre fenêtre ouverte ;
-- **accueil, tutoriel, réglages, confidentialité, mobile 390 px** (pas de défilement horizontal, mode léger, réponse visible, onglets lisibles), **accessibilité** (axe-core, bureau et mobile, dialogues ouverts) et zéro erreur console.
+- **accueil, tutoriel, réglages, confidentialité, mobile 390 px** (pas de défilement horizontal, mode léger, réponse visible, onglets lisibles), **premier lancement** (visuels de démonstration prêts en moins de 6 s en rendu logiciel, import prioritaire), **accessibilité** (axe-core, bureau et mobile, dialogues ouverts, journal rempli et parcouru au clavier) et zéro erreur console.
 
 Les services externes (Open-Meteo, serveur cloud PeerJS, API d’IA) sont simulés dans les tests. Variables utiles :
 

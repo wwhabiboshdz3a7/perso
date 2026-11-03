@@ -719,14 +719,25 @@ describe('liaison réseau PeerJS', () => {
       await pc.p.waitForFunction(() => !document.querySelector('#peers').textContent.includes('Appareil distant'));
 
       // Téléphone fermé brutalement (sans « au revoir ») : retiré grâce au battement.
-      // Détection nominale : silence de 15 s relevé au battement suivant (≤ 20 s).
-      // Marge large : sous forte charge, les minuteries du navigateur restant
-      // ouvert prennent du retard ; le délai est mesuré une fois la fermeture faite.
+      // Détection nominale : liaison ICE coupée + 6 s de grâce (≈ 12 s), au pire
+      // silence de 15 s relevé au battement suivant (≤ 20 s). Le délai est lu sur
+      // l'horloge de la page : après la fermeture d'un contexte en pleine liaison
+      // WebRTC, le pilotage du navigateur peut rester figé plusieurs dizaines de
+      // secondes (sans rapport avec l'application).
       await tel.p.evaluate(() => { const l = window.jarvis.app.link; l.net.stop = () => {}; l.local.stop = () => {}; });
+      await pc.p.evaluate(() => {
+        window.__retrait = { debut: Date.now(), fin: 0 };
+        const t = setInterval(() => {
+          if (window.jarvis.state().peers.some((x) => x.name === 'Téléphone')) return;
+          window.__retrait.fin = Date.now();
+          clearInterval(t);
+        }, 200);
+      });
       await tel.c.close();
-      const t0 = Date.now();
-      await pc.p.waitForFunction(() => !window.jarvis.state().peers.some((x) => x.name === 'Téléphone'), null, { timeout: 90000 });
-      console.log(`# téléphone fermé retiré en ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+      await pc.p.waitForFunction(() => window.__retrait.fin > 0, null, { timeout: 120000 });
+      const retrait = await pc.p.evaluate(() => (window.__retrait.fin - window.__retrait.debut) / 1000);
+      console.log(`# téléphone fermé retiré en ${retrait.toFixed(1)} s (horloge de la page)`);
+      assert.ok(retrait < 60, `téléphone fermé retiré en ${retrait} s`);
       sansErreur({ erreurs: pc.p.erreurs.filter((e) => !/WebSocket connection/.test(e)) });
     } finally {
       await tel.c.close();
