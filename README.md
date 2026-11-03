@@ -251,11 +251,11 @@ Le site charge la librairie depuis `dist/`. Il est en français, accessible (con
 ### Lancer le site en local
 
 ```sh
-python3 -m http.server 8080
-# puis http://localhost:8080
+npm run serve
+# puis http://localhost:8080 (PORT=9000 npm run serve pour changer de port)
 ```
 
-N’importe quel serveur statique convient ; les modules ES ne se chargent pas depuis `file://`.
+`scripts/serve.mjs` sert le site comme Netlify, avec les en-têtes de `netlify.toml`. Un autre serveur statique (`python3 -m http.server 8080`) convient aussi, mais sans ces en-têtes CORS l’aperçu isolé du bac à sable s’affiche avec les polices système. Les modules ES ne se chargent pas depuis `file://`.
 
 ### Déployer sur Netlify
 
@@ -295,11 +295,14 @@ Polices du site (licence SIL OFL, dans `site/fonts/`) : Anybody, Bricolage Grote
 
 ## Développement
 
+Il faut Node 22.22.2+, 24.15+ ou 26+ (versions exigées par jsdom pour les tests ; la CI tourne sur Node 22, 24 et 26).
+
 ```sh
 npm install
 npm test          # tests unitaires : easings, interpolation, keyframes, timeline, stagger, lecture, texte, défilement, SVG
 npm run types     # vérifie types/index.d.ts
 npm run build     # dist/ et tailles brutes et gzip
+npm run test:navigateur   # tests Chromium (Playwright) : mise en page réelle, site, bac à sable
 ```
 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) et le [journal des versions](CHANGELOG.md).
@@ -308,29 +311,57 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) et le [journal des versions](CHANGELOG.m
 
 ### Créer le dépôt dédié sur GitHub
 
-Le code vit dans la branche `kinetika` du dépôt personnel. Pour lui donner son propre dépôt :
+Le code vit pour l’instant dans la branche `kinetika` du dépôt personnel (`origin` pointe vers `wwhabiboshdz3a7/perso`). Deux précautions :
+
+- ne poussez pas la branche `kinetika` telle quelle : son premier commit, « Initialisation du dépôt », contient le README du dépôt personnel, qui liste les autres branches ;
+- ne lancez pas `git push --tags` : le tag partirait vers le dépôt personnel.
+
+La méthode la plus simple consiste à publier l’état actuel en un seul commit initial, sur une branche sans historique :
 
 ```sh
 # 1. créer le dépôt vide (ou depuis github.com/new, sans README ni licence)
 gh repo create wwhabiboshdz3a7/kinetika --public \
   --description "Librairie d’animation JavaScript légère et sans dépendance"
 
-# 2. y pousser la branche kinetika comme branche principale
-git push git@github.com:wwhabiboshdz3a7/kinetika.git kinetika:main
+# 2. déclarer ce dépôt comme second distant
+git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
+
+# 3. branche sans historique avec le contenu actuel de kinetika, puis premier commit
+git checkout --orphan publication kinetika
+git commit -m "Kinetika 0.1.0"
+
+# 4. pousser la branche principale et le tag vers le dépôt dédié, et seulement lui
+git push kinetika publication:main
+git tag -a v0.1.0 -m "Kinetika 0.1.0"
+git push kinetika v0.1.0
+git checkout kinetika
 ```
 
-Ajoutez ensuite l’adresse du site Netlify dans la description du dépôt et quelques sujets (`animation`, `javascript`, `timeline`, `spring`, `svg`). La CI (GitHub Actions) lance tests, types et build à chaque push.
+Pour garder l’historique, réécrivez-le plutôt sur une copie du dépôt, en retirant le commit « Initialisation du dépôt » :
+
+```sh
+git clone -b kinetika <dépôt perso> kinetika-propre && cd kinetika-propre
+GIT_SEQUENCE_EDITOR="sed -i '1s/^pick/drop/'" git rebase -i --root
+# conflit attendu sur README.md au commit qui écrit le README de Kinetika : gardez sa version
+git checkout --theirs README.md && git add README.md && git rebase --continue
+git log --stat                    # vérifiez avant de pousser
+git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
+git push kinetika kinetika:main
+```
+
+Ensuite, travaillez directement dans le dépôt dédié (`git clone git@github.com:wwhabiboshdz3a7/kinetika.git`) : `origin` y désigne bien `kinetika`. Ajoutez l’adresse du site Netlify dans la description du dépôt et quelques sujets (`animation`, `javascript`, `timeline`, `spring`, `svg`). À chaque push, la CI (GitHub Actions, Node 22, 24 et 26) lance les tests, les types et le build.
 
 ### Publier sur npm
+
+Depuis le dépôt dédié (ou la branche `publication`) :
 
 ```sh
 npm login                         # compte npm de wwhabiboshdz3a7
 npm publish --dry-run             # vérifie le contenu du paquet (dist, src, types, README, LICENSE, CHANGELOG)
 npm publish --access public       # prepublishOnly lance tests, types et build
-git tag v0.1.0 && git push --tags
 ```
 
-Pour les versions suivantes : mettez à jour `CHANGELOG.md` et la constante `version` de `src/index.js`, puis `npm version patch|minor|major` et `npm publish`. Quelques minutes après la publication, jsDelivr sert le paquet (`https://cdn.jsdelivr.net/npm/kinetika@0.1.0/…`) et les badges npm et bundlephobia s’activent. Le nom `kinetika` était libre sur npm lors de la vérification (novembre 2026).
+Pour les versions suivantes, mettez à jour `CHANGELOG.md` et la constante `version` de `src/index.js`. Lancez ensuite `npm version patch|minor|major` (qui crée le commit et le tag), `git push --follow-tags` depuis le dépôt dédié, puis `npm publish`. Quelques minutes après la publication, jsDelivr sert le paquet (`https://cdn.jsdelivr.net/npm/kinetika@0.1.0/…`) et les badges npm et bundlephobia s’activent. Le nom `kinetika` était libre sur npm lors de la vérification (novembre 2026).
 
 ## Licence
 

@@ -16,10 +16,12 @@ npm install
 npm test          # tests unitaires (node --test + jsdom)
 npm run types     # vérification des types TypeScript
 npm run build     # régénère dist/ et affiche les tailles
-python3 -m http.server 8080   # puis http://localhost:8080 pour le site
+npm run serve     # site de documentation sur http://localhost:8080
 ```
 
-Node 18 ou plus récent est nécessaire.
+Pour développer, il faut Node 22.22.2+, 24.15+ ou 26+ : ce sont les versions qu’exige jsdom, qui sert aux tests. La CI tourne sur Node 22, 24 et 26. La librairie publiée, elle, ne demande rien à Node : elle tourne dans le navigateur.
+
+Les tests navigateur (`npm run test:navigateur`) passent par Playwright et Chromium. La première fois, lancez `npx playwright install chromium`. Ils démarrent eux-mêmes le serveur de développement.
 
 ## Organisation
 

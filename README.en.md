@@ -246,36 +246,72 @@ The repository also contains Kinetika’s website, fully static and deployable a
 - **Visualizers** for easings (curve, animated ball, parameters, copyable code) and stagger (grid, origin by click or keyboard, axis, easing, copyable code).
 - **Migration** page: API mapping from anime.js and GSAP.
 
-Run it locally with any static server (`python3 -m http.server 8080`). To deploy on Netlify, import the repository, leave the build command empty and the publish directory set to `.`: everything is already in `netlify.toml`.
+Run it locally with `npm run serve` (http://localhost:8080): `scripts/serve.mjs` serves the site like Netlify, with the headers from `netlify.toml`. Any other static server works too, but without those CORS headers the playground’s isolated preview falls back to system fonts. To deploy on Netlify, import the repository, leave the build command empty and the publish directory set to `.`: everything is already in `netlify.toml`.
 
 ## Development
+
+You need Node 22.22.2+, 24.15+ or 26+ (required by jsdom for the tests; CI runs on Node 22, 24 and 26).
 
 ```sh
 npm install
 npm test          # unit tests (node --test + jsdom)
 npm run types     # checks types/index.d.ts
 npm run build     # dist/ plus raw and gzip sizes
+npm run test:navigateur   # Chromium tests (Playwright): real layout, site, playground
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) (in French) and the [changelog](CHANGELOG.md).
 
 ## Publishing
 
-Create the dedicated GitHub repository and push the `kinetika` branch as `main`:
+For now the code lives in the `kinetika` branch of the personal repository (`origin` points to `wwhabiboshdz3a7/perso`). Two things to avoid:
+
+- do not push the `kinetika` branch as is: its first commit, “Initialisation du dépôt”, contains the personal repository’s README, which lists the other branches;
+- do not run `git push --tags`: the tag would go to the personal repository.
+
+The simplest way is to publish the current state as a single initial commit, on a branch with no history:
 
 ```sh
+# 1. create the empty repository (or via github.com/new, without README or license)
 gh repo create wwhabiboshdz3a7/kinetika --public --description "Lightweight, dependency-free JavaScript animation library"
-git push git@github.com:wwhabiboshdz3a7/kinetika.git kinetika:main
+
+# 2. add it as a second remote
+git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
+
+# 3. history-free branch holding the current content of kinetika, then the first commit
+git checkout --orphan publication kinetika
+git commit -m "Kinetika 0.1.0"
+
+# 4. push the main branch and the tag to the dedicated repository only
+git push kinetika publication:main
+git tag -a v0.1.0 -m "Kinetika 0.1.0"
+git push kinetika v0.1.0
+git checkout kinetika
 ```
 
-Then publish to npm:
+To keep the history instead, rewrite it in a copy of the repository, dropping the “Initialisation du dépôt” commit:
+
+```sh
+git clone -b kinetika <personal repository> kinetika-clean && cd kinetika-clean
+GIT_SEQUENCE_EDITOR="sed -i '1s/^pick/drop/'" git rebase -i --root
+# expected conflict on README.md at the commit that writes Kinetika's README: keep that version
+git checkout --theirs README.md && git add README.md && git rebase --continue
+git log --stat                    # check before pushing
+git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
+git push kinetika kinetika:main
+```
+
+From then on, work in the dedicated repository (`git clone git@github.com:wwhabiboshdz3a7/kinetika.git`), where `origin` is `kinetika`. On every push, CI (GitHub Actions, Node 22, 24 and 26) runs the tests, the type check and the build.
+
+Then publish to npm, from the dedicated repository (or the `publication` branch):
 
 ```sh
 npm login
 npm publish --dry-run
 npm publish --access public       # prepublishOnly runs tests, types and build
-git tag v0.1.0 && git push --tags
 ```
+
+For later releases, update `CHANGELOG.md` and the `version` constant in `src/index.js`. Then run `npm version patch|minor|major` (it creates the commit and the tag), `git push --follow-tags` from the dedicated repository, and `npm publish`.
 
 ## License
 
