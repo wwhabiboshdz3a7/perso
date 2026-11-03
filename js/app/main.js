@@ -343,6 +343,11 @@ class App {
   startDemo() {
     this.hideWelcome();
     this.setMouseHand(true);
+    if (matchMedia('(pointer: coarse)').matches) {
+      // Écran tactile : le banc couvrirait l'écran, il reste à portée (bouton fiole).
+      this.ui.toast('Démonstration', 'Main virtuelle : votre doigt est l’index. Toucher bref = pincement, appui long = poing, relâcher = ouvrir la main. Le banc de simulation rejoue les autres gestes.', { ms: 9000 });
+      return;
+    }
     this.openSim(true);
     this.ui.toast('Démonstration', 'Main virtuelle : la souris est votre index. Clic bref = pincement, clic maintenu = poing, relâcher = ouvrir la main. Ouvrez une 2e fenêtre pour tester le partage.', { ms: 9000 });
   }

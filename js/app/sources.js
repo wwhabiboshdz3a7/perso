@@ -88,8 +88,10 @@ export class MouseHand {
     this.pose = 'point';
     this.from = 'point';
     this.blendStart = 0;
-    this.pinchUntil = 0;
-    this.openUntil = 0;
+    // Pose brève après le relâchement (pincement ou main ouverte) : elle dure
+    // un temps minimal ET un nombre minimal d'images, pour que le moteur la
+    // voie même si le navigateur ralentit (onglet chargé, rendu logiciel).
+    this.after = null;
     this.inside = false;
     this.suppressClick = false;
     this._tick = this._tick.bind(this);
@@ -98,6 +100,7 @@ export class MouseHand {
     this._onUp = this._onUp.bind(this);
     this._onLeave = this._onLeave.bind(this);
     this._onClick = this._onClick.bind(this);
+    this._onMenu = this._onMenu.bind(this);
   }
 
   enable(on) {
@@ -111,6 +114,7 @@ export class MouseHand {
       window.addEventListener('pointercancel', this._onUp, opts);
       document.documentElement.addEventListener('pointerleave', this._onLeave, opts);
       window.addEventListener('click', this._onClick, true);
+      window.addEventListener('contextmenu', this._onMenu, true);
       this._raf = requestAnimationFrame(this._tick);
     } else {
       window.removeEventListener('pointermove', this._onMove, opts);
@@ -119,6 +123,7 @@ export class MouseHand {
       window.removeEventListener('pointercancel', this._onUp, opts);
       document.documentElement.removeEventListener('pointerleave', this._onLeave, opts);
       window.removeEventListener('click', this._onClick, true);
+      window.removeEventListener('contextmenu', this._onMenu, true);
       cancelAnimationFrame(this._raf);
       this.pos = null;
     }
@@ -138,6 +143,7 @@ export class MouseHand {
     if (e.button !== 0 || this._isUi(e.target)) return;
     this.down = true;
     this.downAt = performance.now();
+    this.after = null;
     this.pos = { x: e.clientX, y: e.clientY };
     this.inside = true;
   }
@@ -147,8 +153,9 @@ export class MouseHand {
     this.down = false;
     const held = performance.now() - this.downAt;
     if (!this._inViewport(e)) { this.inside = false; this.pos = null; return; } // la main « sort » fermée
-    if (held < 230) this.pinchUntil = performance.now() + 160; // clic bref = pincement
-    else this.openUntil = performance.now() + 450; // fin d'appui long : la main s'ouvre (lâcher)
+    const now = performance.now();
+    if (held < 230) this.after = { pose: 'pinch', until: now + 160, frames: 4 }; // clic bref = pincement
+    else this.after = { pose: 'open', until: now + 450, frames: 8 }; // fin d'appui long : la main s'ouvre (lâcher)
     this.suppressClick = true;
   }
 
@@ -165,14 +172,20 @@ export class MouseHand {
     this.suppressClick = false;
   }
 
+  _onMenu(e) {
+    // Appui long au doigt = poing, pas le menu contextuel du navigateur.
+    if (this.down) e.preventDefault();
+  }
+
   _isUi(target) {
     // Les commandes du banc de simulation et la saisie restent des clics normaux.
     return !!target?.closest?.('#simPanel, #cmdForm, .cmdbar__tools, dialog, input, textarea, select');
   }
 
   _desiredPose(now) {
-    if (now < this.pinchUntil) return 'pinch';
-    if (now < this.openUntil) return 'open';
+    const a = this.after;
+    if (a && (now < a.until || a.frames > 0)) return a.pose;
+    this.after = null;
     if (this.down && now - this.downAt >= 230) return 'fist';
     return 'point';
   }
@@ -204,7 +217,9 @@ export class MouseHand {
       aspect: 1280 / 720,
       anchor: 'index@point',
     });
-    const cat = now - this.blendStart > 120 ? POSE_MODEL_CATEGORY[this.pose] : 'None';
+    const settled = now - this.blendStart > 120;
+    const cat = settled ? POSE_MODEL_CATEGORY[this.pose] : 'None';
+    if (settled && this.after?.pose === this.pose) this.after.frames--;
     this.onFrame({
       t: now, width: 1280, height: 720, source: 'souris',
       hands: [{ landmarks, handedness: mediapipeLabel('Right'), handednessScore: 0.99, gestures: [{ categoryName: cat || 'None', score: cat && cat !== 'None' ? 0.9 : 0.5 }] }],
