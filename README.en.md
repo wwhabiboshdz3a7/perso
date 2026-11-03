@@ -23,7 +23,7 @@ animate('.card', {
 
 ## Features
 
-- **One engine**: a single `requestAnimationFrame` loop for the whole page, global time scale, pauses when the tab is hidden, lag smoothing after a jank, manual ticking for tests.
+- **One engine**: a single `requestAnimationFrame` loop for the whole page, global time scale, pauses when the tab is hidden, lag smoothing after a jank, optional frame-rate cap (`engine.fps`), manual ticking for tests.
 - **`animate()`**: selectors, elements, NodeLists, arrays and plain JS objects. Individual transforms (`x`, `y`, `rotate`, `scale`, `skew`…), CSS with unit conversion, colors interpolated in **OKLab**, CSS variables, SVG attributes, object properties.
 - **Expressive values**: `[from, to]`, relative (`'+=100'`, `'*=2'`), functions `(el, i, total)`, keyframes (arrays or percentages), per-property parameters.
 - **Full playback control**: loops, alternate, reversed, `play` / `pause` / `seek` / `reverse` / `restart`, speed, `progress`, `await animate(…)`, callbacks, `revert()`.
@@ -84,9 +84,9 @@ Copy `dist/kinetika.esm.min.js` into your project and import it directly, or map
 <!-- tailles -->
 | File | Raw | gzip |
 |---|---|---|
-| `dist/kinetika.esm.min.js` | 62.2 kB | **23.9 kB** |
-| `dist/kinetika.umd.min.js` | 63.5 kB | 24.2 kB |
-| `dist/kinetika.esm.js` (unminified, commented) | 108.0 kB | 31.8 kB |
+| `dist/kinetika.esm.min.js` | 62.4 kB | **24.0 kB** |
+| `dist/kinetika.umd.min.js` | 63.8 kB | 24.3 kB |
+| `dist/kinetika.esm.js` (unminified, commented) | 108.6 kB | 32.0 kB |
 <!-- /tailles -->
 
 `npm run build` regenerates these files and `dist/sizes.json`. The package is marked side-effect free (`sideEffects: false`), so bundlers keep only what you import.
@@ -228,7 +228,7 @@ With reduced motion, every animation jumps straight to its end state: content st
 | `splitText()`, `scramble()`, `typewriter()`, `odometer()` | Text. |
 | `onScroll(options)` | Scroll. |
 | `drawable()`, `motionPath()` | SVG. |
-| `engine` | Engine: time scale, reduced motion, manual ticking, `onFrame()`. |
+| `engine` | Engine: time scale, frame rate (`fps`), reduced motion, manual ticking, `onFrame()`. |
 | `utils`, `set`, `get`, `remove`, `clamp`, `lerp`, `mapRange`, `snap`, `wrap`, `random`, `createRandom`… | Utilities. |
 
 The complete reference, with every parameter and its default value, is on the **API** page of the documentation site (generated from `api/donnees.js`; the site is in French). Types live in `types/index.d.ts`.
@@ -246,7 +246,7 @@ The repository also contains Kinetika’s website, fully static and deployable a
 - **Visualizers** for easings (curve, animated ball, parameters, copyable code) and stagger (grid, origin by click or keyboard, axis, easing, copyable code).
 - **Migration** page: API mapping from anime.js and GSAP.
 
-Run it locally with `npm run serve` (http://localhost:8080): `scripts/serve.mjs` serves the site like Netlify, with the headers from `netlify.toml`. Any other static server works too, but without those CORS headers the playground’s isolated preview falls back to system fonts. To deploy on Netlify, import the repository, leave the build command empty and the publish directory set to `.`: everything is already in `netlify.toml`.
+Run it locally with `npm run serve` (http://localhost:8080): `scripts/serve.mjs` serves the site like Netlify, with the headers from `netlify.toml`. Any other static server works too (`python3 -m http.server 8080`): the playground’s isolated preview receives the library and its fonts inlined, so it does not depend on CORS headers. To deploy on Netlify, import the repository, leave the build command empty and the publish directory set to `.`: everything is already in `netlify.toml`.
 
 ## Development
 

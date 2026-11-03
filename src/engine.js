@@ -19,6 +19,7 @@ const state = {
   pauseOnHidden: true,
   lagSmoothing: { threshold: 250, adjusted: 33 },
   reducedMotion: 'auto',
+  fps: Infinity,
   defaults: {
     duration: 1000,
     delay: 0,
@@ -35,8 +36,15 @@ const state = {
 
 let inFrame = false;
 
+const running = () => active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden);
+
 function frame(t) {
   frameId = null;
+  // cadence plafonnée (engine.fps) : trop tôt, on attend l'image suivante (2 ms de tolérance)
+  if (state.fps !== Infinity && t - last < 1000 / state.fps - 2) {
+    if (running()) frameId = raf(frame);
+    return;
+  }
   let dt = t - last;
   last = t;
   const lag = state.lagSmoothing;
@@ -49,7 +57,7 @@ function frame(t) {
   } finally {
     inFrame = false;
     // la boucle continue quoi qu'il arrive pendant l'image
-    if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+    if (frameId === null && running()) frameId = raf(frame);
   }
 }
 
@@ -121,6 +129,9 @@ export const engine = {
   set reducedMotion(v) { state.reducedMotion = v === 'auto' ? 'auto' : !!v; },
   /** Le mouvement réduit est-il actuellement en vigueur ? */
   get prefersReducedMotion() { return isReduced(); },
+  /** Cadence maximale en images par seconde (Infinity par défaut : celle de l'écran). */
+  get fps() { return state.fps; },
+  set fps(v) { const n = +v; state.fps = n > 0 ? n : Infinity; },
   /** Paramètres par défaut de toutes les animations. */
   get defaults() { return state.defaults; },
   set defaults(v) { Object.assign(state.defaults, v); },

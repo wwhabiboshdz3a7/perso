@@ -108,6 +108,29 @@ test('moteur : une exception dans un rappel n’arrête pas les autres animation
   await page.close();
 });
 
+test('moteur : engine.fps plafonne la cadence, Infinity la libère', async () => {
+  const page = await blank();
+  const r = await page.evaluate(async () => {
+    const { engine } = window.kinetika;
+    const count = async (ms) => {
+      let n = 0;
+      const stop = engine.onFrame(() => { n++; });
+      await new Promise((res) => setTimeout(res, ms));
+      stop();
+      return n;
+    };
+    engine.fps = 20;
+    const capped = await count(1000);
+    engine.fps = 0; // valeur invalide : retour à la cadence de l'écran
+    const free = await count(1000);
+    return { capped, free, fps: engine.fps };
+  });
+  assert.ok(r.capped >= 15 && r.capped <= 22, `20 images/s attendues (${r.capped})`);
+  assert.ok(r.free > r.capped * 2, `cadence libre (${r.free})`);
+  assert.equal(r.fps, Infinity);
+  await page.close();
+});
+
 test('site : menu mobile à 390 px, liens visibles et cliquables', async () => {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await page.goto(BASE);
@@ -152,9 +175,11 @@ test('bac à sable : aperçu isolé, code partagé non exécuté par « Réiniti
   await victim.waitForSelector('#notice:not([hidden])');
   assert.equal(await victim.$eval('#open', (b) => b.disabled), true);
   await victim.click('#reset');
+  assert.equal(await victim.$eval('#notice', (n) => n.hidden), false, 'Réinitialiser ne lance rien');
   await victim.click('#trust');
-  await victim.waitForTimeout(800);
+  await victim.waitForFunction(() => document.querySelectorAll('#clog li.is-error').length > 0);
   assert.notEqual(await victim.title(), 'piraté');
+  assert.match(await victim.$eval('#clog li.is-error', (l) => l.textContent), /SecurityError|isolé/, 'l’accès refusé est expliqué');
   await victim.close();
 
   // boucle infinie tapée avec la relance automatique
@@ -164,4 +189,22 @@ test('bac à sable : aperçu isolé, code partagé non exécuté par « Réiniti
   await page.waitForFunction(() => [...document.querySelectorAll('#clog li')].some((li) => /Boucle interrompue/.test(li.textContent)), null, { timeout: 6000 });
   assert.equal(await page.evaluate(() => 1 + 1), 2, 'la page répond');
   await page.close();
+});
+
+test('bac à sable : polices de l’aperçu chargées même sans en-têtes CORS (serveur statique simple)', async () => {
+  const plain = await serve({ port: 0, headers: false });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 860 } });
+  const errors = [];
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  page.on('pageerror', (e) => errors.push(e.message));
+  try {
+    await page.goto(`http://127.0.0.1:${plain.address().port}/bac-a-sable/?ex=split-elastique`);
+    await page.waitForFunction(() => document.querySelector('.CodeMirror')?.CodeMirror?.getValue().length > 0);
+    const frame = page.frames().find((f) => f.parentFrame() === page.mainFrame());
+    await frame.waitForFunction(() => [...document.fonts].some((f) => f.family === 'Anybody' && f.status === 'loaded'), null, { timeout: 5000 });
+    assert.deepEqual(errors, []);
+  } finally {
+    await page.close();
+    plain.close();
+  }
 });

@@ -471,6 +471,7 @@ timeline()
           ['prefersReducedMotion', 'boolean', 'lecture', 'Le mouvement réduit est-il en vigueur ?'],
           ['pauseOnHidden', 'boolean', 'true', 'Suspend la boucle quand l’onglet est masqué.'],
           ['lagSmoothing', '{ threshold, adjusted } | null', '{ 250, 33 }', 'Au-delà de `threshold` ms entre deux images, on n’avance que de `adjusted` ms (pas de saut après un blocage).'],
+          ['fps', 'number', 'Infinity', 'Cadence maximale en images par seconde. Par défaut, celle de l’écran ; `30` divise par deux le travail d’une page chargée (la galerie s’en sert pour ses vignettes).'],
           ['manual', 'boolean', 'false', 'Mode manuel : plus de `requestAnimationFrame`, on avance avec `tick()` (tests, rendu image par image).'],
           ['tick(ms)', '→ void', '16.7', 'Avance toutes les animations de `ms` millisecondes.'],
           ['onFrame(fn)', '→ () => void', '', 'Appelle `fn(delta, temps)` à chaque image, dans la même boucle. Renvoie la fonction d’arrêt.'],

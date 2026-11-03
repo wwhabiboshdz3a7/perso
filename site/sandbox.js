@@ -3,7 +3,7 @@
 // gardées : un code partagé ne peut pas toucher la page, une boucle infinie ne gèle pas l'onglet.
 import { examples, categories, byId } from '../exemples/catalogue.js';
 import { toast, copyText } from './site.js';
-import { buildDoc, libForPreview, syntaxError, encode, decode, LIB_URL, BASE } from './sandbox-doc.js';
+import { buildDoc, previewAssets, syntaxError, encode, decode, LIB_URL, BASE } from './sandbox-doc.js';
 
 const CM = window.CodeMirror;
 const $ = (id) => document.getElementById(id);
@@ -179,10 +179,10 @@ async function run(force) {
   }
   setStatus('');
   const id = ++runId;
-  const lib = await libForPreview();
+  const assets = await previewAssets();
   if (id !== runId) return;
   clearConsole();
-  els.frame.srcdoc = buildDoc(code, { lib });
+  els.frame.srcdoc = buildDoc(code, assets);
 }
 
 // —— Relance automatique ——
@@ -300,8 +300,8 @@ let popup = null;
 addEventListener('message', async (e) => {
   if (!popup || e.source !== popup || e.origin !== location.origin || !e.data || e.data.__kt !== 'apercu-pret') return;
   if (pendingTrust) return;
-  const lib = await libForPreview();
-  popup.postMessage({ __kt: 'apercu-code', doc: buildDoc(current(), { lib, bridge: false }), title: document.title }, location.origin);
+  const assets = await previewAssets();
+  popup.postMessage({ __kt: 'apercu-code', doc: buildDoc(current(), { ...assets, bridge: false }), title: document.title }, location.origin);
 });
 els.open.addEventListener('click', () => {
   if (pendingTrust) return;
@@ -336,7 +336,11 @@ async function start() {
       setPending(true);
       setStatus('');
       clearConsole();
-      els.frame.srcdoc = buildDoc({ js: '', html: '<p class="label" style="text-align:center">Aperçu en attente : lancez le code partagé.</p>', css: '' }, { protect: false, bridge: false });
+      const id = ++runId;
+      const assets = await previewAssets();
+      if (id === runId && pendingTrust) {
+        els.frame.srcdoc = buildDoc({ js: '', html: '<p class="label" style="text-align:center">Aperçu en attente : lancez le code partagé.</p>', css: '' }, { ...assets, protect: false, bridge: false });
+      }
       return;
     } catch (err) {
       toast('Lien de partage illisible : exemple par défaut chargé');

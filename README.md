@@ -23,7 +23,7 @@ animate('.carte', {
 
 ## Fonctionnalités
 
-- **Un seul moteur** : une boucle `requestAnimationFrame` pour toute la page, échelle de temps globale, pause quand l’onglet est masqué, lissage des sauts après un blocage, tick manuel pour les tests.
+- **Un seul moteur** : une boucle `requestAnimationFrame` pour toute la page, échelle de temps globale, pause quand l’onglet est masqué, lissage des sauts après un blocage, cadence plafonnable (`engine.fps`), tick manuel pour les tests.
 - **`animate()`** : sélecteurs, éléments, listes, tableaux et objets JS. Transformations individuelles (`x`, `y`, `rotate`, `scale`, `skew`…), CSS avec conversion d’unités, couleurs interpolées en **OKLab**, variables CSS, attributs SVG, propriétés d’objets.
 - **Valeurs expressives** : `[de, à]`, relatives (`'+=100'`, `'*=2'`), fonctions `(el, i, total)`, keyframes (tableau ou pourcentages), paramètres par propriété.
 - **Lecture complète** : boucles, aller-retour, sens inverse, `play` / `pause` / `seek` / `reverse` / `restart`, vitesse, `progress`, `await animate(…)`, rappels, `revert()`.
@@ -84,9 +84,9 @@ Copiez `dist/kinetika.esm.min.js` dans votre projet et importez-le directement, 
 <!-- tailles -->
 | Fichier | Brut | gzip |
 |---|---|---|
-| `dist/kinetika.esm.min.js` | 62,2 ko | **23,9 ko** |
-| `dist/kinetika.umd.min.js` | 63,5 ko | 24,2 ko |
-| `dist/kinetika.esm.js` (non minifié, commenté) | 108,0 ko | 31,8 ko |
+| `dist/kinetika.esm.min.js` | 62,4 ko | **24,0 ko** |
+| `dist/kinetika.umd.min.js` | 63,8 ko | 24,3 ko |
+| `dist/kinetika.esm.js` (non minifié, commenté) | 108,6 ko | 32,0 ko |
 <!-- /tailles -->
 
 `npm run build` régénère ces fichiers et `dist/sizes.json`. Le paquet est déclaré sans effet de bord (`sideEffects: false`) : un bundler ne garde que ce que vous importez.
@@ -228,7 +228,7 @@ En mouvement réduit, chaque animation saute directement à son état final : le
 | `splitText()`, `scramble()`, `typewriter()`, `odometer()` | Texte. |
 | `onScroll(options)` | Défilement. |
 | `drawable()`, `motionPath()` | SVG. |
-| `engine` | Moteur : échelle de temps, mouvement réduit, tick manuel, `onFrame()`. |
+| `engine` | Moteur : échelle de temps, cadence (`fps`), mouvement réduit, tick manuel, `onFrame()`. |
 | `utils`, `set`, `get`, `remove`, `clamp`, `lerp`, `mapRange`, `snap`, `wrap`, `random`, `createRandom`… | Utilitaires. |
 
 La référence complète, avec tous les paramètres et leurs valeurs par défaut, est sur la page **API** du site de documentation (générée depuis `api/donnees.js`). Les types sont dans `types/index.d.ts`.
@@ -255,7 +255,7 @@ npm run serve
 # puis http://localhost:8080 (PORT=9000 npm run serve pour changer de port)
 ```
 
-`scripts/serve.mjs` sert le site comme Netlify, avec les en-têtes de `netlify.toml`. Un autre serveur statique (`python3 -m http.server 8080`) convient aussi, mais sans ces en-têtes CORS l’aperçu isolé du bac à sable s’affiche avec les polices système. Les modules ES ne se chargent pas depuis `file://`.
+`scripts/serve.mjs` sert le site comme Netlify, avec les en-têtes de `netlify.toml`. N’importe quel autre serveur statique convient aussi (`python3 -m http.server 8080`) : l’aperçu isolé du bac à sable reçoit la librairie et ses polices intégrées, sans dépendre des en-têtes CORS. Les modules ES ne se chargent pas depuis `file://`.
 
 ### Déployer sur Netlify
 

@@ -24,6 +24,37 @@ export function libForPreview() {
   return libPromise;
 }
 
+// —— Feuille de base des exemples pour l'aperçu ——
+// Les polices exigent CORS depuis une origine opaque : on intègre la feuille et ses polices
+// en URL data:, pour que l'aperçu ne dépende pas des en-têtes du serveur (Netlify, GitHub Pages,
+// python -m http.server…). En cas d'échec, l'aperçu garde le lien vers _base.css.
+let cssPromise = null;
+export function stylesForPreview() {
+  if (!cssPromise) {
+    const sheet = new URL('_base.css', BASE);
+    cssPromise = fetch(sheet)
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+      .then(async (css) => {
+        const urls = [...new Set([...css.matchAll(/url\(\s*["']?([^"')]+\.woff2)["']?\s*\)/g)].map((m) => m[1]))];
+        const inlined = await Promise.all(urls.map(async (u) => {
+          const res = await fetch(new URL(u, sheet));
+          if (!res.ok) throw new Error(String(res.status));
+          return [u, `data:font/woff2;base64,${toB64(new Uint8Array(await res.arrayBuffer()), false)}`];
+        }));
+        for (const [u, data] of inlined) css = css.split(u).join(data);
+        return css;
+      })
+      .catch(() => null);
+  }
+  return cssPromise;
+}
+
+/** Librairie et feuille de base prêtes pour une iframe d'origine opaque. */
+export async function previewAssets() {
+  const [lib, baseCss] = await Promise.all([libForPreview(), stylesForPreview()]);
+  return { lib, baseCss };
+}
+
 // —— Garde contre les boucles infinies ——
 // Chaque for / while / do…while reçoit un appel __ktBoucle(id, ligne) à chaque tour.
 // Une boucle qui tourne plus d'une seconde sans que la page reprenne la main lève une erreur.
@@ -224,7 +255,16 @@ const BRIDGE = `(() => {
   // numéro de ligne rapporté au code JS de l'éditeur (le document commence par l'en-tête de l'aperçu)
   const OFFSET = __KT_OFFSET__;
   const where = (n) => (n > OFFSET ? ' (JS, ligne ' + (n - OFFSET) + ')' : ' (ligne ' + n + ' du document)');
-  addEventListener('error', (e) => send('error', [e.message + (e.lineno && !/ligne [0-9]/.test(e.message) ? where(e.lineno) : '')]));
+  addEventListener('error', (e) => {
+    let msg = String(e.message || '').trim();
+    // une erreur d'accès à la page parente arrive sans détail : on l'explique
+    if (!msg || msg === 'Uncaught') {
+      const err = e.error;
+      msg = err && err.message ? 'Uncaught ' + (err.name || 'Error') + ': ' + err.message
+        : 'Erreur sans détail. Rappel : l’aperçu est isolé, il n’a accès ni à la page du site (parent, top) ni à son stockage.';
+    }
+    send('error', [msg + (e.lineno && !/ligne [0-9]/.test(msg) ? where(e.lineno) : '')]);
+  });
   addEventListener('unhandledrejection', (e) => send('error', ['Promesse rejetée : ' + fmt(e.reason)]));
 })();`;
 
@@ -233,10 +273,10 @@ const protectInline = (html) => html.replace(/(<script\b[^>]*>)([\s\S]*?)(<\/scr
 
 /**
  * Document HTML de l'aperçu.
- * options.lib : URL de la librairie ; options.protect : instrumenter les boucles ;
- * options.bridge : relayer la console vers la page parente.
+ * options.lib : URL de la librairie ; options.baseCss : feuille de base intégrée (sinon lien vers _base.css) ;
+ * options.protect : instrumenter les boucles ; options.bridge : relayer la console vers la page parente.
  */
-export function buildDoc({ js, html, css }, { lib = LIB_URL, protect = true, bridge = true } = {}) {
+export function buildDoc({ js, html, css }, { lib = LIB_URL, baseCss = null, protect = true, bridge = true } = {}) {
   const script = protect ? protectLoops(js) : js;
   const body = protect ? protectInline(html) : html;
   const doc = `<!doctype html>
@@ -246,7 +286,7 @@ export function buildDoc({ js, html, css }, { lib = LIB_URL, protect = true, bri
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aperçu — Kinetika</title>
 <base href="${BASE}">
-<link rel="stylesheet" href="_base.css">
+${baseCss ? `<style>${guardTag(baseCss, 'style')}</style>` : '<link rel="stylesheet" href="_base.css">'}
 <script type="importmap">{ "imports": { "kinetika": "${lib}" } }<\/script>
 ${bridge ? `<script>${BRIDGE}<\/script>\n` : ''}${protect ? `<script>${RUNTIME}<\/script>\n` : ''}<style>
 ${guardTag(css, 'style')}

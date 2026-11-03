@@ -437,6 +437,8 @@ export interface Engine {
   manual: boolean;
   pauseOnHidden: boolean;
   lagSmoothing: { threshold: number; adjusted: number } | null;
+  /** Cadence maximale (images par seconde) ; Infinity par défaut, celle de l'écran. */
+  fps: number;
   reducedMotion: 'auto' | boolean;
   readonly prefersReducedMotion: boolean;
   defaults: AnimationOptions;

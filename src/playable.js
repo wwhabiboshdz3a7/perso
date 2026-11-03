@@ -1,6 +1,6 @@
 // Base commune des animations et des timelines : temps, boucles, sens, rappels, promesse.
 import { clamp, isFn, isNum } from './utils.js';
-import { engine, addActive, removeActive, isReduced } from './engine.js';
+import { engine, addActive, removeActive, isReduced, reportError } from './engine.js';
 import { flush } from './props.js';
 
 export const SCROLL = Symbol.for('kinetika.scroll');
@@ -124,8 +124,16 @@ export class Playable {
       return this;
     }
     addActive(this);
-    this._render(this._time);
-    flush();
+    try {
+      this._render(this._time);
+    } catch (err) {
+      // même règle que pendant une image : le rappel fautif arrête son animation, rien d'autre
+      removeActive(this);
+      this._fail(err);
+      reportError(err);
+    } finally {
+      flush();
+    }
     return this;
   }
 

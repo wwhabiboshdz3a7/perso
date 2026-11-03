@@ -31,6 +31,8 @@ export function resolveTargets(input, root = hasDOM ? document : null) {
       return;
     }
     if (isListLike(v)) { for (const x of v) visit(x); return; }
+    // nombres, booléens… : rien à animer, cible ignorée comme un sélecteur sans résultat
+    if (typeof v !== 'object' && typeof v !== 'function') return;
     add(v);
   };
   const add = (v) => {

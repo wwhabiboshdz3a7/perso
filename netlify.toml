@@ -9,8 +9,8 @@
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=3600"
 
-# L'aperçu du bac à sable tourne dans une iframe d'origine opaque (sandbox) :
-# les polices et la feuille de base des exemples doivent être servies avec CORS.
+# Polices et feuille de base des exemples ouvertes avec CORS : l'aperçu du bac à sable les intègre
+# lui-même, mais un exemple téléchargé (ouvert en file://) ou un autre site peut les charger directement.
 [[headers]]
   for = "/site/fonts/*"
   [headers.values]

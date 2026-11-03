@@ -12,7 +12,7 @@ Première version publique.
 
 ### Ajouté
 
-- **Moteur** : une seule boucle `requestAnimationFrame`, échelle de temps globale (`engine.timeScale`), pause quand l’onglet est masqué, lissage des sauts après un blocage, mode manuel avec `engine.tick()` pour les tests, `engine.onFrame()`, respect de `prefers-reduced-motion` (`engine.reducedMotion = 'auto'`).
+- **Moteur** : une seule boucle `requestAnimationFrame`, échelle de temps globale (`engine.timeScale`), pause quand l’onglet est masqué, lissage des sauts après un blocage, mode manuel avec `engine.tick()` pour les tests, cadence plafonnable (`engine.fps`), `engine.onFrame()`, rappels fautifs isolés (une exception n’arrête que son animation), respect de `prefers-reduced-motion` (`engine.reducedMotion = 'auto'`).
 - **`animate()`** : sélecteurs, éléments, listes, tableaux et objets JS ; transformations individuelles composées (`x`, `y`, `rotate`, `scale`…), CSS avec conversion d’unités, couleurs interpolées en OKLab, variables CSS, attributs SVG, propriétés d’objets ; valeurs `[de, à]`, relatives (`+=`, `-=`, `*=`, `/=`), fonctions `(el, i, total)`, keyframes (tableau ou pourcentages), paramètres par propriété ; composition « replace ».
 - **Lecture** : `play`, `pause`, `restart`, `reverse`, `seek`, `complete`, `cancel`, `revert`, `progress`, `speed`, boucles, aller-retour, promesse (`await animate(…)`), rappels `onBegin`, `onUpdate`, `onLoop`, `onComplete`, `onPause`.
 - **Easings** : familles classiques en `in`, `out`, `inOut`, `outIn`, `Back` et `Elastic` paramétrables, `cubicBezier()`, `steps()`, `spring()` avec durée calculée, chaînes paramétrées et alias anime.js, GSAP et CSS.

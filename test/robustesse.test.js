@@ -33,6 +33,17 @@ test('moteur : une exception dans un rappel n’arrête que son animation', asyn
   assert.equal(o.v, 10);
 });
 
+test('moteur : une exception dès le premier rendu (dans animate()) n’échappe pas et n’arrête rien', async () => {
+  const good = { v: 0 };
+  animate(good, { v: 100, duration: 200, ease: 'linear' });
+  const { result: bad, seen } = silence('error', () => animate({ w: 0 }, { w: 1, duration: 300, onUpdate: () => { throw new Error('dès le départ'); } }));
+  assert.equal(seen.length, 1, 'l’erreur est signalée');
+  assert.equal(bad.paused, true);
+  assert.equal(await bad.then(() => 'résolue', (e) => e.message), 'dès le départ');
+  for (let i = 0; i < 15; i++) engine.tick(16);
+  assert.equal(good.v, 100);
+});
+
 test('moteur : une exception dans engine.onFrame retire seulement ce rappel', () => {
   let calls = 0;
   const stop = engine.onFrame(() => { calls++; throw new Error('image'); });
@@ -42,6 +53,17 @@ test('moteur : une exception dans engine.onFrame retire seulement ce rappel', ()
   assert.equal(calls, 1);
   assert.equal(o.v, 1);
   stop();
+});
+
+test('cibles : nombres et booléens ignorés comme un sélecteur sans résultat', () => {
+  const o = { v: 0 };
+  const { seen } = silence('error', () => {
+    animate([5, true, o], { v: 10, duration: 32, ease: 'linear' });
+    animate(5, { x: 10, duration: 32 });
+    engine.tick(16); engine.tick(16); engine.tick(16);
+  });
+  assert.deepEqual(seen, []);
+  assert.equal(o.v, 10);
 });
 
 test('composition : la promesse d’une animation entièrement reprise se résout', async () => {

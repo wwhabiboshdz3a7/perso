@@ -1,26 +1,26 @@
 {
   "kinetika.esm.js": {
-    "raw": "108.0 ko",
-    "gzip": "31.8 ko",
-    "rawBytes": 107999,
-    "gzipBytes": 31842
+    "raw": "108.6 ko",
+    "gzip": "32.0 ko",
+    "rawBytes": 108577,
+    "gzipBytes": 32015
   },
   "kinetika.esm.min.js": {
-    "raw": "62.2 ko",
-    "gzip": "23.9 ko",
-    "rawBytes": 62154,
-    "gzipBytes": 23928
+    "raw": "62.4 ko",
+    "gzip": "24.0 ko",
+    "rawBytes": 62391,
+    "gzipBytes": 24034
   },
   "kinetika.umd.min.js": {
-    "raw": "63.5 ko",
-    "gzip": "24.2 ko",
-    "rawBytes": 63533,
-    "gzipBytes": 24216
+    "raw": "63.8 ko",
+    "gzip": "24.3 ko",
+    "rawBytes": 63771,
+    "gzipBytes": 24311
   },
   "kinetika.cjs": {
-    "raw": "109.2 ko",
-    "gzip": "32.1 ko",
-    "rawBytes": 109161,
-    "gzipBytes": 32119
+    "raw": "109.7 ko",
+    "gzip": "32.3 ko",
+    "rawBytes": 109739,
+    "gzipBytes": 32291
   }
 }

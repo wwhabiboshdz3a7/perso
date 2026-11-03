@@ -16,6 +16,7 @@ animate(split.lines, { y: ['100%', '0%'], autoplay: onScroll({ enter: 'top 80%',
 animate(drawable('path'), { draw: [0, 1] });
 animate('.avion', { ...motionPath('#route'), duration: 4000 });
 engine.timeScale = 0.5;
+engine.fps = 30;
 const stop = engine.onFrame((dt, t) => {});
 stop();
 const r = utils.createRandom(4);

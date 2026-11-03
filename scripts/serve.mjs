@@ -32,13 +32,16 @@ function netlifyHeaders() {
 }
 const rules = netlifyHeaders();
 
-/** Démarre le serveur ; port 0 = port libre choisi par le système. Renvoie le serveur http. */
-export function serve({ port = 8080, host = '127.0.0.1' } = {}) {
-  const server = createServer(handle);
+/**
+ * Démarre le serveur ; port 0 = port libre choisi par le système. Renvoie le serveur http.
+ * headers: false sert les fichiers sans les en-têtes de netlify.toml (comme un serveur statique simple).
+ */
+export function serve({ port = 8080, host = '127.0.0.1', headers = true } = {}) {
+  const server = createServer((req, res) => handle(req, res, headers));
   return new Promise((resolve) => server.listen(port, host, () => resolve(server)));
 }
 
-async function handle(req, res) {
+async function handle(req, res, withHeaders = true) {
   try {
     const url = new URL(req.url, 'http://localhost');
     const path = decodeURIComponent(url.pathname);
@@ -55,7 +58,7 @@ async function handle(req, res) {
     }
     if (!info) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Introuvable'); return; }
     const headers = { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' };
-    for (const r of rules) if (r.re.test(path)) Object.assign(headers, r.values);
+    if (withHeaders) for (const r of rules) if (r.re.test(path)) Object.assign(headers, r.values);
     headers['Cache-Control'] = 'no-cache';
     res.writeHead(200, headers);
     res.end(req.method === 'HEAD' ? undefined : await readFile(file));

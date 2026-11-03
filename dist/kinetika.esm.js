@@ -376,6 +376,7 @@ var state = {
   pauseOnHidden: true,
   lagSmoothing: { threshold: 250, adjusted: 33 },
   reducedMotion: "auto",
+  fps: Infinity,
   defaults: {
     duration: 1e3,
     delay: 0,
@@ -390,8 +391,13 @@ var state = {
   }
 };
 var inFrame = false;
+var running = () => active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden);
 function frame(t) {
   frameId = null;
+  if (state.fps !== Infinity && t - last < 1e3 / state.fps - 2) {
+    if (running()) frameId = raf(frame);
+    return;
+  }
   let dt = t - last;
   last = t;
   const lag = state.lagSmoothing;
@@ -402,7 +408,7 @@ function frame(t) {
     step(dt);
   } finally {
     inFrame = false;
-    if (frameId === null && active.length && !state.manual && !state.paused && !(hidden && state.pauseOnHidden)) frameId = raf(frame);
+    if (frameId === null && running()) frameId = raf(frame);
   }
 }
 function reportError(err) {
@@ -485,6 +491,14 @@ var engine = {
   /** Le mouvement réduit est-il actuellement en vigueur ? */
   get prefersReducedMotion() {
     return isReduced();
+  },
+  /** Cadence maximale en images par seconde (Infinity par défaut : celle de l'écran). */
+  get fps() {
+    return state.fps;
+  },
+  set fps(v) {
+    const n = +v;
+    state.fps = n > 0 ? n : Infinity;
   },
   /** Paramètres par défaut de toutes les animations. */
   get defaults() {
@@ -1075,6 +1089,7 @@ function resolveTargets(input, root = hasDOM ? document : null) {
       for (const x of v) visit(x);
       return;
     }
+    if (typeof v !== "object" && typeof v !== "function") return;
     add(v);
   };
   const add = (v) => {
@@ -1226,8 +1241,15 @@ var Playable = class {
       return this;
     }
     addActive(this);
-    this._render(this._time);
-    flush();
+    try {
+      this._render(this._time);
+    } catch (err) {
+      removeActive(this);
+      this._fail(err);
+      reportError(err);
+    } finally {
+      flush();
+    }
     return this;
   }
   resume() {
@@ -2555,8 +2577,8 @@ function typewriter(target, opts = {}) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   const el = resolveTargets(target)[0];
   if (!el) return animate({}, { duration: 0 });
-  const running = typers.get(el);
-  if (running) running.revert();
+  const running2 = typers.get(el);
+  if (running2) running2.revert();
   const original = el.innerHTML;
   const texts = isArr(opts.text) ? opts.text : [(_a = opts.text) != null ? _a : el.textContent];
   const cps = (_b = opts.speed) != null ? _b : 22;
