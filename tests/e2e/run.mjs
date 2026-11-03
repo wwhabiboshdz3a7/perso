@@ -101,6 +101,9 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
     await B.evaluate(() => window.jarvis.app.settings.set({ deviceName: 'Poste B' }));
     await A.waitForFunction(() => window.jarvis.state().peers.some((p) => p.name === 'Poste B'));
     await B.waitForFunction(() => window.jarvis.state().peers.some((p) => p.name === 'Poste A'));
+    // Machine de test chargée : le délai « photo reposée » ne doit pas
+    // interrompre un parcours qui attend le rendu logiciel.
+    for (const p of [A, B]) await p.evaluate(() => { window.jarvis.app.share.carryTimeout = 600000; });
     await stabiliser(A);
   });
 
@@ -110,17 +113,17 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
     const avantB = (await etat(B)).photos;
     const cibleA = await cible(A, '.photo:nth-child(2) .photo__btn');
     const nomVise = await A.textContent('.photo:nth-child(2) .photo__name');
+    await A.bringToFront();
     const lecture = geste(A, 'attraper', cibleA);
     await A.waitForFunction(() => window.jarvis.state().carry);
     assert.equal((await etat(A)).carry.name, nomVise, 'la photo visée est attrapée');
     await lecture;
     await A.waitForFunction(() => window.jarvis.state().carry?.prepared);
-    await capture(A, 'partage-A-en-main');
     // B voit la photo « en approche » et reçoit les données à l'avance.
     await B.waitForSelector('#incoming:not([hidden])');
     await B.waitForFunction(() => [...window.jarvis.app.share.incoming.values()].some((i) => i.ready));
-    await capture(B, 'partage-B-en-approche');
 
+    await B.bringToFront();
     await geste(B, 'lacher');
     await B.waitForFunction(() => window.jarvis.state().lastReceived);
     await A.waitForFunction(() => window.jarvis.state().lastSent);
@@ -147,6 +150,7 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
   it('lancer : poing qui s’ouvre en mouvement, la photo part directement vers B', async () => {
     const avantB = (await etat(B)).photos;
     const cibleA = await cible(A, '.photo:nth-child(3) .photo__btn');
+    await A.bringToFront();
     await geste(A, 'attraper', cibleA);
     await A.waitForFunction(() => window.jarvis.state().carry?.prepared);
     await geste(A, 'lancer', { dir: 'right' });
@@ -155,15 +159,22 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
     const envoi = (await etat(A)).lastSent;
     const recu = (await etat(B)).lastReceived;
     assert.equal(recu.hash, envoi.hash);
-    assert.match(await A.textContent('#log'), /photo lancée \(right\) vers Poste B/);
+    assert.match(await A.textContent('#log'), /photo lancée vers la droite → Poste B/);
+    assert.doesNotMatch(await A.textContent('#log'), /\b(right|left)\b/, 'journal en français');
     sansErreur(A, B);
   });
 
   it('ouvrir la main sur l’appareil émetteur repose la photo', async () => {
     const cibleA = await cible(A, '.photo:nth-child(4) .photo__btn');
+    await A.bringToFront();
     await geste(A, 'attraper', cibleA);
     await A.waitForFunction(() => window.jarvis.state().carry?.prepared);
     await B.waitForFunction(() => window.jarvis.state().incoming > 0);
+    // Captures prises ici, hors du parcours de transfert chronométré.
+    await capture(A, 'partage-A-en-main');
+    await B.bringToFront();
+    await capture(B, 'partage-B-en-approche');
+    await A.bringToFront();
     await geste(A, 'lacher');
     await A.waitForFunction(() => window.jarvis.state().carry === null);
     await B.waitForFunction(() => window.jarvis.state().incoming === 0);
@@ -179,6 +190,66 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
     await reponse(A, /Photo envoyée/);
     await B.waitForFunction((n) => window.jarvis.state().photos === n + 1, avantB);
     await A.keyboard.press('Escape');
+    sansErreur(A, B);
+  });
+
+  it('deux récepteurs lâchent en même temps : un seul reçoit la photo', async () => {
+    // Troisième fenêtre : mise au premier plan avant d'attendre son affichage
+    // (un onglet en arrière-plan ne dessine pas).
+    const C = await ouvrir(ctx, '/?rapide', { attendrePret: false });
+    try {
+      await C.bringToFront();
+      await pret(C);
+      await stabiliser(C);
+      await C.evaluate(() => window.jarvis.app.settings.set({ deviceName: 'Poste C' }));
+      await A.waitForFunction(() => window.jarvis.state().peers.length >= 2);
+      await C.waitForFunction(() => window.jarvis.state().peers.length >= 2);
+      const avant = { B: (await etat(B)).photos, C: (await etat(C)).photos };
+      await A.bringToFront();
+      await geste(A, 'attraper', await cible(A, '.photo:nth-child(2) .photo__btn'));
+      await A.waitForFunction(() => window.jarvis.state().carry?.prepared);
+      for (const P of [B, C]) await P.waitForFunction(() => [...window.jarvis.app.share.incoming.values()].some((i) => i.ready));
+      // Les deux appareils réclament la photo dans la même seconde.
+      await Promise.all([B.evaluate(() => window.jarvis.app.share.release()), C.evaluate(() => window.jarvis.app.share.release())]);
+      await A.waitForFunction(() => window.jarvis.state().lastSent && window.jarvis.state().carry === null);
+      await attendre(2500);
+      const gains = { B: (await etat(B)).photos - avant.B, C: (await etat(C)).photos - avant.C };
+      assert.equal(gains.B + gains.C, 1, `une seule réception (${JSON.stringify(gains)})`);
+      const perdant = gains.B ? C : B;
+      assert.equal((await etat(perdant)).incoming, 0, 'l’autre appareil n’attend plus la photo');
+      assert.match(await perdant.textContent('#toasts'), /déjà récupérée/);
+      sansErreur(A, B, C);
+    } finally {
+      await C.close();
+      await A.waitForFunction(() => window.jarvis.state().peers.length === 1);
+    }
+  });
+
+  it('réception validée : fichier non image, vignette piégée et dimensions forgées refusés', async () => {
+    const requetes = [];
+    const ecoute = (r) => { if (/pirate/.test(r.url())) requetes.push(r.url()); };
+    ctx.on('request', ecoute);
+    const avant = (await etat(A)).photos;
+    // B se comporte en pair malveillant : il annonce, envoie et « lance » un fichier texte.
+    await B.evaluate(async () => {
+      const P = await import('/js/core/protocol.js');
+      const t = window.jarvis.app.link.local;
+      const vers = [...t.peers.keys()][0];
+      const tid = 'tx-pirate-1';
+      const octets = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>');
+      t.sendCtrl(vers, { type: 'grab', tid, name: 'pirate', width: 'abc', height: '<b>x</b>', size: octets.length, from: 'Pirate', thumb: 'data:image/png;base64,AAAA"), url("/pirate-css.png' });
+      t.sendCtrl(vers, { type: 'file-begin', tid, size: octets.length, chunks: 1, hash: await P.sha256Hex(octets), name: 'pirate', width: 'abc', height: '<b>x</b>', mime: 'image/jpeg' });
+      await t.sendBin(vers, P.encodePacket({ t: 'chunk', tid, i: 0, n: 1 }, octets));
+      t.sendCtrl(vers, { type: 'file-end', tid });
+      t.sendCtrl(vers, { type: 'throw', tid, direction: 'right', from: 'Pirate' });
+      setTimeout(() => t.sendCtrl(vers, { type: 'granted', tid }), 200);
+    });
+    await A.waitForSelector('.toast >> text=Fichier refusé');
+    await attendre(800);
+    assert.equal((await etat(A)).photos, avant, 'aucun fichier non image dans la galerie');
+    assert.equal((await etat(A)).incoming, 0);
+    assert.deepEqual(requetes, [], 'la vignette piégée ne déclenche aucune requête');
+    ctx.off('request', ecoute);
     sansErreur(A, B);
   });
 });
@@ -309,6 +380,13 @@ describe('interface en simulation', () => {
     await capture(page, 'hologramme-reacteur');
     await page.click('[data-holo="globe"]');
     await page.click('#btnHoloReset');
+    // Perte du contexte WebGL : message, puis relance.
+    await page.evaluate(() => window.jarvis.app.holo.renderer.getContext().getExtension('WEBGL_lose_context').loseContext());
+    await page.waitForSelector('.holo-lost:not([hidden])');
+    await capture(page, 'hologramme-contexte-perdu');
+    await page.click('.holo-lost button');
+    await page.waitForFunction(() => !window.jarvis.app.holo.lost && window.jarvis.app.holo.running, null, { timeout: 30000 });
+    assert.equal(await page.isHidden('.holo-lost'), true);
     sansErreur(page);
   });
 
@@ -346,10 +424,20 @@ describe('interface en simulation', () => {
 
   it('« prends une capture » ajoute une photo avec cadre HUD ; « mode veille » puis réveil', async () => {
     const avant = (await etat(page)).photos;
+    // Sans caméra et hors démonstration : pas de fausse photo.
+    await commande(page, 'prends une capture');
+    await reponse(page, /Activez d’abord la caméra/);
+    await attendre(300);
+    assert.equal((await etat(page)).photos, avant, 'aucune capture sans caméra');
+    // En démonstration (main virtuelle), la capture simulée est permise et nommée comme telle.
+    await page.click('#btnMouseHand');
     await commande(page, 'prends une capture');
     await page.waitForFunction((n) => window.jarvis.state().photos === n + 1, avant);
-    assert.equal(await page.evaluate(() => window.jarvis.app.gallery.photos[0].source), 'capture');
-    // Même chose avec le geste « victoire ».
+    const vocale = await page.evaluate(() => window.jarvis.app.gallery.photos[0]);
+    assert.equal(vocale.source, 'capture');
+    assert.match(vocale.name, /^Capture simulée/);
+    await page.click('#btnMouseHand');
+    // Même chose avec le geste « victoire » (banc de simulation).
     await geste(page, 'victoire');
     await page.waitForFunction((n) => window.jarvis.state().photos === n + 2, avant);
     const cap = await page.evaluate(() => window.jarvis.app.gallery.photos[0]);
@@ -381,7 +469,7 @@ describe('interface en simulation', () => {
     await reponse(page, /^Oui/);
     await page.evaluate(() => window.__dire('ouvre la galerie'));
     await page.waitForFunction(() => window.jarvis.state().mode === 'galerie');
-    assert.match(await page.textContent('#log'), /« Jarvis, ouvre le mode dessin »/);
+    assert.match(await page.textContent('#log'), /«\u202fJarvis, ouvre le mode dessin\u202f»/);
     await page.click('#btnMic');
     await page.waitForFunction(() => !window.jarvis.app.assistant.listening);
     sansErreur(page);
@@ -442,6 +530,55 @@ describe('interface en simulation', () => {
     sansErreur(page);
   });
 
+  it('capteurs et squelette remis à zéro quand plus aucune image n’arrive', async () => {
+    await page.evaluate(() => { const app = window.jarvis.app; app.setMode('galerie'); app.gallery.close(); });
+    await geste(page, 'pincer', { x: 0.5, y: 0.5 });
+    await attendre(2600);
+    const st = await page.evaluate(() => ({
+      fps: document.querySelector('#sFps').textContent, mains: document.querySelector('#sHands').textContent,
+      pose: window.jarvis.state().pose, propre: window.jarvis.app.fx._clean,
+    }));
+    assert.deepEqual(st, { fps: '0', mains: '0', pose: null, propre: true });
+    const reste = await encre(page, '#fxCanvas');
+    if (reste) {
+      const diag = await page.evaluate(async () => {
+        const fx = window.jarvis.app.fx;
+        let n = 0;
+        await new Promise((r) => { const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 400) requestAnimationFrame(f); else r(); }; requestAnimationFrame(f); });
+        return { visible: document.visibilityState, raf: n, clean: fx._clean, shown: fx._ghostShown, parts: fx.particles.length, rings: fx.rings.length, result: fx.result?.hands?.length ?? null, taille: [fx.canvas.width, fx.canvas.height], transform: String(fx.ctx.getTransform()) };
+      });
+      assert.fail(`squelette résiduel (${reste}) : ${JSON.stringify(diag)} ; encre après 400 ms : ${await encre(page, '#fxCanvas')}`);
+    }
+    sansErreur(page);
+  });
+
+  it('import refusé si les horodatages sont aberrants ; lecture interruptible', async () => {
+    const json = await page.evaluate(async () => {
+      const { swipe } = await import('/js/core/sequences.js');
+      const f = swipe('left', { mirror: true }).frames.filter((x) => x.hands.length)[0];
+      return JSON.stringify({ name: 'Piégé', frames: [0, 1e9, 2e9].map((t) => ({ ...f, t })) });
+    });
+    await page.click('#btnSim');
+    await page.setInputFiles('#simImport', { name: 'piege.json', mimeType: 'application/json', buffer: Buffer.from(json) });
+    await page.waitForSelector('.toast >> text=Un geste dure 60 secondes au plus');
+    assert.equal(await page.locator('#simRecs li >> text=Piégé').count(), 0);
+    // Lecture longue (8 s) arrêtée par le bouton du banc.
+    const lecture = page.evaluate(async () => {
+      const { swipe } = await import('/js/core/sequences.js');
+      const f = swipe('left', { mirror: true }).frames.filter((x) => x.hands.length)[0];
+      const frames = Array.from({ length: 240 }, (_, i) => ({ ...f, t: i * 33 }));
+      return window.jarvis.sim.playFrames(frames);
+    });
+    await page.waitForSelector('#simStop:not([hidden])');
+    await page.click('#simStop');
+    await lecture;
+    assert.equal(await page.evaluate(() => window.jarvis.app.player.active), false);
+    assert.equal(await page.isHidden('#simStop'), true);
+    assert.equal(await page.evaluate(() => window.jarvis.app.pipeline.override), null, 'caméra et souris retrouvent la main');
+    await page.click('#simClose');
+    sansErreur(page);
+  });
+
   it('main virtuelle (souris) : clic maintenu = poing qui attrape, relâcher = reposer', async () => {
     // Point de départ connu : galerie affichée, visionneuse et banc fermés.
     await page.evaluate(() => { const app = window.jarvis.app; app.setMode('galerie'); app.gallery.close(); app.openSim(false); });
@@ -483,13 +620,41 @@ describe('liaison réseau PeerJS', () => {
     await page.waitForSelector('.toast >> text=Liaison réseau indisponible');
     assert.equal(await page.isVisible('#btnNetStart'), true, 'bouton « Réessayer » proposé');
     assert.match(await page.textContent('#btnNetStart'), /Réessayer/);
+    // L'état reste stable : pas de boucle de reconnexion, ni de code ou QR inutilisables.
+    await attendre(6000);
+    assert.equal(await page.evaluate(() => window.jarvis.app.link.net.state), 'error');
+    assert.equal(await page.isVisible('#btnNetStart'), true);
+    assert.equal(await page.isHidden('#linkCode'), true, 'pas de code ni de QR hors ligne');
     sansErreur(page);
+    await ctx.close();
+  });
+
+  it('serveur injoignable pour de vrai (port fermé) : un seul essai, « Réessayer » recrée la liaison', async (t) => {
+    const ctx = await contexteJetable(t);
+    await ctx.addInitScript((port) => {
+      if (!sessionStorage.getItem('init')) { localStorage.setItem('jarvis.reglages.v1', JSON.stringify({ peerHost: '127.0.0.1', peerPort: String(port), peerPath: '/', peerSecure: false, welcomed: true })); sessionStorage.setItem('init', '1'); }
+    }, PORT + 3);
+    const page = await ouvrir(ctx);
+    const etats = [];
+    await page.exposeFunction('__etat', (e) => etats.push(e));
+    await page.evaluate(() => window.jarvis.app.link.net.on('state', (e) => window.__etat(e)));
+    await page.click('#btnNetStart');
+    await page.waitForSelector('.toast >> text=Liaison réseau indisponible');
+    await attendre(8000);
+    assert.deepEqual(etats, ['connecting', 'error'], 'aucune reconnexion en boucle');
+    assert.equal(await page.isHidden('#linkCode'), true);
+    await page.click('#btnNetStart');
+    await page.waitForFunction(() => window.jarvis.app.link.net.state === 'error');
+    assert.deepEqual(etats, ['connecting', 'error', 'connecting', 'error'], '« Réessayer » relance une tentative');
+    const ws = page.erreurs.filter((e) => /WebSocket connection/.test(e));
+    assert.ok(ws.length <= 2, `une erreur de connexion par tentative (${ws.length})`);
+    sansErreur({ erreurs: page.erreurs.filter((e) => !/WebSocket connection/.test(e)) });
     await ctx.close();
   });
 
   it('transfert WebRTC réel entre deux navigateurs via un serveur PeerJS local (code + QR)', async (t) => {
     const portPeer = PORT + 1;
-    const srv = await demarrerPeerServer(portPeer);
+    let srv = await demarrerPeerServer(portPeer);
     if (!srv) { t.skip('module « peer » absent (JARVIS_NPM)'); return; }
     const reglages = { peerHost: '127.0.0.1', peerPort: String(portPeer), peerPath: '/', peerSecure: false, iceServers: '[]', welcomed: true };
     const ouvrirAppareil = async (nom) => {
@@ -515,6 +680,10 @@ describe('liaison réseau PeerJS', () => {
       await tel.p.waitForSelector('#linkNetState.is-ok');
       await tel.p.fill('#joinCode', code.toLowerCase());
       await tel.p.press('#joinCode', 'Enter');
+      // L'appareil appelé doit accepter la liaison.
+      await pc.p.waitForSelector('.toast--ask >> text=Téléphone veut se relier');
+      await tel.p.waitForSelector('#peers >> text=en attente d’accord');
+      await pc.p.click('.toast--ask >> text=Accepter');
       await pc.p.waitForFunction(() => window.jarvis.state().peers.some((x) => x.name === 'Téléphone' && x.via === 'réseau'));
       await tel.p.waitForFunction(() => window.jarvis.state().peers.some((x) => x.name === 'Ordinateur'));
       const avant = (await etat(pc.p)).photos;
@@ -526,6 +695,36 @@ describe('liaison réseau PeerJS', () => {
       await tel.p.waitForFunction(() => window.jarvis.state().lastSent?.verified);
       assert.equal((await etat(pc.p)).lastReceived.hash, (await etat(tel.p)).lastSent.hash);
       sansErreur(tel.p, pc.p);
+
+      // Serveur de signalisation coupé après l'appairage : une seule notification,
+      // la liaison directe continue, retour automatique quand le serveur revient.
+      const notes = async () => pc.p.evaluate(() => window.__notes);
+      await pc.p.evaluate(() => {
+        window.__notes = 0;
+        new MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) if (/Serveur de liaison perdu/.test(n.textContent)) window.__notes++; })
+          .observe(document.querySelector('#toasts'), { childList: true });
+      });
+      srv.kill();
+      await pc.p.waitForSelector('#linkNetState.is-busy');
+      await attendre(9000);
+      assert.equal(await notes(), 1, 'une seule notification pendant la coupure');
+      assert.ok((await etat(pc.p)).peers.some((x) => x.name === 'Téléphone'), 'la liaison directe continue');
+      srv = await demarrerPeerServer(portPeer);
+      await pc.p.waitForSelector('#linkNetState.is-ok', { timeout: 60000 });
+
+      // Code inexistant : pas d'entrée fantôme.
+      await pc.p.fill('#joinCode', 'ZZZ-ZZZ');
+      await pc.p.press('#joinCode', 'Enter');
+      await pc.p.waitForSelector('.toast >> text=Appareil introuvable', { timeout: 30000 });
+      await pc.p.waitForFunction(() => !document.querySelector('#peers').textContent.includes('Appareil distant'));
+
+      // Téléphone fermé brutalement (sans « au revoir ») : retiré grâce au battement.
+      await tel.p.evaluate(() => { const l = window.jarvis.app.link; l.net.stop = () => {}; l.local.stop = () => {}; });
+      const t0 = Date.now();
+      await tel.c.close();
+      await pc.p.waitForFunction(() => !window.jarvis.state().peers.some((x) => x.name === 'Téléphone'), null, { timeout: 45000 });
+      console.log(`# téléphone fermé retiré en ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+      sansErreur({ erreurs: pc.p.erreurs.filter((e) => !/WebSocket connection/.test(e)) });
     } finally {
       await tel.c.close();
       await pc.c.close();
@@ -627,6 +826,29 @@ describe('accueil, mobile et accessibilité', () => {
     const petites = await page.evaluate(() => [...document.querySelectorAll('.topbar button, .cmdbar button, .mode-tab')]
       .filter((b) => b.offsetParent).map((b) => b.getBoundingClientRect()).filter((r) => r.width < 32 || r.height < 32).length);
     assert.equal(petites, 0, 'cibles tactiles ≥ 32 px');
+    // En-tête sur deux lignes au plus : marque, pastilles et boutons, puis les modules.
+    const centres = await page.evaluate(() => [...document.querySelectorAll('.brand, .topbar__status, .topbar__actions')].map((n) => { const r = n.getBoundingClientRect(); return r.top + r.height / 2; }));
+    assert.ok(Math.max(...centres) - Math.min(...centres) < 16, `marque, pastilles et boutons sur une seule ligne (${centres.map(Math.round)})`);
+    // La réponse de JARVIS reste visible : bulle au-dessus de la barre de commande.
+    await commande(page, 'quelle heure est-il');
+    await page.waitForSelector('#cmdBubble:not([hidden])');
+    const bulle = await page.evaluate(() => { const r = document.querySelector('#cmdBubble').getBoundingClientRect(); return { haut: r.top, bas: r.bottom, texte: document.querySelector('#cmdBubble q').textContent }; });
+    assert.ok(bulle.haut >= 0 && bulle.bas <= 844, `bulle dans l’écran (${bulle.haut}–${bulle.bas})`);
+    assert.match(bulle.texte, /^Il est \d+ heures?/);
+    await capture(page, 'mobile-reponse');
+    // Réglages : la barre d'onglets garde sa hauteur dans chaque rubrique.
+    for (const tab of ['Gestes', 'Camera', 'Voix', 'Liaison', 'General']) {
+      await page.evaluate((x) => window.jarvis.app.openSettings(x), tab);
+      const h = await page.evaluate(() => document.querySelector('#dlgSettings .tabs').getBoundingClientRect().height);
+      assert.ok(h >= 40, `onglets lisibles dans ${tab} (${h} px)`);
+    }
+    await capture(page, 'mobile-reglages');
+    await page.keyboard.press('Escape');
+    // Outils de dessin dans l'écran.
+    await page.evaluate(() => window.jarvis.app.setMode('dessin'));
+    const horsEcran = await page.evaluate(() => [...document.querySelectorAll('.draw-acts .btn')].filter((b) => b.getBoundingClientRect().right > innerWidth).length);
+    assert.equal(horsEcran, 0, 'boutons de dessin dans l’écran');
+    await page.evaluate(() => window.jarvis.app.setMode('galerie'));
     const conf = await ouvrir(ctx, '/confidentialite.html', { attendrePret: false });
     assert.deepEqual(await conf.evaluate(() => [document.documentElement.scrollWidth, innerWidth]), [390, 390]);
     await capture(conf, 'mobile-confidentialite', { fullPage: true });
@@ -634,18 +856,121 @@ describe('accueil, mobile et accessibilité', () => {
     await ctx.close();
   });
 
-  it('accessibilité (axe-core) : aucune violation sérieuse', async (t) => {
+  it('accessibilité (axe-core) : aucune violation sérieuse, bureau et mobile, dialogues ouverts', async (t) => {
     const axe = facultatif('axe-core');
     if (!axe?.source) { t.skip('module « axe-core » absent (JARVIS_NPM)'); return; }
-    const ctx = await contexteJetable(t);
     const resultats = [];
-    for (const chemin of ['/?rapide', '/confidentialite.html']) {
-      const page = await ouvrir(ctx, chemin, { attendrePret: chemin !== '/confidentialite.html' });
+    const auditer = async (page, nom) => {
       await page.evaluate(axe.source);
-      const r = await page.evaluate(() => window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa'], resultTypes: ['violations'] }));
-      for (const v of r.violations) if (['serious', 'critical'].includes(v.impact)) resultats.push(`${chemin} · ${v.id} : ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);
+      const r = await page.evaluate(() => window.axe.run(document, { runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'], resultTypes: ['violations'] }));
+      for (const v of r.violations) if (['serious', 'critical'].includes(v.impact)) resultats.push(`${nom} · ${v.id} : ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);
+    };
+    for (const [taille, options] of [['bureau', {}], ['mobile', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }]]) {
+      const ctx = await contexteJetable(t, options);
+      const page = await ouvrir(ctx, '/?rapide');
+      await auditer(page, `${taille} galerie`);
+      await page.evaluate(() => window.jarvis.app.setMode('dessin'));
+      await auditer(page, `${taille} dessin`);
+      await page.evaluate(() => window.jarvis.app.setMode('galerie'));
+      await page.evaluate(() => window.jarvis.app.openSettings('Voix'));
+      await auditer(page, `${taille} réglages`);
+      await page.keyboard.press('Escape');
+      await page.evaluate(() => window.jarvis.app.openTutorial());
+      await auditer(page, `${taille} tutoriel`);
+      await page.keyboard.press('Escape');
+      const conf = await ouvrir(ctx, '/confidentialite.html', { attendrePret: false });
+      await auditer(conf, `${taille} confidentialité`);
+      await ctx.close();
     }
     assert.deepEqual(resultats, []);
-    await ctx.close();
+  });
+});
+
+// ——— 6. Démonstration tactile, plusieurs fenêtres ———————————————————————————
+
+describe('démonstration tactile et fenêtres multiples', () => {
+  it('au doigt : appui long sur A = attraper (la photo reste en main), appui long puis relâcher sur B = lâcher', async (t) => {
+    const ctx = await contexteJetable(t, { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+    const A = await ouvrir(ctx, '/?demo');
+    const B = await ouvrir(ctx, '/?demo');
+    await A.waitForFunction(() => window.jarvis.state().peers.length >= 1);
+    await B.waitForFunction(() => window.jarvis.state().peers.length >= 1);
+    const appuiLong = async (page, x, y, ms) => {
+      const cdp = await ctx.newCDPSession(page);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+      for (let i = 0; i < Math.ceil(ms / 60); i++) {
+        await attendre(60);
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + (i % 2) * 0.5, y }] });
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await cdp.detach();
+    };
+    const journal = (page) => page.evaluate(() => {
+      window.__ev = [];
+      window.jarvis.app.pipeline.on('event', ({ ev }) => window.__ev.push(ev.type));
+    });
+    await journal(A);
+    await journal(B);
+    await A.bringToFront();
+    await stabiliser(A);
+    const box = await A.locator('.photo:nth-child(2) .photo__img').boundingBox();
+    await appuiLong(A, box.x + box.width / 2, box.y + box.height / 2, 1400);
+    await A.waitForFunction(() => window.jarvis.state().carry?.prepared, null, { timeout: 30000 }).catch(async (e) => {
+      throw new Error(`${e.message}\névènements A : ${JSON.stringify(await A.evaluate(() => window.__ev))}`);
+    });
+    await attendre(1000);
+    assert.ok((await etat(A)).carry, 'doigt levé : la photo reste en main');
+    await B.bringToFront();
+    await stabiliser(B);
+    await B.waitForFunction(() => [...window.jarvis.app.share.incoming.values()].some((i) => i.ready));
+    const avant = (await etat(B)).photos;
+    await appuiLong(B, 195, 420, 1000);
+    await B.waitForFunction((n) => window.jarvis.state().photos === n + 1, avant, { timeout: 30000 }).catch(async (e) => {
+      throw new Error(`${e.message}\névènements B : ${JSON.stringify(await B.evaluate(() => window.__ev))}`);
+    });
+    await A.waitForFunction(() => window.jarvis.state().carry === null);
+    await capture(B, 'tactile-B-atterrie');
+    sansErreur(A, B);
+  });
+
+  it('réglages : chaque fenêtre garde les siens, rien n’est écrasé', async (t) => {
+    const ctx = await contexteJetable(t);
+    const A = await ouvrir(ctx);
+    const B = await ouvrir(ctx);
+    await A.evaluate(() => window.jarvis.app.settings.set({ deviceName: 'Salon', aiProvider: 'groq', aiBase: 'https://api.groq.com/openai/v1' }));
+    await B.evaluate(() => window.jarvis.app.settings.set({ deviceName: 'Bureau', volume: 0.3 }));
+    // B a reçu le cerveau IA choisi dans A ; A a reçu le volume réglé dans B.
+    await B.waitForFunction(() => window.jarvis.app.settings.get('aiProvider') === 'groq');
+    await A.waitForFunction(() => window.jarvis.app.settings.get('volume') === 0.3);
+    await A.reload();
+    await pret(A);
+    const a = await A.evaluate(() => ({ nom: window.jarvis.app.settings.get('deviceName'), ia: window.jarvis.app.settings.get('aiProvider'), vol: window.jarvis.app.settings.get('volume') }));
+    assert.deepEqual(a, { nom: 'Salon', ia: 'groq', vol: 0.3 });
+    assert.equal(await B.evaluate(() => window.jarvis.app.settings.get('deviceName')), 'Bureau');
+    sansErreur(A, B);
+  });
+
+  it('« Tout réinitialiser » avec une autre fenêtre ouverte : la galerie repart sans blocage', async (t) => {
+    const ctx = await contexteJetable(t);
+    const A = await ouvrir(ctx);
+    const B = await ouvrir(ctx);
+    A.on('dialog', (d) => d.accept());
+    await A.evaluate(() => window.jarvis.app.openSettings('General'));
+    // L'autre fenêtre libère la base et prévient l'utilisateur.
+    const avis = B.waitForFunction(() => /JARVIS réinitialisé ailleurs/.test(document.querySelector('#toasts').textContent), null, { timeout: 60000 });
+    await Promise.all([A.waitForEvent('load', { timeout: 60000 }), A.click('#btnResetAll')]);
+    await avis;
+    await pret(A);
+    assert.equal((await etat(A)).photos, 6, 'galerie de démonstration régénérée');
+    // L'import fonctionne aussitôt dans la fenêtre réinitialisée.
+    const png = await A.evaluate(async () => {
+      const c = document.createElement('canvas'); c.width = 64; c.height = 48;
+      c.getContext('2d').fillRect(0, 0, 10, 10);
+      const b = await new Promise((r) => c.toBlob(r, 'image/png'));
+      return [...new Uint8Array(await b.arrayBuffer())];
+    });
+    await A.setInputFiles('#fileInput', { name: 'apres-reset.png', mimeType: 'image/png', buffer: Buffer.from(png) });
+    await A.waitForFunction(() => window.jarvis.state().photos === 7, null, { timeout: 15000 });
+    sansErreur(A, B);
   });
 });

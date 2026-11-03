@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   encodePacket, decodePacket, chunkify, Assembler, sha256Hex, makeCode, normalizeCode, formatCode,
-  CODE_ALPHABET, validControl, formatBytes, CHUNK_SIZE,
+  CODE_ALPHABET, validControl, formatBytes, CHUNK_SIZE, validThumb, validDim, sniffImage,
 } from '../../js/core/protocol.js';
 
 test('paquet binaire : aller-retour en-tête + charge utile', () => {
@@ -76,4 +76,19 @@ test('tailles lisibles', () => {
   assert.equal(formatBytes(512), '512 o');
   assert.equal(formatBytes(2048), '2 Ko');
   assert.equal(formatBytes(1.5 * 1024 * 1024), '1,5 Mo');
+});
+
+test('réception : vignette, dimensions et type d’image validés strictement', () => {
+  assert.ok(validThumb('data:image/jpeg;base64,/9j/4AAQSkZJRg=='));
+  assert.ok(!validThumb('data:image/png;base64,AAAA"), url("/pirate.png'), 'pas d’injection CSS');
+  assert.ok(!validThumb('data:image/svg+xml;base64,PHN2Zz4='), 'pas de SVG');
+  assert.ok(!validThumb('javascript:alert(1)'));
+  assert.ok(!validThumb('data:image/jpeg;base64,' + 'A'.repeat(200_000)));
+  assert.equal(validDim(1600), 1600);
+  for (const v of ['abc', '<b>x</b>', 0, -3, 1.5, 1e9, NaN, null]) assert.equal(validDim(v), null, String(v));
+  assert.equal(sniffImage(new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0])), 'image/jpeg');
+  assert.equal(sniffImage(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0])), 'image/png');
+  assert.equal(sniffImage(new TextEncoder().encode('<svg onload="alert(1)"></svg>')), null);
+  assert.equal(sniffImage(new TextEncoder().encode('bonjour')), null);
+  assert.ok(validControl({ type: 'granted', tid: 'tx-1' }) && validControl({ type: 'denied', tid: 'tx-1' }));
 });

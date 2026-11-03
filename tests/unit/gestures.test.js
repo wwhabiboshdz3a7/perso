@@ -257,3 +257,15 @@ test('séquences : coordonnées valides et main absente en fin de séquence', ()
     }
   }
 });
+
+test('geste importé : horodatages croissants et durée bornée', () => {
+  const ok = S.swipe('left', { mirror: true }).frames;
+  assert.equal(S.sequenceProblem(ok), null, 'séquence synthétique jouable');
+  const hand = ok.find((f) => f.hands.length).hands[0];
+  const at = (t) => ({ t, width: 1280, height: 720, hands: [hand] });
+  assert.equal(S.sequenceProblem([at(0), at(1e9), at(2e9)]), 'durée', '23 jours refusés');
+  assert.equal(S.sequenceProblem([at(0), at(500), at(200)]), 'temps', 'horodatages décroissants refusés');
+  assert.equal(S.sequenceProblem([at(0), at(10)]), 'format', 'trop court');
+  assert.equal(S.sequenceProblem([at(0), at(10), { t: 20, hands: [{ landmarks: [] }] }]), 'format', 'main incomplète');
+  assert.equal(S.sequenceProblem([at(0), at(10), at(S.MAX_SEQUENCE_S * 1000)]), null, 'durée maximale acceptée');
+});

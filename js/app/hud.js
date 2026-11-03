@@ -263,8 +263,11 @@ export class FX {
     if (!ghostOn && !hasFx) {
       // Rien à montrer : le calque est vidé une fois (plus de squelette résiduel).
       if (!this._clean) {
-        const { w, h } = fitCanvas(this.canvas, 1.5);
-        ctx.clearRect(0, 0, w, h);
+        // Remise à zéro complète du tampon (réaffecter la largeur, même
+        // identique, vide le canevas) : un clearRect isolé peut rester sans
+        // effet visible quand le rendu graphique est très chargé.
+        const { w } = fitCanvas(this.canvas, 1.5);
+        this.canvas.width = w;
         this._clean = true;
       }
       this._dirty = false;

@@ -38,6 +38,21 @@ test('durées', () => {
   assert.equal(parseDuration('quatre-vingt-dix secondes'), 90);
   assert.equal(parseDuration('1,5 minute'), 90);
   assert.equal(parseDuration('ouvre la galerie'), 0);
+  // Nombres collés à leur unité.
+  assert.equal(parseDuration('timer 30s'), 30);
+  assert.equal(parseDuration('minuterie 5min'), 300);
+  assert.equal(parseDuration('minuterie de 2h'), 7200);
+  assert.equal(parseDuration('minuterie de un million d’heures'), 3600e6);
+});
+
+test('minuteries : article conservé, durée plafonnée', () => {
+  const t = parseCommand('minuterie de 5 minutes pour les pâtes');
+  assert.equal(t.intent, 'timer');
+  assert.equal(t.params.purpose, 'les pâtes');
+  assert.equal(t.params.label, 'pâtes');
+  assert.equal(parseCommand('timer 30s').params.seconds, 30);
+  assert.equal(parseCommand('minuterie pour cinq minutes').params.label, '', 'la durée n’est pas un libellé');
+  assert.equal(parseCommand('minuterie de un million d’heures').params.tooLong, true);
 });
 
 test('intentions principales du brief', () => {
@@ -91,9 +106,28 @@ test('les questions libres ne sont pas détournées vers une commande', () => {
     "j'aime le jazz, que me conseilles-tu d'écouter",
     'explique-moi la relativité générale simplement',
     'lance la musique de mon enfance et raconte une histoire',
+    'comment faire une capture d’écran sur Mac ?',
+    'à quelle heure ferme le Louvre ?',
+    'quelle est la température du soleil ?',
+    'peux-tu me donner la date de la révolution française ?',
+    'je suis là depuis 10 minutes, tu peux m’aider ?',
+    'comment régler le minuteur de mon four ?',
+    'le film dure pendant 2 heures, c’est long ?',
+    'mon plat favori, c’est les pâtes',
+    'quelle est la meilleure caméra pour filmer ?',
   ]) {
     assert.equal(intent(q), 'unknown', q);
   }
+});
+
+test('les formes polies et les questions explicites restent des commandes', () => {
+  assert.equal(intent('peux-tu prendre une capture'), 'capture');
+  assert.equal(intent('tu peux me dire quelle heure il est'), 'time');
+  assert.equal(intent('quelle est la météo à Toulouse demain'), 'weather');
+  assert.equal(parseCommand('quelle est la température à Paris ?').params.city, 'Paris');
+  assert.equal(parseCommand('va-t-il pleuvoir demain à Lille ?').params.city, 'Lille');
+  assert.equal(intent('rappelle-moi dans dix minutes'), 'timer');
+  assert.equal(intent('mets la photo en favori'), 'favorite');
 });
 
 test('ville de la météo : accents, tirets, mots de temps', () => {
