@@ -136,18 +136,105 @@ async function createTask(kind, delegate, onProgress) {
   return entry;
 }
 
+/** Convertit un résultat MediaPipe au format des images du pipeline. */
+function toHands(res) {
+  return (res.landmarks || []).map((lm, i) => {
+    const hd = (res.handedness || res.handednesses || [])[i]?.[0];
+    const g = res.gestures ? res.gestures[i] : null;
+    return {
+      landmarks: lm.map((p) => ({ x: p.x, y: p.y, z: p.z })),
+      handedness: hd?.categoryName || 'Right',
+      handednessScore: hd?.score ?? 1,
+      gestures: g ? g.slice(0, 2).map((c) => ({ categoryName: c.categoryName, score: c.score })) : undefined,
+    };
+  });
+}
+
+/**
+ * Inférence dans un worker : l'image est copiée (ImageBitmap transférée) et
+ * le fil principal reste libre pour l'interface, quelle que soit la latence.
+ */
+class WorkerEngine {
+  constructor() {
+    this.thread = 'worker';
+    this.worker = new Worker(new URL('./vision-worker.js', import.meta.url));
+    this.seq = 0;
+    this.pending = new Map();
+    this.onProgress = null;
+    this.worker.onmessage = ({ data: m }) => {
+      if (m.type === 'progress') { this.onProgress?.(m.progress); return; }
+      const p = this.pending.get(m.id);
+      if (!p) return;
+      this.pending.delete(m.id);
+      if (m.type === 'error') p.reject(new Error(m.message));
+      else p.resolve(m);
+    };
+    this.worker.onerror = (e) => {
+      e.preventDefault?.();
+      this.broken = true;
+      const err = new Error(e.message || 'Worker d’inférence indisponible');
+      for (const p of this.pending.values()) p.reject(err);
+      this.pending.clear();
+    };
+  }
+
+  _call(msg, transfer = []) {
+    if (this.broken) return Promise.reject(new Error('Worker d’inférence indisponible'));
+    const id = ++this.seq;
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, { resolve, reject });
+      this.worker.postMessage({ ...msg, id }, transfer);
+    });
+  }
+
+  async load(kind, delegate, onProgress) {
+    this.onProgress = onProgress;
+    const r = await this._call({ type: 'init', kind, delegate, wasmBase: WASM_BASE, modelUrl: MODEL_URLS[kind] });
+    this.kind = r.kind;
+    this.delegate = r.delegate;
+    return this;
+  }
+
+  async detect(video, ts) {
+    const bitmap = await createImageBitmap(video);
+    return this._call({ type: 'frame', bitmap, ts }, [bitmap]);
+  }
+
+  terminate() { this.worker.terminate(); }
+}
+
+/** Inférence sur le fil principal (repli si les workers ne conviennent pas). */
+class MainEngine {
+  constructor() { this.thread = 'principal'; }
+
+  async load(kind, delegate, onProgress) {
+    const entry = await createTask(kind, delegate, onProgress);
+    this.task = entry.task;
+    this.kind = entry.kind;
+    this.delegate = entry.delegate;
+    return this;
+  }
+
+  async detect(video, ts) {
+    const t0 = performance.now();
+    const res = this.kind === 'gesture' ? this.task.recognizeForVideo(video, ts) : this.task.detectForVideo(video, ts);
+    return { hands: toHands(res), inference: performance.now() - t0 };
+  }
+}
+
 export class CameraSource {
   constructor({ video, onFrame, onStatus }) {
     this.video = video;
     this.onFrame = onFrame;
     this.onStatus = onStatus || (() => {});
     this.stream = null;
-    this.entry = null;
+    this.engine = null;
     this.running = false;
+    this._gen = 0;
     this.throttleMs = 0;
     this.lastTs = 0;
     this.lastVideoTime = -1;
-    this.stats = { fps: 0, latency: 0, delegate: '—', width: 0, height: 0, model: '—' };
+    this.stats = { fps: 0, latency: 0, delegate: '—', width: 0, height: 0, model: '—', thread: '—' };
     this._frames = [];
     this._loop = this._loop.bind(this);
   }
@@ -185,16 +272,36 @@ export class CameraSource {
       this._preferCpu = true;
       this.onStatus({ phase: 'notice', message: 'Processeur graphique émulé : calcul sur le processeur.' });
     }
-    this.entry = await createTask(opts.model || 'gesture', delegate, (p) => this.onStatus({ phase: 'download', progress: p, message: 'Chargement du modèle optique…' }));
+    this.engine = await this._loadEngine(opts.model || 'gesture', delegate, (p) => this.onStatus({ phase: 'download', progress: p, message: 'Chargement du modèle optique…' }));
     this.startedAt = performance.now();
-    this._gpuEntry = null;
+    this._gpuLatency = null;
     this._decided = false;
-    this.stats.delegate = this.entry.delegate;
-    this.stats.model = this.entry.kind === 'gesture' ? 'gestes' : 'points';
+    this._busy = false;
+    this.stats.delegate = this.engine.delegate;
+    this.stats.model = this.engine.kind === 'gesture' ? 'gestes' : 'points';
+    this.stats.thread = this.engine.thread;
     this.running = true;
+    this._gen++;
     this.onStatus({ phase: 'running', message: 'Suivi actif' });
     this._schedule();
     return this.stream;
+  }
+
+  /** Worker d'abord ; fil principal si le worker ne peut pas démarrer. */
+  async _loadEngine(kind, delegate, onProgress) {
+    if (!this._mainOnly && typeof Worker !== 'undefined' && typeof createImageBitmap === 'function') {
+      try {
+        this._worker = this._worker && !this._worker.broken ? this._worker : new WorkerEngine();
+        return await this._worker.load(kind, delegate, onProgress);
+      } catch (err) {
+        console.info('[jarvis] inférence en worker indisponible, repli sur le fil principal :', err?.message || err);
+        this._worker?.terminate();
+        this._worker = null;
+        this._mainOnly = true;
+      }
+    }
+    this._main = this._main || new MainEngine();
+    return this._main.load(kind, delegate, onProgress);
   }
 
   _schedule() {
@@ -208,8 +315,9 @@ export class CameraSource {
     }
   }
 
-  _loop() {
-    if (!this.running) return;
+  async _loop() {
+    if (!this.running || this._busy) return;
+    const gen = this._gen;
     try {
       const v = this.video;
       if (v.readyState >= 2 && v.videoWidth && (this.throttleMs > 0 || v.currentTime !== this.lastVideoTime)) {
@@ -217,31 +325,21 @@ export class CameraSource {
         let ts = performance.now();
         if (ts <= this.lastTs) ts = this.lastTs + 0.01;
         this.lastTs = ts;
-        const t0 = performance.now();
-        const res = this.entry.kind === 'gesture'
-          ? this.entry.task.recognizeForVideo(v, ts)
-          : this.entry.task.detectForVideo(v, ts);
-        const latency = performance.now() - t0;
-        this._measure(ts, latency);
+        this._busy = true;
+        const { hands } = await this.engine.detect(v, ts);
+        if (!this.running || gen !== this._gen) return;
+        this._measure(ts, performance.now() - ts);
         this._checkDelegate();
         this.stats.width = v.videoWidth;
         this.stats.height = v.videoHeight;
-        const hands = (res.landmarks || []).map((lm, i) => {
-          const hd = (res.handedness || res.handednesses || [])[i]?.[0];
-          const g = res.gestures ? res.gestures[i] : null;
-          return {
-            landmarks: lm.map((p) => ({ x: p.x, y: p.y, z: p.z })),
-            handedness: hd?.categoryName || 'Right',
-            handednessScore: hd?.score ?? 1,
-            gestures: g ? g.slice(0, 2).map((c) => ({ categoryName: c.categoryName, score: c.score })) : undefined,
-          };
-        });
         this.onFrame({ t: ts, width: v.videoWidth, height: v.videoHeight, hands, source: 'camera' });
       }
     } catch (err) {
-      console.warn('[jarvis] inférence :', err);
+      if (this.running && gen === this._gen) console.warn('[jarvis] inférence :', err);
+    } finally {
+      if (gen === this._gen) this._busy = false;
     }
-    this._schedule();
+    if (gen === this._gen) this._schedule();
   }
 
   _measure(ts, latency) {
@@ -258,28 +356,24 @@ export class CameraSource {
   _checkDelegate() {
     if (this._switching || this._decided) return;
     const now = performance.now();
-    if (this.entry.delegate === 'GPU' && !this._gpuEntry) {
-      if (now - this.startedAt < 3000 || this._frames.length < 3 || this.stats.latency < 140) return;
-      this._gpuEntry = this.entry;
-      this._gpuLatency = this.stats.latency;
+    const kind = this.engine.kind;
+    const swap = (delegate, then) => {
       this._switching = true;
-      createTask(this.entry.kind, 'CPU')
-        .then((entry) => {
-          if (!this.running) return;
-          this.entry = entry;
-          this.stats.delegate = entry.delegate;
-          this.stats.latency = 0;
-          this._cpuSince = performance.now();
-        })
-        .catch((err) => { this._decided = true; console.warn('[jarvis] repli CPU :', err); })
+      this.engine.load(kind, delegate)
+        .then(() => { if (this.running) { this.stats.delegate = this.engine.delegate; then?.(); } })
+        .catch((err) => { this._decided = true; console.warn('[jarvis] changement de délégué :', err); })
         .finally(() => { this._switching = false; });
+    };
+    if (this.engine.delegate === 'GPU' && this._gpuLatency === null) {
+      if (now - this.startedAt < 3000 || this._frames.length < 3 || this.stats.latency < 140) return;
+      this._gpuLatency = this.stats.latency;
+      swap('CPU', () => { this.stats.latency = 0; this._cpuSince = performance.now(); });
       return;
     }
-    if (this._gpuEntry && this.entry.delegate === 'CPU' && now - this._cpuSince > 2500) {
+    if (this._gpuLatency !== null && this.engine.delegate === 'CPU' && now - this._cpuSince > 2500) {
       this._decided = true;
       if (this.stats.latency > this._gpuLatency) {
-        this.entry = this._gpuEntry;
-        this.stats.delegate = 'GPU';
+        swap('GPU');
       } else {
         this._preferCpu = true;
         this.onStatus({ phase: 'delegate', delegate: 'CPU', message: 'Calcul basculé sur le processeur, plus rapide sur cet appareil.' });
@@ -299,6 +393,8 @@ export class CameraSource {
 
   stop() {
     this.running = false;
+    this._gen++;
+    this._busy = false;
     clearTimeout(this._timer);
     if (this._rvfc && this.video.cancelVideoFrameCallback) this.video.cancelVideoFrameCallback(this._rvfc);
     cancelAnimationFrame(this._raf);

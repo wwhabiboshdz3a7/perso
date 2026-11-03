@@ -66,6 +66,7 @@ js/core/                   Cœur pur, sans DOM, testé avec node --test
 js/app/                    Interface
   main.js                  Assemblage, routage des gestes, modes, caméra, simulation
   tracker.js               Caméra + MediaPipe (GPU avec repli CPU, mode léger 640×480)
+  vision-worker.js         Inférence MediaPipe dans un worker (repli sur le fil principal)
   pipeline.js              Bus unique caméra / simulation / main virtuelle → moteur
   sources.js               Rejoueur de séquences, main virtuelle (souris), enregistreur
   cursor.js                Curseur aérien
@@ -77,7 +78,7 @@ js/app/                    Interface
   hud.js · ui.js · sound.js · weather.js · timers.js · capture.js · sleep.js
   tutorial.js · settings-ui.js · store.js · db.js · dom.js · demo-images.js
 models/                    gesture_recognizer.task, hand_landmarker.task (auto-hébergés)
-vendor/                    MediaPipe Tasks Vision 1.1.1 (+ wasm), Three.js r186, PeerJS 1.5.5,
+vendor/                    MediaPipe Tasks Vision 1.1.1 (ESM + IIFE pour le worker, wasm), Three.js r186, PeerJS 1.5.5,
                            qrcode-generator 2.0.4, polices Chakra Petch et JetBrains Mono
 tests/unit/                Tests du cœur (node --test)
 tests/e2e/                 Tests de bout en bout Playwright (fausse caméra, deux pages…)
@@ -142,6 +143,7 @@ La clé n’est envoyée qu’au point d’accès choisi ; sans mémorisation, e
 - **Safari** (macOS, iOS 16.4+) : gestes, partage, hologramme ; reconnaissance vocale selon la version.
 - **Firefox** : gestes, partage, hologramme ; pas de reconnaissance vocale, la barre de commande au clavier prend le relais.
 - Sur mobile, la qualité automatique passe en 640×480 ; elle bascule aussi seule en mode léger si le suivi descend sous 12 images/s.
+- L’analyse des images tourne dans un worker : l’interface reste fluide même quand le suivi est lent. Si le navigateur ne le permet pas, elle repasse automatiquement sur le fil principal.
 
 ---
 
