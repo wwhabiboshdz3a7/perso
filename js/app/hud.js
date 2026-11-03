@@ -52,7 +52,7 @@ export class HUD {
     this.video = $('#camVideo');
     this.fpsHist = new Array(48).fill(0);
     this.el = {
-      fps: $('#sFps'), hands: $('#sHands'), handsIcons: [...$('#sHandsIcons').children], latency: $('#sLatency'),
+      fps: $('#sFps'), hands: $('#sHands'), handsIcons: [...$('#sHandsIcons').children], latency: $('#sLatency'), latencyUnit: $('#sLatencyUnit'),
       pose: $('#sPose'), model: $('#sModel'), pinch: $('#sPinch'), source: $('#sensSource'), spark: $('#sFpsSpark'),
       tag: $('#opticTag'), meta: $('#optMeta'), optic: $('#optic'),
     };
@@ -106,7 +106,12 @@ export class HUD {
       ctx.save();
       ctx.font = `${10 * dpr}px "JetBrains Mono", monospace`;
       ctx.fillStyle = color;
-      ctx.fillText(`${hand.side === 'Right' ? 'D' : 'G'} · ${(POSE_LABELS[hand.pose] || hand.pose).toUpperCase()}`, wrist.x + 8 * dpr, wrist.y + 14 * dpr);
+      // Étiquette gardée dans le cadre, quelle que soit la position de la main.
+      const label = `${hand.side === 'Right' ? 'D' : 'G'} · ${(POSE_LABELS[hand.pose] || hand.pose).toUpperCase()}`;
+      const lw = ctx.measureText(label).width;
+      const lx = Math.max(4 * dpr, Math.min(w - lw - 4 * dpr, wrist.x + 8 * dpr));
+      const ly = Math.max(12 * dpr, Math.min(h - 4 * dpr, wrist.y + 14 * dpr));
+      ctx.fillText(label, lx, ly);
       ctx.restore();
       if (hand.pinching) {
         const p4 = map(hand.landmarks[4]), p8 = map(hand.landmarks[8]);
@@ -118,6 +123,17 @@ export class HUD {
       }
       void i;
     });
+  }
+
+  /** Latence lisible : 0,4 ms · 38,2 ms · 412 ms · 2,4 s (cinq caractères au plus). */
+  _latency(ms) {
+    let text = '—', unit = 'ms';
+    if (ms > 0) {
+      if (ms >= 1000) { text = (ms / 1000).toFixed(ms >= 10000 ? 0 : 1); unit = 's'; }
+      else text = ms >= 100 ? ms.toFixed(0) : Math.max(0.1, ms).toFixed(1);
+    }
+    this.el.latency.textContent = text.replace('.', ',');
+    this.el.latencyUnit.textContent = unit;
   }
 
   updateSensors(result, frame) {
@@ -138,11 +154,11 @@ export class HUD {
     // Source simulée sans caméra : l'aperçu montre la main, les boutons passent en haut.
     this.el.optic.classList.toggle('is-sim', src !== 'camera' && !cam?.active && n > 0);
     if (src === 'camera' && cam?.active) {
-      this.el.latency.textContent = cam.stats.latency ? cam.stats.latency.toFixed(1).replace('.', ',') : '—';
+      this._latency(cam.stats.latency ? cam.stats.latency + pipe.engineMs : 0);
       this.el.source.textContent = `caméra · ${cam.stats.delegate}`;
       this.el.tag.textContent = `${cam.stats.width}×${cam.stats.height} · ${cam.stats.delegate} · ${cam.stats.model}`;
     } else {
-      this.el.latency.textContent = '0,1';
+      this._latency(pipe.engineMs);
       this.el.source.textContent = src === 'souris' ? 'main virtuelle' : 'simulation';
       this.el.tag.textContent = src === 'souris' ? 'main virtuelle · souris' : 'banc de simulation';
     }

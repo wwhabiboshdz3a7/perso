@@ -14,6 +14,7 @@ export class Pipeline extends Emitter {
     this.lastFrame = null;
     this.frames = [];
     this.fps = 0;
+    this.engineMs = 0; // temps moyen du moteur de gestes par image
     this.paused = false;
   }
 
@@ -32,7 +33,10 @@ export class Pipeline extends Emitter {
       return;
     }
     if (this.paused) return;
+    const t0 = performance.now();
     const result = this.engine.update(frame);
+    const cost = performance.now() - t0;
+    this.engineMs = this.engineMs ? this.engineMs * 0.9 + cost * 0.1 : cost;
     this.lastFrame = frame;
     this.lastResult = result;
     const now = performance.now();

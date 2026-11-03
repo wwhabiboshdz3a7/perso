@@ -59,7 +59,7 @@ function loadFileset(wasmBase, onProgress) {
 
 async function createTask({ kind, delegate, wasmBase, modelUrl }) {
   const key = `${kind}:${delegate}`;
-  if (tasks.has(key)) return tasks.get(key);
+  if (tasks.has(key)) { postMessage({ type: 'progress', progress: 1 }); return tasks.get(key); }
   const prog = { wasm: 0, model: 0 };
   const report = () => postMessage({ type: 'progress', progress: prog.wasm * 0.6 + prog.model * 0.4 });
   const [fileset, model] = await Promise.all([

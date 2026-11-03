@@ -98,7 +98,7 @@ async function loadFileset(onProgress) {
 
 async function createTask(kind, delegate, onProgress) {
   const key = `${kind}:${delegate}`;
-  if (taskCache.has(key)) return taskCache.get(key);
+  if (taskCache.has(key)) { onProgress?.(1); return taskCache.get(key); }
   const prog = { wasm: 0, model: 0 };
   const report = () => onProgress?.(prog.wasm * 0.6 + prog.model * 0.4);
   const [fileset, model] = await Promise.all([
@@ -304,8 +304,17 @@ export class CameraSource {
     return this._main.load(kind, delegate, onProgress);
   }
 
+  /** Une seule demande d'image en attente à la fois. */
+  _cancel() {
+    clearTimeout(this._timer);
+    if (this._rvfc && this.video.cancelVideoFrameCallback) this.video.cancelVideoFrameCallback(this._rvfc);
+    cancelAnimationFrame(this._raf);
+    this._timer = this._rvfc = this._raf = 0;
+  }
+
   _schedule() {
     if (!this.running) return;
+    this._cancel();
     if (this.throttleMs > 0) {
       this._timer = setTimeout(this._loop, this.throttleMs);
     } else if (this.video.requestVideoFrameCallback) {
@@ -316,6 +325,7 @@ export class CameraSource {
   }
 
   async _loop() {
+    // Image précédente encore en cours d'analyse : elle relancera la boucle.
     if (!this.running || this._busy) return;
     const gen = this._gen;
     try {
@@ -383,21 +393,14 @@ export class CameraSource {
 
   setThrottle(ms) {
     this.throttleMs = ms;
-    if (this.running) {
-      clearTimeout(this._timer);
-      if (this._rvfc && this.video.cancelVideoFrameCallback) this.video.cancelVideoFrameCallback(this._rvfc);
-      cancelAnimationFrame(this._raf);
-      this._schedule();
-    }
+    if (this.running && !this._busy) this._schedule();
   }
 
   stop() {
     this.running = false;
     this._gen++;
     this._busy = false;
-    clearTimeout(this._timer);
-    if (this._rvfc && this.video.cancelVideoFrameCallback) this.video.cancelVideoFrameCallback(this._rvfc);
-    cancelAnimationFrame(this._raf);
+    this._cancel();
     if (this.stream) for (const tr of this.stream.getTracks()) tr.stop();
     this.stream = null;
     this.video.srcObject = null;
