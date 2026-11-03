@@ -72,6 +72,7 @@ export class GestureEngine {
     this.twoHand = null;
     this.twoIndex = { since: null, fired: false };
     this.lastT = null;
+    this.frameDt = 0;
     this.aspect = 4 / 3;
   }
 
@@ -84,7 +85,11 @@ export class GestureEngine {
     const t = frame.t;
     const aspect = frame.width && frame.height ? frame.width / frame.height : frame.aspect || this.aspect;
     this.aspect = aspect;
+    // Intervalle moyen entre deux images : la tolérance de perte s'y adapte.
+    const gap = this.lastT === null ? 0 : t - this.lastT;
+    if (gap > 0 && gap < 2000) this.frameDt = this.frameDt ? this.frameDt * 0.8 + gap * 0.2 : gap;
     this.lastT = t;
+    const lostMs = Math.max(o.lostMs, this.frameDt * 2.5);
     const events = [];
 
     const inputs = (frame.hands || [])
@@ -130,7 +135,7 @@ export class GestureEngine {
     // Pistes non vues : perdues après un délai (les micro-coupures sont tolérées).
     this.tracks = this.tracks.filter((tr) => {
       if (tr.lastSeen === t) return true;
-      if (t - tr.lastSeen > o.lostMs) {
+      if (t - tr.lastSeen > lostMs) {
         if (tr.pinching) events.push(this._evt('pinchend', tr, { duration: t - tr.pinchStart.t, moved: 0, cancelled: true }));
         events.push(this._evt('handlost', tr, { closed: tr.stable === 'fist' }));
         if (this.primaryId === tr.id) this.primaryId = null;
@@ -340,7 +345,11 @@ export class GestureEngine {
     if (from === 'fist') {
       tr.fistEndedAt = tr.candSince;
     }
-    if (to === 'open' && t - tr.fistEndedAt <= o.releaseWindowMs + o.poseDebounceMs) {
+    // Lâcher : la main ouverte a commencé moins de releaseWindowMs après la fin
+    // du poing. On compare le début de la nouvelle pose (et non l'instant où elle
+    // devient stable) : à faible cadence (2-3 images/s sur un appareil modeste),
+    // l'anti-rebond dure une image entière et ne doit pas faire manquer le geste.
+    if (to === 'open' && tr.candSince - tr.fistEndedAt <= o.releaseWindowMs) {
       tr.fistEndedAt = -Infinity;
       const v = this._velocity(tr, Math.min(tr.candSince, t - o.throwWindowMs) - 60, t);
       const speed = Math.hypot(v.vx, v.vy);

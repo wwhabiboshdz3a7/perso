@@ -47,6 +47,15 @@ for (const model of [true, false]) {
     assert.equal(of(events, 'throw').length, 0);
   });
 
+  test(`cadence faible (2 et 3 images/s) : attraper et lâcher restent détectés (${mode})`, () => {
+    for (const fps of [2, 3]) {
+      assert.equal(of(run(S.grabAt(0.4, 0.45, { model, fps })).events, 'grab').length, 1, `attraper à ${fps} images/s`);
+      const rel = of(run(S.releaseAt(0.6, 0.5, { model, fps })).events, 'release');
+      assert.equal(rel.length, 1, `lâcher à ${fps} images/s`);
+      assert.equal(rel[0].thrown, false, 'une main immobile ne lance pas');
+    }
+  });
+
   test(`lancer vers la droite et vers la gauche (${mode})`, () => {
     for (const dir of ['right', 'left', 'up']) {
       const { events } = run(S.throwToward(dir, { model }));
@@ -195,6 +204,21 @@ test('perte de main tolérée brièvement puis signalée', () => {
   assert.equal(of(ev, 'handfound').length, 1, 'même piste conservée');
   for (let i = 0; i < 12; i++) ev.push(...engine.update({ t: (t += 33), width: 1280, height: 720, hands: [] }).events);
   assert.equal(of(ev, 'handlost').length, 1);
+});
+
+test('cadence faible : une image manquée à 3 images/s n’est pas une perte de main', () => {
+  const engine = new GestureEngine({ lostMs: 320 });
+  const lm = renderHand('open', { x: 0.5, y: 0.5, aspect: 16 / 9 });
+  const ev = [];
+  const hand = [{ landmarks: lm, handedness: 'Left' }];
+  let t = 0;
+  for (let i = 0; i < 6; i++) ev.push(...engine.update({ t: (t += 333), width: 1280, height: 720, hands: hand }).events);
+  ev.push(...engine.update({ t: (t += 333), width: 1280, height: 720, hands: [] }).events);
+  ev.push(...engine.update({ t: (t += 333), width: 1280, height: 720, hands: hand }).events);
+  assert.equal(of(ev, 'handlost').length, 0, 'une image vide isolée est tolérée');
+  assert.equal(of(ev, 'handfound').length, 1, 'même piste conservée');
+  for (let i = 0; i < 4; i++) ev.push(...engine.update({ t: (t += 333), width: 1280, height: 720, hands: [] }).events);
+  assert.equal(of(ev, 'handlost').length, 1, 'perte signalée ensuite');
 });
 
 test('miroir : un swipe vers la droite à l’écran est vers la gauche dans l’image brute', () => {

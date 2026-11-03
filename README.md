@@ -21,7 +21,7 @@ Site **100 % statique** (aucune commande de build), publiable tel quel sur Netli
 | **Captures** | Geste *victoire* (ou « prends une capture ») : compte à rebours, photo webcam avec cadre HUD, ajoutée à la galerie. |
 | **HUD** | Démarrage court et passable (Échap), horloge, météo (Open-Meteo), capteurs (images/s, mains, latence, geste et score du modèle), journal, minuteries, notifications, sons synthétisés en WebAudio (aucun fichier), squelette des mains en miroir sur l’aperçu et en fantôme plein écran, veille. |
 | **Accueil, tutoriel, calibration** | Explication avant toute demande de caméra ou de micro, tutoriel animé de chaque geste (mains en SVG), calibration du pincement et du poing, main dominante, miroir, sensibilité, lissage, anti-rebond. Page [confidentialité](confidentialite.html). |
-| **Mode simulation** | Banc qui rejoue des gestes synthétiques ou **enregistrés depuis la vraie caméra** (« Enregistrer un geste », export/import JSON) à travers le **même pipeline** que la caméra. **Main virtuelle** : la souris devient une main (clic bref = pincement, clic maintenu = poing, relâcher = main ouverte). |
+| **Mode simulation** | Banc qui rejoue des gestes synthétiques ou **enregistrés depuis la vraie caméra** (« Enregistrer un geste », export/import JSON) à travers le **même pipeline** que la caméra. **Main virtuelle** : la souris, ou le doigt sur écran tactile, devient une main (clic bref = pincement, appui maintenu = poing, relâcher = main ouverte). |
 
 ### Gestes
 
@@ -144,6 +144,7 @@ La clé n’est envoyée qu’au point d’accès choisi ; sans mémorisation, e
 - **Firefox** : gestes, partage, hologramme ; pas de reconnaissance vocale, la barre de commande au clavier prend le relais.
 - Sur mobile, la qualité automatique passe en 640×480 ; elle bascule aussi seule en mode léger si le suivi descend sous 12 images/s.
 - L’analyse des images tourne dans un worker : l’interface reste fluide même quand le suivi est lent. Si le navigateur ne le permet pas, elle repasse automatiquement sur le fil principal.
+- Le moteur de gestes s’adapte à la cadence réelle : attraper, lâcher et la tolérance de perte de main restent fiables jusqu’à 2–3 images/s sur un appareil modeste.
 
 ---
 
@@ -173,7 +174,7 @@ Les services externes (Open-Meteo, serveur cloud PeerJS, API d’IA) sont simul�
 | `JARVIS_CAPTURES` | dossier des captures d’écran (défaut : dossier temporaire du système) |
 | `JARVIS_NPM` | dossier `node_modules` contenant `playwright`, `peer` et `axe-core` (les deux derniers sont facultatifs : sans eux, les tests correspondants sont ignorés) |
 
-Pour une démonstration sans caméra : ouvrir `/?demo` (main virtuelle + banc de simulation) dans deux fenêtres du même navigateur. Dans la première, maintenez le clic sur une photo (poing : elle est attrapée) ; dans la seconde, maintenez puis relâchez le clic (la main s’ouvre) : la photo y atterrit.
+Pour une démonstration sans caméra : ouvrir `/?demo` (main virtuelle + banc de simulation ; sur écran tactile, le banc s’ouvre avec le bouton fiole) dans deux fenêtres du même navigateur. Dans la première, maintenez le clic sur une photo (poing : elle est attrapée) ; dans la seconde, maintenez puis relâchez le clic (la main s’ouvre) : la photo y atterrit.
 
 `window.jarvis` expose une petite console : `jarvis.state()`, `jarvis.sim.play('attraper')`, `jarvis.command('météo à Lyon')`…
 
