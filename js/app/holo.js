@@ -32,7 +32,7 @@ export class Holo {
   async init() {
     if (this.ready || this.failed) return this.ready;
     try {
-      const THREE = await import('../../vendor/three/three.module.js');
+      const THREE = await import('../../vendor/three/three.module.min.js');
       this.THREE = THREE;
       const renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
       // Contexte graphique perdu (onglet en arrière-plan sur mobile, mémoire,
