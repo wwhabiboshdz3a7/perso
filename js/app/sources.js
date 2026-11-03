@@ -182,10 +182,15 @@ export class MouseHand {
     this._raf = requestAnimationFrame(this._tick);
     if (!this.isActive()) return;
     const now = performance.now();
+    // Cadence d'une caméra (30 images/s), pas celle de l'écran.
+    if (now - (this._last || 0) < 31) return;
+    this._last = now;
     if (!this.pos || !this.inside) {
-      this.onFrame({ t: now, width: 1280, height: 720, hands: [], source: 'souris' });
+      // Quelques images vides suffisent pour que le moteur constate l'absence de main.
+      if (now - (this._goneAt ??= now) < 1000) this.onFrame({ t: now, width: 1280, height: 720, hands: [], source: 'souris' });
       return;
     }
+    this._goneAt = null;
     const want = this._desiredPose(now);
     if (want !== this.pose) { this.from = this._currentBlend(now); this.pose = want; this.blendStart = now; }
     const pose = this._currentBlend(now);

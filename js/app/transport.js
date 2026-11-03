@@ -179,18 +179,23 @@ class NetTransport extends Emitter {
   _setup(conn, outgoing = false) {
     const id = conn.peer;
     this.conns.set(id, conn);
-    this.emit('peer', { id, state: 'connecting', hello: conn.metadata?.hello || {} });
+    // Les métadonnées d'une connexion sortante sont NOS informations : côté
+    // appelant, l'appareil n'est annoncé qu'à réception de son « hello »
+    // (envoyé dès l'ouverture), pour l'afficher tout de suite sous son nom.
+    let helloWait = 0;
+    this.emit('peer', { id, state: 'connecting', hello: outgoing ? {} : conn.metadata?.hello || {} });
     conn.on('open', () => {
       if (conn.dataChannel) conn.dataChannel.bufferedAmountLowThreshold = 1 << 20;
-      this.emit('peer', { id, state: 'open', hello: conn.metadata?.hello || {} });
       conn.send(JSON.stringify({ type: 'hello', hello: this.getHello() }));
+      if (!outgoing) this.emit('peer', { id, state: 'open', hello: conn.metadata?.hello || {} });
+      else helloWait = setTimeout(() => this.emit('peer', { id, state: 'open', hello: {} }), 4000);
     });
     conn.on('data', (data) => {
       if (typeof data === 'string') {
         let msg;
         try { msg = JSON.parse(data); } catch { return; }
         if (!validControl(msg)) return;
-        if (msg.type === 'hello') { this.emit('peer', { id, state: 'open', hello: msg.hello || {} }); return; }
+        if (msg.type === 'hello') { clearTimeout(helloWait); this.emit('peer', { id, state: 'open', hello: msg.hello || {} }); return; }
         this.emit('ctrl', { id, msg });
       } else if (data instanceof ArrayBuffer) {
         this.emit('bin', { id, buf: data });
@@ -201,13 +206,13 @@ class NetTransport extends Emitter {
       }
     });
     const gone = () => {
+      clearTimeout(helloWait);
       if (this.conns.get(id) !== conn) return;
       this.conns.delete(id);
       this.emit('peer', { id, state: 'gone' });
     };
     conn.on('close', gone);
     conn.on('error', gone);
-    void outgoing;
   }
 
   sendCtrl(id, msg) {

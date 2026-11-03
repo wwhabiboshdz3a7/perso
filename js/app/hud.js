@@ -225,9 +225,13 @@ export class FX {
     requestAnimationFrame(this._loop);
     const dt = Math.min(0.05, (now - (this._t || now)) / 1000);
     this._t = now;
-    const ghostOn = this.app.settings.get('ghost') && this.result && this.result.hands.length && now - this.resultAt < 400;
-    if (!this._dirty && !ghostOn && !this.particles.length && !this.rings.length) return;
+    const ghostOn = !!(this.app.settings.get('ghost') && this.result && this.result.hands.length && now - this.resultAt < 400);
+    // On ne redessine que si quelque chose a changé : nouvelle image de suivi,
+    // effets en cours, ou squelette fantôme à effacer.
+    const fading = this._ghostShown && !ghostOn;
+    if (!this._dirty && !fading && !this.particles.length && !this.rings.length) return;
     this._dirty = false;
+    this._ghostShown = ghostOn;
     const { w, h, dpr } = fitCanvas(this.canvas, 1.5);
     const ctx = this.ctx;
     ctx.clearRect(0, 0, w, h);

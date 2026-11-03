@@ -450,7 +450,10 @@ class App {
 
   exportSequence(s) {
     const blob = new Blob([JSON.stringify({ format: 'jarvis-geste', version: 1, name: s.name, frames: s.frames })], { type: 'application/json' });
-    const a = el('a', { href: URL.createObjectURL(blob), download: `${s.name.replace(/[^\p{L}\d]+/gu, '-').toLowerCase()}.json` });
+    // Nom de fichier en ASCII : certains systèmes refusent les accents et
+    // remplacent alors le nom par « download ».
+    const base = s.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'geste';
+    const a = el('a', { href: URL.createObjectURL(blob), download: `${base}.json` });
     document.body.append(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);

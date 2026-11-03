@@ -419,7 +419,8 @@ body.is-recording .optic { border-color: var(--red); box-shadow: 0 0 0 1px var(-
 .viewer__readout:not(:empty) { padding: 5px 9px; background: rgba(3, 8, 12, .86); border: 1px solid rgba(255, 181, 71, .45); }
 
 /* Dessin */
-.draw-tools { gap: 10px; }
+.draw-tools { gap: 10px; flex-basis: 100%; margin-left: 0; }
+.draw-tools .range { margin-right: auto; }
 .swatches { display: flex; gap: 6px; }
 .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; background: var(--c); cursor: pointer; padding: 0; box-shadow: 0 0 10px -2px var(--c); transition: transform var(--t); }
 .swatch[aria-checked="true"] { border-color: #fff; transform: scale(1.12); }
@@ -671,8 +672,8 @@ body.is-simulating .stage { box-shadow: inset 0 0 0 1px rgba(255, 181, 71, .4); 
 .share-steps strong { color: var(--text); }
 .share-steps__n { flex: none; width: 26px; height: 26px; display: grid; place-items: center; font: 600 13px var(--mono); color: #160d00; background: var(--amber); }
 .gesture-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.gcard { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--line); background: rgba(110, 231, 255, .025); }
-.gcard__svg { width: 84px; height: 84px; background: radial-gradient(circle, rgba(110, 231, 255, .1), transparent 70%); }
+.gcard { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--line); background: rgba(110, 231, 255, .025); }
+.gcard__svg { width: 92px; height: 92px; background: radial-gradient(circle, rgba(110, 231, 255, .1), transparent 70%); }
 .gcard__svg line { stroke: var(--cyan); stroke-width: 2.2; stroke-linecap: round; }
 .gcard__svg circle { fill: var(--bg); stroke: var(--cyan); stroke-width: 1.4; }
 .gcard__svg circle.tip { fill: var(--amber); stroke: var(--amber); }

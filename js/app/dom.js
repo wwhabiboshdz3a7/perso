@@ -9,7 +9,10 @@ export function el(tag, attrs = {}, ...children) {
     if (v === undefined || v === null || v === false) continue;
     if (k === 'class') node.className = v;
     else if (k === 'text') node.textContent = v;
-    else if (k === 'style' && typeof v === 'object') Object.assign(node.style, v);
+    else if (k === 'style' && typeof v === 'object') {
+      // setProperty gère aussi les propriétés personnalisées (--c).
+      for (const [p, val] of Object.entries(v)) node.style.setProperty(p.startsWith('--') ? p : p.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`), val);
+    }
     else if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2), v);
     else if (k === 'dataset') Object.assign(node.dataset, v);
     else node.setAttribute(k, v === true ? '' : String(v));

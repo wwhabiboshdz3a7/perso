@@ -90,7 +90,7 @@ export class Tutorial {
     for (const card of this.cards) {
       card.hands.forEach((h, hi) => {
         const s = sample(h.keys, t);
-        const pts = renderHand(s.pose, { x: 1 - s.x, y: s.y, size: 0.27, aspect: 1, side: h.side, anchor: 'palm' })
+        const pts = renderHand(s.pose, { x: 1 - s.x, y: s.y, size: card.hands.length > 1 ? 0.3 : 0.4, aspect: 1, side: h.side, anchor: 'palm' })
           .map((p) => ({ x: (1 - p.x) * 100, y: p.y * 100 }));
         HAND_CONNECTIONS.forEach(([a, b], i) => {
           const l = h.lines[i];
