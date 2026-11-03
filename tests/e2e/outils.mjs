@@ -28,6 +28,34 @@ export function facultatif(nom) {
 
 export const playwright = facultatif('playwright');
 
+/** Chemin du module npm facultatif (ou null). */
+export function cheminModule(nom) {
+  const dossiers = [process.env.JARVIS_NPM, path.join(RACINE, 'node_modules')].filter(Boolean);
+  for (const d of dossiers) {
+    try { return require.resolve(nom, { paths: [d] }); } catch { /* suivant */ }
+  }
+  try { return require.resolve(nom); } catch { return null; }
+}
+
+/**
+ * Serveur de signalisation PeerJS local, dans un processus à part : ses
+ * minuteries internes ne peuvent pas être arrêtées et garderaient sinon le
+ * lanceur de tests en vie.
+ */
+export async function demarrerPeerServer(port) {
+  const module = cheminModule('peer');
+  if (!module) return null;
+  const code = `const { PeerServer } = require(${JSON.stringify(module)});
+PeerServer({ port: ${Number(port)}, path: '/', host: '127.0.0.1' }, () => console.log('pret'));`;
+  const proc = spawn(process.execPath, ['-e', code], { stdio: ['ignore', 'pipe', 'inherit'] });
+  await new Promise((resolve, reject) => {
+    const fin = setTimeout(() => reject(new Error('Serveur PeerJS local injoignable')), 15000);
+    proc.stdout.on('data', (d) => { if (String(d).includes('pret')) { clearTimeout(fin); resolve(); } });
+    proc.on('exit', () => { clearTimeout(fin); reject(new Error('Serveur PeerJS local arrêté')); });
+  });
+  return proc;
+}
+
 export const ARGS_CHROMIUM = [
   '--use-angle=swiftshader',
   '--enable-unsafe-swiftshader',
@@ -224,10 +252,25 @@ export async function reponse(page, motif, timeout = 15000) {
   return page.textContent('#asstJarvis q');
 }
 
+/**
+ * Capture d'écran. Les animations infinies du décor (anneaux en rotation) sont
+ * figées le temps de la capture : en rendu logiciel, elles la ralentissent
+ * d'un facteur 50 (de 0,3 s à 15-20 s par image).
+ */
 export async function capture(page, nom, options = {}) {
   const fichier = path.join(CAPTURES, `${nom}.png`);
-  await page.screenshot({ path: fichier, timeout: 120000, caret: 'hide', ...options });
+  await page.screenshot({ path: fichier, timeout: 120000, caret: 'hide', animations: 'disabled', ...options });
   return fichier;
+}
+
+/** Exécute fn(ctx) puis ferme le contexte, même en cas d'échec. */
+export async function avecContexte(creer, fn) {
+  const ctx = await creer();
+  try {
+    return await fn(ctx);
+  } finally {
+    await ctx.close().catch(() => {});
+  }
 }
 
 /** Empreinte SHA-256 d'un blob de la galerie (calculée dans la page). */

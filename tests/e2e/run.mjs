@@ -7,7 +7,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  playwright, facultatif, ARGS_CHROMIUM, ORIGINE, CAPTURES, demarrerServeur, attendre,
+  playwright, facultatif, ARGS_CHROMIUM, ORIGINE, PORT, CAPTURES, demarrerServeur, demarrerPeerServer, attendre,
   simulerMeteo, bloquerPeerCloud, simulerIA, MICRO_SIMULE, SYNTHESE_SIMULEE,
   ouvrir, pret, stabiliser, etat, geste, cible, commande, reponse, capture, empreintePhoto, encre,
 } from './outils.mjs';
@@ -27,7 +27,7 @@ before(async () => {
 });
 
 after(async () => {
-  await navigateur?.close();
+  await Promise.race([navigateur?.close(), attendre(15000)]);
   serveur?.kill();
 });
 
@@ -41,6 +41,13 @@ async function nouveauContexte(options = {}) {
   return ctx;
 }
 
+/** Contexte propre à un test, fermé à la fin du test même en cas d'échec. */
+async function contexteJetable(t, options) {
+  const ctx = await nouveauContexte(options);
+  t.after(() => ctx.close().catch(() => {}));
+  return ctx;
+}
+
 function sansErreur(...pages) {
   const erreurs = pages.flatMap((p) => p.erreurs);
   assert.deepEqual(erreurs, [], `Erreurs dans la console :\n${erreurs.join('\n')}`);
@@ -49,8 +56,8 @@ function sansErreur(...pages) {
 // ——— 1. Optique : vraie inférence MediaPipe sur la fausse caméra ————————————
 
 describe('optique (fausse caméra)', () => {
-  it('charge le modèle depuis models/ et vendor/, fait tourner la boucle et affiche les FPS', async () => {
-    const ctx = await nouveauContexte({ permissions: ['camera'] });
+  it('charge le modèle depuis models/ et vendor/, fait tourner la boucle et affiche les FPS', async (t) => {
+    const ctx = await contexteJetable(t, { permissions: ['camera'] });
     const requetes = [];
     ctx.on('request', (r) => requetes.push(r.url()));
     const page = await ouvrir(ctx, '/?rapide', { attendrePret: false });
@@ -63,10 +70,11 @@ describe('optique (fausse caméra)', () => {
     assert.ok(st.camera.width >= 320, 'résolution vidéo');
     assert.equal(st.camera.model, 'gestes');
     assert.match(st.camera.delegate, /^(GPU|CPU)$/);
+    assert.equal(st.camera.thread, 'worker', 'inférence hors du fil principal');
     assert.equal(st.pose, null, 'aucune main sur la mire de test');
     assert.equal(await page.textContent('#sHands'), '0');
     const locales = requetes.filter((u) => u.startsWith(ORIGINE));
-    for (const f of ['/models/gesture_recognizer.task', '/vendor/mediapipe/vision_bundle.mjs', '/vendor/mediapipe/wasm/vision_wasm_internal']) {
+    for (const f of ['/models/gesture_recognizer.task', '/vendor/mediapipe/vision_bundle.js', '/js/app/vision-worker.js', '/vendor/mediapipe/wasm/vision_wasm_internal']) {
       assert.ok(locales.some((u) => u.includes(f)), `ressource locale chargée : ${f}`);
     }
     const externes = requetes.filter((u) => !u.startsWith(ORIGINE) && !/^(blob|data):/.test(u) && !/open-meteo\.com/.test(u));
@@ -312,10 +320,10 @@ describe('interface en simulation', () => {
     assert.equal(dit.lang, 'fr-FR');
     assert.equal(dit.voice, 'Thomas', 'voix française de France choisie');
     await commande(page, 'météo à Toulouse');
-    const meteo = await reponse(page, /degrés/);
+    const meteo = await reponse(page, /À Toulouse.*degrés/);
     assert.match(meteo, /À Toulouse, 17 degrés, partiellement nuageux/);
     await commande(page, 'Quel temps fait-il à Lyon ?');
-    assert.match(await reponse(page, /Lyon/), /21 degrés, ciel dégagé/);
+    assert.match(await reponse(page, /À Lyon.*degrés/), /21 degrés, ciel dégagé/);
     await commande(page, 'météo à Zzyzx');
     await reponse(page, /Je ne trouve pas la ville/);
     assert.match(await page.textContent('#weatherTemp'), /17°/, 'le widget garde la ville par défaut');
@@ -435,6 +443,8 @@ describe('interface en simulation', () => {
   });
 
   it('main virtuelle (souris) : clic maintenu = poing qui attrape, relâcher = reposer', async () => {
+    // Point de départ connu : galerie affichée, visionneuse et banc fermés.
+    await page.evaluate(() => { const app = window.jarvis.app; app.setMode('galerie'); app.gallery.close(); app.openSim(false); });
     await page.click('#btnMouseHand');
     const box = await page.locator('.photo:nth-child(3) .photo__btn').boundingBox();
     await page.mouse.move(box.x + box.width / 2 - 30, box.y + box.height / 2 + 20);
@@ -456,8 +466,8 @@ describe('interface en simulation', () => {
 // ——— 4. Liaison réseau (PeerJS) ————————————————————————————————————————————
 
 describe('liaison réseau PeerJS', () => {
-  it('serveur cloud injoignable : état « hors ligne » propre, sans exception', async () => {
-    const ctx = await nouveauContexte();
+  it('serveur cloud injoignable : état « hors ligne » propre, sans exception', async (t) => {
+    const ctx = await contexteJetable(t);
     const page = await ouvrir(ctx);
     await page.click('#btnNetStart');
     await page.waitForSelector('.toast >> text=Liaison réseau indisponible');
@@ -468,10 +478,9 @@ describe('liaison réseau PeerJS', () => {
   });
 
   it('transfert WebRTC réel entre deux navigateurs via un serveur PeerJS local (code + QR)', async (t) => {
-    const peer = facultatif('peer');
-    if (!peer?.PeerServer) { t.skip('module « peer » absent (JARVIS_NPM)'); return; }
-    const portPeer = 9148;
-    const srv = await new Promise((r) => peer.PeerServer({ port: portPeer, path: '/', host: '127.0.0.1' }, r));
+    const portPeer = PORT + 1;
+    const srv = await demarrerPeerServer(portPeer);
+    if (!srv) { t.skip('module « peer » absent (JARVIS_NPM)'); return; }
     const reglages = { peerHost: '127.0.0.1', peerPort: String(portPeer), peerPath: '/', peerSecure: false, iceServers: '[]', welcomed: true };
     const ouvrirAppareil = async (nom) => {
       const c = await nouveauContexte();
@@ -510,8 +519,7 @@ describe('liaison réseau PeerJS', () => {
     } finally {
       await tel.c.close();
       await pc.c.close();
-      srv.closeAllConnections?.();
-      await new Promise((r) => srv.close(r));
+      srv.kill();
     }
   });
 });
@@ -519,8 +527,8 @@ describe('liaison réseau PeerJS', () => {
 // ——— 5. Accueil, tutoriel, réglages, confidentialité, mobile, accessibilité ———
 
 describe('accueil, mobile et accessibilité', () => {
-  it('premier lancement : démarrage passable, accueil, tutoriel, démonstration', async () => {
-    const ctx = await nouveauContexte();
+  it('premier lancement : démarrage passable, accueil, tutoriel, démonstration', async (t) => {
+    const ctx = await contexteJetable(t);
     const page = await ouvrir(ctx, '/', { attendrePret: false });
     await page.waitForSelector('#boot .boot__log li');
     await capture(page, 'demarrage');
@@ -543,8 +551,8 @@ describe('accueil, mobile et accessibilité', () => {
     await ctx.close();
   });
 
-  it('réglages : onglets au clavier, calibration indisponible sans caméra, réinitialisation', async () => {
-    const ctx = await nouveauContexte();
+  it('réglages : onglets au clavier, calibration indisponible sans caméra, réinitialisation', async (t) => {
+    const ctx = await contexteJetable(t);
     const page = await ouvrir(ctx);
     await page.click('#btnSettings');
     await page.waitForSelector('#dlgSettings[open]');
@@ -567,17 +575,19 @@ describe('accueil, mobile et accessibilité', () => {
     await ctx.close();
   });
 
-  it('confidentialité : page claire et lisible', async () => {
-    const ctx = await nouveauContexte();
+  it('confidentialité : page claire et lisible', async (t) => {
+    const ctx = await contexteJetable(t);
     const page = await ouvrir(ctx, '/confidentialite.html', { attendrePret: false });
-    assert.match(await page.textContent('h1'), /Confidentialit/);
-    assert.match(await page.textContent('body'), /jamais envoyée/);
+    assert.match(await page.title(), /^Confidentialité/);
+    assert.match(await page.textContent('h1'), /votre appareil/);
+    assert.match(await page.textContent('body'), /Aucune image de la caméra n’est envoyée/);
+    assert.match(await page.textContent('body'), /Seule la photo que vous attrapez part/);
     sansErreur(page);
     await ctx.close();
   });
 
-  it('mobile 390 px : aucun défilement horizontal, mode léger 640×480, captures', async () => {
-    const ctx = await nouveauContexte({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, permissions: ['camera'] });
+  it('mobile 390 px : aucun défilement horizontal, mode léger 640×480, captures', async (t) => {
+    const ctx = await contexteJetable(t, { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, permissions: ['camera'] });
     const accueil = await ouvrir(ctx, '/', { attendrePret: false });
     await accueil.keyboard.press('Escape').catch(() => {});
     await accueil.waitForSelector('#welcome:not([hidden])', { timeout: 120000 });
@@ -585,10 +595,15 @@ describe('accueil, mobile et accessibilité', () => {
     await capture(accueil, 'mobile-accueil', { fullPage: true });
     await accueil.close();
 
-    const page = await ouvrir(ctx);
+    const page = await ouvrir(ctx, '/?rapide', { attendrePret: false });
+    await pret(page);
     await page.waitForFunction(() => window.jarvis.state().camera.active, null, { timeout: 120000 });
     const st = await etat(page);
     assert.deepEqual([st.camera.width, st.camera.height], [640, 480], 'mode léger sur mobile');
+    // Le rendu logiciel partage le même processus que l'inférence : on espace
+    // les analyses pour des captures nettes (l'aperçu caméra reste affiché).
+    await page.evaluate(() => window.jarvis.app.camera.setThrottle(4000));
+    await stabiliser(page);
     for (const mode of ['galerie', 'dessin', 'holo']) {
       await page.evaluate((m) => window.jarvis.app.setMode(m), mode);
       await attendre(700);
@@ -612,7 +627,7 @@ describe('accueil, mobile et accessibilité', () => {
   it('accessibilité (axe-core) : aucune violation sérieuse', async (t) => {
     const axe = facultatif('axe-core');
     if (!axe?.source) { t.skip('module « axe-core » absent (JARVIS_NPM)'); return; }
-    const ctx = await nouveauContexte();
+    const ctx = await contexteJetable(t);
     const resultats = [];
     for (const chemin of ['/?rapide', '/confidentialite.html']) {
       const page = await ouvrir(ctx, chemin, { attendrePret: chemin !== '/confidentialite.html' });
