@@ -33,7 +33,10 @@ function writeupSur(wu, id) {
 export function normaliserPack(p, origine) {
   if (!p || p.format !== 'lumio-ctf-pack' || !Array.isArray(p.defis)) return [];
   const pack = { id: String(p.id || '').replace(/[^a-z0-9-]/g, '').slice(0, 40), titre: String(p.titre || 'Pack sans titre').slice(0, 60), auteur: String(p.auteur || '').slice(0, 40) };
-  return p.defis.filter(d => d && typeof d.id === 'string' && /^(p|photo)-[a-z0-9-]{1,80}$/.test(d.id) && typeof d.wu === 'string' && (Array.isArray(d.h) || Array.isArray(d.zones))).map(d => {
+  // identifiants « photo-… » réservés au pack du propriétaire servi par le site (ils comptent au score),
+  // « p-… » pour les packs importés (hors score et badges)
+  const prefixe = origine === 'photos' ? /^photo-[a-z0-9-]{1,80}$/ : /^p-[a-z0-9-]{1,80}$/;
+  return p.defis.filter(d => d && typeof d.id === 'string' && prefixe.test(d.id) && typeof d.wu === 'string' && (Array.isArray(d.h) || Array.isArray(d.zones))).map(d => {
     const carte = d.validation === 'carte';
     const zones = carte && Array.isArray(d.zones) ? d.zones.slice(0, 4).filter(z => z && Array.isArray(z.c)).map(z => ({ p: Math.min(9, Math.max(1, +z.p || 6)), part: Math.min(1, Math.max(0, +z.part || 0)), r: Math.max(1, +z.r || 100), c: z.c.filter(x => /^[0-9a-f]{24}$/.test(x)).slice(0, 5000) })) : [];
     const vue = Array.isArray(d.vue) && d.vue.length === 3 && coord(d.vue[0], 90) !== null && coord(d.vue[1], 180) !== null && coord(d.vue[2], 19) !== null ? d.vue.map(Number) : [30, 10, 2];
@@ -161,7 +164,7 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
     let p;
     try { p = JSON.parse(txt); } catch { return ctx.toast('Ce n\'est pas du JSON valide.'); }
     const defis = normaliserPack(p, 'packs');
-    if (!defis.length) return ctx.toast('Pack invalide ou vide (format « lumio-ctf-pack » attendu).');
+    if (!defis.length) return ctx.toast(Array.isArray(p && p.defis) && p.defis.some(d => d && /^photo-/.test(d.id)) ? 'Ce fichier est un pack « Mes photos » : il se publie dans assets/ctf/photos/defis.json, il ne s\'importe pas comme pack d\'ami.' : 'Pack invalide ou vide (format « lumio-ctf-pack » attendu).');
     const l = lirePacks().filter(x => x.id !== p.id);
     l.push(p);
     try { ecrirePacks(l); } catch { return ctx.toast('Stockage du navigateur plein : supprime un pack ou réduis les images.'); }

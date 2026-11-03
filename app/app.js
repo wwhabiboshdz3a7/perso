@@ -516,7 +516,7 @@ async function vueProfil(id) {
       <div class="card">
         <h3>Sauvegarde</h3>
         <p class="muted" style="font-size:.92rem">Ta progression est stockée uniquement dans ce navigateur. Exporte-la pour la transférer sur un autre appareil.</p>
-        <div class="row"><button class="btn" id="exportBtn" type="button">⬇ Exporter (JSON)</button><label class="btn" for="importFile">⬆ Importer</label><input type="file" id="importFile" accept="application/json" hidden><button class="btn ghost" id="resetBtn" type="button" style="color:var(--err)">Réinitialiser</button></div>
+        <div class="row"><button class="btn" id="exportBtn" type="button">⬇ Exporter (JSON)</button><label class="btn" for="importFile">⬆ Importer</label><input type="file" id="importFile" accept="application/json" hidden><button class="btn ghost danger-txt" id="resetBtn" type="button">Réinitialiser</button></div>
       </div>
     </div>
     <div class="section-title"><h2>Arène CTF</h2><a href="#/ctf/classement" class="muted">Classement →</a></div>
