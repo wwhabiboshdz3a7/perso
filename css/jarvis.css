@@ -727,6 +727,9 @@ body.is-simulating .stage { box-shadow: inset 0 0 0 1px rgba(255, 181, 71, .4); 
   }
   .rail--right { overflow: visible; }
   .cmdbar { position: fixed; left: var(--gap); right: var(--gap); bottom: calc(var(--gap) + var(--safe-b)); z-index: 50; }
+  /* Barre flottante au-dessus du contenu qui défile : fond opaque pour rester lisible. */
+  .cmdbar .cmd, .cmdbar__tools .btn { background-color: #06141c; box-shadow: 0 -12px 30px -14px #000; }
+  .cmdbar__tools .btn[aria-pressed="true"], .cmdbar__tools .btn[aria-expanded="true"] { background-image: linear-gradient(rgba(255, 181, 71, .1), rgba(255, 181, 71, .1)); }
   .panel--log { min-height: 200px; max-height: 280px; }
 }
 @media (max-width: 720px) {
