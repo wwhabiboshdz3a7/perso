@@ -347,6 +347,7 @@ git checkout --theirs README.md && git add README.md && git rebase --continue
 git log --stat                    # vérifiez avant de pousser
 git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
 git push kinetika kinetika:main
+git tag -a v0.1.0 -m "Kinetika 0.1.0" && git push kinetika v0.1.0
 ```
 
 Ensuite, travaillez directement dans le dépôt dédié (`git clone git@github.com:wwhabiboshdz3a7/kinetika.git`) : `origin` y désigne bien `kinetika`. Ajoutez l’adresse du site Netlify dans la description du dépôt et quelques sujets (`animation`, `javascript`, `timeline`, `spring`, `svg`). À chaque push, la CI (GitHub Actions, Node 22, 24 et 26) lance les tests, les types et le build.

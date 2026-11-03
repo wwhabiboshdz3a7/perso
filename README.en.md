@@ -299,6 +299,7 @@ git checkout --theirs README.md && git add README.md && git rebase --continue
 git log --stat                    # check before pushing
 git remote add kinetika git@github.com:wwhabiboshdz3a7/kinetika.git
 git push kinetika kinetika:main
+git tag -a v0.1.0 -m "Kinetika 0.1.0" && git push kinetika v0.1.0
 ```
 
 From then on, work in the dedicated repository (`git clone git@github.com:wwhabiboshdz3a7/kinetika.git`), where `origin` is `kinetika`. On every push, CI (GitHub Actions, Node 22, 24 and 26) runs the tests, the type check and the build.
