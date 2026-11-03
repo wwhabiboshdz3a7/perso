@@ -6,6 +6,7 @@ import { Emitter } from './dom.js';
 const KEY = 'jarvis.reglages.v1';
 const AI_KEY_LOCAL = 'jarvis.cle-ia';
 const AI_KEY_SESSION = 'jarvis.cle-ia.session';
+const DEVICE_KEY = 'jarvis.appareil';
 
 function guessDevice() {
   const ua = navigator.userAgent || '';
@@ -73,13 +74,24 @@ function safeSet(storage, key, value) {
   } catch { /* stockage indisponible (navigation privée stricte) */ }
 }
 
+function readSaved() {
+  try {
+    const v = JSON.parse(safeGet(localStorage, KEY) || '{}');
+    return v && typeof v === 'object' ? v : {};
+  } catch { return {}; }
+}
+
 export class Settings extends Emitter {
   constructor() {
     super();
-    let saved = {};
-    try { saved = JSON.parse(safeGet(localStorage, KEY) || '{}') || {}; } catch { saved = {}; }
-    this.data = { ...DEFAULTS, ...saved };
-    if (!this.data.deviceName) this.data.deviceName = guessDevice();
+    const saved = readSaved();
+    this.data = { ...DEFAULTS };
+    for (const k of Object.keys(DEFAULTS)) if (k in saved) this.data[k] = saved[k];
+    // Nom propre à chaque fenêtre (deux onglets = deux « appareils » distincts) ;
+    // le dernier nom choisi sert de nom par défaut aux nouvelles fenêtres.
+    this.data.deviceName = safeGet(sessionStorage, DEVICE_KEY) || this.data.deviceName || guessDevice();
+    // Réglages modifiés dans une autre fenêtre : resynchronisation immédiate.
+    window.addEventListener?.('storage', (e) => { if (e.key === KEY || e.key === null) this._sync(); });
   }
 
   get(k) { return this.data[k]; }
@@ -90,15 +102,34 @@ export class Settings extends Emitter {
       if (!(k in DEFAULTS)) continue;
       if (this.data[k] !== v) { this.data[k] = v; changed[k] = v; }
     }
-    if (Object.keys(changed).length) {
-      this.save();
+    const keys = Object.keys(changed);
+    if (keys.length) {
+      this.save(keys);
       this.emit('change', changed);
     }
     return changed;
   }
 
-  save() {
-    safeSet(localStorage, KEY, JSON.stringify(this.data));
+  /**
+   * Enregistre seulement les clés modifiées, fusionnées avec ce qui est
+   * stocké : une autre fenêtre ouverte n'écrase plus ces réglages.
+   */
+  save(keys = Object.keys(DEFAULTS)) {
+    const stored = readSaved();
+    for (const k of keys) stored[k] = this.data[k];
+    safeSet(localStorage, KEY, JSON.stringify(stored));
+    if (keys.includes('deviceName')) safeSet(sessionStorage, DEVICE_KEY, this.data.deviceName);
+  }
+
+  _sync() {
+    const stored = readSaved();
+    const changed = {};
+    for (const k of Object.keys(DEFAULTS)) {
+      if (k === 'deviceName') continue;
+      const v = k in stored ? stored[k] : DEFAULTS[k];
+      if (this.data[k] !== v) { this.data[k] = v; changed[k] = v; }
+    }
+    if (Object.keys(changed).length) this.emit('change', changed);
   }
 
   /** Clé d'API : jamais dans l'objet de réglages exporté. */
@@ -125,7 +156,7 @@ export class Settings extends Emitter {
   }
 
   reset() {
-    try { localStorage.removeItem(KEY); } catch { /* rien */ }
+    try { localStorage.removeItem(KEY); sessionStorage.removeItem(DEVICE_KEY); } catch { /* rien */ }
     this.forgetAiKey();
     this.data = { ...DEFAULTS, deviceName: guessDevice() };
     this.emit('change', { ...this.data });

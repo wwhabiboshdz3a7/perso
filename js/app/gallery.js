@@ -26,8 +26,18 @@ export class Gallery {
 
   async init() {
     let list = [];
-    try { list = await db.all('photos'); } catch (err) { console.warn('[jarvis] IndexedDB :', err); }
-    const seeded = await db.meta('seeded').catch(() => false);
+    try {
+      list = await db.all('photos');
+    } catch (err) {
+      // Stockage indisponible (navigation privée stricte, ou base bloquée par
+      // une autre fenêtre en cours de réinitialisation) : galerie en mémoire.
+      this.storageError = true;
+      console.info('[jarvis] IndexedDB indisponible :', err?.message || err);
+      this.app.ui.toast('Stockage local indisponible', err?.blocked
+        ? 'Une autre fenêtre JARVIS bloque la base de données : fermez-la, puis rechargez cette page.'
+        : 'Les photos ne seront pas conservées après la fermeture de la page.', { kind: 'warn', ms: 9000 });
+    }
+    const seeded = this.storageError ? false : await db.meta('seeded').catch(() => false);
     if (!list.length && !seeded) {
       // Premier lancement : visuels de démonstration, affichés au fil de l'eau.
       this.seeding = DEMO_COUNT;
@@ -40,7 +50,7 @@ export class Gallery {
         this.render();
       });
       this.seeding = 0;
-      await db.meta('seeded', true).catch(() => {});
+      if (!this.storageError) await db.meta('seeded', true).catch(() => {});
       list = this.photos;
     }
     this.photos = list.sort((a, b) => b.createdAt - a.createdAt);
@@ -57,8 +67,8 @@ export class Gallery {
       thumb,
       type: blob.type || 'image/jpeg',
       size: blob.size,
-      width: meta.width,
-      height: meta.height,
+      width: Number.isInteger(meta.width) && meta.width > 0 ? meta.width : 0,
+      height: Number.isInteger(meta.height) && meta.height > 0 ? meta.height : 0,
       createdAt: meta.createdAt || Date.now(),
       favorite: !!meta.favorite,
       source: meta.source || 'import',
@@ -70,7 +80,9 @@ export class Gallery {
       rec.width = img.width; rec.height = img.height;
       img.close?.();
     }
-    try { await db.put('photos', rec); } catch (err) { console.warn('[jarvis] enregistrement photo :', err); }
+    if (!this.storageError) {
+      try { await db.put('photos', rec); } catch (err) { console.warn('[jarvis] enregistrement photo :', err); }
+    }
     return rec;
   }
 
@@ -189,18 +201,32 @@ export class Gallery {
     return rec.favorite;
   }
 
+  /** Suppression annulable quelques secondes (bouton « Annuler » de la notification). */
   async remove(id) {
     const rec = this.get(id);
     if (!rec) return;
+    if (this.app.share?.carry?.photoId === id) this.app.share.putBack(null, { quiet: true });
+    const list = this.visible();
+    const index = list.findIndex((p) => p.id === id);
     this.photos = this.photos.filter((p) => p.id !== id);
     await db.delete('photos', id).catch(() => {});
     this._revoke(id);
     if (this.viewerId === id) {
-      const list = this.visible();
-      if (list.length) this.open(list[0].id); else this.close();
+      const rest = this.visible();
+      if (rest.length) this.open(rest[Math.min(index, rest.length - 1)].id); else this.close();
     }
     this.render();
-    this.app.ui.toast('Photo supprimée', rec.name, { sound: 'click' });
+    this.app.ui.log('galerie', `photo supprimée : ${rec.name}`);
+    this.app.ui.toast('Photo supprimée', rec.name, { sound: 'click', ms: 7000, action: { label: 'Annuler', run: () => this.restore(rec) } });
+  }
+
+  async restore(rec) {
+    if (this.get(rec.id)) return;
+    if (!this.storageError) await db.put('photos', rec).catch(() => {});
+    this.photos.push(rec);
+    this.photos.sort((a, b) => b.createdAt - a.createdAt);
+    this.render(rec.id);
+    this.app.ui.log('galerie', `photo restaurée : ${rec.name}`);
   }
 
   async clearAll() {

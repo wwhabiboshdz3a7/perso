@@ -1,25 +1,41 @@
 // Partage de photos à la main.
 // Émetteur : viser → poing (attraper) → la photo est « dans la main » et part
 // en pré-envoi vers les appareils reliés. Récepteur : ouvrir la main devant sa
-// caméra (lâcher) → la photo atterrit. Lancer = envoi direct dans une direction.
+// caméra (lâcher) → l'émetteur confirme → la photo atterrit. Lancer = envoi
+// direct dans une direction.
 
 import { $, reducedMotion } from './dom.js';
 import { resizeToJpeg } from './images.js';
 import {
   encodePacket, decodePacket, chunkify, Assembler, sha256Hex, makeTransferId, CHUNK_SIZE, formatBytes,
+  validThumb, validDim, sniffImage,
 } from '../core/protocol.js';
 
 const CARRY_TIMEOUT = 90_000;
 const INCOMING_TIMEOUT = 120_000;
+const GRANT_TIMEOUT = 12_000;          // confirmation de l'émetteur après un lâcher
+const MAX_SIZE = 60 * 1024 * 1024;
+// Limites par appareil relié (sur 10 minutes glissantes).
+const QUOTA_WINDOW = 10 * 60_000;
+const QUOTA_COUNT = 40;
+const QUOTA_BYTES = 400 * 1024 * 1024;
+const MAX_PENDING_PER_PEER = 3;
+const DIR_WORD = { right: 'vers la droite', left: 'vers la gauche', up: 'vers le haut', down: 'vers le bas' };
+
+const cleanText = (v, fallback, max = 80) => {
+  const s = typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f]/g, '').trim() : '';
+  return (s || fallback).slice(0, max);
+};
 
 export class Share {
   constructor(app) {
     this.app = app;
     this.carry = null;          // photo tenue par cet appareil
     this.incoming = new Map();  // photos annoncées par les autres appareils
-    this.pendingLand = null;    // main ouverte avant la fin du transfert
+    this.quotas = new Map();
     this.lastSent = null;
     this.lastReceived = null;
+    this.carryTimeout = CARRY_TIMEOUT;
     this.carryEl = $('#carry');
     this.carryImg = $('#carryImg');
     this.carryRing = $('#carryRing');
@@ -30,9 +46,9 @@ export class Share {
     const link = this.app.link;
     link.on('ctrl', ({ from, msg, peer }) => this._onCtrl(from, msg, peer));
     link.on('bin', ({ from, buf }) => this._onBin(from, buf));
-    link.on('change', ({ key, state, isNew }) => {
-      if (state === 'open' && isNew && this.carry?.prepared) this._offerTo(key);
-      if (state === 'gone') this._peerGone(key);
+    link.on('change', ({ key, state, isNew, name }) => {
+      if (state === 'open' && isNew && this.carry?.prepared && !this.carry.thrown && !this.carry.claimedBy) this._offerTo(key);
+      if (state === 'gone') this._peerGone(key, name);
     });
     $('#btnCarrySend').addEventListener('click', () => this.throwCarry('right'));
     $('#btnCarryDrop').addEventListener('click', () => this.putBack());
@@ -42,6 +58,34 @@ export class Share {
   get role() { return this.app.settings.get('role'); }
 
   // ——— Émetteur ———————————————————————————————————————————————
+
+  _newCarry(rec, extra = {}) {
+    const tid = makeTransferId();
+    this.carry = { tid, photoId: rec.id, name: rec.name, startedAt: Date.now(), prepared: null, progress: new Map(), claimedBy: null, offered: new Set(), targets: null, ...extra };
+    this.app.gallery.markGrabbed(rec.id, true);
+    this._showCarryBar(rec);
+    clearTimeout(this._carryTimer);
+    this._carryTimer = setTimeout(() => { if (this.carry?.tid === tid && !this.carry.claimedBy) this.putBack('Délai dépassé : photo reposée.'); }, this.carryTimeout);
+    return tid;
+  }
+
+  /** Préparation (redimensionnement, empreinte, vignette) ; false si la photo est illisible. */
+  async _prepareCarry(tid, rec) {
+    try {
+      const prepared = await this._prepare(rec);
+      if (this.carry?.tid !== tid) return false;
+      this.carry.prepared = prepared;
+      return true;
+    } catch (err) {
+      if (!/illisible/i.test(err?.message || '')) console.warn('[jarvis] préparation :', err);
+      if (this.carry?.tid === tid) {
+        this.app.ui.toast('Envoi impossible', `« ${rec.name} » est illisible : elle ne peut pas être partagée.`, { kind: 'error' });
+        this.app.ui.log('liaison', `photo illisible, non partagée : ${rec.name}`);
+        this._endCarry();
+      }
+      return false;
+    }
+  }
 
   /** Geste « attraper » (poing) à l'endroit du curseur. */
   async grab(ev) {
@@ -56,30 +100,16 @@ export class Share {
     }
     const rec = this.app.gallery.get(id);
     if (!rec) return false;
-    const tid = makeTransferId();
-    this.carry = { tid, photoId: id, name: rec.name, startedAt: Date.now(), prepared: null, progress: new Map(), claimedBy: null, offered: new Set() };
+    const tid = this._newCarry(rec);
     this.app.sound.play('grab');
     this.app.ui.log('geste', `photo attrapée : ${rec.name}`);
     const screen = this.app.cursor.screen || this.app.mapToScreen({ x: ev.x, y: ev.y });
     this._flyIntoHand(id, screen);
-    this.app.gallery.markGrabbed(id, true);
-    this._showCarryBar(rec);
     this.app.fx.burst(screen.x, screen.y, { color: '#ffb547', count: 48, inward: true, radius: 120, speed: 300, life: 0.5 });
     this.app.fx.ring(screen.x, screen.y, { r0: 140, r1: 20, color: '#ffb547', dur: 0.45 });
-    clearTimeout(this._carryTimer);
-    this._carryTimer = setTimeout(() => { if (this.carry?.tid === tid) this.putBack('Délai dépassé : photo reposée.'); }, CARRY_TIMEOUT);
-
-    try {
-      const prepared = await this._prepare(rec);
-      if (this.carry?.tid !== tid) return true;
-      this.carry.prepared = prepared;
-      for (const p of this.app.link.list()) this._offerTo(p.key);
-      if (this.carry.pendingThrow) this.throwCarry(this.carry.pendingThrow);
-    } catch (err) {
-      console.warn('[jarvis] préparation :', err);
-      this.app.ui.toast('Préparation impossible', 'La photo n’a pas pu être préparée pour l’envoi.', { kind: 'error' });
-      this._endCarry();
-    }
+    if (!(await this._prepareCarry(tid, rec))) return true;
+    for (const p of this.app.link.list()) this._offerTo(p.key);
+    if (this.carry.pendingThrow) this.throwCarry(this.carry.pendingThrow);
     return true;
   }
 
@@ -110,7 +140,7 @@ export class Share {
     this.app.link.send(key, { type: 'file-begin', tid, size: p.size, chunks: chunks.length, hash: p.hash, name: p.name, width: p.width, height: p.height, mime: p.mime });
     try {
       for (let i = 0; i < chunks.length; i++) {
-        if (this.carry?.tid === tid && this.carry.cancelled) return;
+        if (this.carry?.tid !== tid || this.carry.cancelled) return;
         await this.app.link.sendBin(key, encodePacket({ t: 'chunk', tid, i, n: chunks.length }, chunks[i]));
         if (this.carry?.tid === tid) {
           this.carry.progress.set(key, (i + 1) / chunks.length);
@@ -120,7 +150,8 @@ export class Share {
       }
       this.app.link.send(key, { type: 'file-end', tid });
     } catch (err) {
-      console.warn('[jarvis] envoi :', err);
+      // Appareil parti pendant l'envoi : la liaison le signale déjà.
+      if (!/déconnecté/.test(err?.message || '')) console.warn('[jarvis] envoi :', err);
     }
   }
 
@@ -133,14 +164,16 @@ export class Share {
   }
 
   /** Main ouverte sur CET appareil alors qu'il tient la photo : on la repose. */
-  putBack(reason) {
+  putBack(reason, { quiet = false } = {}) {
     if (!this.carry) return;
     const c = this.carry;
     c.cancelled = true;
     this.app.link.send(null, { type: 'cancel', tid: c.tid });
     const card = this.app.gallery.cardEl(c.photoId);
-    if (card && this.app.cursor.screen && !reducedMotion()) this._flyBack(card);
-    this.app.sound.play('release');
+    if (!quiet) {
+      if (card && this.app.cursor.screen && !reducedMotion()) this._flyBack(card);
+      this.app.sound.play('release');
+    }
     this.app.ui.log('geste', reason || `photo reposée : ${c.name}`);
     if (reason) this.app.ui.toast('Photo reposée', reason, { kind: 'warn', sound: false });
     this._endCarry();
@@ -149,7 +182,7 @@ export class Share {
   /** Lancer : envoi direct aux appareils situés dans la direction du geste. */
   throwCarry(direction = 'right') {
     const c = this.carry;
-    if (!c) return;
+    if (!c || c.thrown || c.claimedBy) return;
     const peers = this.app.link.list().filter((p) => p.role !== 'sender');
     if (!peers.length) {
       this.app.ui.toast('Aucun appareil relié', 'Reliez un appareil (panneau Liaison) pour y lancer la photo.', { kind: 'warn' });
@@ -161,67 +194,110 @@ export class Share {
     if (!targets.length) targets = peers.length === 1 ? peers : peers.filter((p) => p.position === 'auto');
     if (!targets.length) targets = peers;
     c.thrown = true;
+    c.targets = new Set(targets.map((t) => t.key));
     for (const t of targets) {
       this._offerTo(t.key);
       this.app.link.send(t.key, { type: 'throw', tid: c.tid, direction, from: this.app.settings.get('deviceName') });
     }
+    const names = targets.map((t) => t.name).join(', ');
     this.app.sound.play('throw');
-    this.app.ui.log('geste', `photo lancée (${direction}) vers ${targets.map((t) => t.name).join(', ')}`);
+    this.app.ui.log('geste', `photo lancée ${DIR_WORD[direction] || ''} → ${names}`.replace(/\s+/g, ' '));
     this._flyAway(direction);
     $('#carryTitle').textContent = 'Photo lancée';
-    $('#carryHint').textContent = `En route vers ${targets.map((t) => t.name).join(', ')}…`;
+    $('#carryHint').textContent = `En route vers ${names}…`;
   }
 
-  /** Bouton « Envoyer » ou commande vocale. */
+  /**
+   * Bouton « Envoyer » ou commande vocale. Si une autre photo est déjà en
+   * main, elle est reposée et c'est la photo demandée qui part.
+   * @returns {Promise<boolean>} true si l'envoi est lancé
+   */
   async sendPhoto(id) {
     const gal = this.app.gallery;
-    if (this.carry) { this.throwCarry('right'); return; }
-    const photoId = id || gal.viewerId || gal.visible()[0]?.id;
-    if (!photoId) { this.app.ui.toast('Aucune photo', 'La galerie est vide.', { kind: 'warn' }); return; }
-    if (!this.app.link.list().length) {
+    const photoId = id || this.carry?.photoId || gal.viewerId || gal.visible()[0]?.id;
+    if (this.carry) {
+      if (photoId === this.carry.photoId) {
+        if (this.carry.thrown || this.carry.claimedBy) return true;
+        this.throwCarry('right');
+        return !!this.carry?.thrown || !!this.carry?.pendingThrow;
+      }
+      if (this.carry.thrown || this.carry.claimedBy) {
+        this.app.ui.toast('Envoi en cours', 'Attendez que la photo précédente soit arrivée.', { kind: 'warn' });
+        return false;
+      }
+      this.putBack(null, { quiet: true });
+    }
+    if (!photoId) { this.app.ui.toast('Aucune photo', 'La galerie est vide.', { kind: 'warn' }); return false; }
+    if (!this.app.link.list().some((p) => p.role !== 'sender')) {
       this.app.ui.toast('Aucun appareil relié', 'Ouvrez JARVIS sur un autre appareil puis reliez-le (panneau Liaison).', { kind: 'warn' });
       $('#btnNetStart')?.focus();
-      return;
+      return false;
+    }
+    if (this.role === 'receiver') {
+      this.app.ui.toast('Mode récepteur', 'Cet appareil ne fait que recevoir. Changez le rôle dans les réglages.', { kind: 'warn' });
+      return false;
     }
     const rec = gal.get(photoId);
-    const tid = makeTransferId();
-    this.carry = { tid, photoId, name: rec.name, startedAt: Date.now(), prepared: null, progress: new Map(), offered: new Set(), viaButton: true };
-    gal.markGrabbed(photoId, true);
-    this._showCarryBar(rec);
-    this.carry.prepared = await this._prepare(rec);
-    if (this.carry?.tid !== tid) return;
+    if (!rec) return false;
+    const tid = this._newCarry(rec, { viaButton: true });
+    if (!(await this._prepareCarry(tid, rec))) return false;
     this.throwCarry('right');
+    return this.carry?.tid === tid && !!this.carry.thrown;
   }
 
+  /** Un récepteur a ouvert la main : le premier qui réclame la photo l'obtient. */
   _onClaim(from, tid) {
     const c = this.carry;
-    if (!c || c.tid !== tid || c.claimedBy) return;
-    c.claimedBy = from;
     const peer = this.app.link.peers.get(from);
+    if (!c || c.tid !== tid || c.cancelled) { this.app.link.send(from, { type: 'denied', tid, by: '' }); return; }
+    if (c.claimedBy && c.claimedBy !== from) {
+      this.app.link.send(from, { type: 'denied', tid, by: this.app.link.peers.get(c.claimedBy)?.name || '' });
+      return;
+    }
+    if (c.claimedBy === from) { this.app.link.send(from, { type: 'granted', tid }); return; }
+    c.claimedBy = from;
+    this.app.link.send(from, { type: 'granted', tid });
     for (const p of this.app.link.list()) if (p.key !== from) this.app.link.send(p.key, { type: 'taken', tid, by: peer?.name || '' });
     this.app.ui.log('liaison', `photo lâchée sur ${peer?.name || 'un appareil'}`);
-    this._teleport();
+    if (!c.thrown) this._teleport();
     $('#carryTitle').textContent = 'Photo lâchée';
     $('#carryHint').textContent = `Atterrissage sur ${peer?.name || 'l’autre appareil'}…`;
-    this._claimTimer = setTimeout(() => this._endCarry(), 15000);
+    clearTimeout(this._claimTimer);
+    this._claimTimer = setTimeout(() => { if (this.carry?.tid === tid) this._endCarry(); }, 15000);
   }
 
   _onReceived(from, msg) {
     const c = this.carry;
+    if (!c || c.tid !== msg.tid || (c.claimedBy && c.claimedBy !== from)) return;
     const peer = this.app.link.peers.get(from);
-    const ok = c && c.prepared && msg.hash === c.prepared.hash;
-    if (c && c.tid === msg.tid) {
-      this.lastSent = { tid: c.tid, hash: c.prepared?.hash, width: c.prepared?.width, height: c.prepared?.height, size: c.prepared?.size, to: peer?.name, verified: ok };
-      this.app.ui.toast('Photo livrée', `${c.name} → ${peer?.name || 'appareil relié'}${ok ? ' · intégrité vérifiée' : ''}`, { kind: 'ok', sound: 'ok' });
-      this.app.ui.log('liaison', `livrée à ${peer?.name || '?'} (${formatBytes(c.prepared?.size || 0)}, SHA-256 ${ok ? 'identique' : 'différent'})`);
-      clearTimeout(this._claimTimer);
-      this._endCarry();
+    const ok = !!c.prepared && msg.hash === c.prepared.hash;
+    c.delivered = true;
+    this.lastSent = { tid: c.tid, hash: c.prepared?.hash, width: c.prepared?.width, height: c.prepared?.height, size: c.prepared?.size, to: peer?.name, verified: ok };
+    this.app.ui.toast('Photo livrée', `${c.name} → ${peer?.name || 'appareil relié'}${ok ? ' · intégrité vérifiée' : ''}`, { kind: 'ok', sound: 'ok' });
+    this.app.ui.log('liaison', `livrée à ${peer?.name || '?'} (${formatBytes(c.prepared?.size || 0)}, SHA-256 ${ok ? 'identique' : 'différent'})`);
+    clearTimeout(this._claimTimer);
+    this._endCarry();
+  }
+
+  /** Appareil parti (fermé, en veille, déconnecté). */
+  _peerGone(key, name = 'L’appareil') {
+    for (const [tid, inc] of this.incoming) if (inc.from === key) { clearTimeout(inc.claimTimer); this.incoming.delete(tid); }
+    this._renderIncoming();
+    const c = this.carry;
+    if (!c || c.delivered) return;
+    c.offered.delete(key);
+    c.progress.delete(key);
+    c.targets?.delete(key);
+    if (c.claimedBy === key) {
+      this.putBack(`${name} s’est déconnecté avant la fin de l’envoi : la photo est restée ici.`);
+    } else if (c.thrown && !c.claimedBy && c.targets && c.targets.size === 0) {
+      this.putBack(`${name} ne répond plus : la photo est restée ici.`);
     }
   }
 
-  _peerGone(key) {
-    for (const [tid, inc] of this.incoming) if (inc.from === key) { this.incoming.delete(tid); }
-    this._renderIncoming();
+  /** Fenêtre fermée ou rechargée : la photo tenue est annulée chez les autres. */
+  onPageHide() {
+    if (this.carry && !this.carry.delivered) this.app.link.send(null, { type: 'cancel', tid: this.carry.tid });
   }
 
   _endCarry() {
@@ -244,7 +320,7 @@ export class Share {
     $('#carryTitle').textContent = `En main : ${rec.name}`;
     const peers = this.app.link.list().length;
     $('#carryHint').textContent = peers
-      ? `Ouvrez la main devant l’autre appareil, ou lancez-la. Ouvrir la main ici la repose.`
+      ? 'Ouvrez la main devant l’autre appareil, ou lancez-la. Ouvrir la main ici la repose.'
       : 'Aucun appareil relié pour l’instant : reliez-en un, ou ouvrez la main pour la reposer.';
     $('#carryProg').style.width = '0%';
     bar.hidden = false;
@@ -264,13 +340,44 @@ export class Share {
 
   // ——— Récepteur ———————————————————————————————————————————————
 
+  _quota(from) {
+    const now = Date.now();
+    let q = this.quotas.get(from);
+    if (!q || now - q.since > QUOTA_WINDOW) { q = { since: now, count: 0, bytes: 0, warned: false }; this.quotas.set(from, q); }
+    return q;
+  }
+
+  /** Limite le nombre et le volume de photos acceptés d'un même appareil. */
+  _allow(from, { count = 0, bytes = 0 } = {}) {
+    const q = this._quota(from);
+    if (q.count + count > QUOTA_COUNT || q.bytes + bytes > QUOTA_BYTES) {
+      if (!q.warned) {
+        q.warned = true;
+        const name = this.app.link.peers.get(from)?.name || 'un appareil relié';
+        this.app.ui.log('liaison', `trop de photos reçues de ${name} : réception suspendue quelques minutes`);
+        this.app.ui.toast('Réception suspendue', `Trop de photos envoyées par ${name} en peu de temps.`, { kind: 'warn' });
+      }
+      return false;
+    }
+    q.count += count;
+    q.bytes += bytes;
+    return true;
+  }
+
   _onCtrl(from, msg, peer) {
     switch (msg.type) {
       case 'grab': {
         if (this.role === 'sender') return;
         const inc = this._incoming(from, msg.tid);
-        Object.assign(inc, { name: String(msg.name || 'Photo').slice(0, 80), width: msg.width, height: msg.height, size: msg.size, fromName: msg.from || peer?.name || 'Appareil', announced: true });
-        if (typeof msg.thumb === 'string' && msg.thumb.startsWith('data:image/') && msg.thumb.length < 200_000) inc.thumb = msg.thumb;
+        if (!inc) return;
+        Object.assign(inc, {
+          name: cleanText(msg.name, 'Photo'),
+          width: validDim(msg.width),
+          height: validDim(msg.height),
+          fromName: cleanText(msg.from, peer?.name || 'Appareil', 40),
+          announced: true,
+        });
+        if (validThumb(msg.thumb)) inc.thumb = msg.thumb;
         if (!inc.toasted) {
           inc.toasted = true;
           this.app.sound.play('notify');
@@ -282,41 +389,69 @@ export class Share {
       case 'file-begin': {
         if (this.role === 'sender') return;
         const inc = this._incoming(from, msg.tid);
-        if (!Number.isInteger(msg.chunks) || msg.chunks < 1 || msg.chunks > 4000 || !(msg.size > 0) || msg.size > 60 * 1024 * 1024) return;
-        inc.asm = new Assembler({ size: msg.size, chunks: msg.chunks });
-        Object.assign(inc, { hash: String(msg.hash || ''), name: inc.name || String(msg.name || 'Photo').slice(0, 80), width: msg.width, height: msg.height, mime: 'image/jpeg' });
-        for (const [i, data] of inc.early || []) inc.asm.add(i, data);
+        if (!inc || inc.asm) return;
+        const { chunks, size } = msg;
+        const valid = Number.isInteger(size) && size > 0 && size <= MAX_SIZE
+          && Number.isInteger(chunks) && chunks === Math.ceil(size / CHUNK_SIZE)
+          && typeof msg.hash === 'string' && /^[0-9a-f]{64}$/.test(msg.hash);
+        if (!valid || !this._allow(from, { bytes: size })) { this._discard(msg.tid); return; }
+        inc.asm = new Assembler({ size, chunks });
+        Object.assign(inc, { hash: msg.hash, name: inc.name || cleanText(msg.name, 'Photo') });
+        try {
+          for (const [i, data] of inc.early || []) inc.asm.add(i, data);
+        } catch { this._discard(msg.tid); return; }
         inc.early = null;
         this._checkComplete(msg.tid);
         break;
       }
       case 'file-end':
-        this._checkComplete(msg.tid);
+        if (this.incoming.get(msg.tid)?.from === from) this._checkComplete(msg.tid);
         break;
       case 'throw': {
         if (this.role === 'sender') return;
         const inc = this._incoming(from, msg.tid);
-        inc.thrown = msg.direction || 'right';
-        inc.fromName = msg.from || inc.fromName || peer?.name;
+        if (!inc) return;
+        inc.thrown = DIR_WORD[msg.direction] ? msg.direction : 'right';
+        inc.fromName = cleanText(msg.from, inc.fromName || peer?.name || 'Appareil', 40);
         if (this.app.settings.get('autoAccept')) this._claim(msg.tid, { thrown: true });
         else this._renderIncoming();
         break;
       }
-      case 'cancel':
-        if (this.incoming.has(msg.tid)) {
-          const inc = this.incoming.get(msg.tid);
+      case 'cancel': {
+        const inc = this.incoming.get(msg.tid);
+        if (inc && inc.from === from) {
+          clearTimeout(inc.claimTimer);
           this.incoming.delete(msg.tid);
-          if (!inc.claimed) this.app.ui.log('liaison', `${inc.fromName || 'L’appareil'} a reposé la photo`);
+          if (!inc.landed) this.app.ui.log('liaison', `${inc.fromName || 'L’appareil'} a reposé la photo`);
           this._renderIncoming();
         }
         break;
-      case 'taken':
-        if (this.incoming.has(msg.tid)) {
-          this.incoming.delete(msg.tid);
-          this._renderIncoming();
-          this.app.ui.toast('Photo récupérée ailleurs', msg.by ? `Lâchée sur ${String(msg.by).slice(0, 40)}.` : '', { sound: false });
+      }
+      case 'taken': {
+        const inc = this.incoming.get(msg.tid);
+        if (inc && inc.from === from) {
+          this._discard(msg.tid);
+          this.app.ui.toast('Photo déjà récupérée', msg.by ? `Lâchée sur ${cleanText(msg.by, '', 40)}.` : '', { sound: false });
         }
         break;
+      }
+      case 'granted': {
+        const inc = this.incoming.get(msg.tid);
+        if (!inc || inc.from !== from || !inc.claimed) return;
+        inc.granted = true;
+        clearTimeout(inc.claimTimer);
+        if (inc.ready) this._land(msg.tid);
+        else this._renderIncoming();
+        break;
+      }
+      case 'denied': {
+        const inc = this.incoming.get(msg.tid);
+        if (!inc || inc.from !== from) return;
+        this._discard(msg.tid);
+        const by = cleanText(msg.by, '', 40);
+        this.app.ui.toast('Photo déjà récupérée', by ? `${by} l’a attrapée en premier.` : 'L’autre appareil ne la propose plus.', { kind: 'warn', sound: false });
+        break;
+      }
       case 'claim':
         this._onClaim(from, msg.tid);
         break;
@@ -328,27 +463,45 @@ export class Share {
     }
   }
 
+  /** Entrée « photo en approche » ; null si l'annonce est refusée. */
   _incoming(from, tid) {
     let inc = this.incoming.get(tid);
-    if (!inc) {
-      inc = { tid, from, at: Date.now(), asm: null, early: [], ready: false, claimed: false };
-      this.incoming.set(tid, inc);
-      setTimeout(() => { if (this.incoming.get(tid) === inc && !inc.claimed) { this.incoming.delete(tid); this._renderIncoming(); } }, INCOMING_TIMEOUT);
-    }
+    if (inc) return inc.from === from ? inc : null;
+    let pending = 0;
+    for (const i of this.incoming.values()) if (i.from === from) pending++;
+    if (pending >= MAX_PENDING_PER_PEER || !this._allow(from, { count: 1 })) return null;
+    inc = { tid, from, at: Date.now(), asm: null, early: [], earlyBytes: 0, ready: false, claimed: false, granted: false };
+    this.incoming.set(tid, inc);
+    setTimeout(() => { if (this.incoming.get(tid) === inc && !inc.claimed) { this.incoming.delete(tid); this._renderIncoming(); } }, INCOMING_TIMEOUT);
     return inc;
+  }
+
+  _discard(tid) {
+    const inc = this.incoming.get(tid);
+    if (!inc) return;
+    clearTimeout(inc.claimTimer);
+    this.incoming.delete(tid);
+    this._renderIncoming();
   }
 
   _onBin(from, buf) {
     let pkt;
     try { pkt = decodePacket(buf); } catch { return; }
     const h = pkt.header;
-    if (h.t !== 'chunk' || typeof h.tid !== 'string') return;
+    if (h?.t !== 'chunk' || typeof h.tid !== 'string') return;
     const inc = this.incoming.get(h.tid);
-    if (!inc || inc.from !== from) return;
+    if (!inc || inc.from !== from || inc.ready) return;
+    const len = pkt.payload.byteLength;
+    if (len > CHUNK_SIZE) { this._discard(h.tid); return; }
     try {
-      if (!inc.asm) { if (inc.early.length < 4000) inc.early.push([h.i, pkt.payload]); return; }
+      if (!inc.asm) {
+        // Morceaux arrivés avant l'annonce du fichier : tampon borné.
+        if (inc.early.length < 4000 && inc.earlyBytes + len <= MAX_SIZE) { inc.early.push([h.i, pkt.payload]); inc.earlyBytes += len; }
+        return;
+      }
+      if (inc.asm.bytes + len > inc.asm.size) throw new Error('trop d’octets');
       inc.asm.add(h.i, pkt.payload);
-    } catch { return; }
+    } catch { this._discard(h.tid); return; }
     this._renderIncomingProgress(inc);
     this._checkComplete(h.tid);
   }
@@ -357,26 +510,50 @@ export class Share {
     const inc = this.incoming.get(tid);
     if (!inc?.asm || !inc.asm.complete || inc.ready || inc.verifying) return;
     inc.verifying = true;
-    const bytes = inc.asm.assemble();
-    const hash = await sha256Hex(bytes);
-    inc.verifying = false;
-    if (inc.hash && hash !== inc.hash) {
-      this.app.ui.toast('Transfert corrompu', 'L’empreinte de la photo ne correspond pas : elle a été ignorée.', { kind: 'error' });
-      this.incoming.delete(tid);
-      this._renderIncoming();
+    let bytes;
+    try { bytes = inc.asm.assemble(); } catch { bytes = null; }
+    const hash = bytes ? await sha256Hex(bytes) : '';
+    if (!bytes || hash !== inc.hash) {
+      this._reject(tid, 'Transfert corrompu', 'L’empreinte de la photo ne correspond pas : elle a été ignorée.');
       return;
     }
-    inc.bytes = bytes;
-    inc.receivedHash = hash;
-    inc.ready = true;
+    // Seules de vraies images, décodables, sont acceptées ; leurs dimensions
+    // viennent du décodage, jamais de l'annonce réseau.
+    const type = sniffImage(bytes);
+    const dims = type ? await this._decodeDims(new Blob([bytes], { type })) : null;
+    if (this.incoming.get(tid) !== inc) return;
+    inc.verifying = false;
+    if (!dims) {
+      this._reject(tid, 'Fichier refusé', `${inc.fromName || 'L’appareil relié'} a envoyé un fichier qui n’est pas une image valide.`);
+      return;
+    }
+    Object.assign(inc, { bytes, type, receivedHash: hash, width: dims.width, height: dims.height, ready: true });
     this._renderIncomingProgress(inc);
-    if (inc.claimed) this._land(tid);
+    if (inc.claimed && inc.granted) this._land(tid);
+  }
+
+  async _decodeDims(blob) {
+    try {
+      const bmp = await createImageBitmap(blob);
+      const d = { width: bmp.width, height: bmp.height };
+      bmp.close?.();
+      return validDim(d.width) && validDim(d.height) ? d : null;
+    } catch {
+      return null;
+    }
+  }
+
+  _reject(tid, title, text) {
+    const inc = this.incoming.get(tid);
+    this._discard(tid);
+    this.app.ui.toast(title, text, { kind: 'error' });
+    this.app.ui.log('liaison', `${title.toLowerCase()} : ${inc?.name || 'photo'}`);
   }
 
   /** Photo la plus récente en attente (non réclamée). */
   _latestIncoming() {
     let best = null;
-    for (const inc of this.incoming.values()) if (!inc.claimed && inc.announced !== false && (!best || inc.at > best.at)) best = inc;
+    for (const inc of this.incoming.values()) if (!inc.claimed && inc.announced && (!best || inc.at > best.at)) best = inc;
     return best;
   }
 
@@ -402,6 +579,7 @@ export class Share {
     if (inc) this._claim(inc.tid, {});
   }
 
+  /** Lâcher ici : on réclame la photo, l'atterrissage attend l'accord de l'émetteur. */
   _claim(tid, o = {}) {
     const inc = this.incoming.get(tid);
     if (!inc || inc.claimed) return;
@@ -409,21 +587,23 @@ export class Share {
     inc.landAt = o.at || null;
     this.app.link.send(inc.from, { type: 'claim', tid });
     this.app.ui.log('geste', `photo lâchée ici : ${inc.name || 'photo'}`);
-    if (!inc.ready) {
-      $('#incomingFrom').textContent = 'Réception en cours';
-      this._renderIncoming();
-    } else {
-      this._land(tid);
-    }
+    clearTimeout(inc.claimTimer);
+    inc.claimTimer = setTimeout(() => {
+      if (this.incoming.get(tid) !== inc || inc.granted) return;
+      this._discard(tid);
+      this.app.ui.toast('Pas de confirmation', `${inc.fromName || 'L’appareil émetteur'} ne répond pas : la photo n’a pas été reçue.`, { kind: 'warn' });
+    }, GRANT_TIMEOUT);
+    this._renderIncoming();
   }
 
   async _land(tid) {
     const inc = this.incoming.get(tid);
-    if (!inc || !inc.ready || inc.landed) return;
+    if (!inc || !inc.ready || !inc.granted || inc.landed) return;
     inc.landed = true;
+    clearTimeout(inc.claimTimer);
     this.incoming.delete(tid);
     this._renderIncoming();
-    const blob = new Blob([inc.bytes], { type: 'image/jpeg' });
+    const blob = new Blob([inc.bytes], { type: inc.type || 'image/jpeg' });
     const fromName = inc.fromName || this.app.link.peers.get(inc.from)?.name || 'appareil relié';
     this.app.link.send(inc.from, { type: 'received', tid, hash: inc.receivedHash });
     if (this.app.mode !== 'galerie') this.app.setMode('galerie');
@@ -453,10 +633,11 @@ export class Share {
     const inc = this._latestIncoming() || [...this.incoming.values()].find((i) => i.claimed && !i.landed);
     if (!inc) { box.hidden = true; return; }
     box.hidden = false;
+    // Vignette validée à la réception (data:image/… en base64 uniquement).
     $('#incomingThumb').style.backgroundImage = inc.thumb ? `url("${inc.thumb}")` : '';
     $('#incomingFrom').textContent = inc.claimed ? `Réception de ${inc.fromName || 'l’appareil relié'}` : `${inc.thrown ? 'Photo lancée' : 'Photo en approche'} · ${inc.fromName || 'appareil relié'}`;
     box.querySelector('.incoming__title').textContent = inc.claimed
-      ? 'Atterrissage dès la fin du transfert…'
+      ? (inc.granted ? 'Atterrissage dès la fin du transfert…' : 'Confirmation de l’envoi…')
       : 'Ouvrez la main devant la caméra pour la lâcher ici';
     $('#btnReceive').hidden = inc.claimed;
     this._renderIncomingProgress(inc);
@@ -478,7 +659,7 @@ export class Share {
     Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none', boxShadow: '0 0 0 2px #ffb547, 0 0 40px rgba(255,181,71,.5)' });
     document.body.append(ghost);
     const dx = to.x - (r.left + r.width / 2), dy = to.y - (r.top + r.height / 2);
-    const s = 76 / Math.max(r.width, r.height);
+    const s = 76 / Math.max(r.width, r.height, 1);
     ghost.animate([
       { transform: 'translate(0,0) scale(1)', borderRadius: '0%', opacity: 1 },
       { transform: `translate(${dx}px, ${dy}px) scale(${s})`, borderRadius: '50%', opacity: 0.9 },
@@ -492,6 +673,7 @@ export class Share {
     const from = this.app.cursor.screen;
     if (!img || !from) return;
     const r = img.getBoundingClientRect();
+    if (!r.width || !r.height) return;
     const ghost = img.cloneNode();
     Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none' });
     document.body.append(ghost);
@@ -540,8 +722,8 @@ export class Share {
     this.app.sound.play('land');
     if (reducedMotion()) { URL.revokeObjectURL(url); return; }
     const maxW = Math.min(stage.width * 0.62, 760), maxH = stage.height * 0.62;
-    const ratio = (inc.width || 4) / (inc.height || 3);
-    const w = Math.min(maxW, maxH * ratio), h = w / ratio;
+    const ratio = inc.width && inc.height ? inc.width / inc.height : 4 / 3;
+    const w = Math.max(40, Math.min(maxW, maxH * ratio)), h = w / ratio;
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
@@ -561,7 +743,7 @@ export class Share {
     const grid = $('#photoGrid').getBoundingClientRect();
     const tx = slot ? slot.left + slot.width / 2 : grid.left + 100;
     const ty = slot ? slot.top + slot.height / 2 : grid.top + 70;
-    const ts = slot ? Math.max(slot.width / w, slot.height / h) : 200 / w;
+    const ts = slot && slot.width ? Math.max(slot.width / w, slot.height / h) : 200 / w;
     await img.animate([
       { transform: 'translate(0,0) scale(1)', opacity: 1 },
       { transform: `translate(${tx - cx}px, ${ty - cy}px) scale(${ts})`, opacity: 0.35 },

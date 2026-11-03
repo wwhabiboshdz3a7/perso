@@ -159,8 +159,18 @@ export class SettingsUI {
     $('#btnResetAll').addEventListener('click', async () => {
       if (!confirm('Réinitialiser JARVIS (réglages, photos, gestes enregistrés, clé IA) ?')) return;
       this.app.settings.reset();
-      await db.destroy();
-      location.reload();
+      try {
+        await db.destroy();
+        location.reload();
+      } catch (err) {
+        if (!err?.blocked) throw err;
+        // Une autre fenêtre garde la base ouverte : pas de rechargement sur
+        // une suppression en suspens (la galerie resterait bloquée).
+        this.dialog.close();
+        this.app.ui.toast('Réinitialisation en attente', 'Fermez les autres fenêtres ou onglets JARVIS : la réinitialisation se terminera ensuite.', {
+          kind: 'warn', ms: 15000, action: { label: 'Recharger', run: () => location.reload() },
+        });
+      }
     });
     $('#btnCalib').addEventListener('click', () => this.calibrate());
   }

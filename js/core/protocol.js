@@ -111,7 +111,7 @@ export function makeTransferId(rng = Math.random) {
 }
 
 /** Messages de contrôle reconnus (validation défensive des entrées réseau). */
-const CONTROL_TYPES = new Set(['hello', 'bye', 'grab', 'cancel', 'claim', 'taken', 'received', 'throw', 'file-begin', 'file-end', 'ping', 'pong', 'send']);
+const CONTROL_TYPES = new Set(['hello', 'bye', 'grab', 'cancel', 'claim', 'granted', 'denied', 'taken', 'received', 'throw', 'file-begin', 'file-end', 'ping', 'pong']);
 
 export function validControl(msg) {
   return !!msg && typeof msg === 'object' && typeof msg.type === 'string' && CONTROL_TYPES.has(msg.type)
@@ -122,4 +122,23 @@ export function formatBytes(n) {
   if (n < 1024) return `${n} o`;
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} Ko`;
   return `${(n / 1024 / 1024).toFixed(1).replace('.', ',')} Mo`;
+}
+
+/** Vignette annoncée par un autre appareil : petite image data: stricte (rien d'autre). */
+export function validThumb(s) {
+  return typeof s === 'string' && s.length < 200_000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(s);
+}
+
+/** Dimension d'image annoncée : entier raisonnable, sinon null. */
+export function validDim(v) {
+  return Number.isInteger(v) && v > 0 && v <= 16384 ? v : null;
+}
+
+/** Type d'image reconnu à ses premiers octets (JPEG, PNG, WebP), sinon null. */
+export function sniffImage(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return 'image/jpeg';
+  if (b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return 'image/png';
+  if (b.length > 12 && b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return 'image/webp';
+  return null;
 }
