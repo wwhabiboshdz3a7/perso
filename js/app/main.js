@@ -6,9 +6,9 @@ import { Settings } from './store.js';
 import { Sound } from './sound.js';
 import { UI } from './ui.js';
 import { GestureEngine } from '../core/gestures.js';
-import { SCENARIOS } from '../core/sequences.js';
-import { POSE_LABELS } from '../core/hand.js';
-import { Pipeline } from './pipeline.js';
+import { SCENARIOS, sequenceProblem, MAX_SEQUENCE_S } from '../core/sequences.js';
+import { POSE_LABELS, GESTURE_LABELS } from '../core/hand.js';
+import { Pipeline, EMPTY_RESULT } from './pipeline.js';
 import { CameraSource } from './tracker.js';
 import { SequencePlayer, MouseHand, Recorder } from './sources.js';
 import { HUD, FX } from './hud.js';
@@ -28,8 +28,8 @@ import { SettingsUI } from './settings-ui.js';
 import { db } from './db.js';
 
 const ENGINE_KEYS = ['mirror', 'dominant', 'pinchOn', 'debounce', 'swipeSpeed', 'smoothing'];
+
 const CAMERA_KEYS = ['facing', 'quality', 'model', 'delegate'];
-const GESTURE_FR = { Thumb_Up: 'pouce levé', Victory: 'victoire', ILoveYou: 'I love you', Pointing_Up: 'index levé', Open_Palm: 'main ouverte', Closed_Fist: 'poing', Two_Index: 'deux index', Thumb_Down: 'pouce baissé' };
 const DIR_FR = { left: '←', right: '→', up: '↑', down: '↓' };
 
 class App {
@@ -49,6 +49,7 @@ class App {
       toCamera: (x, y) => this.mapFromScreen(x, y),
       mirror: () => this.settings.get('mirror'),
       isActive: () => !this.player.active,
+      grabbedSince: (t) => !!this.share?.carry && this.share.carry.startedAt >= t - 50,
     });
     this.hud = new HUD(this);
     this.fx = new FX(this);
@@ -108,6 +109,12 @@ class App {
       else if (this.mode === 'holo') this.holo.onFrame(result);
     });
     this.pipeline.on('raw', (frame) => { if (frame.source === 'camera') this.recorder.push(frame); });
+    this.pipeline.on('idle', () => {
+      this.fx.setResult(null);
+      if (!this.sleep.on) this.cursor.update(EMPTY_RESULT);
+      this._visual = { frame: this.pipeline.lastFrame, result: null };
+      if (!this._visualRaf) this._visualRaf = requestAnimationFrame(() => this._drawVisual());
+    });
     this.pipeline.on('event', ({ ev, result }) => this.route(ev, result));
 
     for (const b of $$('.mode-tab')) b.addEventListener('click', () => this.setMode(b.dataset.mode));
@@ -121,6 +128,7 @@ class App {
     $('#simClose').addEventListener('click', () => this.openSim(false));
     $('#btnMouseHand').addEventListener('click', () => this.setMouseHand(!this.mouseHand.enabled));
     $('#simImport').addEventListener('change', (e) => { this.importSequence(e.target.files[0]); e.target.value = ''; });
+    $('#simStop').addEventListener('click', () => this.stopPlayback());
     this._buildSim();
 
     this.settings.on('change', (c) => this._onSettings(c));
@@ -132,6 +140,12 @@ class App {
     window.addEventListener('keydown', unlock, { capture: true });
 
     window.addEventListener('keydown', (e) => this._keys(e));
+    // Réinitialisation lancée depuis une autre fenêtre : la base a été libérée.
+    window.addEventListener('jarvis:db-reset', () => {
+      this.ui.toast('JARVIS réinitialisé ailleurs', 'Une autre fenêtre a tout réinitialisé. Rechargez cette page pour repartir de zéro.', {
+        kind: 'warn', ms: 15000, action: { label: 'Recharger', run: () => location.reload() },
+      });
+    });
     window.addEventListener('resize', () => this.hud.drawOptic(this.pipeline.lastFrame, this.pipeline.lastResult));
     setInterval(() => this._watchPerf(), 1000);
   }
@@ -154,7 +168,7 @@ class App {
     if ('userName' in c) $('#welcomeName').textContent = c.userName ? ` ${c.userName}` : '';
     if (keys.some((k) => CAMERA_KEYS.includes(k)) && this.camera.active) {
       clearTimeout(this._restartT);
-      this._restartT = setTimeout(() => { this.stopCamera(true); this.startCamera(); }, 400);
+      this._restartT = setTimeout(() => { this.stopCamera(true); this.startCamera({ silent: true }); }, 400);
     }
   }
 
@@ -166,7 +180,7 @@ class App {
     else if (e.key === '2') this.setMode('dessin');
     else if (e.key === '3') this.setMode('holo');
     else if (e.key === '/') { e.preventDefault(); $('#cmdInput').focus(); }
-    else if (e.key === 'Escape') { if (!$('#simPanel').hidden) this.openSim(false); else if (this.gallery.viewerId) this.gallery.close(); }
+    else if (e.key === 'Escape') { if (this.player.active) this.stopPlayback(); else if (!$('#simPanel').hidden) this.openSim(false); else if (this.gallery.viewerId) this.gallery.close(); }
     else return;
   }
 
@@ -200,7 +214,7 @@ class App {
       case 'grab': text = 'attraper (poing)'; break;
       case 'release': text = ev.thrown ? `lancer ${DIR_FR[ev.direction] || ''}` : 'lâcher (main ouverte)'; break;
       case 'swipe': text = `swipe ${DIR_FR[ev.direction]}`; break;
-      case 'gesture': if (!['Open_Palm', 'Closed_Fist', 'Pointing_Up'].includes(ev.name)) text = `geste : ${GESTURE_FR[ev.name] || ev.name}`; break;
+      case 'gesture': if (!['Open_Palm', 'Closed_Fist', 'Pointing_Up'].includes(ev.name)) text = `geste : ${GESTURE_LABELS[ev.name] || ev.name}`; break;
       case 'twohand:start': text = 'deux mains : manipulation'; break;
       case 'twohand:end': text = `deux mains : ×${ev.scale.toFixed(2).replace('.', ',')} · ${Math.round((ev.rotation * 180) / Math.PI)}°`; break;
       default: break;
@@ -254,6 +268,7 @@ class App {
         quality,
         model: this.settings.get('model'),
         delegate: this.settings.get('delegate'),
+        restart: silent,
       });
       const bg = $('#bgVideo');
       bg.srcObject = stream;
@@ -278,8 +293,14 @@ class App {
         NotReadableError: 'La caméra est utilisée par une autre application.',
         OverconstrainedError: 'Cette caméra ne propose pas la résolution demandée.',
         SecurityError: 'La caméra exige une connexion sécurisée (HTTPS).',
+        NotSupportedError: 'Ce navigateur ne permet pas d’utiliser la caméra ici (HTTPS requis).',
+        AbortError: 'La caméra n’a pas pu démarrer. Fermez les autres applications qui l’utilisent, puis réessayez.',
+        TypeError: 'Caméra inaccessible : ouvrez la page en HTTPS dans un navigateur récent.',
       };
-      const msg = messages[err?.name] || err?.message || 'Démarrage de la caméra impossible.';
+      const msg = messages[err?.name]
+        || (err?.fr ? err.message : /Téléchargement|Failed to fetch|NetworkError|network/i.test(err?.message || '')
+          ? 'Le modèle optique n’a pas pu être téléchargé. Vérifiez la connexion, puis réessayez.'
+          : 'Caméra inaccessible sur ce navigateur. Essayez un navigateur récent (Chrome, Edge, Safari) en HTTPS, ou la démonstration.');
       this.camera.stop();
       $('#opticMsg').textContent = 'Caméra indisponible';
       $('#opticProgress').hidden = true;
@@ -345,7 +366,7 @@ class App {
     this.setMouseHand(true);
     if (matchMedia('(pointer: coarse)').matches) {
       // Écran tactile : le banc couvrirait l'écran, il reste à portée (bouton fiole).
-      this.ui.toast('Démonstration', 'Main virtuelle : votre doigt est l’index. Toucher bref = pincement, appui long = poing, relâcher = ouvrir la main. Le banc de simulation rejoue les autres gestes.', { ms: 9000 });
+      this.ui.toast('Démonstration', 'Votre doigt est l’index. Toucher bref = pincement. Appui long sur une photo = l’attraper : elle reste en main quand le doigt se lève. Sur l’autre appareil, appui long puis relâcher = ouvrir la main pour la lâcher.', { ms: 11000 });
       return;
     }
     this.openSim(true);
@@ -403,14 +424,29 @@ class App {
   }
 
   async playSequence(seq) {
+    if (sequenceProblem(seq?.frames)) {
+      this.ui.toast('Lecture impossible', 'Ce geste enregistré est invalide ou trop long.', { kind: 'error' });
+      return;
+    }
     this.pipeline.setOverride('simulation');
     document.body.classList.add('is-simulating');
+    $('#simStop').hidden = false;
     try {
       await this.player.play(seq);
     } finally {
-      document.body.classList.remove('is-simulating');
-      this.pipeline.setOverride(this.mouseHand.enabled ? 'souris' : null);
+      if (!this.player.active) {
+        document.body.classList.remove('is-simulating');
+        $('#simStop').hidden = true;
+        this.pipeline.setOverride(this.mouseHand.enabled ? 'souris' : null);
+        this.fx.setResult(null);
+      }
     }
+  }
+
+  stopPlayback() {
+    if (!this.player.active) return;
+    this.player.stop();
+    this.ui.log('simulation', 'lecture arrêtée');
   }
 
   async toggleRecording() {
@@ -467,17 +503,20 @@ class App {
   async importSequence(file) {
     if (!file) return;
     try {
+      if (file.size > 20 * 1024 * 1024) throw new Error('taille');
       const data = JSON.parse(await file.text());
-      const frames = Array.isArray(data) ? data : data.frames;
-      const ok = Array.isArray(frames) && frames.length > 2 && frames.length < 5000 && frames.every((f) => Number.isFinite(f.t) && Array.isArray(f.hands)
-        && f.hands.every((h) => Array.isArray(h.landmarks) && h.landmarks.length === 21 && h.landmarks.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))));
-      if (!ok) throw new Error('format');
+      const frames = Array.isArray(data) ? data : data?.frames;
+      const why = sequenceProblem(frames);
+      if (why) throw new Error(why);
       const rec = { id: `seq-${Date.now().toString(36)}`, name: String(data.name || file.name).slice(0, 60), frames, createdAt: Date.now() };
       await db.put('sequences', rec);
       this.ui.toast('Geste importé', rec.name, { kind: 'ok' });
       this.renderRecordings();
-    } catch {
-      this.ui.toast('Import impossible', 'Ce fichier n’est pas un geste JARVIS valide.', { kind: 'error' });
+    } catch (err) {
+      const detail = err?.message === 'durée' ? `Un geste dure ${MAX_SEQUENCE_S} secondes au plus.`
+        : err?.message === 'temps' ? 'Les horodatages (t) doivent être croissants.'
+          : 'Ce fichier n’est pas un geste JARVIS valide.';
+      this.ui.toast('Import impossible', detail, { kind: 'error' });
     }
   }
 

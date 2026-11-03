@@ -77,6 +77,11 @@ export function softwareGpu() {
   }
 }
 
+/** Échec de téléchargement (réseau coupé, fichier absent) plutôt qu'incompatibilité. */
+export function isNetworkError(err) {
+  return /Téléchargement impossible|Failed to fetch|NetworkError|Load failed|network/i.test(String(err?.message || err || ''));
+}
+
 let visionModule = null;
 let filesetPromise = null;
 const taskCache = new Map();
@@ -243,8 +248,8 @@ export class CameraSource {
 
   async start(opts) {
     this.opts = opts;
-    if (!navigator.mediaDevices?.getUserMedia) throw new Error('Caméra non disponible : ouvrez la page en HTTPS dans un navigateur récent.');
-    this.onStatus({ phase: 'camera', message: 'Autorisation de la caméra…' });
+    if (!navigator.mediaDevices?.getUserMedia) throw Object.assign(new Error('Caméra non disponible : ouvrez la page en HTTPS dans un navigateur récent.'), { fr: true });
+    this.onStatus({ phase: 'camera', message: opts.restart ? 'Redémarrage de l’optique…' : 'Autorisation de la caméra…' });
     const light = opts.quality === 'light';
     const constraints = {
       audio: false,
@@ -287,17 +292,26 @@ export class CameraSource {
     return this.stream;
   }
 
-  /** Worker d'abord ; fil principal si le worker ne peut pas démarrer. */
+  /**
+   * Worker d'abord ; fil principal seulement si le worker est incompatible
+   * avec ce navigateur. Une panne de téléchargement (réseau, 404) n'y change
+   * rien : elle est remontée telle quelle et le prochain essai reprend le worker.
+   */
   async _loadEngine(kind, delegate, onProgress) {
     if (!this._mainOnly && typeof Worker !== 'undefined' && typeof createImageBitmap === 'function') {
       try {
         this._worker = this._worker && !this._worker.broken ? this._worker : new WorkerEngine();
         return await this._worker.load(kind, delegate, onProgress);
       } catch (err) {
+        if (isNetworkError(err) && !this._worker?.broken) throw err;
         console.info('[jarvis] inférence en worker indisponible, repli sur le fil principal :', err?.message || err);
         this._worker?.terminate();
         this._worker = null;
+        this._main = this._main || new MainEngine();
+        const engine = await this._main.load(kind, delegate, onProgress);
+        // Le fil principal fonctionne là où le worker a échoué : on s'y tient.
         this._mainOnly = true;
+        return engine;
       }
     }
     this._main = this._main || new MainEngine();

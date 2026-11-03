@@ -34,7 +34,7 @@ const UNITS = {
   zero: 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9,
   dix: 10, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15, seize: 16,
   vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60,
-  cent: 100, cents: 100, mille: 1000,
+  cent: 100, cents: 100, mille: 1000, million: 1e6, millions: 1e6,
 };
 
 function isNumberToken(tok) {
@@ -58,6 +58,7 @@ export function readNumber(tokens, i) {
     const v = UNITS[tok];
     if (v === 100) current = (current || 1) * 100;
     else if (v === 1000) { total += (current || 1) * 1000; current = 0; }
+    else if (v === 1e6) { total += (current || 1) * 1e6; current = 0; }
     else if (v === 20 && prev === 'quatre') current = current - 4 + 80;
     else current += v;
     prev = tok;
@@ -85,7 +86,11 @@ export function parseDuration(text) {
     .replace(/ (une |un )?demi heure /g, ' 30 minutes ')
     .replace(/ (un )?quart d heure /g, ' 15 minutes ')
     .replace(/ trois quarts? d heure /g, ' 45 minutes ')
-    .replace(/ (une |un )?demi minute /g, ' 30 secondes ');
+    .replace(/ (une |un )?demi minute /g, ' 30 secondes ')
+    // « 30s », « 5min », « 2h » : nombre collé à son unité.
+    .replace(/ (\d+(?:\.\d+)?)(h|hr|min|mins|mn|s|sec|secs|secondes?|minutes?|heures?) /g, ' $1 $2 ')
+    // « un million d'heures » : « d » entre le nombre et l'unité.
+    .replace(/ (d|de) (heures?|minutes?|secondes?) /g, ' $2 ');
   const tokens = s.trim().split(' ');
   let total = 0, lastUnit = 0, found = false;
   for (let i = 0; i < tokens.length; i++) {
@@ -140,6 +145,23 @@ const MODE_WORDS = [
 
 const has = (n, re) => re.test(n);
 
+// Formules de demande qui précèdent une commande (« tu peux prendre une capture »).
+const POLITE_START = /^(?:(?:est ce que |est ce qu )?(?:tu peux|tu pourrais|peux tu|pourrais tu|pouvez vous|pourriez vous|vous pouvez|veux tu|voudrais tu|tu veux bien|tu voudrais bien|je veux que tu|je voudrais que tu|j aimerais que tu|merci de|s il te plait|s il vous plait|stp|svp|vas y|allez|ok|okay|alors|bon|eh|dis|dites)\s+)+/;
+const POLITE_END = /(?:\s+(?:s il te plait|s il vous plait|stp|svp|merci|jarvis|maintenant|vite))+$/;
+// Questions ouvertes : elles vont au cerveau IA, sauf les quelques formes
+// reconnues plus bas (heure, date, météo, aide, présentation).
+const QUESTION = /^(comment|pourquoi|qu est ce|est ce que|est ce qu|c est quoi|ce serait quoi|que signifie|que veut dire|explique|raconte|qui |quand |combien|ou |d ou |quel est|quelle est|quels sont|quelles sont|quel serait|quelle serait|sais tu|connais tu|parle moi|dis moi (pourquoi|comment|qui|quand|ce que|si|combien|ou)|a quel|a quelle|a qui|de quel|de quelle|en quelle|en quel|depuis quand|jusqu a quand|tu sais|t sais|me donner|m expliquer|m aider|aide moi a|j ai besoin|je cherche|je voudrais savoir|j aimerais savoir|je me demande)\b/;
+
+const HELP_RE = /^(aide|aide moi|a l aide|de l aide|help|les commandes|commandes|liste des commandes|quelles commandes|quelles sont les commandes|que sais tu faire|qu est ce que tu sais faire|tu sais faire quoi|que peux tu faire|qu est ce que tu peux faire|tu peux faire quoi|que fais tu)$/;
+const TIME_RE = /^(?:dis moi |donne moi |me dire |me donner )?(?:quelle heure(?: est il| il est| c est| est il maintenant)?|il est quelle heure|l heure|tu as l heure|t as l heure|vous avez l heure)(?: maintenant| exactement| actuellement| ici)?$/;
+const DATE_RE = /^(?:dis moi |donne moi |me dire |me donner )?(?:quel jour(?: sommes nous| on est| est on| est il| nous sommes| est ce| on est aujourd hui)?|on est quel jour|on est le combien|nous sommes le combien|quelle (?:est la )?date(?: on est| sommes nous| d aujourd hui| du jour)?|la date(?: d aujourd hui| du jour)?|date du jour|c est quel jour)(?: aujourd hui| exactement)?$/;
+const WHO_RE = /^(qui es tu|tu es qui|qui etes vous|presente toi|comment tu t appelles|comment t appelles tu|quel est ton nom|c est quoi ton nom|ton nom)$/;
+const WEATHER_WORDS = /\b(meteo|quel temps|fait il (chaud|froid|beau)|va t il pleuvoir|pleut il|il pleut|previsions? meteo|previsions)\b/;
+// « température » seul est ambigu (« température du soleil ») : forme stricte.
+const WEATHER_TEMP = /(^(la )?temperature$|\btemperature (a|en|au|aux|sur|de|dehors|exterieure|actuelle|aujourd hui|ce matin|ce soir|demain|maintenant|ici)\b|\bquelle temperature (fait il|il fait)\b)/;
+const WEATHER_QUESTION = /^(quel temps|quelle (est la )?meteo|quelle meteo|comment est la meteo|la meteo|quelle (est la )?temperature( a| en| au| sur| de| dehors| exterieure| actuelle| aujourd hui| ce matin| ce soir| demain| maintenant| ici|$)|quelle temperature (fait il|il fait)|va t il pleuvoir|est ce qu il (va )?pleu|est ce qu il fait (beau|chaud|froid)|il fait (beau|chaud|froid)|fait il (beau|chaud|froid)|quelles sont les previsions|il pleut)/;
+const MAX_TIMER_S = 24 * 3600;
+
 /**
  * Analyse une commande.
  * @returns {{intent:string, params:object, text:string, normalized:string, woke:boolean}}
@@ -152,61 +174,77 @@ export function parseCommand(input) {
 
   if (!n) return out(woke ? 'wake-only' : 'empty');
 
-  if (has(n, /\b(aide|que sais tu faire|qu est ce que tu sais faire|quelles commandes|liste des commandes|tu sais faire quoi|que peux tu faire)\b/)) return out('help');
-  if (has(n, /\b(reveille toi|reveil|debout|sors de (la )?veille|reprends|je suis la|reactive toi)\b/)) return out('wake');
-  if (has(n, /\b(mode veille|en veille|mets toi en veille|va dormir|eteins toi|mise en veille)\b/) || /^(veille|dors|repos|au repos)$/.test(n)) return out('sleep');
+  // Noyau de la phrase, sans les formules de politesse autour.
+  const core = n.replace(POLITE_START, '').replace(POLITE_END, '').trim() || n;
+  const question = QUESTION.test(core) || QUESTION.test(n) || /\?\s*$/.test(String(text));
+
+  if (HELP_RE.test(core) || HELP_RE.test(n)) return out('help');
+  if (TIME_RE.test(core)) return out('time');
+  if (DATE_RE.test(core)) return out('date');
+  if (WHO_RE.test(core)) return out('who');
+
+  if (question) {
+    // Seules les questions météo explicites restent locales.
+    if (WEATHER_QUESTION.test(core) || (WEATHER_WORDS.test(core) && !/^(comment|pourquoi|qu est ce|explique|c est quoi)\b/.test(core) && extractCity(text))) {
+      return out('weather', { city: extractCity(text) });
+    }
+    return out('unknown');
+  }
+
+  if (/^(reveille toi|reveillez vous|reveil|debout|sors de (la )?veille|reprends|reprenons|on reprend|je suis la|reactive toi|c est reparti)$/.test(core)) return out('wake');
+  if (has(core, /\b(mode veille|mets toi en veille|passe en veille|va dormir|eteins toi|mise en veille)\b/) || /^(veille|en veille|dors|repos|au repos)$/.test(core)) return out('sleep');
 
   const timerWord = /\b(minuterie|minuteur|timer|compte a rebours|chrono|chronometre|rappelle moi dans|alarme dans|sonne dans)\b/;
-  if (has(n, /\b(annule|arrete|stop|supprime|coupe|efface)\b/) && has(n, /\b(minuterie|minuteur|minuteries|timer|compte a rebours|alarme)\b/)) return out('timer-cancel');
+  if (has(core, /\b(annule|arrete|stop|supprime|coupe|efface)\b/) && has(core, /\b(minuterie|minuteur|minuteries|timer|compte a rebours|alarme)\b/)) return out('timer-cancel');
   const dur = parseDuration(text);
-  if (has(n, timerWord) || (dur && has(n, /\b(dans|pendant|pour)\b/) && !has(n, /\bmeteo\b/))) {
+  const implicit = dur > 0 && /^(rappelle moi|previens moi|avertis moi|reveille moi|sonne|bipe)\b/.test(core) && has(core, /\b(dans|pendant)\b/);
+  if (has(core, timerWord) || implicit) {
     if (dur > 0) {
-      const label = (text.match(/\bpour (?:le |la |les |l')?([\p{L} '-]{2,30})$/iu) || [])[1] || '';
-      return out('timer', { seconds: dur, label: label.trim() });
+      const m = String(text).match(/\bpour ((?:le |la |les |l['’]|du |des |de la |mon |ma |mes |ton |ta |tes )?([\p{L}][\p{L} '’-]{1,30}))[\s?!.…]*$/iu);
+      const label = m && !parseDuration(m[2]) ? m[2].trim() : '';
+      const purpose = label ? m[1].trim() : '';
+      return out('timer', { seconds: dur, label, purpose, tooLong: dur > MAX_TIMER_S });
     }
-    if (has(n, timerWord)) return out('timer', { seconds: 0 });
+    if (has(core, timerWord)) return out('timer', { seconds: 0 });
   }
 
-  if (has(n, /\b(meteo|quel temps|temperature|fait il (chaud|froid|beau)|va t il pleuvoir|pleut il|il pleut|previsions?)\b/)) {
-    return out('weather', { city: extractCity(text) });
-  }
-  if (has(n, /\b(quelle heure|l heure|il est quelle heure|heure est il|donne moi l heure)\b/)) return out('time');
-  if (has(n, /\b(quel jour|quelle date|on est le combien|date du jour|la date|quel jour sommes nous|on est quel jour)\b/)) return out('date');
+  if (WEATHER_WORDS.test(core) || WEATHER_TEMP.test(core)) return out('weather', { city: extractCity(text) });
 
-  if (has(n, /\b(prends?|prendre|fais|faire) (une |un )?(capture|photo|cliche|selfie)\b/) || has(n, /\b(capture|selfie|cheese|photographie moi|immortalise)\b/)) {
-    if (!has(n, /\b(envoie|envoyer|partage|transfere)\b/)) return out('capture');
+  const sendWords = /\b(envoie|envoyer|envoi|partage|partager|transfere|transferer|balance|lance|lancer)\b/;
+  if (!has(core, sendWords) && (/^(prends?|prendre|fais|faire|lance|declenche)( moi| nous)? (une |un |la |le )?(capture|photo|cliche|selfie)\b/.test(core)
+    || /^(capture|une capture|selfie|cheese|photographie moi|immortalise( moi| ca| ce moment)?|photo)$/.test(core))) {
+    return out('capture');
   }
-  if ((has(n, /\b(envoie|envoyer|envoi|partage|partager|transfere|transferer|balance|lance|lancer)\b/) && has(n, /\b(photo|image|cliche|celle ci)\b/))
-    || /^(envoie|envoie la|envoie le|envoie ca|partage la|partage ca|transfere la)$/.test(n)) {
+  if ((has(core, sendWords) && has(core, /\b(photo|image|cliche|celle ci)\b/))
+    || /^(envoie|envoie la|envoie le|envoie ca|partage la|partage ca|transfere la)$/.test(core)) {
     return out('send-photo');
   }
 
-  if (has(n, /\b(photo suivante|image suivante|prochaine photo|prochaine image)\b/) || /^(la )?suivante?$/.test(n)) return out('next');
-  if (has(n, /\b(photo precedente|image precedente)\b/) || /^(la )?precedente?$/.test(n)) return out('prev');
-  if (has(n, /\b(favori|favoris|coup de coeur|ajoute aux favoris|mets en favori|mets la en favori)\b/)) return out('favorite');
+  if (/^(la |une )?(photo|image) suivante$|^(la )?(prochaine|suivante?)( photo| image)?$/.test(core) || has(core, /^(passe a la|va a la|montre la) (photo |image )?suivante\b/)) return out('next');
+  if (/^(la |une )?(photo|image) precedente$|^(la )?precedente?( photo| image)?$/.test(core) || has(core, /^(reviens a la|retourne a la|va a la|montre la) (photo |image )?precedente\b/)) return out('prev');
+  if (/^(favori|favoris|en favori|coup de coeur)$/.test(core) || /^(mets?|ajoute|garde|marque|passe)\b.*\bfavoris?\b/.test(core)) return out('favorite');
 
-  if (has(n, /\b(efface tout|efface le dessin|nouveau dessin|nettoie|table rase|vide le dessin|efface l ardoise)\b/)) return out('clear-drawing');
-  if (has(n, /\b(enregistre|sauvegarde|exporte|garde)\b/) && has(n, /\b(dessin|tableau|croquis)\b/)) return out('export-drawing');
+  if (/^(efface tout|efface le dessin|nouveau dessin|nettoie( l ardoise| le dessin| tout)?|table rase|vide le dessin|efface l ardoise|on efface tout)\b/.test(core)) return out('clear-drawing');
+  if (/^(enregistre|sauvegarde|exporte|garde|range)\b/.test(core) && has(core, /\b(dessin|tableau|croquis)\b/)) return out('export-drawing');
 
-  if (has(n, /\bplein ecran\b/)) return out(has(n, /\b(quitte|sors|sortir|ferme)\b/) ? 'fullscreen-exit' : 'fullscreen');
-  if (has(n, /\b(coupe le son|silence|mode muet|muet|sans le son)\b/)) return out('mute');
-  if (has(n, /\b(active le son|remets le son|reactive le son|avec le son)\b/)) return out('unmute');
-  if (has(n, /\b(camera)\b/)) {
-    if (has(n, /\b(coupe|eteins|desactive|arrete|stop)\b/)) return out('camera-off');
-    if (has(n, /\b(active|allume|demarre|lance|ouvre)\b/)) return out('camera-on');
+  if (has(core, /\bplein ecran\b/)) return out(has(core, /\b(quitte|sors|sortir|ferme|enleve)\b/) ? 'fullscreen-exit' : 'fullscreen');
+  if (/^(coupe le son|coupe les sons|silence|mode muet|muet|mode silencieux|sans le son|en silence)\b/.test(core)) return out('mute');
+  if (/^(active le son|remets le son|remets les sons|reactive le son|avec le son|rallume le son)\b/.test(core)) return out('unmute');
+  if (has(core, /\bcamera\b/)) {
+    if (/^(coupe|eteins|desactive|arrete|stop|ferme)\b/.test(core)) return out('camera-off');
+    if (/^(active|allume|demarre|lance|ouvre|mets|rallume)\b/.test(core)) return out('camera-on');
   }
-  if (has(n, /\b(mode (simulation|demo|demonstration)|simulation|demonstration)\b/)) return out('simulation');
-  if (has(n, /\b(ferme|quitte|sors)\b/) && has(n, /\b(visionneuse|photo|image)\b/)) return out('close-viewer');
+  if (/^(mode |lance |ouvre |active |demarre )?(la |une )?(simulation|demo|demonstration)( sans camera)?$/.test(core)) return out('simulation');
+  if (/^(ferme|quitte|sors)\b/.test(core) && has(core, /\b(visionneuse|photo|image)\b/)) return out('close-viewer');
 
-  const verb = /\b(ouvre|ouvrir|affiche|afficher|montre|montrer|lance|va|aller|passe|mode|active|demarre|bascule|retourne|reviens)\b/;
+  const verb = /^(ouvre|ouvrir|affiche|afficher|montre|montre moi|montrer|lance|va|aller|passe|mode|active|demarre|bascule|retourne|reviens)\b/;
   for (const [mode, re] of MODE_WORDS) {
-    if (has(n, re) && (has(n, verb) || n.split(' ').length <= 3)) return out('open-mode', { mode });
+    if (has(core, re) && (verb.test(core) || core.split(' ').length <= 3)) return out('open-mode', { mode });
   }
 
-  if (has(n, /^(bonjour|salut|hello|coucou|bonsoir|hey|yo)\b/)) return out('hello');
-  if (has(n, /^(merci|merci beaucoup|super merci|parfait merci)\b/)) return out('thanks');
-  if (has(n, /\b(qui es tu|tu es qui|presente toi|comment tu t appelles|ton nom)\b/)) return out('who');
-  if (has(n, /^(stop|tais toi|chut|arrete de parler|ca suffit)$/)) return out('stop');
+  if (/^(bonjour|salut|hello|coucou|bonsoir|hey|yo)\b/.test(core) && core.split(' ').length <= 4) return out('hello');
+  if (/^(merci|merci beaucoup|super merci|parfait merci|merci bien)$/.test(n)) return out('thanks');
+  if (/^(stop|tais toi|chut|arrete de parler|ca suffit)$/.test(n)) return out('stop');
 
   return out('unknown');
 }

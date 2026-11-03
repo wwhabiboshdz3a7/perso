@@ -38,7 +38,20 @@ export const POSE_LABELS = Object.freeze({
   victory: 'victoire',
   thumb_up: 'pouce levé',
   thumb_down: 'pouce baissé',
-  iloveyou: 'I love you',
+  iloveyou: 'signe « je t’aime »',
+});
+
+/** Noms français des gestes canoniques du modèle MediaPipe. */
+export const GESTURE_LABELS = Object.freeze({
+  Thumb_Up: 'pouce levé',
+  Thumb_Down: 'pouce baissé',
+  Victory: 'victoire',
+  ILoveYou: 'signe « je t’aime »',
+  Pointing_Up: 'index levé',
+  Open_Palm: 'main ouverte',
+  Closed_Fist: 'poing',
+  Two_Index: 'deux index',
+  None: 'aucun',
 });
 
 /** Catégories du modèle MediaPipe → poses internes. */

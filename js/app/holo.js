@@ -35,6 +35,10 @@ export class Holo {
       const THREE = await import('../../vendor/three/three.module.js');
       this.THREE = THREE;
       const renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+      // Contexte graphique perdu (onglet en arrière-plan sur mobile, mémoire,
+      // pilote) : boucle suspendue et message, puis reprise à la restauration.
+      this.canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); this._setLost(true); });
+      this.canvas.addEventListener('webglcontextrestored', () => this._setLost(false));
       this.maxRatio = Math.min(2, window.devicePixelRatio || 1);
       this.ratio = this.maxRatio;
       renderer.setPixelRatio(this.ratio);
@@ -50,7 +54,9 @@ export class Holo {
       this.reactor.visible = false;
       this.root.add(this.globe, this.reactor);
       this._buildLabels();
-      new ResizeObserver(() => this._resize()).observe(this.wrap);
+      this._ro?.disconnect();
+      this._ro = new ResizeObserver(() => this._resize());
+      this._ro.observe(this.wrap);
       this._resize();
       this.ready = true;
     } catch (err) {
@@ -234,10 +240,52 @@ export class Holo {
 
   stop() { this.running = false; this.drag = null; }
 
+  _setLost(lost) {
+    this.lost = lost;
+    let box = this.wrap.querySelector('.holo-lost');
+    if (lost && !box) {
+      const btn = el('button', { type: 'button', class: 'btn btn--sm btn--primary', 'data-air': '' }, 'Relancer l’hologramme');
+      btn.addEventListener('click', () => this.relaunch());
+      box = el('div', { class: 'holo-lost', role: 'alert' },
+        el('p', { class: 'holo-lost__title', text: 'Projection interrompue' }),
+        el('p', { class: 'holo-lost__text', text: 'Le navigateur a libéré le contexte graphique (mémoire, mise en arrière-plan).' }),
+        btn);
+      this.wrap.append(box);
+    }
+    if (box) box.hidden = !lost;
+    if (lost) this.app.ui.log('système', 'hologramme : contexte graphique perdu');
+    else { this._resize(); this.app.ui.log('système', 'hologramme : contexte graphique restauré'); }
+  }
+
+  /** Restauration demandée ; à défaut, reconstruction complète sur un canevas neuf. */
+  relaunch() {
+    if (!this.lost) return;
+    try { this.renderer?.forceContextRestore(); } catch { /* extension absente */ }
+    clearTimeout(this._relaunchT);
+    this._relaunchT = setTimeout(() => { if (this.lost) this._rebuild(); }, 1500);
+  }
+
+  async _rebuild() {
+    const wasRunning = this.running;
+    this.running = false;
+    try { this.renderer?.dispose(); } catch { /* contexte déjà perdu */ }
+    const fresh = this.canvas.cloneNode(false);
+    this.canvas.replaceWith(fresh);
+    this.canvas = fresh;
+    this._bindCanvas(fresh);
+    this.ready = false;
+    this.failed = false;
+    this.renderer = null;
+    this.lost = false;
+    const box = this.wrap.querySelector('.holo-lost');
+    if (box) box.hidden = true;
+    if (wasRunning || this.app.mode === 'holo') await this.start();
+  }
+
   _loop(now) {
     if (!this.running) return;
     requestAnimationFrame(this._loop);
-    if (document.hidden) return;
+    if (document.hidden || this.lost) return;
     const raw = now - this._t;
     const dt = Math.min(0.05, raw / 1000);
     this._t = now;
@@ -324,7 +372,10 @@ export class Holo {
   _bindUi() {
     for (const b of document.querySelectorAll('[data-holo]')) b.addEventListener('click', () => this.setObject(b.dataset.holo));
     $('#btnHoloReset').addEventListener('click', () => this.reset());
-    const c = this.canvas;
+    this._bindCanvas(this.canvas);
+  }
+
+  _bindCanvas(c) {
     c.addEventListener('pointerdown', (e) => {
       if (this.app.mouseHand?.enabled && e.pointerType === 'mouse') return;
       c.setPointerCapture(e.pointerId);

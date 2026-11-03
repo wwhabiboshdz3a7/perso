@@ -76,8 +76,12 @@ export class SequencePlayer {
  *   relâcher après un appui maintenu = main ouverte (lâcher)
  */
 export class MouseHand {
-  constructor({ onFrame, toCamera, mirror, isActive }) {
+  constructor({ onFrame, toCamera, mirror, isActive, grabbedSince }) {
     this.onFrame = onFrame;
+    // Au doigt : si l'appui long vient d'attraper une photo, lever le doigt
+    // fait sortir la main fermée (la photo reste en main, comme un poing qui
+    // quitte le champ de la caméra) ; sinon la main s'ouvre (lâcher).
+    this.grabbedSince = grabbedSince || (() => false);
     this.toCamera = toCamera; // (sx, sy) écran → coordonnées d'affichage caméra
     this.mirror = mirror;
     this.isActive = isActive;
@@ -142,7 +146,9 @@ export class MouseHand {
   _onDown(e) {
     if (e.button !== 0 || this._isUi(e.target)) return;
     this.down = true;
+    this.lifted = false;
     this.downAt = performance.now();
+    this.downEpoch = Date.now();
     this.after = null;
     this.pos = { x: e.clientX, y: e.clientY };
     this.inside = true;
@@ -153,14 +159,29 @@ export class MouseHand {
     this.down = false;
     const held = performance.now() - this.downAt;
     if (!this._inViewport(e)) { this.inside = false; this.pos = null; return; } // la main « sort » fermée
+    const touch = e.pointerType !== 'mouse';
+    if (touch && held >= 230 && this.grabbedSince(this.downEpoch)) {
+      this.inside = false; this.pos = null; this.after = null; this.suppressClick = true;
+      return;
+    }
     const now = performance.now();
     if (held < 230) this.after = { pose: 'pinch', until: now + 160, frames: 4 }; // clic bref = pincement
     else this.after = { pose: 'open', until: now + 450, frames: 8 }; // fin d'appui long : la main s'ouvre (lâcher)
+    // Doigt levé : la main reste visible le temps de la pose finale, puis disparaît.
+    this.lifted = touch;
     this.suppressClick = true;
   }
 
-  _onLeave() {
-    if (!this.down) { this.inside = false; }
+  _onLeave(e) {
+    // Les écrans tactiles émettent « pointerleave » juste après « pointerup » :
+    // la pose finale (main qui s'ouvre) doit d'abord être vue par le moteur.
+    if (e?.pointerType && e.pointerType !== 'mouse') return;
+    if (!this.down && !this._holding(performance.now())) this.inside = false;
+  }
+
+  _holding(now) {
+    const a = this.after;
+    return !!a && (now < a.until || a.frames > 0);
   }
 
   _onClick(e) {
@@ -198,7 +219,13 @@ export class MouseHand {
     // Cadence d'une caméra (30 images/s), pas celle de l'écran.
     if (now - (this._last || 0) < 31) return;
     this._last = now;
-    if (!this.pos || !this.inside) {
+    if (this.lifted && !this.down && !this._holding(now)) {
+      // Fin de la pose qui suit le doigt levé : la main quitte le champ.
+      this.lifted = false;
+      this.after = null;
+      this.pos = null;
+    }
+    if (!this.pos || (!this.inside && !this._holding(now))) {
       // Quelques images vides suffisent pour que le moteur constate l'absence de main.
       if (now - (this._goneAt ??= now) < 1000) this.onFrame({ t: now, width: 1280, height: 720, hands: [], source: 'souris' });
       return;

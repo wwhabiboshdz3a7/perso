@@ -212,7 +212,7 @@ export function twoHands({ zoom = 1.8, rotate = 0, ...o } = {}) {
   return compose({ ...o, hands: [mk('Right', 1), mk('Left', -1)] });
 }
 
-/** Maintien d'une pose (pouce levé, victoire, I love you…). */
+/** Maintien d'une pose (pouce levé, victoire, signe « je t’aime »…). */
 export function holdPose(pose, o = {}) {
   const side = o.side ?? 'Right';
   const x = o.x ?? 0.5, y = o.y ?? 0.5;
@@ -291,8 +291,28 @@ export const SCENARIOS = {
   rotation: { label: 'Rotation 2 mains', build: (p = {}) => twoHands({ zoom: 1, rotate: p.rotate ?? 0.6, ...p }) },
   'pouce-leve': { label: 'Pouce levé', build: (p = {}) => holdPose('thumb_up', p) },
   victoire: { label: 'Victoire', build: (p = {}) => holdPose('victory', p) },
-  iloveyou: { label: 'I love you', build: (p = {}) => holdPose('iloveyou', p) },
+  iloveyou: { label: 'Signe « je t’aime »', build: (p = {}) => holdPose('iloveyou', p) },
   cercle: { label: 'Dessiner un cercle', build: (p = {}) => drawPath(circlePoints(p.x ?? 0.5, p.y ?? 0.5, p.r ?? 0.18), p) },
   'deux-index': { label: 'Deux index', build: (p = {}) => twoIndex(p) },
   gomme: { label: 'Gommer', build: (p = {}) => fistPath([[0.4, 0.4], [0.6, 0.45], [0.4, 0.55], [0.6, 0.6]], p) },
 };
+
+/** Durée maximale d'un geste enregistré ou importé (secondes). */
+export const MAX_SEQUENCE_S = 60;
+
+/** Geste enregistré ou importé : raison du refus, ou null s'il est jouable. */
+export function sequenceProblem(frames) {
+  if (!Array.isArray(frames) || frames.length < 3 || frames.length > 5000) return 'format';
+  let prev = -Infinity;
+  for (const f of frames) {
+    if (!f || !Number.isFinite(f.t) || !Array.isArray(f.hands) || f.hands.length > 2) return 'format';
+    if (f.t < prev) return 'temps';
+    prev = f.t;
+    for (const h of f.hands) {
+      if (!Array.isArray(h?.landmarks) || h.landmarks.length !== 21) return 'format';
+      if (!h.landmarks.every((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y) && Math.abs(p.x) < 10 && Math.abs(p.y) < 10)) return 'format';
+    }
+  }
+  if (frames.at(-1).t - frames[0].t > MAX_SEQUENCE_S * 1000) return 'durée';
+  return null;
+}

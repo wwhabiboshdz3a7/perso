@@ -147,7 +147,7 @@ export class Assistant {
     this._renderState();
   }
 
-  /** Geste « I love you » : écoute immédiate sans mot d'éveil. */
+  /** Geste « je t’aime » (ILoveYou) : écoute immédiate sans mot d'éveil. */
   attention() {
     if (!this.wanted) this.start();
     this.awaitUntil = Date.now() + AWAIT_MS;
@@ -201,6 +201,21 @@ export class Assistant {
     }
   }
 
+  /** Question libre transmise au cerveau IA (réponse affichée et lue en texte brut). */
+  async _askBrain(question) {
+    this.reply('Réflexion…', { speak: false });
+    document.body.classList.add('is-thinking');
+    try {
+      const answer = forSpeech(await this.brain.ask(question));
+      this.reply(answer);
+      this.app.ui.log('ia', answer.slice(0, 120));
+    } catch (err) {
+      this.reply(err.message || 'Le cerveau IA ne répond pas.');
+    } finally {
+      document.body.classList.remove('is-thinking');
+    }
+  }
+
   /** Exécute une phrase (voix ou clavier). */
   async handle(text, { source = 'clavier', parsed } = {}) {
     const cmd = parsed || parseCommand(text);
@@ -232,10 +247,11 @@ export class Assistant {
           } else if (m === 'confidentialite') { window.open('confidentialite.html', '_blank', 'noopener'); this.reply('Tout est expliqué sur cette page.'); }
           return;
         }
-        case 'send-photo':
-          await app.share.sendPhoto();
-          this.reply(app.link.list().length ? 'Photo envoyée.' : 'Aucun appareil n’est relié pour le moment.');
+        case 'send-photo': {
+          const sent = await app.share.sendPhoto();
+          this.reply(sent ? 'Photo envoyée.' : app.link.list().length ? 'Je n’ai pas pu envoyer cette photo.' : 'Aucun appareil n’est relié pour le moment.');
           return;
+        }
         case 'time': {
           const d = new Date();
           this.reply(`Il est ${d.getHours()} heure${d.getHours() > 1 ? 's' : ''} ${String(d.getMinutes()).padStart(2, '0')}.`);
@@ -254,14 +270,17 @@ export class Assistant {
             if (!p.city || w.place.name.toLowerCase() === (app.settings.get('city') || '').toLowerCase()) app.weather.renderWidget(w);
             this.reply(app.weather.sentence(w));
           } catch (err) {
+            // Ville inconnue : c'était peut-être une question libre (« température de l'eau »).
+            if (err?.code === 'notfound' && p.city && this.brain.enabled) { await this._askBrain(cmd.text || text); return; }
             this.reply(err?.code === 'notfound' ? `Je ne trouve pas la ville « ${city} ».` : 'Le service météo est injoignable pour le moment.');
           }
           return;
         }
         case 'timer':
           if (!p.seconds) { this.reply('Pour combien de temps ? Par exemple : minuterie de cinq minutes.'); return; }
+          if (p.tooLong) { this.reply('C’est un peu long : une minuterie dure 24 heures au plus.'); return; }
           app.timers.add(p.seconds, p.label);
-          this.reply(`Minuterie de ${spokenDuration(p.seconds)} lancée${p.label ? ` pour ${p.label}` : ''}.`);
+          this.reply(`Minuterie de ${spokenDuration(p.seconds)} lancée${p.purpose ? ` pour ${p.purpose}` : ''}.`);
           return;
         case 'timer-cancel': {
           const n = app.timers.clear();
@@ -269,8 +288,12 @@ export class Assistant {
           return;
         }
         case 'capture':
+          if (!app.capture.available()) {
+            this.reply('Activez d’abord la caméra, dans le panneau Optique, puis redemandez-moi une capture.');
+            return;
+          }
           this.reply('Souriez.');
-          await app.capture.take();
+          await app.capture.take({ via: source === 'voix' ? 'commande vocale' : 'commande clavier' });
           return;
         case 'sleep':
           this.reply('Je me mets en veille.');
@@ -346,18 +369,7 @@ export class Assistant {
           return;
         default:
           if (this.brain.enabled) {
-            this.reply('Réflexion…', { speak: false });
-            document.body.classList.add('is-thinking');
-            try {
-              // Réponse affichée et lue en texte brut (sans markdown).
-              const answer = forSpeech(await this.brain.ask(cmd.text || text));
-              this.reply(answer);
-              app.ui.log('ia', answer.slice(0, 120));
-            } catch (err) {
-              this.reply(err.message || 'Le cerveau IA ne répond pas.');
-            } finally {
-              document.body.classList.remove('is-thinking');
-            }
+            await this._askBrain(cmd.text || text);
           } else {
             this.reply('Je n’ai pas compris. Dites « aide » pour la liste des commandes, ou branchez un cerveau IA dans les réglages pour les questions libres.');
           }

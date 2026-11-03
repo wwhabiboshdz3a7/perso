@@ -2,7 +2,7 @@
 // plein écran (squelette fantôme, particules, ondes).
 
 import { $, fitCanvas, reducedMotion } from './dom.js';
-import { HAND_CONNECTIONS, POSE_LABELS } from '../core/hand.js';
+import { HAND_CONNECTIONS, POSE_LABELS, GESTURE_LABELS } from '../core/hand.js';
 
 const TIPS = [4, 8, 12, 16, 20];
 const COLORS = ['#6ee7ff', '#ffb547'];
@@ -136,9 +136,22 @@ export class HUD {
     this.el.latencyUnit.textContent = unit;
   }
 
-  updateSensors(result, frame) {
+  updateSensors(result, frame, { force = false } = {}) {
     const now = performance.now();
-    if (now - this._lastSensors < 120) return;
+    this._pendingSensors = [result, frame];
+    if (!force && now - this._lastSensors < 120) {
+      // Mise à jour finale différée : la dernière image est toujours affichée.
+      if (!this._sensT) {
+        this._sensT = setTimeout(() => {
+          this._sensT = 0;
+          const [r, f] = this._pendingSensors;
+          this.updateSensors(r, f, { force: true });
+        }, 125 - (now - this._lastSensors));
+      }
+      return;
+    }
+    clearTimeout(this._sensT);
+    this._sensT = 0;
     this._lastSensors = now;
     const cam = this.app.camera;
     const pipe = this.app.pipeline;
@@ -165,7 +178,9 @@ export class HUD {
     const p = result?.primary;
     if (p) {
       this.el.pose.textContent = POSE_LABELS[p.pose] || p.pose;
-      this.el.model.textContent = p.model && p.model.name && p.model.name !== 'None' ? `modèle : ${p.model.name} ${(p.model.score * 100).toFixed(0)} %` : 'géométrie';
+      this.el.model.textContent = p.model && p.model.name && p.model.name !== 'None'
+        ? `modèle : ${GESTURE_LABELS[p.model.name] || p.model.name} ${(p.model.score * 100).toFixed(0)} %`
+        : 'géométrie';
       const v = Math.max(0, Math.min(1, 1 - (p.pinchRatio - 0.05) / 0.9));
       this.el.pinch.style.width = `${(v * 100).toFixed(0)}%`;
     } else {
@@ -208,7 +223,7 @@ export class FX {
 
   setResult(result) {
     this.result = result;
-    this.resultAt = performance.now();
+    this.resultAt = result ? performance.now() : 0;
     this._dirty = true;
   }
 
@@ -241,15 +256,27 @@ export class FX {
     requestAnimationFrame(this._loop);
     const dt = Math.min(0.05, (now - (this._t || now)) / 1000);
     this._t = now;
-    const ghostOn = !!(this.app.settings.get('ghost') && this.result && this.result.hands.length && now - this.resultAt < 400);
-    // On ne redessine que si quelque chose a changé : nouvelle image de suivi,
-    // effets en cours, ou squelette fantôme à effacer.
-    const fading = this._ghostShown && !ghostOn;
-    if (!this._dirty && !fading && !this.particles.length && !this.rings.length) return;
+    const fresh = performance.now() - this.resultAt < 400;
+    const ghostOn = !!(this.app.settings.get('ghost') && this.result && this.result.hands.length && fresh);
+    const hasFx = this.particles.length > 0 || this.rings.length > 0;
+    const ctx = this.ctx;
+    if (!ghostOn && !hasFx) {
+      // Rien à montrer : le calque est vidé une fois (plus de squelette résiduel).
+      if (!this._clean) {
+        const { w, h } = fitCanvas(this.canvas, 1.5);
+        ctx.clearRect(0, 0, w, h);
+        this._clean = true;
+      }
+      this._dirty = false;
+      this._ghostShown = false;
+      return;
+    }
+    // Squelette inchangé et aucun effet en cours : rien à redessiner.
+    if (!this._dirty && !hasFx && this._ghostShown) return;
     this._dirty = false;
     this._ghostShown = ghostOn;
+    this._clean = false;
     const { w, h, dpr } = fitCanvas(this.canvas, 1.5);
-    const ctx = this.ctx;
     ctx.clearRect(0, 0, w, h);
 
     if (ghostOn) {
