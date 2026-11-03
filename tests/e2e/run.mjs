@@ -719,10 +719,13 @@ describe('liaison réseau PeerJS', () => {
       await pc.p.waitForFunction(() => !document.querySelector('#peers').textContent.includes('Appareil distant'));
 
       // Téléphone fermé brutalement (sans « au revoir ») : retiré grâce au battement.
+      // Détection nominale : silence de 15 s relevé au battement suivant (≤ 20 s).
+      // Marge large : sous forte charge, les minuteries du navigateur restant
+      // ouvert prennent du retard ; le délai est mesuré une fois la fermeture faite.
       await tel.p.evaluate(() => { const l = window.jarvis.app.link; l.net.stop = () => {}; l.local.stop = () => {}; });
-      const t0 = Date.now();
       await tel.c.close();
-      await pc.p.waitForFunction(() => !window.jarvis.state().peers.some((x) => x.name === 'Téléphone'), null, { timeout: 45000 });
+      const t0 = Date.now();
+      await pc.p.waitForFunction(() => !window.jarvis.state().peers.some((x) => x.name === 'Téléphone'), null, { timeout: 90000 });
       console.log(`# téléphone fermé retiré en ${((Date.now() - t0) / 1000).toFixed(1)} s`);
       sansErreur({ erreurs: pc.p.erreurs.filter((e) => !/WebSocket connection/.test(e)) });
     } finally {
@@ -758,6 +761,30 @@ describe('accueil, mobile et accessibilité', () => {
     await capture(page, 'demo-banc');
     sansErreur(page);
     await ctx.close();
+  });
+
+  it('premier lancement : visuels de démonstration prêts en moins de 6 s, un import passe avant eux', async (t) => {
+    const ctx = await contexteJetable(t);
+    const debut = Date.now();
+    const page = await ouvrir(ctx, '/?rapide', { attendrePret: false });
+    await page.waitForSelector('#photoGrid .photo--ghost', { state: 'attached', timeout: 30000 });
+    // Import lancé pendant la génération : il ne doit pas attendre la fin.
+    const png = await page.evaluate(async () => {
+      const c = document.createElement('canvas'); c.width = 96; c.height = 64;
+      c.getContext('2d').fillRect(0, 0, 20, 20);
+      const b = await new Promise((r) => c.toBlob(r, 'image/png'));
+      return [...new Uint8Array(await b.arrayBuffer())];
+    });
+    await page.setInputFiles('#fileInput', { name: 'pendant.png', mimeType: 'image/png', buffer: Buffer.from(png) });
+    await page.waitForSelector('#photoGrid .photo__src[data-src="import"]', { state: 'attached', timeout: 30000 });
+    const restants = await page.locator('#photoGrid .photo--ghost').count();
+    await page.waitForFunction(() => window.jarvis?.app?.gallery?.ready, null, { timeout: 60000 });
+    const duree = Date.now() - debut;
+    console.log(`# galerie de démonstration prête en ${(duree / 1000).toFixed(1)} s ; visuels encore en préparation à l’arrivée de l’import : ${restants}`);
+    assert.ok(restants > 0, 'import terminé avant la fin des visuels de démonstration');
+    assert.ok(duree < 6000, `galerie prête en ${duree} ms (attendu < 6 s en rendu logiciel)`);
+    assert.equal((await etat(page)).photos, 7);
+    sansErreur(page);
   });
 
   it('réglages : onglets au clavier, calibration indisponible sans caméra, réinitialisation', async (t) => {

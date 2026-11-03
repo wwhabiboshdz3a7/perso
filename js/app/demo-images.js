@@ -10,6 +10,22 @@ export function makeCanvas(w, h) {
   return c;
 }
 
+/**
+ * Contexte 2D en mémoire (rendu logiciel). Les visuels sont lus puis encodés :
+ * sur un canevas accéléré, chaque copie vers un canevas logiciel imposerait une
+ * relecture depuis le GPU, très lente quand l'interface l'occupe déjà.
+ */
+function soft2d(canvas) {
+  return canvas.getContext('2d', { willReadFrequently: true });
+}
+
+/** Calque intermédiaire rempli à partir de pixels calculés. */
+function layerFrom(img) {
+  const c = makeCanvas(img.width, img.height);
+  soft2d(c).putImageData(img, 0, 0);
+  return c;
+}
+
 /** Encode un canevas (OffscreenCanvas ou <canvas>) en Blob. */
 export function encodeCanvas(canvas, type = 'image/jpeg', quality = 0.9) {
   if (canvas.convertToBlob) return canvas.convertToBlob({ type, quality });
@@ -82,8 +98,7 @@ const SCENES = [
           d[i] = Math.min(255, 4 + R); d[i + 1] = Math.min(255, 5 + G); d[i + 2] = Math.min(255, 14 + B); d[i + 3] = 255;
         }
       }
-      const small = makeCanvas(W, H);
-      small.getContext('2d').putImageData(img, 0, 0);
+      const small = layerFrom(img);
       ctx.fillStyle = '#02040a'; ctx.fillRect(0, 0, w, h);
       stars(ctx, w, h, 700, r);
       ctx.globalCompositeOperation = 'lighter';
@@ -219,8 +234,7 @@ const SCENES = [
           }
         }
       }
-      const layer = makeCanvas(W, H);
-      layer.getContext('2d').putImageData(img, 0, 0);
+      const layer = layerFrom(img);
       ctx.save();
       ctx.beginPath(); ctx.rect(0, 0, w, lake); ctx.clip();
       ctx.globalCompositeOperation = 'lighter';
@@ -234,16 +248,31 @@ const SCENES = [
       for (let x = 0; x <= w; x += 8) {
         ridge.push([x, lake - Math.pow(Math.abs(Math.sin(x * 0.0036 + 0.6)), 1.5) * 150 - Math.abs(Math.sin(x * 0.015)) * 22 - (nC(x * 0.01, 3) - 0.5) * 40]);
       }
-      // Lac : reflet inversé, atténué et ondulé, puis le reflet des montagnes.
+      // Lac : ciel retourné, ondulé et atténué avec la profondeur, calculé
+      // ligne à ligne dans les pixels puis posé en une seule copie.
+      const Hr = Math.ceil((h - lake) * H / h);
+      const refl = new ImageData(W, Hr);
+      const rd = refl.data;
+      const stretch = W / (W + 6);
+      for (let j = 0; j < Hr; j++) {
+        const src = Math.max(0, rows - 1 - j) * W * 4;
+        const fade = 0.55 * Math.max(0, 1 - j / Hr) ** 1.3;
+        const shift = Math.sin(j * 0.84) * 2.5 - 3;
+        const row = j * W * 4;
+        for (let x = 0; x < W; x++) {
+          const sx = Math.min(W - 1, Math.max(0, (x - shift) * stretch));
+          const x0 = sx | 0, x1 = Math.min(W - 1, x0 + 1), f = sx - x0;
+          const i0 = src + x0 * 4, i1 = src + x1 * 4, o = row + x * 4;
+          rd[o] = (d[i0] + (d[i1] - d[i0]) * f) * fade;
+          rd[o + 1] = (d[i0 + 1] + (d[i1 + 1] - d[i0 + 1]) * f) * fade;
+          rd[o + 2] = (d[i0 + 2] + (d[i1 + 2] - d[i0 + 2]) * f) * fade;
+          rd[o + 3] = 255;
+        }
+      }
       ctx.save();
       ctx.beginPath(); ctx.rect(0, lake, w, h - lake); ctx.clip();
       ctx.globalCompositeOperation = 'lighter';
-      for (let y = 0; y < h - lake; y += 2) {
-        const sy = ((lake - y) / h) * H;
-        const off = Math.sin(y * 0.42) * 5;
-        ctx.globalAlpha = 0.55 * (1 - y / (h - lake)) ** 1.3;
-        ctx.drawImage(layer, 0, sy, W, 1, off - 6, lake + y, w + 12, 2);
-      }
+      ctx.drawImage(layerFrom(refl), 0, lake, w, Hr * h / H);
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 0.88;
       ctx.fillStyle = '#01070b';
@@ -266,7 +295,7 @@ const SCENES = [
       // Calcul à demi-résolution puis agrandissement (rapide et net).
       const lw = w / 2, lh = h / 2;
       const off = makeCanvas(lw, lh);
-      const octx = off.getContext('2d');
+      const octx = soft2d(off);
       const n = valueNoise(77);
       const levels = 18;
       const img = octx.createImageData(lw, lh);
