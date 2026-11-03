@@ -456,8 +456,18 @@ describe('interface en simulation', () => {
     await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2, { steps: 5 });
     await attendre(200);
     await capture(page, 'main-virtuelle-attraper');
+    // Journal des images et évènements après le relâchement (diagnostic en cas d'échec).
+    await page.evaluate(() => {
+      window.__apres = [];
+      window.jarvis.app.pipeline.on('frame', ({ frame, result }) => {
+        if (window.__apres.length < 40) window.__apres.push(`${Math.round(frame.t)} ${frame.source} ${result.primary?.pose || '-'} ${result.events.map((e) => e.type).join(',')}`);
+      });
+    });
     await page.mouse.up();
-    await page.waitForFunction(() => window.jarvis.state().carry === null);
+    await page.waitForFunction(() => window.jarvis.state().carry === null).catch(async (e) => {
+      const diag = await page.evaluate(() => ({ main: { after: window.jarvis.app.mouseHand.after, pose: window.jarvis.app.mouseHand.pose }, images: window.__apres }));
+      throw new Error(`${e.message}\n${JSON.stringify(diag, null, 1)}`);
+    });
     await page.click('#btnMouseHand');
     sansErreur(page);
   });
