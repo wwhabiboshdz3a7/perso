@@ -126,6 +126,15 @@ function fuite(texte, ou, { donneesDefi = false, fichier = null } = {}) {
     if (s.re && (!donneesDefi || s.long) && s.re.test(plat)) erreurs.push(`FUITE : la réponse de ${s.d.id} (« ${s.mot} ») apparaît dans ${ou}`);
   }
 }
+// textes d'exemple des champs (placeholder) : aucun morceau d'au moins 5 caractères d'une réponse
+// (ex. le début d'une adresse IP à trouver), sinon l'interface souffle la solution
+const reponses = defis.flatMap(d => (d.flags || []).map(f => ({ d, inner: sansAccent(f.slice(6, -1)) })));
+function exemples(texte, ou) {
+  for (const m of texte.matchAll(/placeholder\s*[=:]\s*(["'`])([^"'`]{1,200})\1/g)) {
+    const morceaux = sansAccent(m[2]).replace(/^ex\.\s*/, '').split(/[,;…]|\s+ou\s+/).map(x => x.trim()).filter(x => x.replace(/[^a-z0-9]/g, '').length >= 5);
+    for (const t of morceaux) for (const r of reponses) if (r.inner.includes(t)) erreurs.push(`EXEMPLE : le texte d'exemple « ${m[2]} » dans ${ou} reprend une partie de la réponse de ${r.d.id}`);
+  }
+}
 // coordonnées présentes dans un texte (décimales ou DMS) : vérifiées contre toutes les zones acceptées
 function coordonnees(texte) {
   const res = [];
@@ -176,6 +185,7 @@ async function parcourir(dossier) {
     else if (/\.(js|mjs|css|html|svg|json|geojson|txt|log|md|toml|csv|xml)$/i.test(n)) {
       const texte = await readFile(p, 'utf8');
       fuite(texte, rel, { fichier: rel });
+      exemples(texte, rel);
       if (!/\.geojson$/i.test(n) && rel !== 'assets/ctf/photos/defis.json') await zonesTouchees(texte, rel, { strict: rel.startsWith('app/') || rel === 'index.html', fichier: rel });
     }
   }

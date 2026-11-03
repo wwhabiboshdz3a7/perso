@@ -335,7 +335,7 @@ async function rendreRessource(sec, r, page, k) {
     case 'texte': case 'log': {
       sec.innerHTML = tete(`<div class="row"><button type="button" class="btn small" data-copier>Copier</button>${page.q('#tab-boite') && r.type === 'texte' ? '<button type="button" class="btn small" data-boite>Envoyer dans la boîte à outils</button>' : ''}${r.type === 'log' ? `<button type="button" class="btn small" data-dl>Télécharger</button>` : ''}</div>`)
         + (r.description ? `<p class="ctf-res-desc">${r.description}</p>` : '')
-        + (r.type === 'log' ? `<div class="ctf-logfiltre"><label for="lf${k}">Filtrer les lignes</label><input id="lf${k}" type="search" placeholder="ex. 401, sshd, 203.0.113" autocomplete="off"><span class="muted" data-compte></span></div>` : '')
+        + (r.type === 'log' ? `<div class="ctf-logfiltre"><label for="lf${k}">Filtrer les lignes</label><input id="lf${k}" type="search" placeholder="ex. 401, POST, sshd" autocomplete="off"><span class="muted" data-compte></span></div>` : '')
         + `<pre class="ctf-pre ${r.type === 'log' ? 'ctf-log' : ''}" tabindex="0" role="region" aria-label="${esc(r.titre || r.nom || 'Contenu')}">${esc(r.contenu)}</pre>`;
       $('[data-copier]', sec).addEventListener('click', async () => ctx.toast(await copier(r.contenu) ? 'Copié dans le presse-papiers.' : 'Copie impossible : sélectionne le texte à la main.'));
       $('[data-boite]', sec)?.addEventListener('click', () => page.etabli.ouvrir('boite', { texte: r.contenu }));

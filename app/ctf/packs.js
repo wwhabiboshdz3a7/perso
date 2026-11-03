@@ -136,7 +136,7 @@ export async function vuePacks(navId, ctx, { chargerDefis, invaliderDefis }) {
           <div class="field"><label for="fType">Validation</label><select id="fType"><option value="flag">Flag LUMIO{…}</option><option value="carte">Clic sur la carte</option></select></div>
         </div>
         <div class="field"><label for="fBrief">Briefing *</label><textarea id="fBrief" class="answer" rows="4" required placeholder="Raconte la situation et ce qu'il faut trouver."></textarea></div>
-        <div class="ctf-form-grille">
+        <div class="ctf-form-grille ctf-form-image">
           <div class="field"><span class="ctf-lab" id="fImgLab">Image (facultative)</span><div class="ctf-fichier-choix"><label class="btn small" for="fImg">🖼 Choisir une image</label><input id="fImg" type="file" accept="image/*" class="sr" aria-labelledby="fImgLab"><span class="muted" id="fImgNom" aria-live="polite">Aucun fichier choisi</span></div></div>
           <div class="field"><label for="fImgChemin">… ou chemin dans le site</label><input id="fImgChemin" placeholder="assets/ctf/photos/ma-photo.jpg"></div>
           <div class="field"><label for="fAlt">Description de l'image (accessibilité)</label><input id="fAlt" maxlength="200"></div>

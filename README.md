@@ -96,7 +96,7 @@ outils/               jamais publié (404 forcé par netlify.toml) :
   stats.mjs                 vérifie parcours et défis (chargement, comptes, fichiers référencés)
   ctf/source/*.mjs          sources des défis (flags, cibles, writeups en clair)
   ctf/generer.mjs           produit content/ctf/index.js, content/ctf/defis/*.json et solutions.json, et vérifie
-                            qu'aucun secret ne fuit
+                            qu'aucun secret ne fuit (flags, coordonnées acceptées, textes d'exemple des champs)
   ctf/scenes/               scènes de géolocalisation et de vérification dessinées en SVG
   ctf/rendre_scenes.mjs     rend les scènes en JPEG/PNG (Playwright)
   ctf/generer_fichiers.py   fichiers EXIF, stéganographie et son (Pillow, piexif, numpy)
