@@ -317,6 +317,7 @@ body.is-recording .optic { border-color: var(--red); box-shadow: 0 0 0 1px var(-
 /* Journal */
 .panel--log { flex: 1; min-height: 120px; display: flex; flex-direction: column; }
 .log { flex: 1; overflow-y: auto; min-height: 0; font: 400 11.5px/1.5 var(--mono); scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.log:focus-visible { outline-offset: 4px; box-shadow: inset 0 0 0 999px rgba(255, 181, 71, .04); }
 .log li { display: grid; grid-template-columns: auto auto 1fr; gap: 8px; padding: 4px 0; border-bottom: 1px dashed rgba(110, 231, 255, .08); color: var(--text-2); animation: logIn .3s var(--ease-out); }
 .log time { color: var(--text-3); }
 .log .tag { color: var(--cyan); text-transform: uppercase; letter-spacing: .08em; }

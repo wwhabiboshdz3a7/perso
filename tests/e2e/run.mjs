@@ -896,6 +896,18 @@ describe('accueil, mobile et accessibilité', () => {
       const ctx = await contexteJetable(t, options);
       const page = await ouvrir(ctx, '/?rapide');
       await auditer(page, `${taille} galerie`);
+      // Journal rempli jusqu'à défiler : il doit rester lisible au clavier.
+      const deborde = () => page.evaluate(() => { const l = document.querySelector('#log'); return l.scrollHeight > l.clientHeight + 10; });
+      for (let i = 0; i < 15 && !(await deborde()); i++) {
+        const n = await page.locator('#log li').count();
+        await commande(page, 'quelle heure est-il');
+        await page.waitForFunction((k) => document.querySelectorAll('#log li').length > k, n);
+      }
+      assert.ok(await deborde(), `${taille} : le journal défile`);
+      await auditer(page, `${taille} journal rempli`);
+      await page.focus('#log');
+      await page.keyboard.press('End');
+      await page.waitForFunction(() => document.querySelector('#log').scrollTop > 0);
       await page.evaluate(() => window.jarvis.app.setMode('dessin'));
       await auditer(page, `${taille} dessin`);
       await page.evaluate(() => window.jarvis.app.setMode('galerie'));
