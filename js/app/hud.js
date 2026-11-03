@@ -61,7 +61,7 @@ export class HUD {
     this.last = null;
   }
 
-  /** Transformation « object-fit: cover » de l'image vers le canevas. */
+  /** Transformation « object-fit: cover » de l'image vers le canevas. */
   _coverMap(fw, fh, cw, ch) {
     const s = Math.max(cw / fw, ch / fh);
     const ox = (cw - fw * s) / 2, oy = (ch - fh * s) / 2;

@@ -1,11 +1,11 @@
 // Inférence MediaPipe hors du fil principal : l'interface reste fluide même
 // quand le suivi des mains est lent (processeur modeste, calcul sur le CPU).
-// Worker « classique » : le chargeur WASM de MediaPipe passe par importScripts,
+// Worker « classique » : le chargeur WASM de MediaPipe passe par importScripts,
 // d'où la version IIFE de la bibliothèque (même version que le module ESM).
 /* eslint-env worker */
 /* global importScripts, Vision */
 
-// Les journaux internes de MediaPipe (format glog) restent au niveau « debug ».
+// Les journaux internes de MediaPipe (format glog) restent au niveau « debug ».
 const GLOG = /^(?:[IW]\d{4} \d{2}:\d{2}:\d{2}|INFO: |Graph successfully started running)/;
 for (const level of ['error', 'warn', 'log', 'info']) {
   const original = console[level].bind(console);

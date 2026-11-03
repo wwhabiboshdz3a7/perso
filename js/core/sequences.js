@@ -212,7 +212,7 @@ export function twoHands({ zoom = 1.8, rotate = 0, ...o } = {}) {
   return compose({ ...o, hands: [mk('Right', 1), mk('Left', -1)] });
 }
 
-/** Maintien d'une pose (pouce levé, victoire, signe « je t’aime »…). */
+/** Maintien d'une pose (pouce levé, victoire, signe « je t’aime »…). */
 export function holdPose(pose, o = {}) {
   const side = o.side ?? 'Right';
   const x = o.x ?? 0.5, y = o.y ?? 0.5;
@@ -291,7 +291,7 @@ export const SCENARIOS = {
   rotation: { label: 'Rotation 2 mains', build: (p = {}) => twoHands({ zoom: 1, rotate: p.rotate ?? 0.6, ...p }) },
   'pouce-leve': { label: 'Pouce levé', build: (p = {}) => holdPose('thumb_up', p) },
   victoire: { label: 'Victoire', build: (p = {}) => holdPose('victory', p) },
-  iloveyou: { label: 'Signe « je t’aime »', build: (p = {}) => holdPose('iloveyou', p) },
+  iloveyou: { label: 'Signe « je t’aime »', build: (p = {}) => holdPose('iloveyou', p) },
   cercle: { label: 'Dessiner un cercle', build: (p = {}) => drawPath(circlePoints(p.x ?? 0.5, p.y ?? 0.5, p.r ?? 0.18), p) },
   'deux-index': { label: 'Deux index', build: (p = {}) => twoIndex(p) },
   gomme: { label: 'Gommer', build: (p = {}) => fistPath([[0.4, 0.4], [0.6, 0.45], [0.4, 0.55], [0.6, 0.6]], p) },

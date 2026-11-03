@@ -158,7 +158,7 @@ export class MouseHand {
     if (!this.down) return;
     this.down = false;
     const held = performance.now() - this.downAt;
-    if (!this._inViewport(e)) { this.inside = false; this.pos = null; return; } // la main « sort » fermée
+    if (!this._inViewport(e)) { this.inside = false; this.pos = null; return; } // la main « sort » fermée
     const touch = e.pointerType !== 'mouse';
     if (touch && held >= 230 && this.grabbedSince(this.downEpoch)) {
       this.inside = false; this.pos = null; this.after = null; this.suppressClick = true;
@@ -173,7 +173,7 @@ export class MouseHand {
   }
 
   _onLeave(e) {
-    // Les écrans tactiles émettent « pointerleave » juste après « pointerup » :
+    // Les écrans tactiles émettent « pointerleave » juste après « pointerup » :
     // la pose finale (main qui s'ouvre) doit d'abord être vue par le moteur.
     if (e?.pointerType && e.pointerType !== 'mouse') return;
     if (!this.down && !this._holding(performance.now())) this.inside = false;

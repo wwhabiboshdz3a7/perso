@@ -1,5 +1,5 @@
 // Partage de photos à la main.
-// Émetteur : viser → poing (attraper) → la photo est « dans la main » et part
+// Émetteur : viser → poing (attraper) → la photo est « dans la main » et part
 // en pré-envoi vers les appareils reliés. Récepteur : ouvrir la main devant sa
 // caméra (lâcher) → l'émetteur confirme → la photo atterrit. Lancer = envoi
 // direct dans une direction.
@@ -79,7 +79,7 @@ export class Share {
     } catch (err) {
       if (!/illisible/i.test(err?.message || '')) console.warn('[jarvis] préparation :', err);
       if (this.carry?.tid === tid) {
-        this.app.ui.toast('Envoi impossible', `« ${rec.name} » est illisible : elle ne peut pas être partagée.`, { kind: 'error' });
+        this.app.ui.toast('Envoi impossible', `« ${rec.name} » est illisible : elle ne peut pas être partagée.`, { kind: 'error' });
         this.app.ui.log('liaison', `photo illisible, non partagée : ${rec.name}`);
         this._endCarry();
       }
@@ -87,10 +87,10 @@ export class Share {
     }
   }
 
-  /** Geste « attraper » (poing) à l'endroit du curseur. */
+  /** Geste « attraper » (poing) à l'endroit du curseur. */
   async grab(ev) {
     if (this.carry) return false;
-    // Une photo arrive d'un autre appareil : le poing la « tient », il n'attrape rien ici.
+    // Une photo arrive d'un autre appareil : le poing la « tient », il n'attrape rien ici.
     if (this.hasIncoming()) return false;
     const id = this.app.gallery.photoUnderCursor();
     if (!id) return false;
@@ -208,7 +208,7 @@ export class Share {
   }
 
   /**
-   * Bouton « Envoyer » ou commande vocale. Si une autre photo est déjà en
+   * Bouton « Envoyer » ou commande vocale. Si une autre photo est déjà en
    * main, elle est reposée et c'est la photo demandée qui part.
    * @returns {Promise<boolean>} true si l'envoi est lancé
    */
@@ -463,7 +463,7 @@ export class Share {
     }
   }
 
-  /** Entrée « photo en approche » ; null si l'annonce est refusée. */
+  /** Entrée « photo en approche » ; null si l'annonce est refusée. */
   _incoming(from, tid) {
     let inc = this.incoming.get(tid);
     if (inc) return inc.from === from ? inc : null;
@@ -559,7 +559,7 @@ export class Share {
 
   hasIncoming() { return !!this._latestIncoming(); }
 
-  /** Geste « lâcher » (poing → main ouverte) sur cet appareil. */
+  /** Geste « lâcher » (poing → main ouverte) sur cet appareil. */
   release(ev) {
     if (this.carry && !this.carry.thrown && !this.carry.claimedBy) {
       if (ev?.thrown) this.throwCarry(ev.direction);

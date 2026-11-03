@@ -10,18 +10,18 @@ Site **100 % statique** (aucune commande de build), publiable tel quel sur Netli
 
 | Module | Ce qu’il fait |
 |---|---|
-| **Partage à la main** (fonction phare) | Viser une photo avec l’index → **poing** = attraper (la photo se réduit dans la main, particules, anneau de progression) → **main ouverte** devant l’autre appareil = lâcher (animation d’atterrissage). **Lancer** : poing qui s’ouvre en plein mouvement = envoi direct vers l’appareil situé dans cette direction. Ouvrir la main sur l’appareil émetteur repose la photo. Pré-envoi dès l’attrapé (atterrissage instantané), découpage en morceaux de 48 Ko avec progression, image redimensionnée (2560 px max, JPEG), **empreinte SHA-256 vérifiée** à l’arrivée. |
-| **Liaison entre appareils** | Réseau : WebRTC via PeerJS, appairage par **QR code** ou **code court** (6 caractères, ex. `K7P-2QX`). Locale : `BroadcastChannel` entre fenêtres/onglets du même navigateur. Rôle de chaque appareil : émetteur, récepteur ou les deux ; direction de lancer par appareil. Téléphone ↔ ordinateur. |
+| **Partage à la main** (fonction phare) | Viser une photo avec l’index → **poing** = attraper (la photo se réduit dans la main, particules, anneau de progression) → **main ouverte** devant l’autre appareil = lâcher (animation d’atterrissage). **Lancer** : poing qui s’ouvre en plein mouvement = envoi direct vers l’appareil situé dans cette direction. Ouvrir la main sur l’appareil émetteur repose la photo. Pré-envoi dès l’attrapé (atterrissage instantané), découpage en morceaux de 48 Ko avec progression, image redimensionnée (2560 px max, JPEG), **empreinte SHA-256 vérifiée** à l’arrivée. Le lâcher est confirmé par l’émetteur : si deux appareils ouvrent la main en même temps, un seul reçoit la photo. Chaque fichier reçu est décodé avant d’être rangé (JPEG, PNG ou WebP, dimensions issues du décodage), avec des limites de nombre et de volume par appareil. |
+| **Liaison entre appareils** | Réseau : WebRTC via PeerJS, appairage par **QR code** ou **code court** (6 caractères, ex. `K7P-2QX`) ; toute demande de liaison entrante doit être **acceptée** sur l’appareil appelé, et « Nouveau code » rend l’ancien inutilisable. Battement toutes les 5 s : un appareil fermé ou en veille est retiré après 15 s de silence. Serveur de signalisation injoignable : état « hors ligne » stable et bouton « Réessayer » ; perdu après l’appairage : une seule notification, reconnexion automatique à délai croissant, les liaisons directes continuent. Locale : `BroadcastChannel` entre fenêtres/onglets du même navigateur (« au revoir » envoyé à la fermeture). Rôle de chaque appareil : émetteur, récepteur ou les deux ; direction de lancer par appareil. Téléphone ↔ ordinateur. |
 | **Curseur aérien** | L’index pilote un curseur sur toute l’interface (aimantation douce sur les boutons). Pincement bref = clic, pincement maintenu = glisser (curseurs de réglage, défilement). |
 | **Galerie gestuelle** | Photos de l’utilisateur (sélecteur ou glisser-déposer, stockées en IndexedDB) + 6 visuels de démonstration générés en canvas. Visionneuse : swipe ← → pour naviguer, deux mains qui pincent pour zoomer/pivoter, pouce levé = favori. |
 | **Dessin dans l’air** | Index levé = dessiner, pincement = couleur suivante, poing = gomme, deux index levés = tout effacer, export PNG vers la galerie. Souris et doigt aussi. |
-| **Hologramme 3D** | Three.js : globe filaire avec 15 villes reliées à Toulouse et un satellite, ou réacteur à anneaux. Rotation en pinçant, zoom à deux mains, swipe pour lancer la rotation. |
-| **Commandes vocales** | Web Speech API en `fr-FR`, mot d’éveil « Jarvis » (ou geste *I love you* pour écouter sans mot d’éveil), réponses parlées en voix française. Repli clavier (Firefox) : la barre de commande accepte les mêmes phrases. |
+| **Hologramme 3D** | Three.js : globe filaire de 15 villes (Toulouse et 14 villes reliées par des arcs) et un satellite, ou réacteur à anneaux. Rotation en pinçant, zoom à deux mains, swipe pour lancer la rotation. |
+| **Commandes vocales** | Web Speech API en `fr-FR`, mot d’éveil « Jarvis » (ou signe « je t’aime », index, auriculaire et pouce levés, pour écouter sans mot d’éveil), réponses parlées en voix française. Repli clavier (Firefox) : la barre de commande accepte les mêmes phrases. |
 | **Cerveau IA** (facultatif) | Questions libres via n’importe quelle API compatible OpenAI : Groq, OpenRouter, Mistral, Hugging Face, Ollama ou LM Studio en local, ou point d’accès personnalisé. Clé saisie dans les réglages, gardée uniquement dans ce navigateur. |
-| **Captures** | Geste *victoire* (ou « prends une capture ») : compte à rebours, photo webcam avec cadre HUD, ajoutée à la galerie. |
+| **Captures** | Geste *victoire* (ou « prends une capture ») : compte à rebours, photo webcam avec cadre HUD (la source, geste ou commande, y est inscrite), ajoutée à la galerie. Sans caméra, JARVIS demande de l’activer ; seule la démonstration produit une « capture simulée », nommée comme telle. |
 | **HUD** | Démarrage court et passable (Échap), horloge, météo (Open-Meteo), capteurs (images/s, mains, latence, geste et score du modèle), journal, minuteries, notifications, sons synthétisés en WebAudio (aucun fichier), squelette des mains en miroir sur l’aperçu et en fantôme plein écran, veille. |
 | **Accueil, tutoriel, calibration** | Explication avant toute demande de caméra ou de micro, tutoriel animé de chaque geste (mains en SVG), calibration du pincement et du poing, main dominante, miroir, sensibilité, lissage, anti-rebond. Page [confidentialité](confidentialite.html). |
-| **Mode simulation** | Banc qui rejoue des gestes synthétiques ou **enregistrés depuis la vraie caméra** (« Enregistrer un geste », export/import JSON) à travers le **même pipeline** que la caméra. **Main virtuelle** : la souris, ou le doigt sur écran tactile, devient une main (clic bref = pincement, appui maintenu = poing, relâcher = main ouverte). |
+| **Mode simulation** | Banc qui rejoue des gestes synthétiques ou **enregistrés depuis la vraie caméra** (« Enregistrer un geste », export/import JSON) à travers le **même pipeline** que la caméra. **Main virtuelle** : la souris, ou le doigt sur écran tactile, devient une main (clic bref = pincement, appui maintenu = poing, relâcher = main ouverte ; au doigt, lever le doigt juste après avoir attrapé une photo la garde en main). Gestes importés vérifiés (horodatages croissants, 60 s au plus) ; « Arrêter la lecture » (ou Échap) interrompt un rejeu. |
 
 ### Gestes
 
@@ -36,7 +36,7 @@ Site **100 % statique** (aucune commande de build), publiable tel quel sur Netli
 | Deux mains qui pincent | Zoom (écartement) et rotation (angle) |
 | Pouce levé | Favori |
 | Victoire | Capture webcam |
-| I love you | JARVIS écoute sans mot d’éveil |
+| Signe « je t’aime » (pouce, index et auriculaire levés) | JARVIS écoute sans mot d’éveil |
 | Deux index levés | Effacer le dessin |
 
 ### Commandes vocales (exemples)
@@ -78,7 +78,8 @@ js/app/                    Interface
   hud.js · ui.js · sound.js · weather.js · timers.js · capture.js · sleep.js
   tutorial.js · settings-ui.js · store.js · db.js · dom.js · demo-images.js
 models/                    gesture_recognizer.task, hand_landmarker.task (auto-hébergés)
-vendor/                    MediaPipe Tasks Vision 1.1.1 (ESM + IIFE pour le worker, wasm), Three.js r186, PeerJS 1.5.5,
+vendor/                    MediaPipe Tasks Vision 1.1.1 (ESM + IIFE pour le worker, wasm), Three.js r186 (versions
+                           minifiées de three.module.js et three.core.js : 0,77 Mo au lieu de 2,1 Mo), PeerJS 1.5.5,
                            qrcode-generator 2.0.4, polices Chakra Petch et JetBrains Mono
 tests/unit/                Tests du cœur (node --test)
 tests/e2e/                 Tests de bout en bout Playwright (fausse caméra, deux pages…)
@@ -143,7 +144,7 @@ La clé n’est envoyée qu’au point d’accès choisi ; sans mémorisation, e
 - **Safari** (macOS, iOS 16.4+) : gestes, partage, hologramme ; reconnaissance vocale selon la version.
 - **Firefox** : gestes, partage, hologramme ; pas de reconnaissance vocale, la barre de commande au clavier prend le relais.
 - Sur mobile, la qualité automatique passe en 640×480 ; elle bascule aussi seule en mode léger si le suivi descend sous 12 images/s.
-- L’analyse des images tourne dans un worker : l’interface reste fluide même quand le suivi est lent. Si le navigateur ne le permet pas, elle repasse automatiquement sur le fil principal.
+- L’analyse des images tourne dans un worker : l’interface reste fluide même quand le suivi est lent. Si le navigateur ne le permet pas, elle repasse automatiquement sur le fil principal (une simple panne de téléchargement du modèle ne déclenche pas ce repli).
 - Le moteur de gestes s’adapte à la cadence réelle : attraper, lâcher et la tolérance de perte de main restent fiables jusqu’à 2–3 images/s sur un appareil modeste.
 
 ---
@@ -160,11 +161,12 @@ npm run test:e2e         # tests de bout en bout (Playwright + Chromium)
 Les tests de bout en bout démarrent eux-mêmes un serveur local (`tests/e2e/serveur.py`, port 9147, mêmes en-têtes que Netlify) et couvrent :
 
 - **optique** : vraie inférence MediaPipe sur la fausse caméra de Chromium, modèles et WASM chargés depuis `models/` et `vendor/`, boucle d’inférence active, FPS affichés, aucune ressource externe ;
-- **partage entre deux pages** (BroadcastChannel) : attraper sur A, lâcher sur B, empreinte SHA-256 et dimensions identiques ; lancer ; reposer ; envoi par bouton et par commande ;
-- **curseur aérien, dessin, galerie, hologramme, import** en simulation ;
+- **partage entre deux pages** (BroadcastChannel) : attraper sur A, lâcher sur B, empreinte SHA-256 et dimensions identiques ; lancer ; reposer ; envoi par bouton et par commande ; deux récepteurs qui lâchent ensemble (un seul reçoit) ; pair malveillant (fichier non image, vignette piégée, dimensions forgées : tout est refusé) ;
+- **curseur aérien, dessin, galerie, hologramme** (dont la perte du contexte WebGL), **import** en simulation, capteurs remis à zéro quand plus rien n’arrive, gestes importés aberrants refusés et lecture interruptible ;
 - **commandes** au clavier, mot d’éveil avec une reconnaissance vocale simulée, réponses parlées en français, cerveau IA simulé, repli sans reconnaissance vocale, main virtuelle à la souris ;
-- **liaison réseau** : serveur cloud injoignable (état propre) et transfert WebRTC réel entre deux navigateurs via un serveur PeerJS local ;
-- **accueil, tutoriel, réglages, confidentialité, mobile 390 px** (pas de défilement horizontal, mode léger), **accessibilité** (axe-core) et zéro erreur console.
+- **liaison réseau** : serveur cloud injoignable et serveur réellement fermé (pas de boucle, « Réessayer »), transfert WebRTC réel entre deux navigateurs via un serveur PeerJS local avec accord de l’appareil appelé, coupure puis retour du serveur (une seule notification), code inexistant, appareil fermé sans prévenir (retiré par le battement) ;
+- **démonstration tactile** (vrais évènements tactiles), réglages entre fenêtres, « Tout réinitialiser » avec une autre fenêtre ouverte ;
+- **accueil, tutoriel, réglages, confidentialité, mobile 390 px** (pas de défilement horizontal, mode léger, réponse visible, onglets lisibles), **accessibilité** (axe-core, bureau et mobile, dialogues ouverts) et zéro erreur console.
 
 Les services externes (Open-Meteo, serveur cloud PeerJS, API d’IA) sont simulés dans les tests. Variables utiles :
 
@@ -174,7 +176,7 @@ Les services externes (Open-Meteo, serveur cloud PeerJS, API d’IA) sont simul�
 | `JARVIS_CAPTURES` | dossier des captures d’écran (défaut : dossier temporaire du système) |
 | `JARVIS_NPM` | dossier `node_modules` contenant `playwright`, `peer` et `axe-core` (les deux derniers sont facultatifs : sans eux, les tests correspondants sont ignorés) |
 
-Pour une démonstration sans caméra : ouvrir `/?demo` (main virtuelle + banc de simulation ; sur écran tactile, le banc s’ouvre avec le bouton fiole) dans deux fenêtres du même navigateur. Dans la première, maintenez le clic sur une photo (poing : elle est attrapée) ; dans la seconde, maintenez puis relâchez le clic (la main s’ouvre) : la photo y atterrit.
+Pour une démonstration sans caméra : ouvrir `/?demo` (main virtuelle + banc de simulation ; sur écran tactile, le banc s’ouvre avec le bouton fiole) dans deux fenêtres du même navigateur. Dans la première, maintenez le clic sur une photo (poing : elle est attrapée) puis, sans relâcher, sortez de la fenêtre : la main quitte le champ, toujours fermée. Dans la seconde, maintenez puis relâchez le clic (la main s’ouvre) : la photo y atterrit. Au doigt, c’est plus simple : appui long sur la photo (elle reste en main quand le doigt se lève), puis, sur l’autre appareil, appui long et relâcher.
 
 `window.jarvis` expose une petite console : `jarvis.state()`, `jarvis.sim.play('attraper')`, `jarvis.command('météo à Lyon')`…
 
@@ -183,3 +185,5 @@ Pour une démonstration sans caméra : ouvrir `/?demo` (main virtuelle + banc de
 ## Licences des composants embarqués
 
 MediaPipe Tasks Vision et ses modèles (Apache 2.0), Three.js (MIT), PeerJS (MIT), qrcode-generator (MIT), Chakra Petch et JetBrains Mono (SIL OFL 1.1). Les textes de licence sont dans chaque dossier de `vendor/`.
+
+Le paquet npm `three@0.186.0` ne fournit plus de fichiers minifiés : `vendor/three/three.module.min.js` et `three.core.min.js` sont ses deux fichiers `build/` passés tels quels dans un minificateur (`esbuild --minify --format=esm --legal-comments=inline`), l’import de `three.core.js` étant renommé en `three.core.min.js`.

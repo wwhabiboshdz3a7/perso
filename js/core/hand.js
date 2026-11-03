@@ -38,7 +38,7 @@ export const POSE_LABELS = Object.freeze({
   victory: 'victoire',
   thumb_up: 'pouce levé',
   thumb_down: 'pouce baissé',
-  iloveyou: 'signe « je t’aime »',
+  iloveyou: 'signe « je t’aime »',
 });
 
 /** Noms français des gestes canoniques du modèle MediaPipe. */
@@ -46,7 +46,7 @@ export const GESTURE_LABELS = Object.freeze({
   Thumb_Up: 'pouce levé',
   Thumb_Down: 'pouce baissé',
   Victory: 'victoire',
-  ILoveYou: 'signe « je t’aime »',
+  ILoveYou: 'signe « je t’aime »',
   Pointing_Up: 'index levé',
   Open_Palm: 'main ouverte',
   Closed_Fist: 'poing',
@@ -90,7 +90,7 @@ export function mid(a, b) {
 
 /**
  * Convertit des points normalisés (0..1 en x et y, image caméra brute) vers un
- * espace isotrope « affichage » : x multiplié par le rapport largeur/hauteur
+ * espace isotrope « affichage » : x multiplié par le rapport largeur/hauteur
  * (sinon les distances seraient déformées), miroir appliqué si demandé.
  */
 export function toIso(landmarks, aspect, mirror) {

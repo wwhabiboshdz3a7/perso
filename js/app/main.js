@@ -477,7 +477,7 @@ class App {
     const list = (await db.all('sequences').catch(() => [])).sort((a, b) => b.createdAt - a.createdAt);
     ul.textContent = '';
     if (!list.length) {
-      ul.append(el('li', { class: 'empty' }, 'Aucun. Activez la caméra puis « Enregistrer un geste ».'));
+      ul.append(el('li', { class: 'empty' }, 'Aucun. Activez la caméra puis « Enregistrer un geste ».'));
       return;
     }
     for (const s of list) {
@@ -492,7 +492,7 @@ class App {
   exportSequence(s) {
     const blob = new Blob([JSON.stringify({ format: 'jarvis-geste', version: 1, name: s.name, frames: s.frames })], { type: 'application/json' });
     // Nom de fichier en ASCII : certains systèmes refusent les accents et
-    // remplacent alors le nom par « download ».
+    // remplacent alors le nom par « download ».
     const base = s.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'geste';
     const a = el('a', { href: URL.createObjectURL(blob), download: `${base}.json` });
     document.body.append(a);

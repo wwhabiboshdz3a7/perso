@@ -33,6 +33,7 @@ export class SettingsUI {
     this._load();
     if (tab) this._select($(`#tab${tab}`));
     this.app.openDialog(this.dialog);
+    requestAnimationFrame(() => this._tabEdges?.());
   }
 
   _providers() {
@@ -51,6 +52,16 @@ export class SettingsUI {
 
   _tabs() {
     const tabs = $$('[role="tab"]', this.dialog);
+    // Onglets plus larges que l'écran : fondu sur le bord qui défile encore.
+    const bar = $('.tabs', this.dialog);
+    this._tabEdges = () => {
+      const max = bar.scrollWidth - bar.clientWidth;
+      bar.classList.toggle('is-scrollable', max > 2);
+      bar.classList.toggle('is-start', bar.scrollLeft <= 2);
+      bar.classList.toggle('is-end', bar.scrollLeft >= max - 2);
+    };
+    bar.addEventListener('scroll', this._tabEdges, { passive: true });
+    window.addEventListener('resize', this._tabEdges);
     tabs.forEach((t) => {
       t.addEventListener('click', () => this._select(t));
       t.addEventListener('keydown', (e) => {
@@ -69,6 +80,8 @@ export class SettingsUI {
       t.tabIndex = on ? 0 : -1;
       $(`#${t.getAttribute('aria-controls')}`).hidden = !on;
     }
+    tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    this._tabEdges?.();
   }
 
   _load() {
@@ -224,7 +237,8 @@ export class SettingsUI {
     app.settings.set({ pinchOn: +on.toFixed(2) });
     this._load();
     const fistOk = res.fist.ratio > 0.5 ? 'poing bien reconnu' : 'poing peu reconnu : serrez davantage';
-    msg.textContent = `Calibré : seuil de pincement ${on.toFixed(2).replace('.', ',')} (ouvert ${res.open.median.toFixed(2)}, pincé ${res.pinch.median.toFixed(2)}) · ${fistOk}.`;
+    const f2 = (v) => v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    msg.textContent = `Calibré : seuil de pincement ${f2(on)} (main ouverte ${f2(res.open.median)}, pincée ${f2(res.pinch.median)}) · ${fistOk}.`;
     app.ui.log('système', 'calibration terminée');
   }
 }

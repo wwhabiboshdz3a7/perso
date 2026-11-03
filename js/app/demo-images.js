@@ -56,22 +56,51 @@ const SCENES = [
   {
     name: 'Nébuleuse', w: 1600, h: 1000,
     draw(ctx, w, h) {
+      // Gaz calculé au pixel (bruit fractal déformé) sur une grille réduite,
+      // agrandie ensuite : filaments, couloirs de poussière, cœur lumineux.
       const r = rng(11);
-      ctx.fillStyle = '#02040a'; ctx.fillRect(0, 0, w, h);
-      stars(ctx, w, h, 900, r);
-      ctx.globalCompositeOperation = 'lighter';
-      const clouds = [['255,90,160', 0.62, 0.45, 520], ['90,170,255', 0.38, 0.55, 600], ['255,180,90', 0.55, 0.38, 300], ['120,255,230', 0.3, 0.35, 260]];
-      for (const [c, cx, cy, rad] of clouds) {
-        for (let k = 0; k < 26; k++) {
-          const x = w * cx + (r() - 0.5) * rad * 1.6, y = h * cy + (r() - 0.5) * rad;
-          const gr = rad * (0.3 + r() * 0.5);
-          const g = ctx.createRadialGradient(x, y, 0, x, y, gr);
-          g.addColorStop(0, `rgba(${c},0.12)`); g.addColorStop(1, `rgba(${c},0)`);
-          ctx.fillStyle = g; ctx.fillRect(x - gr, y - gr, gr * 2, gr * 2);
+      const W = 400, H = 250;
+      const n1 = valueNoise(3), n2 = valueNoise(7), n3 = valueNoise(13);
+      const img = new ImageData(W, H);
+      const d = img.data;
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const u = x / W * 4.2, v = y / H * 2.6;
+          const wx = u + 1.6 * n1(u * 0.9, v * 0.9), wy = v + 1.6 * n2(u * 0.9 + 4.1, v * 0.9 + 1.7);
+          const gas = n3(wx, wy);
+          const dx = (x / W - 0.56) * 1.6, dy = (y / H - 0.47) * 1.05;
+          const core = Math.exp(-(dx * dx + dy * dy) * 5.2);
+          const dust = Math.max(0, n1(wx * 2.2 + 9, wy * 2.2) - 0.5) * 2.4;
+          let k = Math.max(0, gas - 0.36) * 2.6 * (0.35 + core * 1.25);
+          k *= 1 - Math.min(0.85, dust);
+          const m = Math.min(1, n2(wx * 1.3, wy * 1.3) * 1.25);
+          // Magenta et violet en périphérie, cyan et ambre vers le cœur.
+          const R = 255 * k * (0.95 * m + 0.25 * core) + 200 * core * core * 0.42;
+          const G = 255 * k * (0.28 + 0.62 * core * (1 - m * 0.4)) + 235 * core * core * 0.5;
+          const B = 255 * k * (0.75 + 0.35 * (1 - m)) + 255 * core * core * 0.62;
+          const i = (y * W + x) * 4;
+          d[i] = Math.min(255, 4 + R); d[i + 1] = Math.min(255, 5 + G); d[i + 2] = Math.min(255, 14 + B); d[i + 3] = 255;
         }
       }
+      const small = makeCanvas(W, H);
+      small.getContext('2d').putImageData(img, 0, 0);
+      ctx.fillStyle = '#02040a'; ctx.fillRect(0, 0, w, h);
+      stars(ctx, w, h, 700, r);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(small, 0, 0, w, h);
+      // Étoiles brillantes avec aigrettes de diffraction.
+      for (let k = 0; k < 9; k++) {
+        const x = r() * w, y = r() * h, L = 14 + r() * 40, c = r() < 0.5 ? '200,235,255' : '255,220,180';
+        const g = ctx.createRadialGradient(x, y, 0, x, y, L * 0.5);
+        g.addColorStop(0, `rgba(${c},0.95)`); g.addColorStop(1, `rgba(${c},0)`);
+        ctx.fillStyle = g; ctx.fillRect(x - L, y - L, L * 2, L * 2);
+        ctx.strokeStyle = `rgba(${c},0.55)`; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x - L, y); ctx.lineTo(x + L, y); ctx.moveTo(x, y - L); ctx.lineTo(x, y + L); ctx.stroke();
+      }
       ctx.globalCompositeOperation = 'source-over';
-      stars(ctx, w, h, 120, r, '220,240,255');
+      stars(ctx, w, h, 160, r, '230,244,255');
     },
   },
   {
@@ -145,27 +174,90 @@ const SCENES = [
   {
     name: 'Aurore boréale', w: 1600, h: 900,
     draw(ctx, w, h) {
+      // Rideaux de lumière (verts à la base, violets au sommet) striés de
+      // rayons, montagnes en ombre chinoise et reflet dans un lac.
       const r = rng(5);
-      const sky = ctx.createLinearGradient(0, 0, 0, h);
-      sky.addColorStop(0, '#010814'); sky.addColorStop(1, '#03222a');
-      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
-      stars(ctx, w, h * 0.7, 500, r);
-      ctx.globalCompositeOperation = 'lighter';
-      for (let band = 0; band < 4; band++) {
-        const hue = [150, 170, 190, 290][band];
-        for (let x = 0; x < w; x += 3) {
-          const y = h * (0.28 + band * 0.07) + Math.sin(x * 0.004 + band * 1.7) * 70 + Math.sin(x * 0.011 + band) * 25;
-          const len = 160 + Math.sin(x * 0.007 + band * 3) * 90;
-          const g = ctx.createLinearGradient(0, y - len, 0, y + 20);
-          g.addColorStop(0, `hsla(${hue},100%,60%,0)`); g.addColorStop(0.75, `hsla(${hue},100%,62%,0.09)`); g.addColorStop(1, `hsla(${hue},100%,70%,0)`);
-          ctx.fillStyle = g; ctx.fillRect(x, y - len, 3, len + 20);
+      const horizon = 0.72;
+      const lake = Math.round(h * horizon);
+      const sky = ctx.createLinearGradient(0, 0, 0, lake);
+      sky.addColorStop(0, '#020711'); sky.addColorStop(0.75, '#061d27'); sky.addColorStop(1, '#0b3036');
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, lake);
+      const water = ctx.createLinearGradient(0, lake, 0, h);
+      water.addColorStop(0, '#07232a'); water.addColorStop(1, '#01070b');
+      ctx.fillStyle = water; ctx.fillRect(0, lake, w, h - lake);
+      stars(ctx, w, lake * 0.95, 650, r);
+      const W = 800, H = 450;
+      const nA = valueNoise(21), nB = valueNoise(22), nC = valueNoise(23);
+      const img = new ImageData(W, H);
+      const d = img.data;
+      const curtains = [
+        { base: 0.52, amp: 0.07, height: 0.3, f: 1.7, ph: 0.3, k: 1 },
+        { base: 0.43, amp: 0.06, height: 0.22, f: 2.6, ph: 2.1, k: 0.65 },
+        { base: 0.62, amp: 0.04, height: 0.16, f: 1.2, ph: 4.4, k: 0.5 },
+      ];
+      const rows = Math.floor(H * horizon);
+      for (let x = 0; x < W; x++) {
+        const u = x / W;
+        for (const c of curtains) {
+          const yb = c.base + c.amp * Math.sin(u * Math.PI * c.f + c.ph) + 0.12 * (nC(u * 3.2 + c.ph, c.ph * 2) - 0.5);
+          const rays = 0.4 + 0.6 * Math.pow(nB(u * 46 + c.ph * 7, c.ph), 1.8);
+          const body = Math.max(0, nA(u * 3 + c.ph * 3, 1.3) - 0.2) * 1.7;
+          const I = c.k * rays * body;
+          if (I < 0.01) continue;
+          for (let y = 0; y < rows; y++) {
+            const v = y / H;
+            // Bord inférieur lumineux et net, voile qui s'estompe vers le haut.
+            const a = v <= yb ? Math.exp(-(yb - v) / c.height) : Math.exp(-(((v - yb) / 0.014) ** 2));
+            const e = a * I;
+            if (e < 0.004) continue;
+            const t = Math.min(1, Math.max(0, (yb - v) / (c.height * 1.5)));
+            const i = (y * W + x) * 4;
+            d[i] += 255 * e * (0.2 + 0.8 * t * t);
+            d[i + 1] += 255 * e * (1 - 0.7 * t);
+            d[i + 2] += 255 * e * (0.55 + 0.45 * t);
+            d[i + 3] = 255;
+          }
         }
       }
+      const layer = makeCanvas(W, H);
+      layer.getContext('2d').putImageData(img, 0, 0);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, w, lake); ctx.clip();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(layer, 0, 0, w, h);
+      ctx.globalAlpha = 0.45;
+      ctx.drawImage(layer, 0, 0, w, h);
+      ctx.restore();
+      // Relief des montagnes (gardé pour le reflet).
+      const ridge = [];
+      for (let x = 0; x <= w; x += 8) {
+        ridge.push([x, lake - Math.pow(Math.abs(Math.sin(x * 0.0036 + 0.6)), 1.5) * 150 - Math.abs(Math.sin(x * 0.015)) * 22 - (nC(x * 0.01, 3) - 0.5) * 40]);
+      }
+      // Lac : reflet inversé, atténué et ondulé, puis le reflet des montagnes.
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, lake, w, h - lake); ctx.clip();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let y = 0; y < h - lake; y += 2) {
+        const sy = ((lake - y) / h) * H;
+        const off = Math.sin(y * 0.42) * 5;
+        ctx.globalAlpha = 0.55 * (1 - y / (h - lake)) ** 1.3;
+        ctx.drawImage(layer, 0, sy, W, 1, off - 6, lake + y, w + 12, 2);
+      }
       ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle = '#01070b';
+      ctx.beginPath(); ctx.moveTo(0, lake);
+      for (const [x, y] of ridge) ctx.lineTo(x, lake + (lake - y) * 0.9);
+      ctx.lineTo(w, lake); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      ctx.globalAlpha = 1;
       ctx.fillStyle = '#010509';
-      ctx.beginPath(); ctx.moveTo(0, h);
-      for (let x = 0; x <= w; x += 20) ctx.lineTo(x, h * 0.82 - Math.abs(Math.sin(x * 0.006)) * 90 - r() * 14);
-      ctx.lineTo(w, h); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(0, lake + 1);
+      for (const [x, y] of ridge) ctx.lineTo(x, y);
+      ctx.lineTo(w, lake + 1); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(110,255,200,0.16)';
+      ctx.fillRect(0, lake, w, 1);
     },
   },
   {

@@ -21,7 +21,7 @@ const CARDS = [
   ] },
   { name: 'Pouce levé', still: 1200, act: ['thumb'],  does: 'Ajoute la photo ouverte (ou visée) aux favoris.', tag: 'Galerie', hands: [[[0, 'fist', 0.5, 0.55], [500, 'fist'], [750, 'thumb_up'], [1600, 'thumb_up'], [1900, 'fist']]] },
   { name: 'Victoire', still: 1200, act: ['index', 'middle'],  does: 'Prend une capture de la caméra avec le cadre HUD.', tag: 'Capture', hands: [[[0, 'fist', 0.5, 0.56], [500, 'fist'], [750, 'victory'], [1600, 'victory'], [1900, 'fist']]] },
-  { name: 'Signe « je t’aime »', still: 1200, act: ['thumb', 'index', 'pinky'],  does: 'JARVIS vous écoute tout de suite, sans dire « Jarvis ».', tag: 'Voix', hands: [[[0, 'fist', 0.5, 0.56], [500, 'fist'], [750, 'iloveyou'], [1600, 'iloveyou'], [1900, 'fist']]] },
+  { name: 'Signe « je t’aime »', still: 1200, act: ['thumb', 'index', 'pinky'],  does: 'JARVIS vous écoute tout de suite, sans dire « Jarvis ».', tag: 'Voix', hands: [[[0, 'fist', 0.5, 0.56], [500, 'fist'], [750, 'iloveyou'], [1600, 'iloveyou'], [1900, 'fist']]] },
   { name: 'Deux index', still: 1200, act: ['index'],  does: 'Les deux index levés une demi-seconde : l’ardoise s’efface.', tag: 'Dessin', hands: [
     [[0, 'fist', 0.68, 0.56], [500, 'fist'], [750, 'point'], [1700, 'point'], [1900, 'fist']],
     [[0, 'fist', 0.32, 0.56], [500, 'fist'], [750, 'point'], [1700, 'point'], [1900, 'fist']],
@@ -30,7 +30,7 @@ const CARDS = [
   { name: 'Main ouverte 1 s', still: 900, act: ['thumb', 'index', 'middle', 'ring', 'pinky'],  does: 'En veille, montrez la paume une seconde pour réveiller JARVIS.', tag: 'Veille', hands: [[[0, 'open', 0.5, 0.6], [900, 'open', 0.5, 0.5], [1800, 'open', 0.5, 0.6]]] },
 ];
 
-// Schémas plus lisibles que les poses de simulation : « victoire » en V net.
+// Schémas plus lisibles que les poses de simulation : « victoire » en V net.
 const TUTO_POSES = { victory: { ...POSES.victory, spread: 3.6, roll: -0.14 } };
 const P = (name) => TUTO_POSES[name] || name;
 const FINGER_OF = (i) => (i === 0 ? null : ['thumb', 'index', 'middle', 'ring', 'pinky'][Math.ceil(i / 4) - 1]);

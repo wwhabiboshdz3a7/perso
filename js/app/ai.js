@@ -1,4 +1,4 @@
-// « Cerveau IA » facultatif : n'importe quel point d'accès compatible avec
+// « Cerveau IA » facultatif : n'importe quel point d'accès compatible avec
 // l'API Chat Completions d'OpenAI (Groq, OpenRouter, Mistral, Ollama…).
 // La clé est conservée dans ce navigateur et n'est envoyée qu'à ce point d'accès.
 
@@ -14,7 +14,7 @@ export const PROVIDERS = {
 };
 
 export function defaultSystemPrompt(name) {
-  return `Tu es JARVIS, l’assistant personnel de ${name || 'l’utilisateur'}, fondateur de l’agence NEXORA à Toulouse. `
+  return `Tu es JARVIS, l’assistant personnel de ${name || 'l’utilisateur'}, fondateur de l’agence NEXORA. `
     + 'Réponds toujours en français, avec un ton posé, précis et une pointe d’humour pince-sans-rire. '
     + 'Tes réponses sont lues à voix haute : une à trois phrases courtes, sans liste, sans markdown, sans émoji.';
 }
@@ -91,6 +91,6 @@ export class Brain {
   }
 
   async test() {
-    return this.ask('Réponds simplement « Systèmes opérationnels. »', { remember: false });
+    return this.ask('Réponds simplement « Systèmes opérationnels. »', { remember: false });
   }
 }

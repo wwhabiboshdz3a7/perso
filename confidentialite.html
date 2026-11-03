@@ -23,14 +23,16 @@
     <ul>
       <li>Les images de la caméra sont analysées <strong>localement</strong> par un modèle de suivi des mains (MediaPipe, exécuté en WebAssembly). Le modèle et son moteur sont servis par ce site, pas par un service tiers.</li>
       <li>Aucune image de la caméra n’est envoyée, enregistrée ou partagée. Seuls les 21 points de chaque main sont calculés, puis oubliés à l’image suivante.</li>
-      <li>Une photo n’est prise que si vous la demandez (geste victoire, commande « prends une capture ») ; elle est rangée dans la galerie locale.</li>
-      <li>« Enregistrer un geste » ne conserve que les coordonnées des points de la main, pas l’image.</li>
+      <li>Une photo n’est prise que si vous la demandez (geste victoire, commande « prends une capture ») ; elle est rangée dans la galerie locale.</li>
+      <li>« Enregistrer un geste » ne conserve que les coordonnées des points de la main, pas l’image.</li>
     </ul>
 
     <h2>Vos photos et le partage</h2>
     <ul>
       <li>Les photos de la galerie restent dans le stockage de ce navigateur (IndexedDB).</li>
-      <li><strong>Seule la photo que vous attrapez part</strong>, et uniquement vers les appareils que vous avez reliés. Pour que l’atterrissage soit instantané, elle leur est pré-envoyée dès que vous fermez le poing ; si vous la reposez, ils l’effacent sans l’afficher.</li>
+      <li><strong>Seule la photo que vous attrapez part</strong>, et uniquement vers les appareils que vous avez reliés. Dès que vous fermez le poing, sa vignette et son nom s’affichent sur ces appareils (« photo en approche »), et la photo complète leur est pré-envoyée pour que l’atterrissage soit instantané. Si vous la reposez, ils effacent la copie reçue sans l’enregistrer ; si vous la lâchez sur l’un d’eux, lui seul la garde.</li>
+      <li>Un appareil ne peut se relier par le réseau que si vous <strong>acceptez sa demande</strong> sur l’appareil qui a montré son code. « Nouveau code » rend l’ancien code (et son QR code) inutilisable.</li>
+      <li>Chaque fichier reçu est vérifié avant d’être rangé : empreinte SHA-256 identique à celle annoncée, et image réellement décodable (JPEG, PNG ou WebP). Le nombre et le volume de photos acceptés d’un même appareil sont limités.</li>
       <li>Liaison locale : entre fenêtres du même navigateur (BroadcastChannel), rien ne sort de votre ordinateur.</li>
       <li>Liaison réseau : la photo voyage en pair-à-pair, chiffrée de bout en bout par WebRTC (DTLS). Un serveur de signalisation PeerJS met seulement les appareils en relation (il voit le code de liaison et l’adresse IP, jamais la photo). Si aucune connexion directe n’est possible, un relais TURN transmet le flux, qui reste chiffré.</li>
       <li>Le serveur de signalisation est configurable (Réglages → Liaison) : vous pouvez héberger le vôtre.</li>
@@ -47,8 +49,8 @@
       <table>
         <thead><tr><th scope="col">Service</th><th scope="col">Quand</th><th scope="col">Ce qui est envoyé</th></tr></thead>
         <tbody>
-          <tr><td>Open-Meteo (météo)</td><td>Widget météo, commande « météo à … »</td><td>Le nom de la ville, puis ses coordonnées</td></tr>
-          <tr><td>PeerJS (signalisation)</td><td>Seulement si vous activez « Relier un autre appareil »</td><td>Le code de liaison, des informations réseau</td></tr>
+          <tr><td>Open-Meteo (météo)</td><td>Widget météo, commande « météo à … »</td><td>Le nom de la ville, puis ses coordonnées</td></tr>
+          <tr><td>PeerJS (signalisation)</td><td>Seulement si vous activez « Relier un autre appareil »</td><td>Le code de liaison, des informations réseau</td></tr>
           <tr><td>Cerveau IA (Groq, OpenRouter, Mistral, Ollama…)</td><td>Seulement si vous l’avez configuré, pour les questions libres</td><td>Le texte de votre question et les derniers échanges, avec votre clé</td></tr>
         </tbody>
       </table>
@@ -62,7 +64,7 @@
     </ul>
 
     <h2>Tout effacer</h2>
-    <p>Réglages → Général → « Tout réinitialiser » supprime réglages, photos, gestes enregistrés et clé. Vous pouvez aussi effacer les données du site depuis les paramètres du navigateur.</p>
+    <p>Réglages → Général → « Tout réinitialiser » supprime réglages, photos, gestes enregistrés et clé. Vous pouvez aussi effacer les données du site depuis les paramètres du navigateur.</p>
     <p style="margin-top:28px"><a href="./">← Retour à JARVIS</a></p>
   </main>
 </body>

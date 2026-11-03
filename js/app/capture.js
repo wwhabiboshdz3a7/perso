@@ -1,4 +1,4 @@
-// Capture : photo webcam avec cadre HUD (geste « victoire » ou commande vocale).
+// Capture : photo webcam avec cadre HUD (geste « victoire » ou commande vocale).
 
 import { $, sleep, reducedMotion } from './dom.js';
 import { simulatedFeed } from './demo-images.js';
@@ -11,7 +11,7 @@ export class Capture {
   }
 
   /**
-   * Sans caméra, une « capture » n'a de sens qu'en démonstration (flux simulé,
+   * Sans caméra, une « capture » n'a de sens qu'en démonstration (flux simulé,
    * clairement marqué comme tel) : ailleurs, on demande d'activer la caméra.
    */
   available() {
@@ -19,7 +19,7 @@ export class Capture {
     return !!(app.camera?.active || app.mouseHand?.enabled || app.player?.active || app.pipeline?.override === 'simulation');
   }
 
-  /** @param {{countdown?:boolean, via?:string}} [o] via : « geste victoire », « commande vocale »… */
+  /** @param {{countdown?:boolean, via?:string}} [o] via : « geste victoire », « commande vocale »… */
   async take({ countdown = true, via = 'geste victoire' } = {}) {
     if (this.busy) return null;
     if (!this.available()) {
@@ -101,7 +101,7 @@ export class Capture {
     ctx.fillStyle = cyan;
     ctx.font = `600 ${15 * u}px "JetBrains Mono", monospace`;
     ctx.textBaseline = 'top';
-    // Titre en haut à droite : en vignette, le coin haut gauche porte le badge « capture ».
+    // Titre en haut à droite : en vignette, le coin haut gauche porte le badge « capture ».
     ctx.textAlign = 'right';
     ctx.fillText(`J.A.R.V.I.S  //  CAPTURE ${this._live ? 'OPTIQUE' : 'SIMULÉE'}`, w - m - 8 * u, m + 10 * u);
     ctx.textAlign = 'left';

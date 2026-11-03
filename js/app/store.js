@@ -87,7 +87,7 @@ export class Settings extends Emitter {
     const saved = readSaved();
     this.data = { ...DEFAULTS };
     for (const k of Object.keys(DEFAULTS)) if (k in saved) this.data[k] = saved[k];
-    // Nom propre à chaque fenêtre (deux onglets = deux « appareils » distincts) ;
+    // Nom propre à chaque fenêtre (deux onglets = deux « appareils » distincts) ;
     // le dernier nom choisi sert de nom par défaut aux nouvelles fenêtres.
     this.data.deviceName = safeGet(sessionStorage, DEVICE_KEY) || this.data.deviceName || guessDevice();
     // Réglages modifiés dans une autre fenêtre : resynchronisation immédiate.

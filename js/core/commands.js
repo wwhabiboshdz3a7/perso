@@ -1,5 +1,5 @@
 // Analyse des commandes vocales (ou tapées) en français : mot d'éveil,
-// intentions, durées (« cinq minutes et demie »), ville pour la météo.
+// intentions, durées (« cinq minutes et demie »), ville pour la météo.
 // Module pur, sans DOM.
 
 const WAKE_RE = /(^|[\s,.;:!?«"'(])(d?jarv[iy]s+e?|jarvice|jarvi|jervis|gervais|jarwis|charvis)(?=$|[\s,.;:!?»"')-])[\s,.;:!?»"')-]*/i;
@@ -18,14 +18,14 @@ export function normalize(text) {
     .trim();
 }
 
-/** Détecte le mot d'éveil « Jarvis » (et ses transcriptions approximatives). */
+/** Détecte le mot d'éveil « Jarvis » (et ses transcriptions approximatives). */
 export function extractWake(text) {
   const raw = String(text || '');
   const m = raw.match(WAKE_RE);
   if (!m) return { woke: false, rest: raw.trim() };
   const before = raw.slice(0, m.index + m[1].length);
   const after = raw.slice(m.index + m[0].length);
-  // Ce qui précède le mot d'éveil (« dis jarvis », « ok jarvis ») est ignoré.
+  // Ce qui précède le mot d'éveil (« dis jarvis », « ok jarvis ») est ignoré.
   void before;
   return { woke: true, rest: after.trim() };
 }
@@ -87,9 +87,9 @@ export function parseDuration(text) {
     .replace(/ (un )?quart d heure /g, ' 15 minutes ')
     .replace(/ trois quarts? d heure /g, ' 45 minutes ')
     .replace(/ (une |un )?demi minute /g, ' 30 secondes ')
-    // « 30s », « 5min », « 2h » : nombre collé à son unité.
+    // « 30s », « 5min », « 2h » : nombre collé à son unité.
     .replace(/ (\d+(?:\.\d+)?)(h|hr|min|mins|mn|s|sec|secs|secondes?|minutes?|heures?) /g, ' $1 $2 ')
-    // « un million d'heures » : « d » entre le nombre et l'unité.
+    // « un million d'heures » : « d » entre le nombre et l'unité.
     .replace(/ (d|de) (heures?|minutes?|secondes?) /g, ' $2 ');
   const tokens = s.trim().split(' ');
   let total = 0, lastUnit = 0, found = false;
@@ -105,7 +105,7 @@ export function parseDuration(text) {
       if (tokens[i + 1] === 'et' && /^demie?$/.test(tokens[i + 2] || '')) { total += u / 2; i += 2; }
       else if (tokens[i + 1] === 'et' && tokens[i + 2] === 'quart') { total += u / 4; i += 2; }
     } else if (lastUnit > 1) {
-      // « 1 minute 30 », « 2 heures 15 » : unité inférieure implicite.
+      // « 1 minute 30 », « 2 heures 15 » : unité inférieure implicite.
       total += n.value * (lastUnit === 3600 ? 60 : 1);
       i = n.next - 1;
     } else {
@@ -145,7 +145,7 @@ const MODE_WORDS = [
 
 const has = (n, re) => re.test(n);
 
-// Formules de demande qui précèdent une commande (« tu peux prendre une capture »).
+// Formules de demande qui précèdent une commande (« tu peux prendre une capture »).
 const POLITE_START = /^(?:(?:est ce que |est ce qu )?(?:tu peux|tu pourrais|peux tu|pourrais tu|pouvez vous|pourriez vous|vous pouvez|veux tu|voudrais tu|tu veux bien|tu voudrais bien|je veux que tu|je voudrais que tu|j aimerais que tu|merci de|s il te plait|s il vous plait|stp|svp|vas y|allez|ok|okay|alors|bon|eh|dis|dites)\s+)+/;
 const POLITE_END = /(?:\s+(?:s il te plait|s il vous plait|stp|svp|merci|jarvis|maintenant|vite))+$/;
 // Questions ouvertes : elles vont au cerveau IA, sauf les quelques formes
@@ -157,7 +157,7 @@ const TIME_RE = /^(?:dis moi |donne moi |me dire |me donner )?(?:quelle heure(?:
 const DATE_RE = /^(?:dis moi |donne moi |me dire |me donner )?(?:quel jour(?: sommes nous| on est| est on| est il| nous sommes| est ce| on est aujourd hui)?|on est quel jour|on est le combien|nous sommes le combien|quelle (?:est la )?date(?: on est| sommes nous| d aujourd hui| du jour)?|la date(?: d aujourd hui| du jour)?|date du jour|c est quel jour)(?: aujourd hui| exactement)?$/;
 const WHO_RE = /^(qui es tu|tu es qui|qui etes vous|presente toi|comment tu t appelles|comment t appelles tu|quel est ton nom|c est quoi ton nom|ton nom)$/;
 const WEATHER_WORDS = /\b(meteo|quel temps|fait il (chaud|froid|beau)|va t il pleuvoir|pleut il|il pleut|previsions? meteo|previsions)\b/;
-// « température » seul est ambigu (« température du soleil ») : forme stricte.
+// « température » seul est ambigu (« température du soleil ») : forme stricte.
 const WEATHER_TEMP = /(^(la )?temperature$|\btemperature (a|en|au|aux|sur|de|dehors|exterieure|actuelle|aujourd hui|ce matin|ce soir|demain|maintenant|ici)\b|\bquelle temperature (fait il|il fait)\b)/;
 const WEATHER_QUESTION = /^(quel temps|quelle (est la )?meteo|quelle meteo|comment est la meteo|la meteo|quelle (est la )?temperature( a| en| au| sur| de| dehors| exterieure| actuelle| aujourd hui| ce matin| ce soir| demain| maintenant| ici|$)|quelle temperature (fait il|il fait)|va t il pleuvoir|est ce qu il (va )?pleu|est ce qu il fait (beau|chaud|froid)|il fait (beau|chaud|froid)|fait il (beau|chaud|froid)|quelles sont les previsions|il pleut)/;
 const MAX_TIMER_S = 24 * 3600;
@@ -251,17 +251,17 @@ export function parseCommand(input) {
 
 /** Liste lisible des commandes (aide). */
 export const COMMAND_HELP = [
-  ['« Jarvis, ouvre la galerie »', 'affiche la galerie et le partage'],
-  ['« mode dessin »', 'dessin dans l’air'],
-  ['« affiche l’hologramme »', 'globe holographique'],
-  ['« envoie la photo »', 'envoie la photo ouverte à l’appareil relié'],
-  ['« quelle heure est-il ? »', 'heure et date'],
-  ['« météo à Toulouse »', 'météo actuelle (Open-Meteo)'],
-  ['« minuterie de 5 minutes »', 'minuterie (plusieurs possibles)'],
-  ['« annule la minuterie »', 'supprime les minuteries'],
-  ['« prends une capture »', 'photo webcam avec cadre HUD'],
-  ['« photo suivante » / « précédente »', 'navigation dans la galerie'],
-  ['« efface tout »', 'efface le dessin'],
-  ['« mode veille » / « réveille-toi »', 'mise en veille'],
-  ['« coupe le son »', 'sons et voix désactivés'],
+  ['« Jarvis, ouvre la galerie »', 'affiche la galerie et le partage'],
+  ['« mode dessin »', 'dessin dans l’air'],
+  ['« affiche l’hologramme »', 'globe holographique'],
+  ['« envoie la photo »', 'envoie la photo ouverte à l’appareil relié'],
+  ['« quelle heure est-il ? »', 'heure et date'],
+  ['« météo à Toulouse »', 'météo actuelle (Open-Meteo)'],
+  ['« minuterie de 5 minutes »', 'minuterie (plusieurs possibles)'],
+  ['« annule la minuterie »', 'supprime les minuteries'],
+  ['« prends une capture »', 'photo webcam avec cadre HUD'],
+  ['« photo suivante » / « précédente »', 'navigation dans la galerie'],
+  ['« efface tout »', 'efface le dessin'],
+  ['« mode veille » / « réveille-toi »', 'mise en veille'],
+  ['« coupe le son »', 'sons et voix désactivés'],
 ];

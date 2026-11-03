@@ -75,7 +75,7 @@ export class Timers {
       if (!t.done && left <= 0) {
         t.done = true;
         this.app.sound.play('alarm');
-        const what = t.label ? `La minuterie « ${t.label} »` : `La minuterie de ${spokenDuration(t.total)}`;
+        const what = t.label ? `La minuterie « ${t.label} »` : `La minuterie de ${spokenDuration(t.total)}`;
         this.app.ui.toast('Minuterie terminée', t.label || spokenDuration(t.total), { kind: 'warn', sound: false, ms: 8000 });
         this.app.assistant?.say(`${what} est terminée.`);
         setTimeout(() => this.remove(t.id), 10000);

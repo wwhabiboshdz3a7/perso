@@ -107,8 +107,8 @@ export function localPoints(pose) {
 const fixedAnchors = new Map();
 
 function anchorPoint(local, anchor, side) {
-  // « index@point » : point fixe dans le repère de la paume (là où serait le bout
-  // de l'index en pose « point ») — la paume reste immobile quand la pose change.
+  // « index@point » : point fixe dans le repère de la paume (là où serait le bout
+  // de l'index en pose « point ») — la paume reste immobile quand la pose change.
   if (typeof anchor === 'string' && anchor.startsWith('index@')) {
     const key = anchor + side;
     if (!fixedAnchors.has(key)) {

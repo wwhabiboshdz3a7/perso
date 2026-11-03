@@ -1,5 +1,5 @@
 // Assistant vocal : reconnaissance (Web Speech API, fr-FR), mot d'éveil
-// « Jarvis », exécution des commandes, réponses parlées, cerveau IA facultatif.
+// « Jarvis », exécution des commandes, réponses parlées, cerveau IA facultatif.
 // Repli clavier : la barre de commande accepte les mêmes phrases.
 
 import { $ } from './dom.js';
@@ -77,7 +77,7 @@ export class Assistant {
 
   _renderState() {
     const chipState = !this.supported ? 'off' : this.listening ? (Date.now() < this.awaitUntil ? 'active' : 'on') : 'off';
-    const label = !this.supported ? 'clavier' : this.listening ? (this.app.settings.get('wake') ? '« Jarvis »' : 'écoute') : 'coupée';
+    const label = !this.supported ? 'clavier' : this.listening ? (this.app.settings.get('wake') ? '« Jarvis »' : 'écoute') : 'coupée';
     this.app.ui.chip('Mic', chipState, label);
     $('#btnMic').setAttribute('aria-pressed', String(this.listening));
     $('#btnMic').setAttribute('aria-label', this.listening ? 'Arrêter l’écoute vocale' : 'Activer l’écoute vocale');
@@ -147,7 +147,7 @@ export class Assistant {
     this._renderState();
   }
 
-  /** Geste « je t’aime » (ILoveYou) : écoute immédiate sans mot d'éveil. */
+  /** Geste « je t’aime » (ILoveYou) : écoute immédiate sans mot d'éveil. */
   attention() {
     if (!this.wanted) this.start();
     this.awaitUntil = Date.now() + AWAIT_MS;
@@ -182,8 +182,35 @@ export class Assistant {
 
   say(text) { this.reply(text); }
 
+  /**
+   * Téléphone et tablette : le panneau Assistant est loin sous la scène ; la
+   * réponse s'affiche aussi dans une bulle au-dessus de la barre de commande.
+   */
+  _bubble(text) {
+    const b = $('#cmdBubble');
+    if (!b) return;
+    if (!this._narrow) {
+      this._narrow = matchMedia('(max-width: 1080px)');
+      b.addEventListener('click', () => this._hideBubble());
+    }
+    if (!this._narrow.matches) return;
+    b.querySelector('q').textContent = text;
+    b.hidden = false;
+    document.documentElement.style.setProperty('--bubble-h', `${b.offsetHeight + 8}px`);
+    clearTimeout(this._bubbleT);
+    this._bubbleT = setTimeout(() => this._hideBubble(), Math.min(15000, 4500 + text.length * 50));
+  }
+
+  _hideBubble() {
+    clearTimeout(this._bubbleT);
+    const b = $('#cmdBubble');
+    if (b) b.hidden = true;
+    document.documentElement.style.setProperty('--bubble-h', '0px');
+  }
+
   reply(text, { speak = true } = {}) {
     this.jarvisEl.textContent = text;
+    this._bubble(text);
     if (speak && this.app.settings.get('speak') && 'speechSynthesis' in window) {
       this.ensureVoices();
       try {
@@ -222,7 +249,7 @@ export class Assistant {
     const app = this.app;
     const name = app.settings.get('userName');
     this.youEl.textContent = text;
-    app.ui.log('voix', `« ${text} »${source === 'clavier' ? ' (clavier)' : ''}`);
+    app.ui.log('voix', `« ${text} »${source === 'clavier' ? ' (clavier)' : ''}`);
     const p = cmd.params;
     try {
       switch (cmd.intent) {
@@ -270,9 +297,9 @@ export class Assistant {
             if (!p.city || w.place.name.toLowerCase() === (app.settings.get('city') || '').toLowerCase()) app.weather.renderWidget(w);
             this.reply(app.weather.sentence(w));
           } catch (err) {
-            // Ville inconnue : c'était peut-être une question libre (« température de l'eau »).
+            // Ville inconnue : c'était peut-être une question libre (« température de l'eau »).
             if (err?.code === 'notfound' && p.city && this.brain.enabled) { await this._askBrain(cmd.text || text); return; }
-            this.reply(err?.code === 'notfound' ? `Je ne trouve pas la ville « ${city} ».` : 'Le service météo est injoignable pour le moment.');
+            this.reply(err?.code === 'notfound' ? `Je ne trouve pas la ville « ${city} ».` : 'Le service météo est injoignable pour le moment.');
           }
           return;
         }
@@ -371,7 +398,7 @@ export class Assistant {
           if (this.brain.enabled) {
             await this._askBrain(cmd.text || text);
           } else {
-            this.reply('Je n’ai pas compris. Dites « aide » pour la liste des commandes, ou branchez un cerveau IA dans les réglages pour les questions libres.');
+            this.reply('Je n’ai pas compris. Dites « aide » pour la liste des commandes, ou branchez un cerveau IA dans les réglages pour les questions libres.');
           }
       }
     } catch (err) {

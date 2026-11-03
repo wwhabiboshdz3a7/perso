@@ -188,7 +188,7 @@ class NetTransport extends Emitter {
     this.peer = peer;
     let opened = false;
     // Échec avant la première ouverture : le pair est détruit (pas de
-    // reconnexion en boucle) et l'état « hors ligne » reste stable.
+    // reconnexion en boucle) et l'état « hors ligne » reste stable.
     const fail = (message) => {
       clearTimeout(openTimer);
       if (this.peer === peer) this.peer = null;
@@ -260,7 +260,7 @@ class NetTransport extends Emitter {
     try { p.reconnect(); } catch { this._scheduleReconnect(); }
   }
 
-  /** « Appareil introuvable » : la connexion sortante visée est abandonnée. */
+  /** « Appareil introuvable » : la connexion sortante visée est abandonnée. */
   _unavailable(err) {
     const m = String(err?.message || '').match(/peer\s+(\S+)\s*$/i);
     const target = m ? m[1] : null;
@@ -321,7 +321,7 @@ class NetTransport extends Emitter {
     c.seen = Date.now();
     clearTimeout(c.timer);
     if (c.outgoing) {
-      // On se présente, puis on attend que l'autre appareil accepte (son « hello »).
+      // On se présente, puis on attend que l'autre appareil accepte (son « hello »).
       c.status = 'waiting';
       this._send(c, { type: 'hello', hello: this.getHello() });
       this.emit('peer', { id: c.id, state: 'waiting', hello: {} });
@@ -443,7 +443,7 @@ class NetTransport extends Emitter {
     this.emit('state', s);
   }
 
-  /** Arrêt complet : « au revoir » aux appareils reliés, pair détruit. */
+  /** Arrêt complet : « au revoir » aux appareils reliés, pair détruit. */
   stop() {
     clearTimeout(this._reconnectTimer);
     clearInterval(this._hb);
@@ -470,7 +470,7 @@ export class Link extends Emitter {
   constructor(app) {
     super();
     this.app = app;
-    this.peers = new Map(); // clé « local:id » ou « réseau:id »
+    this.peers = new Map(); // clé « local:id » ou « réseau:id »
     const hello = () => ({ name: app.settings.get('deviceName'), role: app.settings.get('role'), v: 1 });
     this.local = new LocalTransport(hello);
     this.net = new NetTransport(app.settings, hello);

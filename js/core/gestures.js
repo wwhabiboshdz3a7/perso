@@ -378,8 +378,8 @@ export class GestureEngine {
     const pose = tr.stable === 'none' ? tr.rawPose : tr.stable;
     if (pose === 'fist' || pose === 'thumb_up' || pose === 'thumb_down') return { kind: 'palm', pos: tr.palm };
     // Pendant un pincement, et dès que l'index commence à se replier ou que le
-    // pouce s'en approche, le pointeur suit la paume : le geste de « clic » ou
-    // d'« attraper » ne décale pas la cible visée.
+    // pouce s'en approche, le pointeur suit la paume : le geste de « clic » ou
+    // d'« attraper » ne décale pas la cible visée.
     if (pose === 'pinch' || tr.pinching || !tr.steadyIndex) return { kind: 'palm', pos: tr.palm };
     return { kind: 'index', pos: p[LM.INDEX_TIP] };
   }

@@ -91,7 +91,7 @@ export function makeCode(length = 6, rng = Math.random) {
   return s;
 }
 
-/** Normalise une saisie d'utilisateur (« k7p-2qx » → « K7P2QX »), ou null si invalide. */
+/** Normalise une saisie d'utilisateur (« k7p-2qx » → « K7P2QX »), ou null si invalide. */
 export function normalizeCode(input) {
   if (typeof input !== 'string') return null;
   // On tolère espaces, tirets et minuscules. Les caractères ambigus (0, O, 1, I, L)

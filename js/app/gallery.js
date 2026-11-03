@@ -201,7 +201,7 @@ export class Gallery {
     return rec.favorite;
   }
 
-  /** Suppression annulable quelques secondes (bouton « Annuler » de la notification). */
+  /** Suppression annulable quelques secondes (bouton « Annuler » de la notification). */
   async remove(id) {
     const rec = this.get(id);
     if (!rec) return;

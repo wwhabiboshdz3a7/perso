@@ -241,7 +241,7 @@ export class Draw {
     if (!this.active) return;
     const p = result.primary;
     const s = this.app.cursor.screen;
-    // Deux index levés : geste « tout effacer » en cours, on ne trace pas.
+    // Deux index levés : geste « tout effacer » en cours, on ne trace pas.
     const twoIndex = result.hands.filter((h) => h.pose === 'point').length >= 2;
     if (!p || !s || twoIndex) { this._endGesture(); this.brush.classList.remove('is-on'); return; }
     const inside = this._inside(s);

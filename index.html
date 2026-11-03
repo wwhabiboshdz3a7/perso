@@ -90,9 +90,9 @@
       <h1 id="welcomeTitle" class="welcome__title">Bonjour<span id="welcomeName"></span>.<br>Prenez la main sur l’écran.</h1>
       <p class="welcome__lead">JARVIS lit vos gestes avec la caméra et écoute vos commandes vocales. Attrapez une photo d’un poing fermé sur un appareil, ouvrez la main devant un autre : elle y atterrit.</p>
       <ul class="welcome__points">
-        <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span><strong>Tout reste sur votre appareil.</strong> L’image de la caméra est analysée localement et n’est jamais envoyée. Seule la photo que vous choisissez de partager part, en direct, vers l’appareil relié.</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span><strong>Tout reste sur votre appareil.</strong> L’image de la caméra est analysée localement et n’est jamais envoyée. Seule la photo que vous attrapez quitte l’appareil, en direct, vers les appareils que vous avez reliés.</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span><strong>Caméra</strong> : suivi des deux mains à 21 points, avec un modèle embarqué (pas de serveur).</span></li>
-        <li><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span><strong>Micro</strong> (facultatif) : dites « Jarvis » puis votre commande. Le clavier fonctionne aussi.</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span><strong>Micro</strong> (facultatif) : dites « Jarvis » puis votre commande. Le clavier fonctionne aussi.</span></li>
       </ul>
       <div class="welcome__actions">
         <button type="button" class="btn btn--primary btn--lg" id="welcomeStart"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Activer la caméra</button>
@@ -105,6 +105,7 @@
 
   <!-- Application -->
   <div id="app" class="app" inert>
+    <h1 class="visually-hidden">JARVIS, interface gestuelle et vocale</h1>
     <header class="topbar">
       <a class="brand" href="./" aria-label="JARVIS, accueil">
         <svg class="brand__mark" viewBox="0 0 48 48" aria-hidden="true">
@@ -229,18 +230,20 @@
             <p class="eyebrow">Module 02 · Tracé aérien</p>
             <h2 id="drawTitle" class="view__title">Dessin dans l’air</h2>
           </div>
-          <div class="view__actions draw-tools">
-            <div class="swatches" role="radiogroup" aria-label="Couleur" id="swatches"></div>
-            <label class="range" data-air><span>Épaisseur</span><input type="range" id="brushSize" min="2" max="40" value="8" data-air-range></label>
+          <div class="view__actions draw-acts">
             <button type="button" class="btn btn--sm" id="btnEraser" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-eraser"/></svg>Gomme</button>
             <button type="button" class="btn btn--sm" id="btnClear" data-air><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg>Tout effacer</button>
             <button type="button" class="btn btn--primary btn--sm" id="btnExport" data-air><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Vers la galerie</button>
           </div>
+          <div class="draw-tools">
+            <div class="swatches" role="radiogroup" aria-label="Couleur" id="swatches"></div>
+            <label class="range" data-air><span>Épaisseur</span><input type="range" id="brushSize" min="2" max="40" value="8" aria-label="Épaisseur du trait" data-air-range></label>
+          </div>
         </header>
+        <p class="canvas-hint"><span>Index levé</span> dessiner · <span>pincement</span> couleur suivante · <span>poing</span> gommer · <span>deux index</span> tout effacer</p>
         <div class="canvas-wrap" id="drawWrap">
           <canvas id="drawCanvas" class="draw-canvas" aria-label="Zone de dessin : index levé pour dessiner, ou souris et doigt" role="img"></canvas>
           <div class="draw-brush" id="drawBrush" aria-hidden="true"></div>
-          <p class="canvas-hint">Index levé : dessiner · pincement : couleur suivante · poing : gommer · deux index : tout effacer</p>
         </div>
       </section>
 
@@ -309,12 +312,13 @@
           <p class="link__local" id="linkLocal"><span class="dot"></span>Fenêtres de ce navigateur : <strong id="linkLocalCount">0</strong></p>
           <div class="link__net" id="linkNet">
             <button type="button" class="btn btn--sm btn--block" id="btnNetStart" data-air><svg class="ic" aria-hidden="true"><use href="#i-qr"/></svg>Relier un autre appareil</button>
+            <p class="link__state" id="linkNetState" role="status" hidden>connexion…</p>
             <div class="link__code" id="linkCode" hidden>
               <button type="button" class="qr" id="qrBox" aria-label="Agrandir le QR code" data-air></button>
               <div class="link__codeinfo">
                 <span class="eyebrow">Code de liaison</span>
                 <strong class="link__codeval" id="linkCodeVal">——-——</strong>
-                <span class="link__state" id="linkNetState">connexion…</span>
+                <button type="button" class="link-btn link__renew" id="btnNewCode" data-air>Nouveau code</button>
               </div>
             </div>
             <form class="link__join" id="joinForm" hidden>
@@ -330,7 +334,7 @@
       <section class="panel panel--timers" aria-labelledby="timersTitle">
         <header class="panel__head"><h2 id="timersTitle" class="panel__title">Minuteries</h2><span class="panel__meta" id="timersCount">0</span></header>
         <ul class="timers" id="timers"></ul>
-        <p class="panel__empty" id="timersEmpty">Aucune. Dites « Jarvis, minuterie de 5 minutes ».</p>
+        <p class="panel__empty" id="timersEmpty">Aucune. Dites « Jarvis, minuterie de 5 minutes ».</p>
       </section>
 
       <section class="panel panel--assistant" aria-labelledby="asstTitle">
@@ -345,16 +349,17 @@
 
     <!-- Barre de commande -->
     <footer class="cmdbar">
+      <p class="cmd-bubble" id="cmdBubble" aria-hidden="true" hidden><span>JARVIS</span><q></q></p>
       <form class="cmd" id="cmdForm" role="search" aria-label="Commande">
         <button type="button" class="cmd__mic" id="btnMic" aria-pressed="false" aria-label="Écoute vocale" data-air><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span class="cmd__micring" aria-hidden="true"></span></button>
         <label for="cmdInput" class="visually-hidden">Commande</label>
         <span class="cmd__prompt" aria-hidden="true">&gt;</span>
-        <input id="cmdInput" class="cmd__input" type="text" autocomplete="off" spellcheck="false" enterkeyhint="send" placeholder="Parlez ou tapez une commande — ex. « météo à Toulouse »">
-        <button type="submit" class="btn btn--primary btn--sm cmd__send" data-air><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span>Exécuter</span></button>
+        <input id="cmdInput" class="cmd__input" type="text" autocomplete="off" spellcheck="false" enterkeyhint="send" placeholder="Parlez ou tapez une commande — ex. « météo à Toulouse »">
+        <button type="submit" class="btn btn--primary btn--sm cmd__send" aria-label="Exécuter la commande" data-air><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg><span>Exécuter</span></button>
       </form>
       <div class="cmdbar__tools">
-        <button type="button" class="btn btn--sm" id="btnSim" aria-expanded="false" aria-controls="simPanel" data-air><svg class="ic" aria-hidden="true"><use href="#i-flask"/></svg><span>Simulation</span></button>
-        <button type="button" class="btn btn--sm" id="btnMouseHand" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg><span>Main virtuelle</span></button>
+        <button type="button" class="btn btn--sm" id="btnSim" aria-expanded="false" aria-controls="simPanel" aria-label="Banc de simulation" data-air><svg class="ic" aria-hidden="true"><use href="#i-flask"/></svg><span>Simulation</span></button>
+        <button type="button" class="btn btn--sm" id="btnMouseHand" aria-pressed="false" aria-label="Main virtuelle (souris ou doigt)" data-air><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg><span>Main virtuelle</span></button>
       </div>
     </footer>
 
@@ -367,6 +372,7 @@
       <ul class="sim__recs" id="simRecs"></ul>
       <div class="sim__io">
         <label class="btn btn--xs"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>Importer JSON<input type="file" id="simImport" accept="application/json,.json" class="visually-hidden"></label>
+        <button type="button" class="btn btn--xs btn--danger" id="simStop" hidden><svg class="ic" aria-hidden="true"><use href="#i-stop"/></svg>Arrêter la lecture</button>
       </div>
     </section>
   </div>
@@ -387,7 +393,7 @@
   <div id="sleep" class="sleep" hidden>
     <div class="sleep__core" aria-hidden="true"><i></i><i></i><i></i></div>
     <p class="sleep__title">Veille</p>
-    <p class="sleep__hint">Dites « Jarvis, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
+    <p class="sleep__hint">Dites « Jarvis, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
     <button type="button" class="btn" id="btnWake">Réveiller</button>
   </div>
   <div id="countdown" class="countdown" aria-hidden="true"></div>
@@ -449,7 +455,7 @@
         </section>
         <section role="tabpanel" id="setVoix" aria-labelledby="tabVoix" class="tabpanel" hidden>
           <div class="fields">
-            <label class="check"><input type="checkbox" name="wake"><span>Mot d’éveil « Jarvis » (sinon, chaque phrase est une commande)</span></label>
+            <label class="check"><input type="checkbox" name="wake"><span>Mot d’éveil « Jarvis » (sinon, chaque phrase est une commande)</span></label>
             <label class="check"><input type="checkbox" name="speak"><span>Réponses parlées</span></label>
             <label class="field"><span>Voix</span><select name="voice" id="voiceSelect"><option value="">Voix française par défaut</option></select></label>
             <label class="field field--range"><span>Débit <output name="rateOut"></output></span><input type="range" name="rate" min="0.7" max="1.4" step="0.05"></label>
@@ -519,7 +525,7 @@
         <h2 id="tutoTitle" class="dialog__title">Les gestes</h2>
         <button type="button" class="icon-btn" id="tutoClose" aria-label="Fermer le tutoriel"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
       </header>
-      <div class="dialog__body">
+      <div class="dialog__body" tabindex="0" role="region" aria-label="Gestes et partage de photos">
         <ol class="share-steps" aria-label="Partager une photo en trois temps">
           <li><span class="share-steps__n">1</span><span><strong>Visez</strong> la photo avec l’index sur l’appareil A.</span></li>
           <li><span class="share-steps__n">2</span><span><strong>Fermez le poing</strong> : la photo est dans votre main.</span></li>

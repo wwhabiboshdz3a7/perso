@@ -54,16 +54,16 @@ async function finishGrow(buf, received, value, reader, onProgress, total) {
   return b.slice(0, r);
 }
 
-// Les journaux internes de MediaPipe (format glog, « INFO: … ») passent par
-// console.error/warn : on les range au niveau « debug » pour garder une
-// console propre. Les vraies erreurs (lignes « E… ») restent des erreurs.
+// Les journaux internes de MediaPipe (format glog, « INFO: … ») passent par
+// console.error/warn : on les range au niveau « debug » pour garder une
+// console propre. Les vraies erreurs (lignes « E… ») restent des erreurs.
 const GLOG = /^(?:[IW]\d{4} \d{2}:\d{2}:\d{2}|INFO: |Graph successfully started running)/;
 for (const level of ['error', 'warn', 'log', 'info']) {
   const original = console[level].bind(console);
   console[level] = (...args) => (typeof args[0] === 'string' && GLOG.test(args[0]) ? console.debug(...args) : original(...args));
 }
 
-/** Rendu WebGL logiciel (SwiftShader, llvmpipe…) : le « GPU » y serait plus lent que le CPU. */
+/** Rendu WebGL logiciel (SwiftShader, llvmpipe…) : le « GPU » y serait plus lent que le CPU. */
 export function softwareGpu() {
   try {
     const gl = document.createElement('canvas').getContext('webgl2') || document.createElement('canvas').getContext('webgl');
