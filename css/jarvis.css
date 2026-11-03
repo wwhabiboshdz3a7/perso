@@ -761,6 +761,17 @@ body.is-simulating .stage { box-shadow: inset 0 0 0 1px rgba(255, 181, 71, .4); 
   .cmd-bubble q { quotes: none; max-height: 7.3em; overflow: auto; }
   .toasts { bottom: calc(var(--cmd-h) + var(--gap) * 2 + var(--safe-b) + 6px + var(--bubble-h, 0px)); }
 }
+/* Tablette portrait : les modules passent sur leur propre ligne, sous la marque. */
+@media (max-width: 920px) {
+  .app { grid-template-rows: auto minmax(520px, 72dvh) auto auto var(--cmd-h); }
+  .topbar { flex-wrap: wrap; row-gap: 10px; padding-top: 4px; border-bottom: 0; }
+  .topbar::after { display: none; }
+  .topbar__status { margin-left: auto; }
+  .modes { order: 10; width: 100%; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--line); }
+  .mode-tab { justify-content: center; }
+  .mode-tab + .mode-tab { border-left-color: var(--line); }
+  .mode-tab[aria-pressed="true"]::after { left: 0; right: 0; }
+}
 @media (max-width: 720px) {
   :root { --gap: 10px; --top-h: 56px; --cmd-h: 56px; }
   body { font-size: 14px; }

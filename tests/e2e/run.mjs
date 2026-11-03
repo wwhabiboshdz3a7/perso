@@ -53,6 +53,17 @@ function sansErreur(...pages) {
   assert.deepEqual(erreurs, [], `Erreurs dans la console :\n${erreurs.join('\n')}`);
 }
 
+/** Vérifie que deux éléments visibles ne se superposent pas à l'écran. */
+async function sansChevauchement(page, a, b) {
+  const [ra, rb] = await page.evaluate(([x, y]) => [x, y].map((s) => {
+    const r = document.querySelector(s).getBoundingClientRect();
+    return { l: Math.round(r.left), t: Math.round(r.top), r: Math.round(r.right), b: Math.round(r.bottom) };
+  }), [a, b]);
+  for (const [s, r] of [[a, ra], [b, rb]]) assert.ok(r.r > r.l && r.b > r.t, `${s} affiché`);
+  const separes = ra.r <= rb.l || rb.r <= ra.l || ra.b <= rb.t || rb.b <= ra.t;
+  assert.ok(separes, `${a} (${JSON.stringify(ra)}) chevauche ${b} (${JSON.stringify(rb)})`);
+}
+
 // ——— 1. Optique : vraie inférence MediaPipe sur la fausse caméra ————————————
 
 describe('optique (fausse caméra)', () => {
@@ -372,6 +383,9 @@ describe('interface en simulation', () => {
     assert.ok(await page.evaluate(() => window.jarvis.app.holo.zoom) > 1.3, 'zoom à deux mains');
     const labels = await page.locator('.holo-label').count();
     assert.ok(labels >= 15, 'étiquettes des villes');
+    // La consigne et le relevé restent lisibles : aucun des deux ne recouvre l'autre.
+    await page.waitForFunction(() => /15 VILLES/.test(document.querySelector('#holoReadout').textContent));
+    await sansChevauchement(page, '#holoHint', '#holoReadout');
     await capture(page, 'hologramme-globe');
     await page.click('[data-holo="reactor"]');
     await attendre(600);
@@ -856,6 +870,10 @@ describe('accueil, mobile et accessibilité', () => {
       await attendre(700);
       const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
       assert.equal(sw, iw, `pas de défilement horizontal (${mode})`);
+      if (mode === 'holo') {
+        await page.waitForFunction(() => /15 VILLES/.test(document.querySelector('#holoReadout').textContent));
+        await sansChevauchement(page, '#holoHint', '#holoReadout');
+      }
       await capture(page, `mobile-${mode}`);
     }
     await page.evaluate(() => window.jarvis.app.setMode('galerie'));
@@ -892,6 +910,27 @@ describe('accueil, mobile et accessibilité', () => {
     await capture(conf, 'mobile-confidentialite', { fullPage: true });
     sansErreur(page, conf);
     await ctx.close();
+  });
+
+  it('tablette 768 px et fenêtre de 721 px : en-tête sur deux lignes, aucun défilement horizontal', async (t) => {
+    for (const [width, height, mobile] of [[768, 1024, true], [721, 900, false]]) {
+      const ctx = await contexteJetable(t, { viewport: { width, height }, isMobile: mobile, hasTouch: mobile });
+      const page = await ouvrir(ctx);
+      for (const mode of ['galerie', 'dessin', 'holo']) {
+        await page.evaluate((m) => window.jarvis.app.setMode(m), mode);
+        await attendre(500);
+        const [sw, iw] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
+        assert.deepEqual([sw, iw], [width, width], `pas de défilement horizontal (${width} px, ${mode})`);
+      }
+      const dehors = await page.evaluate(() => [...document.querySelectorAll('.topbar button, .topbar .chip')]
+        .filter((b) => b.offsetParent && b.getBoundingClientRect().right > innerWidth).length);
+      assert.equal(dehors, 0, `boutons de l’en-tête dans l’écran (${width} px)`);
+      await page.waitForFunction(() => /15 VILLES/.test(document.querySelector('#holoReadout').textContent));
+      await sansChevauchement(page, '#holoHint', '#holoReadout');
+      if (width === 768) await capture(page, 'tablette-holo');
+      sansErreur(page);
+      await ctx.close();
+    }
   });
 
   it('accessibilité (axe-core) : aucune violation sérieuse, bureau et mobile, dialogues ouverts', async (t) => {
