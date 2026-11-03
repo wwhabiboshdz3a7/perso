@@ -61,6 +61,13 @@ export class Assistant {
       this.handle(text, { source: 'clavier' });
     });
     $('#btnMic').addEventListener('click', () => this.toggle());
+    // Indication courte sur téléphone : la barre y est trop étroite pour l'exemple.
+    const input = $('#cmdInput');
+    const full = input.placeholder;
+    const narrow = matchMedia('(max-width: 560px)');
+    const fit = () => { input.placeholder = narrow.matches ? 'Commande ou question' : full; };
+    narrow.addEventListener?.('change', fit);
+    fit();
   }
 
   renderBrain() {

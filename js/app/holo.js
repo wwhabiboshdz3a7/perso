@@ -295,14 +295,29 @@ export class Holo {
     const { w, h } = this.size;
     const camDir = new T.Vector3();
     const wp = new T.Vector3();
-    for (const c of this.cityNodes) {
+    const items = this.cityNodes.map((c) => {
       wp.copy(c.pos).applyMatrix4(this.globe.matrixWorld);
       camDir.copy(this.camera.position).sub(wp).normalize();
-      const facing = wp.clone().normalize().dot(camDir) > 0.15;
+      const facing = wp.clone().normalize().dot(camDir);
       const p = wp.clone().project(this.camera);
-      const x = (p.x * 0.5 + 0.5) * w, y = (-p.y * 0.5 + 0.5) * h;
-      c.label.style.transform = `translate(${x.toFixed(1)}px, ${(y - 6).toFixed(1)}px)`;
-      c.label.style.opacity = facing ? '1' : '0';
+      if (!c.lw) c.lw = c.label.offsetWidth || 0;
+      return { c, facing, x: (p.x * 0.5 + 0.5) * w, y: (-p.y * 0.5 + 0.5) * h, lw: c.lw || c.name.length * 7 + 10 };
+    });
+    // Villes proches (Paris, Londres, Toulouse…) : la ville d'origine puis la
+    // plus en face passent d'abord, les étiquettes qui chevaucheraient sont masquées.
+    items.sort((a, b) => (!!b.c.isHome - !!a.c.isHome) || (b.facing - a.facing));
+    const placed = [];
+    for (const it of items) {
+      // Près du bord droit, l'étiquette passe à gauche du point.
+      const left = it.x + it.lw > w - 4;
+      const lx = left ? it.x - it.lw : it.x;
+      const box = { x0: lx, y0: it.y - 7, x1: lx + it.lw, y1: it.y + 7 };
+      const free = !placed.some((o) => box.x0 < o.x1 && box.x1 > o.x0 && box.y0 < o.y1 && box.y1 > o.y0);
+      const show = it.facing > 0.15 && free;
+      if (show) placed.push(box);
+      if (left !== !!it.c.left) { it.c.left = left; it.c.label.classList.toggle('is-left', left); }
+      it.c.label.style.transform = `translate(${lx.toFixed(1)}px, ${(it.y - 6).toFixed(1)}px)`;
+      it.c.label.style.opacity = show ? '1' : '0';
     }
   }
 
