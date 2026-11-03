@@ -263,11 +263,12 @@ export class FX {
     if (!ghostOn && !hasFx) {
       // Rien à montrer : le calque est vidé une fois (plus de squelette résiduel).
       if (!this._clean) {
-        // Remise à zéro complète du tampon (réaffecter la largeur, même
-        // identique, vide le canevas) : un clearRect isolé peut rester sans
-        // effet visible quand le rendu graphique est très chargé.
+        // Calque vidé ET masqué : sous forte charge graphique, le navigateur
+        // peut garder à l'écran la dernière image d'un canevas simplement
+        // effacé (squelette fantôme résiduel). Masqué, il n'affiche plus rien.
         const { w } = fitCanvas(this.canvas, 1.5);
         this.canvas.width = w;
+        this.canvas.style.visibility = 'hidden';
         this._clean = true;
       }
       this._dirty = false;
@@ -278,6 +279,7 @@ export class FX {
     if (!this._dirty && !hasFx && this._ghostShown) return;
     this._dirty = false;
     this._ghostShown = ghostOn;
+    if (this._clean) this.canvas.style.visibility = '';
     this._clean = false;
     const { w, h, dpr } = fitCanvas(this.canvas, 1.5);
     ctx.clearRect(0, 0, w, h);

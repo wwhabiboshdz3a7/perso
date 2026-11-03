@@ -194,13 +194,11 @@ describe('partage à la main entre deux appareils (simulation, liaison locale)',
   });
 
   it('deux récepteurs lâchent en même temps : un seul reçoit la photo', async () => {
-    // Troisième fenêtre : mise au premier plan avant d'attendre son affichage
-    // (un onglet en arrière-plan ne dessine pas).
+    // Troisième fenêtre : elle ne joue aucun geste (lâcher déclenché
+    // directement), inutile d'attendre que son affichage soit fluide.
     const C = await ouvrir(ctx, '/?rapide', { attendrePret: false });
     try {
-      await C.bringToFront();
       await pret(C);
-      await stabiliser(C);
       await C.evaluate(() => window.jarvis.app.settings.set({ deviceName: 'Poste C' }));
       await A.waitForFunction(() => window.jarvis.state().peers.length >= 2);
       await C.waitForFunction(() => window.jarvis.state().peers.length >= 2);
@@ -539,7 +537,9 @@ describe('interface en simulation', () => {
       pose: window.jarvis.state().pose, propre: window.jarvis.app.fx._clean,
     }));
     assert.deepEqual(st, { fps: '0', mains: '0', pose: null, propre: true });
-    const reste = await encre(page, '#fxCanvas');
+    // Rien d'affiché : calque masqué, ou vide s'il est encore visible.
+    const masque = await page.evaluate(() => getComputedStyle(document.querySelector('#fxCanvas')).visibility === 'hidden');
+    const reste = masque ? 0 : await encre(page, '#fxCanvas');
     if (reste) {
       const diag = await page.evaluate(async () => {
         const fx = window.jarvis.app.fx;
