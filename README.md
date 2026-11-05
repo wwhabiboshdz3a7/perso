@@ -11,7 +11,7 @@ Projets web personnels. Chaque branche est un site autonome, publiable tel quel 
 
 ## Plan d'attaque commercial (branche `claude/upbeat-curie-ofztql`)
 
-`index.html` à la racine : présentation HTML de 21 diapositives (inventaire des projets, ce qui se vend, offre de niche « Lumio Enquête », grille de prix, techniques de vente, réseaux sociaux, plan sur 90 jours). Navigation au clavier (← →, O pour la vue d'ensemble, F pour le plein écran), lecture empilée sur mobile, export PDF par l'impression du navigateur.
+`index.html` à la racine : présentation HTML de 22 diapositives (inventaire des projets, ce qui se vend, offre de niche « Lumio Enquête », logique et grille de prix, techniques de vente, réseaux sociaux, plan sur 90 jours). Navigation au clavier (← →, O pour la vue d'ensemble, F pour le plein écran), lecture empilée sur mobile, export PDF par l'impression du navigateur.
 
 ## Publier sur Netlify
 
