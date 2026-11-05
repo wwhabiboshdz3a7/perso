@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan d'attaque NEXORA</title>
+<meta name="description" content="Inventaire des projets, ce qui se vend, l'offre de niche, les prix, les techniques commerciales et le plan réseaux sociaux sur 90 jours.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307030F'/%3E%3Cpath d='M9 23V9l14 14V9' stroke='%23A78BFA' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#07030F; --void2:#0E0820; --card:#140C2B; --line:#2A1E4D;
+  --purple:#7C3AED; --iris:#A78BFA; --mauve:#C084FC; --dusk:#E879F9; --gold:#FBBF24;
+  --mist:#C4B5FD; --fog:#8E82B3; --ink:#F4F0FF;
+  --ok:#34D399; --mid:#FBBF24; --ko:#F87171;
+  --grad:linear-gradient(100deg,#A78BFA 0%,#E879F9 55%,#FBBF24 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--void);color:var(--ink);font-family:Lexend,system-ui,sans-serif;font-weight:300;line-height:1.45;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{color:var(--iris)}
+strong,b{font-weight:600;color:#fff}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* ---------- scène 16:9 mise à l'échelle ---------- */
+.deck{position:fixed;inset:0;overflow:hidden}
+.stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0}
+.slide{position:absolute;inset:0;padding:70px 90px 80px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease,visibility 0s linear .45s;
+  background:radial-gradient(1100px 600px at 90% -10%,rgba(124,58,237,.22),transparent 60%),radial-gradient(800px 500px at -10% 110%,rgba(232,121,249,.10),transparent 60%),var(--void)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .45s ease}
+.slide::after{content:attr(data-n);position:absolute;right:90px;bottom:36px;font:500 14px "JetBrains Mono",monospace;color:var(--fog);letter-spacing:.1em}
+.slide::before{content:"NEXORA · PLAN D'ATTAQUE";position:absolute;left:90px;bottom:36px;font:500 13px "JetBrains Mono",monospace;color:var(--fog);letter-spacing:.18em}
+
+.kicker{font:600 15px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--iris);margin-bottom:18px}
+h1{font-size:96px;line-height:1;font-weight:800;letter-spacing:-.03em}
+h2{font-size:56px;line-height:1.05;font-weight:700;letter-spacing:-.02em;margin-bottom:30px;max-width:1300px}
+h3{font-size:24px;font-weight:600;margin-bottom:10px;letter-spacing:-.01em}
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:26px;color:var(--mist);max-width:1180px}
+p{font-size:20px}
+.muted{color:var(--fog)}
+.small{font-size:16px}
+.grow{flex:1;min-height:0}
+
+.grid{display:grid;gap:22px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:20px;padding:24px 26px}
+.card p,.card li{font-size:18px;color:var(--mist)}
+.card.hl{border-color:rgba(167,139,250,.55);box-shadow:0 0 0 1px rgba(167,139,250,.25),0 20px 60px -20px rgba(124,58,237,.5)}
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:22px;margin:7px 0}
+ul.clean li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--iris)}
+ol.steps{list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding-left:46px;margin:12px 0;font-size:19px;color:var(--mist)}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:10px;background:rgba(124,58,237,.25);color:var(--iris);font:600 16px "JetBrains Mono",monospace;display:grid;place-items:center}
+
+.tag{display:inline-flex;align-items:center;gap:8px;font:600 13px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid}
+.tag.ok{color:var(--ok);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+.tag.mid{color:var(--mid);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.tag.ko{color:var(--ko);border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.08)}
+.tag.star{color:#1a0b33;background:var(--grad);border-color:transparent}
+
+.stat{font-size:64px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.stat small{display:block;font-size:17px;font-weight:400;color:var(--fog);letter-spacing:0;margin-top:10px}
+
+table{width:100%;border-collapse:collapse;font-size:18px}
+th{font:600 13px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--fog);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+td{padding:12px 14px;border-bottom:1px solid rgba(42,30,77,.6);color:var(--mist);vertical-align:top}
+td:first-child{color:#fff;font-weight:500}
+td.num,th.num{text-align:right;font-family:"JetBrains Mono",monospace;white-space:nowrap}
+table.tight{font-size:16.5px}table.tight td{padding:9px 12px}table.tight td:nth-child(5){white-space:nowrap;font-family:"JetBrains Mono",monospace}
+tr.total td{border-top:1px solid var(--iris);color:#fff;font-weight:600}
+
+.price{font-size:44px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+.price span{font-size:16px;font-weight:400;color:var(--fog);letter-spacing:0}
+.script{font-family:"JetBrains Mono",monospace;font-size:15.5px;line-height:1.55;color:var(--mist);background:#0B0619;border:1px solid var(--line);border-left:3px solid var(--iris);border-radius:12px;padding:16px 18px;white-space:pre-wrap}
+.quote{font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-.01em;border-left:4px solid var(--dusk);padding-left:28px;max-width:1250px}
+
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
+.day{border:1px solid var(--line);border-radius:16px;padding:16px;background:rgba(255,255,255,.02)}
+.day b{display:block;font:600 13px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--iris);margin-bottom:8px}
+.day p{font-size:15.5px;color:var(--mist)}
+.day .net{display:block;margin-top:10px;font:500 12px "JetBrains Mono",monospace;color:var(--gold)}
+
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative}
+.tl::before{content:"";position:absolute;left:0;right:0;top:19px;height:2px;background:var(--grad);opacity:.6}
+.tl .ph{position:relative;padding-top:48px}
+.tl .ph::before{content:"";position:absolute;top:10px;left:0;width:20px;height:20px;border-radius:50%;background:var(--void);border:3px solid var(--iris)}
+.tl .ph h3{font-size:21px}
+.tl .ph li{font-size:16.5px}
+
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--grad)}
+
+.tiers .card{padding:16px 24px}.tiers .card h3{margin-bottom:0}.tiers .price{margin:2px 0}
+.split{display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:start}
+.cover{justify-content:center}
+.cover h1{font-size:120px;max-width:1300px}
+.cover .lead{margin-top:30px}
+.cover .meta{margin-top:60px;display:flex;gap:40px;font:500 15px "JetBrains Mono",monospace;color:var(--fog);letter-spacing:.1em;text-transform:uppercase}
+
+/* ---------- navigation ---------- */
+.ui{position:fixed;z-index:10;right:18px;top:16px;display:flex;gap:8px}
+.ui button{font:500 13px "JetBrains Mono",monospace;color:var(--mist);background:rgba(20,12,43,.8);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.ui button:hover,.ui button:focus-visible{border-color:var(--iris);color:#fff;outline:none}
+.progress{position:fixed;left:0;bottom:0;height:3px;background:var(--grad);z-index:10;transition:width .35s ease}
+.hint{position:fixed;left:18px;top:18px;z-index:10;font:500 12px "JetBrains Mono",monospace;color:var(--fog);letter-spacing:.08em}
+
+/* vue d'ensemble */
+body.overview{overflow:auto}
+body.overview .deck{position:static;overflow:visible}
+body.overview .stage{position:static;width:auto;height:auto;transform:none!important;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding:70px 18px 30px}
+body.overview .slide{position:relative;inset:auto;opacity:1;visibility:visible;transform:none;width:1600px;height:900px;zoom:.2;cursor:pointer;border:6px solid var(--line);border-radius:30px}
+body.overview .slide.active{border-color:var(--iris)}
+
+/* ---------- lecture mobile : diapositives empilées ---------- */
+@media (max-width:900px),(orientation:portrait) and (max-width:1200px){
+  body{overflow:auto}
+  .deck{position:static;overflow:visible}
+  .stage{position:static;width:auto;height:auto;transform:none!important}
+  .slide{position:relative;inset:auto;opacity:1;visibility:visible;transform:none;padding:56px 16px 64px;min-height:auto;border-bottom:1px solid var(--line)}
+  .slide::before{left:16px;bottom:22px;font-size:10px}
+  .slide::after{right:16px;bottom:22px;font-size:11px}
+  h1,.cover h1{font-size:46px}
+  h2{font-size:31px;margin-bottom:20px}
+  h3{font-size:20px}
+  .lead{font-size:19px}
+  p{font-size:17px}
+  .quote{font-size:22px;padding-left:16px}
+  .g2,.g3,.g4,.g5,.split,.tl,.week{grid-template-columns:1fr}
+  .tl::before{display:none}
+  .stat{font-size:44px}
+  .price{font-size:34px}
+  table{font-size:14.5px;display:block;overflow-x:auto}
+  th,td{padding:8px}
+  .cover .meta{flex-direction:column;gap:8px;margin-top:30px}
+  .ui,.hint,.progress{display:none}
+  .script{font-size:13.5px}
+}
+@media print{
+  @page{size:1600px 900px;margin:0}
+  body{overflow:visible;background:var(--void)}
+  .deck{position:static}
+  .stage{position:static;transform:none!important}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;page-break-after:always;break-after:page;height:900px;width:1600px}
+  .ui,.hint,.progress{display:none}
+}
+@media (prefers-reduced-motion:reduce){.slide,.progress{transition:none}}
+</style>
+</head>
+<body>
+<div class="hint" aria-hidden="true">← → naviguer · O vue d'ensemble · F plein écran</div>
+<div class="ui">
+  <button type="button" id="b-prev" aria-label="Diapositive précédente">←</button>
+  <button type="button" id="b-next" aria-label="Diapositive suivante">→</button>
+  <button type="button" id="b-ov" aria-label="Vue d'ensemble">Vue d'ensemble</button>
+  <button type="button" id="b-fs" aria-label="Plein écran">Plein écran</button>
+</div>
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck">
+<div class="stage" id="stage">
+
+<!-- 1 · COUVERTURE -->
+<section class="slide cover" aria-label="Couverture">
+  <p class="kicker">NEXORA · Toulouse · France · Algérie</p>
+  <h1>Du code au <span class="gt">chiffre d'affaires.</span></h1>
+  <p class="lead">Ce que j'ai construit, ce qui se vend, ce qui ne se vend pas, l'offre de niche à lancer, les prix, les techniques de vente et le plan réseaux sociaux pour les 90 prochains jours.</p>
+  <div class="meta"><span>9 projets</span><span>≈ 90 000 lignes</span><span>1 semaine de dev</span><span>Novembre 2026</span></div>
+</section>
+
+<!-- 2 · LE CONSTAT -->
+<section class="slide" aria-label="Le constat">
+  <p class="kicker">01 · Point de départ</p>
+  <h2>En une semaine, j'ai construit <span class="gt">9 produits</span> prêts à publier, et je n'en vends encore aucun.</h2>
+  <div class="grid g4" style="margin-top:20px">
+    <div class="card"><div class="stat gt">9</div><p class="muted">branches, une par site, chacune publiable telle quelle sur Netlify</p></div>
+    <div class="card"><div class="stat gt">90k</div><p class="muted">lignes de code et de contenu, librairies tierces et doublons entre branches exclus</p></div>
+    <div class="card"><div class="stat gt">143</div><p class="muted">commits entre le 28 octobre et le 3 novembre 2026</p></div>
+    <div class="card"><div class="stat gt">0 €</div><p class="muted">encaissés pour l'instant : c'est le problème que ce plan doit régler</p></div>
+  </div>
+  <div class="grow"></div>
+  <p class="quote">La technique n'est plus le goulot d'étranglement. <span class="gt">La distribution, si.</span> Il faut arrêter de construire et commencer à vendre.</p>
+</section>
+
+<!-- 3 · COMMENT C'EST CONSTRUIT -->
+<section class="slide" aria-label="Méthode de développement">
+  <p class="kicker">02 · Comment je l'ai développé</p>
+  <h2>Une méthode, appliquée à tous les projets</h2>
+  <div class="split grow">
+    <div>
+      <ol class="steps">
+        <li><b>Statique d'abord.</b> HTML, CSS et JS natifs, aucune étape de build. Netlify sert les fichiers, et des Functions n'interviennent que lorsqu'un secret doit rester côté serveur (paiement, clé API).</li>
+        <li><b>En binôme avec un agent IA de code</b> (Claude Code), par cycles <i>construire → auditer → corriger</i>. L'historique Git en garde la trace : « corrections de relecture », « finitions mobiles », « audit WCAG AA ».</li>
+        <li><b>Tests réels.</b> Playwright de bout en bout (assistant, masterclass, Jarvis), <span class="mono">node --test</span> sur le cœur gestuel, scripts de vérification du contenu.</li>
+        <li><b>RGPD dès la conception.</b> Aucun compte, la progression reste en localStorage, et la caméra de Jarvis ne quitte jamais l'appareil.</li>
+        <li><b>Accessible et mobile.</b> Contrastes AA, clavier, <span class="mono">prefers-reduced-motion</span>, testé jusqu'à 390 px.</li>
+      </ol>
+    </div>
+    <div class="card hl">
+      <h3>Ce que ça veut dire commercialement</h3>
+      <ul class="clean">
+        <li>Coût d'hébergement proche de <b>0 €</b> : la marge est presque totale.</li>
+        <li>Une démo se livre en <b>une URL</b>, sans installation.</li>
+        <li>L'argument « aucune donnée collectée » <b>ouvre les écoles, les collectivités et les DSI</b>.</li>
+        <li>Je peux produire une variante sur mesure en quelques heures, là où une agence classique compte des semaines.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · INVENTAIRE -->
+<section class="slide" aria-label="Inventaire des projets">
+  <p class="kicker">03 · Inventaire</p>
+  <h2>Ce qu'il y a dans le dépôt</h2>
+  <div class="grid g3" style="grid-auto-rows:1fr">
+    <div class="card"><h3>demos-toulouse</h3><p>23 sites de démonstration pour commerces toulousains, chacun avec <b>une vraie fonction métier</b> : réservation, devis, click &amp; collect, carnet vétérinaire…</p></div>
+    <div class="card hl"><h3>academy-ctf · Arène Lumio</h3><p><b>54 défis CTF/OSINT</b> en 9 catégories : géolocalisation, EXIF, Overpass, stéganographie, web, forensique. Flags vérifiés par empreinte, packs personnalisables.</p></div>
+    <div class="card"><h3>masterclass-ia · Levier</h3><p>Formation « Gagner de l'argent avec Claude » : 61 leçons, page de vente, <b>accès payant réel</b> (Stripe, Lemon Squeezy, Gumroad), 6 workflows n8n.</p></div>
+    <div class="card"><h3>jarvis</h3><p>HUD piloté à la main et à la voix : on <b>attrape une photo d'un poing</b> sur un écran et on la lâche sur un autre appareil (WebRTC). Hologramme 3D.</p></div>
+    <div class="card"><h3>academy · Lumio</h3><p>Plateforme de formation au code : 160 leçons, Python exécuté dans le navigateur, exercices corrigés, certificats.</p></div>
+    <div class="card"><h3>assistant · Nour</h3><p>Interface de chat installable (PWA), branchée sur n'importe quel LLM open source, avec mémoire, modes et un serveur sécurisé facultatif.</p></div>
+    <div class="card"><h3>kinetika</h3><p>Librairie d'animation JS open source (MIT) : moteur, timeline, ressorts, texte cinétique, CI, types TypeScript.</p></div>
+    <div class="card"><h3>motion-lab</h3><p>Showreel de typographie cinétique en 15 scènes, 25 effets réglables et un Labo maths (Lorenz, Fourier, Julia…).</p></div>
+    <div class="card"><h3>nexora-v2</h3><p>Site vitrine de l'agence, avec des tarifs affichés : Starter 500–800 €, Pro 1 500–2 500 €, Premium 3 000–5 000 €.</p></div>
+  </div>
+</section>
+
+<!-- 5 · VERDICT -->
+<section class="slide" aria-label="Ce qui est vendable">
+  <p class="kicker">04 · Vendable ou pas</p>
+  <h2 style="margin-bottom:18px">Le tri sans complaisance</h2>
+  <table class="tight">
+    <thead><tr><th>Projet</th><th>Verdict</th><th>Marché</th><th>Concurrence</th><th>Prêt</th><th>Pourquoi</th></tr></thead>
+    <tbody>
+      <tr><td>Arène CTF / OSINT</td><td><span class="tag star">Pépite niche</span></td><td>B2B, écoles</td><td>Faible</td><td>90 %</td><td>OSINT et géolocalisation en français, sans compte ni installation : très peu d'offres comparables</td></tr>
+      <tr><td>Démos Toulouse</td><td><span class="tag ok">Vendable</span></td><td>TPE locales</td><td>Forte</td><td>95 %</td><td>Énorme outil de prospection : on montre au client son futur site avant même de le démarcher</td></tr>
+      <tr><td>Jarvis</td><td><span class="tag ok">Niche</span></td><td>Événementiel</td><td>Faible</td><td>80 %</td><td>Effet waouh immédiat, en face de photobooths classiques facturés entre 99 et 855 € par jour</td></tr>
+      <tr><td>Levier</td><td><span class="tag mid">À repositionner</span></td><td>Infoproduit</td><td>Très forte</td><td>95 %</td><td>Techniquement prêt, mais « gagner de l'argent avec l'IA » est un créneau saturé et méfiant</td></tr>
+      <tr><td>Motion Lab</td><td><span class="tag mid">Aimant</span></td><td>Designers</td><td>Moyenne</td><td>—</td><td>Portfolio et contenu viral ; un pack d'effets peut se vendre en complément</td></tr>
+      <tr><td>Kinetika</td><td><span class="tag mid">Crédibilité</span></td><td>Devs</td><td>Forte (GSAP, anime.js)</td><td>—</td><td>Le MIT ne se vend pas : il sert la réputation, les sponsors et les missions</td></tr>
+      <tr><td>Lumio (code)</td><td><span class="tag mid">Moteur</span></td><td>Grand public</td><td>Très forte, gratuite</td><td>—</td><td>Seul face à OpenClassrooms, il ne se vend pas ; son moteur, lui, sert l'Arène et Levier</td></tr>
+      <tr><td>Nour</td><td><span class="tag ko">Pas seul</span></td><td>Grand public</td><td>Écrasante</td><td>—</td><td>ChatGPT, Open WebUI… À garder comme bonus ou comme intégration chez un client</td></tr>
+      <tr><td>nexora-v2</td><td><span class="tag ok">Vitrine</span></td><td>—</td><td>—</td><td>90 %</td><td>Ce n'est pas un produit mais la vitrine où tout le reste se vend. Avis fictifs à remplacer</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 6 · LE PARI NICHE -->
+<section class="slide" aria-label="Le pari niche">
+  <p class="kicker">05 · Le pari niche</p>
+  <h2><span class="gt">Lumio Enquête</span> : l'escape game OSINT &amp; cyber, clé en main, en français.</h2>
+  <div class="split grow">
+    <div>
+      <p class="lead" style="font-size:23px;margin-bottom:22px">Des équipes de 4 à 30 personnes enquêtent sur une entreprise fictive avec les vraies techniques d'un attaquant : EXIF, géolocalisation, réutilisation de pseudo, fuites de données. Elles en ressortent en sachant <b>ce que leurs propres traces révèlent</b>.</p>
+      <h3>Pourquoi ça peut marcher</h3>
+      <ul class="clean">
+        <li><b>Le produit existe déjà</b> : 54 défis, un établi d'analyse, un classement et un générateur de packs à partir de photos personnelles.</li>
+        <li><b>La concurrence est faible sur l'OSINT.</b> Les escape games cyber existants (Orange Cyberdefense, Kaïno…) parlent de phishing et de mots de passe ; personne ne propose clé en main « ce qu'un attaquant trouve sur vous ».</li>
+        <li><b>Le timing est bon</b> : la loi Résilience, qui transpose NIS2, est en examen à l'Assemblée (15 000 à 18 000 entités concernées), et l'ANSSI a publié son référentiel ReCyF en mars 2026.</li>
+        <li><b>Un angle Maghreb quasi vide</b> : des défis sont déjà localisés à Alger et en Kabylie (tifinagh, plaques algériennes), et NEXORA est présente en Algérie.</li>
+      </ul>
+    </div>
+    <div class="grid" style="gap:16px">
+      <div class="card hl"><h3>4 cibles, 1 même moteur</h3>
+        <table style="font-size:16px">
+          <tr><td>PME, ETI, collectivités</td><td>Sensibilisation des équipes, séminaires</td></tr>
+          <tr><td>Lycées, BTS SIO, IUT</td><td>NSI, SNT, cyber, sans compte élève</td></tr>
+          <tr><td>CSE, team-building</td><td>Animation « enquête » originale</td></tr>
+          <tr><td>Tourisme, médiathèques</td><td>Géo-enquête avec les photos de la ville</td></tr>
+        </table>
+      </div>
+      <div class="card"><p class="small muted">Reste à faire (≈ 2 jours) : une page d'offre, une version démo publique de 10 défis, un pack « entreprise fictive » de 90 minutes et un livret animateur. Les packs JSON existent déjà.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · OFFRE LUMIO ENQUÊTE -->
+<section class="slide" aria-label="Offre et prix Lumio Enquête">
+  <p class="kicker">06 · Lumio Enquête · Offre et prix</p>
+  <h2>Quatre formules, de l'école au comité de direction</h2>
+  <div class="grid g4 grow" style="align-items:stretch">
+    <div class="card"><span class="tag mid">Éducation</span><h3 style="margin-top:14px">Licence établissement</h3><div class="price">290 €<span> /an</span></div><p class="muted small">590 €/an avec un nouveau pack chaque trimestre</p><ul class="clean small"><li>Arène complète et classement de classe</li><li>Aucun compte élève, aucune donnée collectée</li><li>Livret enseignant et corrigés</li></ul></div>
+    <div class="card hl"><span class="tag star">Produit d'appel</span><h3 style="margin-top:14px">Atelier animé · 2 h</h3><div class="price">1 490 €<span> HT</span></div><p class="muted small">8 à 30 personnes, sur site en Occitanie · 990 € HT en visio</p><ul class="clean small"><li>Enquête en équipe et débrief</li><li>Fiche « 10 réflexes » remise à chacun</li><li>Attestation de sensibilisation</li></ul></div>
+    <div class="card"><span class="tag ok">Marge haute</span><h3 style="margin-top:14px">Enquête sur mesure</h3><div class="price">2 900 €<span> HT</span></div><p class="muted small">Scénario aux couleurs de l'entreprise ou de la ville</p><ul class="clean small"><li>10 défis tirés de leurs photos, sans métadonnées</li><li>Atelier de lancement inclus</li><li>Réutilisable un an</li></ul></div>
+    <div class="card"><span class="tag ok">Récurrent</span><h3 style="margin-top:14px">Licence entreprise</h3><div class="price">1 900 €<span> HT/an</span></div><p class="muted small">Pour un RSSI ou une équipe RH qui anime en autonomie</p><ul class="clean small"><li>Sessions illimitées en interne</li><li>2 packs inédits par an</li><li>Onboarding animateur d'une heure</li></ul></div>
+  </div>
+  <p class="small muted" style="margin-top:18px">Logique de prix : l'atelier est la porte d'entrée, la mesure dégage la marge et la licence apporte la récurrence. Annoncer « tarif pilote −40 % pour les 3 premiers clients en échange d'un retour écrit », et seulement tant que c'est vrai.</p>
+</section>
+
+<!-- 8 · PLAN D'ATTAQUE LUMIO -->
+<section class="slide" aria-label="Plan d'attaque Lumio Enquête">
+  <p class="kicker">07 · Lumio Enquête · Plan d'attaque</p>
+  <h2>L'arène publique fait la publicité, l'atelier fait le chiffre</h2>
+  <div class="grid g3 grow">
+    <div class="card"><h3>1 · Attirer</h3><ul class="clean"><li><b>Défi OSINT de la semaine</b> en vidéo : « Où cette photo a-t-elle été prise ? »</li><li>Version démo gratuite de l'arène (10 défis), le classement donne envie de revenir</li><li>Post LinkedIn « Ce que la photo de votre bureau révèle » (EXIF)</li></ul></div>
+    <div class="card"><h3>2 · Convertir</h3><ul class="clean"><li>Le formulaire « Organiser une enquête pour mon équipe » est visible sur chaque défi réussi</li><li><b>Démo de 15 minutes en visio</b> : le décideur résout un défi en direct</li><li>Devis sous 24 h et atelier pilote à tarif annoncé</li></ul></div>
+    <div class="card"><h3>3 · Étendre</h3><ul class="clean"><li>Après l'atelier, proposer la licence entreprise (récurrence)</li><li>Recommandations auprès des autres services et des filiales</li><li>Écoles : un professeur convaincu en ramène d'autres via les réseaux d'enseignants NSI</li></ul></div>
+  </div>
+  <div class="grid g4" style="margin-top:20px">
+    <div class="card"><p class="small"><b>Canaux B2B</b> : LinkedIn (RSSI, DSI, DRH, responsables RSE), CCI et clubs d'entreprises d'Occitanie, événements cyber régionaux</p></div>
+    <div class="card"><p class="small"><b>Éducation</b> : professeurs NSI et SNT, documentalistes, BTS SIO, salons académiques et forums enseignants</p></div>
+    <div class="card"><p class="small"><b>Partenaires</b> : ESN et MSSP locales qui vendent de la conformité NIS2 et cherchent un atelier à ajouter (commission de 20 %)</p></div>
+    <div class="card"><p class="small"><b>Maghreb</b> : écoles d'ingénieurs et entreprises algériennes, version FR avec défis localisés déjà prêts</p></div>
+  </div>
+</section>
+
+<!-- 9 · NEXORA SITES MÉTIERS -->
+<section class="slide" aria-label="NEXORA sites métiers">
+  <p class="kicker">08 · Cash rapide · NEXORA Sites métiers</p>
+  <h2>La technique de la <span class="gt">démo avant contact</span></h2>
+  <div class="split grow">
+    <div>
+      <p class="lead" style="font-size:23px;margin-bottom:20px">Le commerçant ne voit pas une plaquette, il voit <b>son</b> site, avec son nom et sa fonction métier qui fonctionne déjà : réservation, devis, prise de RDV. 23 secteurs sont prêts.</p>
+      <ol class="steps">
+        <li><b>Cibler</b> : sur Google Maps, les commerces sans site ou avec un site daté, bien notés (4,3★ et plus) : ils ont des clients mais pas d'outil.</li>
+        <li><b>Personnaliser</b> la démo du secteur en 30 minutes (nom, couleurs, quartier, horaires) et la mettre en ligne sur un sous-domaine Netlify.</li>
+        <li><b>Passer en personne</b>, tablette en main, en dehors du rush : « J'ai préparé ça pour vous, 30 secondes ? »</li>
+        <li><b>Laisser la démo active 7 jours</b> avec un QR code, puis rappeler à J+3.</li>
+      </ol>
+    </div>
+    <div class="grid tiers" style="gap:14px">
+      <div class="card"><h3>Starter</h3><div class="price">590 €<span> HT</span></div><p class="small muted">Site vitrine, fiche Google Business Profile, mise en ligne</p></div>
+      <div class="card hl"><h3>Pro métier</h3><div class="price">1 490 €<span> HT</span></div><p class="small muted">+ fonction métier (réservation, devis…), SEO local, formulaires</p></div>
+      <div class="card"><h3>Sérénité</h3><div class="price">49 €<span> HT/mois</span></div><p class="small muted">Hébergement, modifications, posts Google mensuels. C'est là qu'est la récurrence.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · PACK FREELANCES + JARVIS -->
+<section class="slide" aria-label="Pack freelances et borne Jarvis">
+  <p class="kicker">09 · Deux produits de niche en plus</p>
+  <h2>Revendre les démos aux freelances, louer Jarvis aux événements</h2>
+  <div class="grid g2 grow">
+    <div class="card">
+      <span class="tag ok">Produit numérique · B2B</span>
+      <h3 style="margin-top:14px;font-size:28px">Pack « 23 sites métiers FR »</h3>
+      <p>Pour les freelances et les petites agences web françaises : 23 templates sectoriels <b>avec fonctions métier</b>, données structurées LocalBusiness, Netlify Forms, mentions légales, plus mon guide de prospection « démo avant contact ».</p>
+      <div class="grid g2" style="margin-top:14px;gap:14px">
+        <div><div class="price">149 €</div><p class="small muted">Licence solo, usage client illimité</p></div>
+        <div><div class="price">349 €</div><p class="small muted">Licence agence, 5 sièges et mises à jour</p></div>
+      </div>
+      <p class="small muted" style="margin-top:12px">Vente sur Lemon Squeezy (TVA européenne gérée). Avant la vente, <b>remplacer les photos Unsplash</b> par des visuels libres de revente et retirer les noms toulousains.</p>
+    </div>
+    <div class="card">
+      <span class="tag ok">Location · Événementiel</span>
+      <h3 style="margin-top:14px;font-size:28px">Borne JARVIS</h3>
+      <p>Une animation de salon, de soirée d'entreprise ou d'inauguration : le visiteur <b>attrape d'un poing</b> sa photo souvenir à l'écran et la <b>lâche dans son téléphone</b>. Hologramme 3D aux couleurs de la marque, commandes vocales.</p>
+      <div class="grid g2" style="margin-top:14px;gap:14px">
+        <div><div class="price">690 €<span> HT/jour</span></div><p class="small muted">Installation et animateur inclus</p></div>
+        <div><div class="price">1 190 €<span> HT</span></div><p class="small muted">Avec habillage marque et galerie souvenir</p></div>
+      </div>
+      <p class="small muted" style="margin-top:12px">Repère : un photobooth classique se loue de 99 à 855 € par jour. Vendre via les agences événementielles et les organisateurs de salons. Prévoir un réseau Wi-Fi dédié et un plan B en local si la signalisation PeerJS tombe.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · LEVIER -->
+<section class="slide" aria-label="Levier repositionné">
+  <p class="kicker">10 · Levier · Infoproduit</p>
+  <h2>Prêt à encaisser, mais à sortir du créneau saturé</h2>
+  <div class="split grow">
+    <div>
+      <p class="lead" style="font-size:23px;margin-bottom:20px">« Gagner de l'argent avec l'IA » attire surtout des curieux méfiants et des vendeurs de rêve. La même formation, présentée comme <b>un outil métier</b>, se vend mieux et s'expose moins juridiquement.</p>
+      <h3>Repositionnement proposé</h3>
+      <ul class="clean">
+        <li><b>Titre</b> : « Claude pour les indépendants du digital : livrer 2× plus vite, en règle ». La promesse porte sur le temps gagné, jamais sur un revenu.</li>
+        <li><b>Déclinaisons verticales</b> à partir des mêmes modules : agents immobiliers, artisans du bâtiment, community managers.</li>
+        <li><b>Offre équipe sur devis</b> : codes en lot pour les agences et les organismes de formation.</li>
+        <li>Les modules 0 et 1, gratuits, servent d'aimant ; le plan sur 30 jours est déjà rédigé dans <span class="mono">VENTE.md</span>.</li>
+      </ul>
+    </div>
+    <div class="grid tiers" style="gap:14px">
+      <div class="card"><h3>Essentiel</h3><div class="price">97 €</div><p class="small muted">Porte d'entrée</p></div>
+      <div class="card hl"><h3>Pro</h3><div class="price">197 €</div><p class="small muted">L'offre à mettre en avant : Claude Code, API, chaîne vidéo</p></div>
+      <div class="card"><h3>VIP</h3><div class="price">497 €</div><p class="small muted">Seulement quand l'accompagnement est décrit et réellement livré</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · GRILLE GLOBALE -->
+<section class="slide" aria-label="Grille tarifaire globale">
+  <p class="kicker">11 · Les prix en un coup d'œil</p>
+  <h2>La grille complète</h2>
+  <table>
+    <thead><tr><th>Produit</th><th>Formule</th><th class="num">Prix</th><th>Type de revenu</th><th>Canal de vente</th></tr></thead>
+    <tbody>
+      <tr><td>Lumio Enquête</td><td>Atelier animé 2 h (visio)</td><td class="num">1 490 € HT (990 €)</td><td>Ponctuel</td><td>LinkedIn, CCI, partenaires ESN</td></tr>
+      <tr><td></td><td>Enquête sur mesure</td><td class="num">2 900 € HT</td><td>Ponctuel, marge haute</td><td>Après un atelier</td></tr>
+      <tr><td></td><td>Licence entreprise</td><td class="num">1 900 € HT/an</td><td>Récurrent</td><td>Montée en gamme</td></tr>
+      <tr><td></td><td>Licence établissement</td><td class="num">290 – 590 €/an</td><td>Récurrent</td><td>Enseignants, établissements</td></tr>
+      <tr><td>NEXORA Sites</td><td>Starter / Pro métier</td><td class="num">590 / 1 490 € HT</td><td>Ponctuel</td><td>Terrain, démo avant contact</td></tr>
+      <tr><td></td><td>Sérénité</td><td class="num">49 € HT/mois</td><td>Récurrent</td><td>Proposé à chaque site</td></tr>
+      <tr><td>Pack sites métiers</td><td>Solo / Agence</td><td class="num">149 / 349 €</td><td>Passif</td><td>Lemon Squeezy, X, Reddit, Malt</td></tr>
+      <tr><td>Borne JARVIS</td><td>Jour / Habillage marque</td><td class="num">690 / 1 190 € HT</td><td>Ponctuel</td><td>Agences événementielles</td></tr>
+      <tr><td>Levier</td><td>Essentiel / Pro / VIP</td><td class="num">97 / 197 / 497 €</td><td>Passif</td><td>TikTok, Reels, email</td></tr>
+    </tbody>
+  </table>
+  <p class="small muted" style="margin-top:16px">Les prix « HT » visent les professionnels ; les produits numériques B2C s'affichent TTC. En franchise de TVA, écrire « TVA non applicable, art. 293 B du CGI ».</p>
+</section>
+
+<!-- 13 · TECHNIQUES PAR CIBLE -->
+<section class="slide" aria-label="Techniques de commercialisation">
+  <p class="kicker">12 · Techniques de commercialisation</p>
+  <h2>Une technique par type de client</h2>
+  <div class="grid g3 grow">
+    <div class="card"><h3>Commerçants locaux</h3><ul class="clean small"><li><b>Démo avant contact</b>, sur place</li><li>Prix affichés et payables en 3 fois</li><li><b>Parrainage</b> : 1 mois de Sérénité offert par client recommandé</li><li>Grouper par rue : « 3 commerces de la rue ont déjà leur site »</li></ul></div>
+    <div class="card"><h3>Entreprises (cyber)</h3><ul class="clean small"><li><b>Démo jouée par le décideur</b>, 15 minutes</li><li>Raisonner sur le coût d'un incident plutôt que sur le prix d'un atelier</li><li>Pilote annoncé avec un vrai nombre de places</li><li>Revente via ESN et MSSP (commission)</li></ul></div>
+    <div class="card"><h3>Écoles</h3><ul class="clean small"><li>Version gratuite de 10 défis pour une classe</li><li>Argument <b>« aucune donnée élève »</b></li><li>Factures et bons de commande acceptés</li><li>Viser les budgets de janvier à mars et de septembre</li></ul></div>
+    <div class="card"><h3>Freelances web</h3><ul class="clean small"><li><b>Build in public</b> sur X et LinkedIn</li><li>Un template offert en échange d'un email</li><li>Tutoriel « mon premier client en 7 jours avec ce pack »</li></ul></div>
+    <div class="card"><h3>Événementiel</h3><ul class="clean small"><li>Vidéo de 20 secondes de l'effet « attraper et lâcher » : elle se vend toute seule</li><li>Démonstration chez l'agence avec un ordinateur portable</li><li>Marque blanche pour l'agence (marge pour elle)</li></ul></div>
+    <div class="card"><h3>Grand public (Levier)</h3><ul class="clean small"><li>Aimant : mini-guide gratuit et séquence de 5 emails</li><li>Atelier live gratuit de 45 minutes</li><li>Tarif de lancement daté et réel, sans faux compte à rebours</li></ul></div>
+  </div>
+</section>
+
+<!-- 14 · RÉSEAUX SOCIAUX : RÔLES -->
+<section class="slide" aria-label="Réseaux sociaux, rôle de chaque plateforme">
+  <p class="kicker">13 · Réseaux sociaux</p>
+  <h2>Chaque réseau a un seul rôle</h2>
+  <div class="grid g3 grow">
+    <div class="card hl"><h3>TikTok · Reels · Shorts</h3><p><b>Attention.</b> Formats : « Où est-ce ? » (géolocalisation en 3 indices, réponse le lendemain), démos de Jarvis, avant/après de sites. Appel à l'action unique : le défi en ligne dans la bio.</p></div>
+    <div class="card hl"><h3>LinkedIn</h3><p><b>Les contrats B2B.</b> Le défi OSINT du jeudi, des posts « ce qu'un attaquant voit de votre entreprise », les coulisses d'un atelier. 10 messages privés personnalisés par jour, jamais automatisés.</p></div>
+    <div class="card"><h3>Instagram</h3><p><b>Preuve locale.</b> Les sites livrés pour des commerces toulousains, en stories avec le gérant (avec son accord). Collaborations avec les commerçants pour doubler la portée.</p></div>
+    <div class="card"><h3>Google Business Profile</h3><p><b>Les demandes entrantes locales.</b> Fiche NEXORA complète, un post par semaine, et de vrais avis demandés à chaque livraison.</p></div>
+    <div class="card"><h3>Facebook · groupes</h3><p><b>Le terrain.</b> Groupes de quartier et de commerçants à Toulouse, groupes d'enseignants NSI : apporter une aide utile, ne jamais spammer.</p></div>
+    <div class="card"><h3>YouTube long · X</h3><p><b>Autorité.</b> Writeups complets des défis, Kinetika et Motion Lab en build in public, auprès des développeurs et des freelances qui achètent le pack.</p></div>
+  </div>
+</section>
+
+<!-- 15 · CALENDRIER ÉDITORIAL -->
+<section class="slide" aria-label="Calendrier éditorial">
+  <p class="kicker">14 · Calendrier éditorial type</p>
+  <h2>Une semaine, 7 contenus, 1 h par jour</h2>
+  <div class="week">
+    <div class="day"><b>LUN</b><p>« Ce que révèle la photo de votre bureau » : 3 traces EXIF expliquées</p><span class="net">LinkedIn</span></div>
+    <div class="day"><b>MAR</b><p>« Où est-ce ? » : une photo, 3 indices, réponse en commentaire demain</p><span class="net">TikTok · Reels · Shorts</span></div>
+    <div class="day"><b>MER</b><p>Avant/après : le site d'un commerce toulousain refait en 60 secondes</p><span class="net">Reels · Instagram</span></div>
+    <div class="day"><b>JEU</b><p>Le défi OSINT du jeudi, avec un lien vers l'arène et un classement</p><span class="net">LinkedIn · TikTok</span></div>
+    <div class="day"><b>VEN</b><p>JARVIS : attraper une photo et la lancer sur un téléphone, 15 secondes</p><span class="net">TikTok · Reels · Shorts</span></div>
+    <div class="day"><b>SAM</b><p>Coulisses : un atelier, une erreur, une leçon</p><span class="net">Stories</span></div>
+    <div class="day"><b>DIM</b><p>Newsletter : réponse du défi, résumé de la semaine, un lien vers une offre</p><span class="net">Email</span></div>
+  </div>
+  <div class="grid g3" style="margin-top:24px">
+    <div class="card"><h3>Production</h3><p class="small">Le lundi, lot de 5 vidéos avec la chaîne vidéo du module 6 de Levier (workflow n8n 06), plus 2 vidéos face caméra.</p></div>
+    <div class="card"><h3>Accroche en 1 seconde</h3><p class="small">Commencer par l'image ou le geste, jamais par « Bonjour ». Sous-titres toujours, 20 à 40 secondes.</p></div>
+    <div class="card"><h3>Mesurer</h3><p class="small">Une seule métrique par réseau : rétention à 3 s (TikTok), messages reçus (LinkedIn), clics vers le défi (bio).</p></div>
+  </div>
+</section>
+
+<!-- 16 · SCRIPTS -->
+<section class="slide" aria-label="Scripts prêts à l'emploi">
+  <p class="kicker">15 · Scripts prêts à copier</p>
+  <h2>Les premiers messages</h2>
+  <div class="grid g2 grow" style="gap:18px">
+    <div><h3>LinkedIn · RSSI, DRH</h3><div class="script">Bonjour {prénom}, j'ai conçu une enquête OSINT en équipe : en 2 h, vos collaborateurs découvrent ce qu'un attaquant trouve sur une entreprise fictive (photos, pseudos, fuites), avec ses vrais outils.
+
+Je vous envoie un défi de 5 minutes à tester ? S'il vous plaît, on en parle 15 minutes.</div></div>
+    <div><h3>Email · enseignant NSI, documentaliste</h3><div class="script">Objet : 54 défis cyber pour vos élèves, sans compte ni installation
+
+Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigateur et ne collecte aucune donnée élève. Je vous ouvre gratuitement 10 défis pour une séance : intéressé·e ?</div></div>
+    <div><h3>Terrain · commerçant</h3><div class="script">« Bonjour, je suis Ibrahim, de NEXORA, une agence ici à Toulouse. J'ai préparé une maquette de votre site, avec la prise de rendez-vous qui fonctionne. Je vous la montre en 30 secondes ? »
+→ laisser le QR code de la démo, rappeler à J+3.</div></div>
+    <div><h3>Agence événementielle</h3><div class="script">Bonjour, je loue une borne « Jarvis » : vos invités attrapent leur photo d'un geste à l'écran et la lâchent dans leur téléphone. Vidéo de 20 s jointe. Marque blanche possible, avec votre marge. Je passe vous la montrer ?</div></div>
+  </div>
+</section>
+
+<!-- 17 · PLAN 90 JOURS -->
+<section class="slide" aria-label="Plan sur 90 jours">
+  <p class="kicker">16 · Plan sur 90 jours</p>
+  <h2>De la mise en ligne aux premiers contrats récurrents</h2>
+  <div class="tl grow">
+    <div class="ph"><h3>Semaine 1 · Mettre en ligne</h3><ul class="clean small"><li>nexora-v2 en ligne, avec de vrais avis ou sans section avis</li><li>Arène démo publique et page de l'offre Lumio Enquête</li><li>Stripe ou Lemon Squeezy configuré, achat test</li><li>Profils LinkedIn, TikTok et Google Business Profile optimisés</li></ul></div>
+    <div class="ph"><h3>Semaines 2 à 4 · Vendre à la main</h3><ul class="clean small"><li>50 messages LinkedIn par semaine</li><li>20 commerces visités par semaine, démo à la main</li><li>1 contenu par jour (calendrier)</li><li><b>Objectif</b> : 1 atelier pilote et 2 sites signés</li></ul></div>
+    <div class="ph"><h3>Mois 2 · Produits passifs</h3><ul class="clean small"><li>Pack sites métiers sur Lemon Squeezy</li><li>Levier lancé avec le plan sur 30 jours de <span class="mono">VENTE.md</span></li><li>10 agences événementielles contactées pour Jarvis</li><li>Partenariat avec 1 ESN ou MSSP locale</li></ul></div>
+    <div class="ph"><h3>Mois 3 · Récurrence</h3><ul class="clean small"><li>Licences entreprise et établissement</li><li>Témoignages réels publiés, avec accord écrit</li><li>Hausse de prix pour les nouveaux clients</li><li>Test de la cible Maghreb (Alger, écoles d'ingénieurs)</li></ul></div>
+  </div>
+</section>
+
+<!-- 18 · OBJECTIFS -->
+<section class="slide" aria-label="Objectifs chiffrés">
+  <p class="kicker">17 · Objectifs au mois 3</p>
+  <h2>Deux scénarios, des hypothèses explicites</h2>
+  <div class="split grow">
+    <table>
+      <thead><tr><th>Source (sur le mois 3)</th><th class="num">Prudent</th><th class="num">Cible</th></tr></thead>
+      <tbody>
+        <tr><td>Ateliers Lumio Enquête (1 490 €)</td><td class="num">1 → 1 490 €</td><td class="num">2 → 2 980 €</td></tr>
+        <tr><td>Licences établissement (290 €)</td><td class="num">2 → 580 €</td><td class="num">3 → 870 €</td></tr>
+        <tr><td>Sites NEXORA (moy. 1 200 €)</td><td class="num">2 → 2 400 €</td><td class="num">3 → 3 600 €</td></tr>
+        <tr><td>Sérénité (49 €/mois)</td><td class="num">2 → 98 €</td><td class="num">3 → 147 €</td></tr>
+        <tr><td>Pack sites métiers (149 €)</td><td class="num">4 → 596 €</td><td class="num">8 → 1 192 €</td></tr>
+        <tr><td>Borne JARVIS (690 €)</td><td class="num">0 → 0 €</td><td class="num">1 → 690 €</td></tr>
+        <tr><td>Levier Pro (197 €)</td><td class="num">3 → 591 €</td><td class="num">6 → 1 182 €</td></tr>
+        <tr class="total"><td>Total du mois 3</td><td class="num">5 755 €</td><td class="num">10 661 €</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="card hl" style="margin-bottom:16px"><h3>Indicateurs à suivre chaque semaine</h3>
+        <p class="small">Messages envoyés → rendez-vous</p><div class="bar"><i style="width:15%"></i></div>
+        <p class="small" style="margin-top:12px">Démos montrées → signatures</p><div class="bar"><i style="width:25%"></i></div>
+        <p class="small" style="margin-top:12px">Visiteurs du défi → emails</p><div class="bar"><i style="width:8%"></i></div>
+        <p class="small" style="margin-top:12px">Emails → achats Levier</p><div class="bar"><i style="width:2%"></i></div>
+      </div>
+      <p class="small muted">Taux visés : 15 %, 25 %, 8 % et 2 %. Ce sont des repères de pilotage, pas des promesses : on les remplace par les vrais chiffres dès le premier mois.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 19 · RISQUES -->
+<section class="slide" aria-label="Risques et conformité">
+  <p class="kicker">18 · Risques et conformité</p>
+  <h2>Ce qui peut tout faire tomber, et comment l'éviter</h2>
+  <div class="grid g3 grow">
+    <div class="card"><h3>Faux avis</h3><p class="small">Les avis de nexora-v2 sont des exemples : il faut les remplacer par de vrais avis ou supprimer la section. Le chiffre « 150+ projets » ne reste que s'il est démontrable. Une pratique commerciale trompeuse coûte bien plus cher qu'elle ne rapporte.</p></div>
+    <div class="card"><h3>Éthique OSINT</h3><p class="small">Toujours sur des personnages et des entreprises fictifs. Jamais d'enquête sur de vrais salariés sans mandat écrit. La charte de l'arène (RGPD, art. 323-1 du Code pénal) est à joindre à chaque devis.</p></div>
+    <div class="card"><h3>Droits des visuels</h3><p class="small">Les photos Unsplash des démos ne se revendent pas dans un pack : il faut les remplacer. Garder l'attribution OpenStreetMap et Leaflet, et la mention « Claude est une marque d'Anthropic ».</p></div>
+    <div class="card"><h3>Promesses de revenus</h3><p class="small">Aucune sur Levier : les règles de Meta et TikTok, comme le Code de la consommation, l'interdisent. Vendre le temps gagné et les livrables.</p></div>
+    <div class="card"><h3>Fiabilité de Jarvis en événement</h3><p class="small">Wi-Fi dédié, appareils testés la veille, mode local de secours. Une démo qui rate devant 200 personnes tue l'offre.</p></div>
+    <div class="card"><h3>Dispersion</h3><p class="small">Neuf produits, c'est trop pour une seule personne. Ordre de priorité : <b>Lumio Enquête</b> et <b>Sites NEXORA</b> d'abord, le reste à partir du mois 2.</p></div>
+  </div>
+</section>
+
+<!-- 20 · CETTE SEMAINE -->
+<section class="slide" aria-label="Actions de la semaine">
+  <p class="kicker">19 · À faire cette semaine</p>
+  <h2>7 actions, une par jour</h2>
+  <div class="grid g2 grow" style="align-items:start">
+    <ol class="steps">
+      <li><b>Lundi</b> : mettre nexora-v2 en ligne sur le vrai domaine, avec les mentions légales complètes.</li>
+      <li><b>Mardi</b> : publier l'arène démo (10 défis) et une page « Organiser une enquête » avec un formulaire Netlify.</li>
+      <li><b>Mercredi</b> : écrire le pack « entreprise fictive » de 90 minutes et le livret animateur.</li>
+      <li><b>Jeudi</b> : 50 messages LinkedIn et publication du premier défi OSINT.</li>
+      <li><b>Vendredi</b> : préparer 5 démos commerçants personnalisées et les présenter sur le terrain.</li>
+      <li><b>Samedi</b> : tourner 7 vidéos (Jarvis, « Où est-ce ? », avant/après).</li>
+      <li><b>Dimanche</b> : faire le bilan des chiffres et ajuster la semaine suivante.</li>
+    </ol>
+    <div class="card hl">
+      <p class="kicker" style="margin-bottom:10px">La règle</p>
+      <p class="quote" style="font-size:34px;border:0;padding:0">Plus une ligne de code tant qu'un client ne l'a pas demandée.</p>
+      <p class="muted" style="margin-top:20px">Le produit est prêt. Les 90 prochains jours se passent sur LinkedIn, dans les rues de Toulouse et devant une caméra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 21 · FIN -->
+<section class="slide cover" aria-label="Conclusion">
+  <p class="kicker">NEXORA</p>
+  <h1>On arrête de construire. <span class="gt">On vend.</span></h1>
+  <p class="lead">Lumio Enquête pour la niche, NEXORA Sites pour la trésorerie, les licences pour la récurrence, et du contenu chaque jour pour que les clients viennent d'eux-mêmes.</p>
+  <div class="meta"><span>nexora.pro.web@gmail.com</span><span>Toulouse · Alger</span></div>
+</section>
+
+</div>
+</main>
+
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const stage = document.getElementById('stage');
+  const bar = document.getElementById('progress');
+  const mobile = matchMedia('(max-width:900px),(orientation:portrait) and (max-width:1200px)');
+  let i = 0;
+  slides.forEach((s, k) => s.dataset.n = String(k + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0'));
+
+  function fit() {
+    if (mobile.matches || document.body.classList.contains('overview')) { stage.style.transform = ''; return; }
+    const w = innerWidth, h = innerHeight, sc = Math.min(w / 1600, h / 900);
+    stage.style.transform = `translate(${(w - 1600 * sc) / 2}px,${(h - 900 * sc) / 2}px) scale(${sc})`;
+  }
+  function go(n, push = true) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => { s.classList.toggle('active', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    if (push) history.replaceState(null, '', '#' + (i + 1));
+  }
+  function overview(on) {
+    document.body.classList.toggle('overview', on);
+    fit();
+    if (on) slides[i].scrollIntoView({ block: 'center' });
+  }
+  const start = parseInt(location.hash.slice(1), 10);
+  go(Number.isFinite(start) ? start - 1 : 0, false);
+  fit();
+  addEventListener('resize', fit);
+  mobile.addEventListener?.('change', fit);
+  addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (Number.isFinite(n)) go(n - 1, false); });
+
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); go(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); go(i - 1); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'o' || k === 'O' || (k === 'Escape' && document.body.classList.contains('overview'))) overview(!document.body.classList.contains('overview'));
+    else if (k === 'f' || k === 'F') toggleFs();
+  });
+  slides.forEach((s, k) => s.addEventListener('click', () => { if (document.body.classList.contains('overview')) { go(k); overview(false); } }));
+
+  let x0 = null;
+  addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  addEventListener('touchend', e => {
+    if (x0 === null || mobile.matches) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1));
+  });
+
+  function toggleFs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+  document.getElementById('b-prev').onclick = () => go(i - 1);
+  document.getElementById('b-next').onclick = () => go(i + 1);
+  document.getElementById('b-ov').onclick = () => overview(!document.body.classList.contains('overview'));
+  document.getElementById('b-fs').onclick = toggleFs;
+})();
+</script>
+</body>
+</html>
