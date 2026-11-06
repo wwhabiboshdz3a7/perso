@@ -1,17 +1,34 @@
 // Réglages persistants (localStorage) — jamais la clé API ici.
 
+import { PROVIDERS } from './providers.js';
+
 const KEY = 'nour.settings';
+
+/** Préréglages facultatifs du propriétaire (config.js, chargé avant l'application). */
+export const preset = (() => {
+  let c = {};
+  try { c = globalThis.NOUR_CONFIG && typeof globalThis.NOUR_CONFIG === 'object' ? globalThis.NOUR_CONFIG : {}; } catch { c = {}; }
+  const str = (v, max = 160) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+  const provider = PROVIDERS.some((p) => p.id === str(c.provider) && p.cloud) ? str(c.provider) : '';
+  return {
+    provider,
+    model: str(c.model),
+    serverModel: str(c.serverModel),
+    path: ['cloud', 'server'].includes(str(c.path)) ? str(c.path) : 'cloud',
+    freeOnly: typeof c.freeOnly === 'boolean' ? c.freeOnly : null,
+  };
+})();
 
 export const DEFAULTS = {
   version: 1,
   onboarded: false,
   connection: {
     mode: 'browser', // 'browser' | 'server'
-    provider: 'groq',
+    provider: preset.provider || 'groq',
     baseUrl: '',
     model: '',
-    serverModel: '',
-    freeOnly: false,
+    serverModel: preset.serverModel,
+    freeOnly: preset.freeOnly ?? false,
     showAll: false,
   },
   assistant: {

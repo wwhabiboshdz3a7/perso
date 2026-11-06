@@ -5,7 +5,7 @@ import { renderDocument, renderStreaming, splitThink, enhance } from '../markdow
 import { avatarHTML } from './avatar.js';
 import { describeError } from './errors.js';
 import { PERSONAS, personaById } from '../personas.js';
-import { PROVIDERS } from '../providers.js';
+import { brainChoicesHTML } from './connect-wizard.js';
 
 function attachmentsHTML(atts) {
   if (!atts || !atts.length) return '';
@@ -162,15 +162,14 @@ export function welcomeEl(ctx) {
     <h2>${greeting()}${first ? `, <span class="name">${esc(first)}</span>` : ''}.</h2>
     <p class="lead">${ctx.configured
       ? 'Que puis-je éclairer pour vous aujourd’hui ?'
-      : 'Connectez une IA open source de votre choix pour commencer. Votre clé reste sur cet appareil, ou sur votre propre serveur.'}</p>
+      : 'Branchez-moi sur un modèle d’IA open source pour commencer. Rien ne tourne sur votre ordinateur : le cloud s’en charge.'}</p>
     ${ctx.configured ? `
       <div class="personas" role="group" aria-label="Mode de l'assistant">${PERSONAS.map((p) => `<button type="button" class="persona-chip" data-persona="${p.id}" aria-pressed="${p.id === persona.id}">${icon(p.icon)}${esc(p.name)}</button>`).join('')}</div>
       <div class="suggestions">${persona.suggestions.map(([t, prompt]) => `<button type="button" class="suggestion" data-prompt="${esc(prompt)}"><b>${esc(t)}</b><span>${esc(prompt)}</span></button>`).join('')}</div>`
     : `
       <div class="setup">
-        <div class="setup-head"><h3>Choisissez un fournisseur</h3><p>Compatible OpenAI · modèles ouverts (Llama, Qwen, Mistral, DeepSeek, Gemma, gpt-oss…)</p></div>
-        <div class="provider-grid">${PROVIDERS.map((p) => `<button type="button" class="provider-card" data-setup-provider="${p.id}">${p.tag ? `<span class="tag">${esc(p.tag)}</span>` : ''}<b>${esc(p.name)}</b><span>${esc(p.blurb)}</span></button>`).join('')}</div>
-        <p class="hint setup-server">Vous avez déployé la fonction serveur sur Netlify ? <button type="button" class="btn btn-sm btn-ghost" data-setup-server>${icon('server')}Utiliser le serveur sécurisé</button></p>
+        <div class="setup-head"><h3>Choisir le cerveau de ${esc(ctx.name)}</h3><p>Le modèle d’IA qui répond. Le plus simple : un modèle ouvert dans le cloud.</p></div>
+        ${brainChoicesHTML({ server: ctx.server })}
       </div>`}
   </div>`);
   return el;

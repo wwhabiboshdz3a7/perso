@@ -96,9 +96,16 @@ export function connection() {
       secrets: s ? [s.token] : [],
     };
   }
-  const provider = providerById(c.provider);
-  const base = String(c.baseUrl || provider.baseUrl || '').trim().replace(/\/+$/, '');
-  const key = keystore.get(provider.id);
+  return browserConnection({ providerId: c.provider, baseUrl: c.baseUrl, model: c.model || '', key: keystore.get(providerById(c.provider).id) });
+}
+
+/**
+ * Connexion « navigateur » construite à partir de valeurs données : sert aussi à tester
+ * un fournisseur dans l'assistant de connexion avant d'enregistrer quoi que ce soit.
+ */
+export function browserConnection({ providerId, baseUrl = '', model = '', key = '' }) {
+  const provider = providerById(providerId);
+  const base = String(baseUrl || provider.baseUrl || '').trim().replace(/\/+$/, '');
   const headers = {};
   if (key) headers.Authorization = `Bearer ${key}`;
   if (provider.extraHeaders) Object.assign(headers, provider.extraHeaders());
@@ -107,7 +114,7 @@ export function connection() {
     provider,
     label: provider.name,
     base,
-    model: c.model || '',
+    model,
     hasKey: !!key,
     ready: !!base && (!!key || !!provider.keyOptional),
     headers,
@@ -180,7 +187,7 @@ function checkReady(conn, { needModel = true } = {}) {
   if (conn.mode === 'server') {
     if (!conn.ready) throw new ApiError('session', 'Session requise');
   } else {
-    if (keystore.isLocked()) throw new ApiError('locked', 'Coffre verrouillé');
+    if (keystore.isLocked() && !conn.candidate) throw new ApiError('locked', 'Coffre verrouillé');
     if (!conn.base) throw new ApiError('nobase', 'URL manquante');
     if (!conn.hasKey && !conn.provider.keyOptional) throw new ApiError('nokey', 'Clé manquante');
   }
@@ -196,11 +203,10 @@ async function doFetch(url, init, conn) {
   }
 }
 
-export async function listModels() {
-  const conn = connection();
+export async function listModels(conn = connection(), { signal } = {}) {
   checkReady(conn, { needModel: false });
   const url = conn.mode === 'server' ? 'api/models' : `${conn.base}/models`;
-  const res = await doFetch(url, { headers: { ...conn.headers, Accept: 'application/json' } }, conn);
+  const res = await doFetch(url, { headers: { ...conn.headers, Accept: 'application/json' }, signal }, conn);
   if (!res.ok) throw await errorFromResponse(res, conn);
   let json;
   try { json = await res.json(); } catch { throw new ApiError('bad-response', 'Réponse illisible'); }
@@ -342,4 +348,47 @@ export async function serverLogin(password) {
   session.set(j.token, j.expiresAt);
   clientEvents.dispatchEvent(new Event('status'));
   return j;
+}
+
+/* ---------- Assistant de connexion : sondes ---------- */
+
+/**
+ * La fonction serveur est-elle déployée sur ce site, et complète ?
+ * → { state: 'ready' | 'incomplete' | 'absent' | 'unknown', missing: [] }
+ * Sans fonction, le fichier statique api/status répond { function: false } (pas d'erreur 404).
+ */
+export async function probeServer({ timeout = 6000 } = {}) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeout);
+  try {
+    const res = await fetch('api/status', { headers: { Accept: 'application/json' }, cache: 'no-store', signal: ctl.signal });
+    if (!res.ok) return { state: 'absent', missing: [] };
+    let j = null;
+    try { j = JSON.parse(await res.text()); } catch { return { state: 'absent', missing: [] }; }
+    if (!j || j.service !== 'nour' || !j.function) return { state: 'absent', missing: [] };
+    const missing = Array.isArray(j.missing) ? j.missing.map((x) => String(x).replace(/[^A-Z_]/g, '')).filter(Boolean).slice(0, 8) : [];
+    return j.configured ? { state: 'ready', missing: [], hasDefault: j.hasDefaultModel !== false } : { state: 'incomplete', missing };
+  } catch {
+    return { state: 'unknown', missing: [] };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/**
+ * Après un échec réseau : le serveur répond-il quand on ne lit pas la réponse (mode no-cors) ?
+ * Oui → il refuse les appels depuis un navigateur (CORS) ; non → réseau, adresse ou blocage.
+ */
+export async function probeReachable(base, { timeout = 6000 } = {}) {
+  if (!base) return false;
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeout);
+  try {
+    await fetch(`${String(base).replace(/\/+$/, '')}/models`, { mode: 'no-cors', cache: 'no-store', credentials: 'omit', signal: ctl.signal });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(t);
+  }
 }

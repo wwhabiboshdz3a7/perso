@@ -13,6 +13,9 @@
 //   RATE_LIMIT_PER_MINUTE  requêtes par minute et par adresse IP (défaut 30)
 //   TOKEN_TTL_HOURS        durée de validité d'une session (défaut 12)
 //
+// /api/status (public, sans secret) indique seulement si la fonction est déployée et complète :
+// l'interface s'en sert pour proposer directement « Se connecter avec le mot de passe ».
+//
 // Révocation : les jetons sont signés avec une clé dérivée de TOKEN_SECRET ET de l'empreinte du
 // mot de passe. Changer le mot de passe (ACCESS_PASSWORD_HASH) ou TOKEN_SECRET déconnecte donc
 // immédiatement tous les appareils.
@@ -20,7 +23,7 @@
 import { createHmac, timingSafeEqual, pbkdf2Sync, randomBytes } from 'node:crypto';
 
 export const config = {
-  path: ['/api/chat', '/api/models', '/api/login', '/api/session'],
+  path: ['/api/chat', '/api/models', '/api/login', '/api/session', '/api/status'],
 };
 
 const MAX_BODY = 6 * 1024 * 1024;
@@ -32,7 +35,10 @@ function env(name, fallback = '') {
     ? globalThis.Netlify.env.get(name)
     : undefined;
   const v = fromNetlify ?? process.env[name];
-  return v === undefined || v === null || v === '' ? fallback : String(v);
+  if (v === undefined || v === null) return fallback;
+  // Valeur collée avec ses guillemets (import d'un bloc .env) : on les retire.
+  const s = String(v).trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
+  return s === '' ? fallback : s;
 }
 
 /* ---------- Réponses ---------- */
@@ -142,12 +148,17 @@ function clientIp(req, context) {
     || 'inconnue';
 }
 
-function missingConfig() {
+/** Variables manquantes ou invalides (noms seuls, jamais de valeur). */
+export function missingVariables() {
   const missing = [];
   if (!env('PROVIDER_BASE_URL')) missing.push('PROVIDER_BASE_URL');
-  if (!env('ACCESS_PASSWORD_HASH')) missing.push('ACCESS_PASSWORD_HASH');
-  if (env('TOKEN_SECRET').length < 32) missing.push('TOKEN_SECRET (32 caractères minimum)');
+  if (!/^pbkdf2-sha256\$\d+\$[^$]+\$[^$]+$/.test(env('ACCESS_PASSWORD_HASH'))) missing.push('ACCESS_PASSWORD_HASH');
+  if (env('TOKEN_SECRET').length < 32) missing.push('TOKEN_SECRET');
   return missing;
+}
+
+function missingConfig() {
+  return missingVariables().map((n) => (n === 'TOKEN_SECRET' ? 'TOKEN_SECRET (32 caractères minimum)' : n));
 }
 
 function upstreamUrl(path) {
@@ -204,6 +215,13 @@ export default async function handler(req, context) {
   const url = new URL(req.url);
   const route = url.pathname.replace(/\/+$/, '').split('/').pop();
   const ip = clientIp(req, context);
+
+  // État public : la fonction est-elle là et complète ? (aucun secret, aucune valeur)
+  if (route === 'status') {
+    if (req.method !== 'GET' && req.method !== 'HEAD') return fail(405, 'Méthode non autorisée.', 'method', { Allow: 'GET' });
+    const vars = missingVariables();
+    return json(200, { service: 'nour', function: true, configured: !vars.length, missing: vars, hasDefaultModel: !!env('PROVIDER_DEFAULT_MODEL') });
+  }
 
   const missing = missingConfig();
   if (missing.length) return fail(500, `Fonction non configurée : variable(s) manquante(s) ${missing.join(', ')}.`, 'config');

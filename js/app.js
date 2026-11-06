@@ -17,6 +17,7 @@ import { estimateMessages, conversationToMarkdown, buildExport, parseImport, par
 import { onMathReady, splitThink } from './markdown.js';
 import { openDialog, confirmDialog, promptDialog, toast, toggleMenu, floatingMenu, closeMenus } from './ui/dialogs.js';
 import { openSettings } from './ui/settings-dialog.js';
+import { openConnectWizard, detectServer, serverState } from './ui/connect-wizard.js';
 import { openMemory, openMemoryReview, openLibrary, openShortcuts, openUnlock, openImageViewer } from './ui/panels.js';
 import { userMessageEl, assistantMessageEl, fillAssistant, editBoxEl, welcomeEl, reasoningOpen } from './ui/thread.js';
 import { mountModelPicker } from './ui/model-picker.js';
@@ -96,7 +97,32 @@ const app = {
   resetApp: () => resetApp(),
   conversationCount: () => state.conversations.length,
   unlock: () => unlock(),
+  openSettings: (opts) => openSettings(app, opts),
+  openConnect: (opts) => openConnect(opts),
+  afterConnect: () => afterConnect(),
 };
+
+/* ---------- Assistant de connexion « Choisir le cerveau de Nour » ---------- */
+function openConnect(opts = {}) {
+  const c = settings.get().connection;
+  return openConnectWizard(app, { step: c.mode === 'server' && !opts.step ? 'serveur' : 'choix', ...opts });
+}
+
+function afterConnect() {
+  renderHeader();
+  renderThread();
+  updateComposerState();
+  updateTokens();
+  if (!mobileMQ.matches) els.input.focus({ preventScroll: true });
+}
+
+/** Sonde la fonction serveur tant que Nour n'est pas branché, puis met l'accueil à jour. */
+function watchServer() {
+  if (isConfigured()) return;
+  detectServer().then(() => {
+    if (!isConfigured() && (!state.current || !state.current.messages.length)) renderThread();
+  });
+}
 
 /* ---------- Préférences d'affichage ---------- */
 function applyPrefs() {
@@ -135,7 +161,7 @@ function refreshStatus(fresh = false) {
   const s = settings.get();
   let stateName = 'none';
   let line1 = 'Non connecté';
-  let line2 = 'Choisir un fournisseur';
+  let line2 = 'Choisir le cerveau de Nour';
   if (c.mode === 'server') {
     line1 = 'Serveur sécurisé';
     line2 = c.ready ? (c.model || 'Modèle par défaut du serveur') : 'Connexion requise';
@@ -145,7 +171,7 @@ function refreshStatus(fresh = false) {
     line1 = c.provider.name; line2 = 'Coffre verrouillé'; stateName = 'locked';
   } else if (c.ready) {
     line1 = c.provider.name; line2 = c.model || 'Choisir un modèle'; stateName = c.model ? 'ok' : 'none';
-  } else if (s.onboarded || c.provider) {
+  } else if (s.onboarded || keystore.has(c.provider.id) || s.connection.baseUrl) {
     line1 = c.provider.name; line2 = c.provider.keyOptional ? 'Adresse à vérifier' : 'Clé API manquante';
   }
   if (c.mode === 'browser' && c.ready && !keystore.isLocked() && authState.failed(c)) { line2 = 'Clé refusée'; stateName = 'error'; }
@@ -319,6 +345,7 @@ function renderThread({ force = false } = {}) {
       persona: conv ? conv.persona : state.draftPersona,
       tone: s.assistant.tone,
       configured: isConfigured(),
+      server: serverState(),
     }));
     els.toBottom.hidden = true;
     return;
@@ -675,8 +702,8 @@ async function send() {
     if (!ok) return;
   }
   if (!isConfigured()) {
-    toast('Connectez d’abord une IA et choisissez un modèle.', { kind: 'error' });
-    openSettings(app, { tab: 'connexion' });
+    toast('Choisissez d’abord le cerveau de Nour : un modèle open source dans le cloud, par exemple.', { kind: 'error' });
+    openConnect();
     return;
   }
   let conv = state.current;
@@ -954,9 +981,8 @@ els.messages.addEventListener('click', async (e) => {
     return;
   }
   if (e.target.closest('[data-older]')) { showOlder(); return; }
-  const prov = e.target.closest('[data-setup-provider]');
-  if (prov) { openSettings(app, { tab: 'connexion', provider: prov.dataset.setupProvider }); return; }
-  if (e.target.closest('[data-setup-server]')) { settings.set('connection', { mode: 'server' }); openSettings(app, { tab: 'connexion', focus: '#srv-pass' }); return; }
+  const brain = e.target.closest('[data-connect]');
+  if (brain) { openConnect({ step: brain.dataset.connect }); return; }
 
   const btn = e.target.closest('[data-act]');
   if (!btn) return;
@@ -1495,7 +1521,12 @@ document.addEventListener('click', (e) => {
     case 'new-chat': e.preventDefault(); newChat(); break;
     case 'toggle-sidebar': setSidebar(!sidebarOpen()); if (!sidebarOpen()) els.sidebarToggle.focus(); break;
     case 'close-sidebar': setSidebar(false); els.sidebarToggle.focus(); break;
-    case 'open-settings': closeMobileSidebar(); openSettings(app, { tab: t.dataset.tab || 'connexion' }); break;
+    case 'open-settings':
+      closeMobileSidebar();
+      // Rien de branché encore : l'assistant de connexion plutôt que les réglages bruts.
+      if (t.dataset.tab === 'connexion' && !isConfigured() && !settings.get().onboarded && !keystore.isLocked()) openConnect();
+      else openSettings(app, { tab: t.dataset.tab || 'connexion' });
+      break;
     case 'open-memory': closeMobileSidebar(); openMemory(app); break;
     case 'open-library': closeMobileSidebar(); openLibrary(app); break;
     case 'open-shortcuts': closeMenus(); openShortcuts(); break;
@@ -1688,6 +1719,7 @@ async function init() {
   onMathReady(() => { if (state.current) renderThread({ force: true }); });
   if (!mobileMQ.matches) els.input.focus({ preventScroll: true });
   registerSW();
+  watchServer();
   if (keystore.isLocked() && settings.get().connection.mode === 'browser') setTimeout(() => unlock(), 200);
   document.documentElement.classList.add('ready');
 }

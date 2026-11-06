@@ -9,6 +9,7 @@
 //   - le faux fournisseur (tests/mock-openai.mjs)            port E2E_PORT + 1
 //   - le site + la fonction Netlify (tests/serveur-local.mjs) port E2E_PORT + 2
 //   - le même, sans aucune variable d'environnement          port E2E_PORT + 3
+//   - le même, avec les variables produites par le générateur de l'assistant (port E2E_PORT + 4)
 // Les captures d'écran vont dans E2E_SHOTS (défaut : dossier temporaire du système).
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
@@ -16,6 +17,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const assert = require('assert/strict');
+const { pathToFileURL } = require('url');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.E2E_PORT || 9301);
@@ -73,7 +75,7 @@ function track(page, label) {
     const t = m.text();
     // Avertissement émis par Playwright lui-même quand un test bloque le service worker.
     if (/Service Worker registration blocked by Playwright/.test(t)) return;
-    if (expectNetErrors && /Failed to load resource|ERR_INTERNET_DISCONNECTED|net::ERR/.test(t)) return;
+    if (expectNetErrors && /Failed to load resource|ERR_INTERNET_DISCONNECTED|net::ERR|blocked by CORS policy/.test(t)) return;
     consoleErrors.push(`[${label}] ${m.type()}: ${t}`);
   });
   page.on('pageerror', (e) => consoleErrors.push(`[${label}] pageerror: ${e.message}`));
@@ -113,19 +115,30 @@ async function newPage(browser, opts = {}) {
   return { ctx, page };
 }
 
-/** Configure la connexion par l'interface (fournisseur « URL personnalisée »). */
+/** Configure la connexion par l'assistant « Choisir le cerveau » (Avancé → URL personnalisée). */
 async function configureUI(page, { key = 'cle-valide' } = {}) {
-  await page.click('[data-setup-provider="custom"]');
-  await page.waitForSelector('#dlg-settings[open]');
-  await page.fill('#base-url', `${MOCK}/v1`);
-  await page.dispatchEvent('#base-url', 'change');
-  await page.fill('#api-key', key);
-  await page.dispatchEvent('#api-key', 'change');
-  await page.click('[data-test]');
-  await page.waitForSelector('[data-status][data-kind="ok"]', { timeout: 5000 });
-  await page.click('#dlg-settings .modal-foot [data-close]');
-  await page.waitForSelector('#dlg-settings', { state: 'detached' });
+  await page.click('.welcome .brain-adv > summary');
+  await page.click('.welcome [data-connect="local"]');
+  await page.waitForSelector('#dlg-connect[open]');
+  await page.click('[data-cw-prov="custom"]');
+  await page.fill('#cw-base', `${MOCK}/v1`);
+  await page.fill('#cw-key', key);
+  await page.click('[data-cw-test]');
+  await page.waitForSelector('[data-cw-diag][data-kind="ok"]', { timeout: 5000 });
+  await page.click('[data-cw-finish]');
+  await page.waitForSelector('#dlg-connect', { state: 'detached' });
 }
+
+/** Redirige un fournisseur cloud (https://…) vers le faux fournisseur local. */
+async function routeProvider(page, origin, prefix = '') {
+  await page.route(`${origin}/**`, async (route) => {
+    const url = route.request().url().replace(`${origin}${prefix}`, MOCK);
+    const resp = await route.fetch({ url });
+    await route.fulfill({ response: resp });
+  });
+}
+
+async function clipboard(page) { return page.evaluate(() => navigator.clipboard.readText()); }
 
 /** Configure directement le stockage (plus rapide) puis recharge. */
 async function configureFast(page, { key = 'cle-valide', model = 'openai/gpt-oss-120b' } = {}) {
@@ -172,9 +185,13 @@ async function noHorizontalScroll(page) {
   await startServers();
   const browser = await chromium.launch();
 
-  await test('accueil sans configuration : fournisseurs proposés, zéro erreur', async () => {
+  await test('accueil sans configuration : les trois cerveaux proposés, zéro erreur', async () => {
     const { ctx, page } = await newPage(browser, { label: 'accueil' });
-    assert.equal(await page.locator('.provider-card').count(), 10);
+    assert.equal(await page.locator('.welcome .brain-card').count(), 2);
+    assert.equal(await page.locator('.welcome .brain-card.reco[data-connect="cloud"]').count(), 1);
+    assert.equal(await page.locator('.welcome [data-connect="local"]').count(), 1, 'local rangé dans « Avancé »');
+    assert.equal(await page.locator('.welcome .brain-detected').count(), 0, 'aucun serveur sur un site statique');
+    assert.match(await page.locator('#conn-status').innerText(), /Non connecté/);
     await page.screenshot({ path: `${SHOTS}/01-accueil-desktop.png` });
     await ctx.close();
   });
@@ -805,18 +822,20 @@ async function noHorizontalScroll(page) {
     const { ctx, page } = await newPage(browser, { label: 'proxy', url: PROXY });
     const csp = await page.evaluate(async () => (await fetch('/')).headers.get('content-security-policy'));
     assert.match(csp, /frame-ancestors 'none'/);
-    await page.click('[data-setup-server]');
-    await page.waitForSelector('#srv-pass');
-    await page.fill('#srv-pass', 'faux mot de passe');
-    await page.click('[data-login-form] button[type="submit"]');
-    await page.waitForSelector('[data-status][data-kind="error"]');
-    assert.match(await page.locator('[data-status]').innerText(), /Mot de passe incorrect/);
-    await page.fill('#srv-pass', 'acces-nour-2026');
-    await page.click('[data-login-form] button[type="submit"]');
-    await page.waitForSelector('[data-logout]');
-    await page.waitForSelector('#dlg-settings .model-opt');
+    await page.waitForSelector('.welcome .brain-detected');
+    await page.click('.welcome .brain-detected');
+    await page.waitForSelector('#cw-pass');
+    await page.fill('#cw-pass', 'faux mot de passe');
+    await page.click('[data-cw-login-form] button[type="submit"]');
+    await page.waitForSelector('[data-cw-login-status][data-kind="error"]');
+    assert.match(await page.locator('[data-cw-login-status]').innerText(), /Mot de passe incorrect/);
+    await page.fill('#cw-pass', 'acces-nour-2026');
+    await page.click('[data-cw-login-form] button[type="submit"]');
+    await page.waitForSelector('[data-cw-logout]');
+    await page.waitForSelector('#dlg-connect .model-opt');
     await page.screenshot({ path: `${SHOTS}/14-mode-serveur-desktop.png` });
-    await page.click('#dlg-settings .modal-foot [data-close]');
+    await page.click('[data-cw-finish]');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
     assert.equal(await page.locator('#conn-status').getAttribute('data-state'), 'ok');
     const keys = await page.evaluate(() => localStorage.getItem('nour.keys'));
     assert.equal(keys, null, 'aucune clé dans le navigateur en mode serveur');
@@ -897,8 +916,18 @@ async function noHorizontalScroll(page) {
   await test('fonction non configurée : variables manquantes indiquées', async () => {
     expectNetErrors = true;
     const { ctx, page } = await newPage(browser, { label: 'sans-config', url: PROXY_NOCONF });
-    await page.click('[data-setup-server]');
-    await page.waitForSelector('#srv-pass:focus');
+    // L'assistant lit /api/status : fonction présente mais incomplète, variables nommées.
+    await page.click('.welcome [data-connect="serveur"]');
+    await page.waitForSelector('[data-cw-srv-status][data-state="incomplete"]');
+    const st = await page.locator('[data-cw-srv-status]').innerText();
+    for (const v of ['PROVIDER_BASE_URL', 'ACCESS_PASSWORD_HASH', 'TOKEN_SECRET']) assert.match(st, new RegExp(v));
+    assert.equal(await page.locator('#cw-pass').count(), 0, 'pas de mot de passe à saisir tant que le serveur est incomplet');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
+    // Le formulaire des réglages donne toujours le détail.
+    await page.click('#sidebar [data-action="open-settings"]');
+    await page.click('input[name="conn-mode"][value="server"]');
+    await page.waitForSelector('#srv-pass');
     await page.fill('#srv-pass', 'peu importe');
     await page.click('[data-login-form] button[type="submit"]');
     await page.waitForSelector('[data-status][data-kind="error"]');
@@ -1248,19 +1277,22 @@ async function noHorizontalScroll(page) {
     await ctx.close();
   });
 
-  await test('accueil 1440×900 : fournisseurs et serveur visibles, clé ciblée', async () => {
+  await test('accueil 1440×900 : cerveaux visibles, clé ciblée', async () => {
     const { ctx, page } = await newPage(browser, { label: 'accueil-2' });
     const vis = await page.evaluate(() => {
-      const b = document.querySelector('[data-setup-server]').getBoundingClientRect();
       const comp = document.querySelector('#composer').getBoundingClientRect();
-      const cards = [...document.querySelectorAll('.provider-card')].map((c) => c.getBoundingClientRect().bottom);
-      return { server: b.bottom <= comp.top, cards: Math.max(...cards) <= comp.top };
+      const cards = [...document.querySelectorAll('.welcome .brain-card, .welcome .brain-adv')].map((c) => c.getBoundingClientRect().bottom);
+      return { cards: Math.max(...cards) <= comp.top };
     });
-    assert.deepEqual(vis, { server: true, cards: true }, 'tout l’accueil tient au-dessus de la zone de saisie');
-    await page.click('[data-setup-provider="groq"]');
-    await page.waitForSelector('#api-key:focus');
-    const inView = await page.evaluate(() => { const r = document.querySelector('#api-key').getBoundingClientRect(); const m = document.querySelector('#dlg-settings .modal-body').getBoundingClientRect(); return r.top >= m.top && r.bottom <= m.bottom; });
+    assert.deepEqual(vis, { cards: true }, 'tout l’accueil tient au-dessus de la zone de saisie');
+    await page.click('.welcome [data-connect="cloud"]');
+    await page.waitForSelector('#cw-key:focus');
+    const inView = await page.evaluate(() => { const r = document.querySelector('#cw-key').getBoundingClientRect(); const m = document.querySelector('#dlg-connect .modal-body').getBoundingClientRect(); return r.top >= m.top && r.bottom <= m.bottom; });
     assert.ok(inView, 'champ de clé visible à l’ouverture');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
+    await page.click('#sidebar [data-action="open-settings"]');
+    await page.waitForSelector('#dlg-settings[open]');
     // Nombres à la française dans les préférences
     await page.click('#tab-preferences');
     assert.equal(await page.locator('[data-temp]').innerText(), '0,7');
@@ -1299,6 +1331,200 @@ async function noHorizontalScroll(page) {
     await waitDone(m.page);
     await m.page.screenshot({ path: `${SHOTS}/32-clair-mobile.png` });
     await m.ctx.close();
+  });
+
+  /* ---------- Assistant « Choisir le cerveau de Nour » ---------- */
+
+  await test('cerveau cloud : Groq simulé, clé d’un autre fournisseur, 401, 429, CORS, modèle conseillé, discussion', async () => {
+    await mockReset();
+    expectNetErrors = true;
+    const { ctx, page } = await newPage(browser, { label: 'cerveau-cloud' });
+    await routeProvider(page, 'https://api.groq.com', '/openai');
+    await page.click('.welcome [data-connect="cloud"]');
+    await page.waitForSelector('#cw-key:focus');
+    assert.equal(await page.locator('[data-cw-prov]').count(), 7, 'sept fournisseurs cloud');
+    assert.equal(await page.locator('[data-cw-prov="groq"]').getAttribute('aria-pressed'), 'true');
+    assert.match(await page.locator('.cw-price-note').innerText(), /à vérifier/);
+    assert.equal(await page.locator('[data-cw-finish]').isDisabled(), true);
+    await page.screenshot({ path: `${SHOTS}/40-cerveau-cloud-desktop.png` });
+    // Clé d'un autre fournisseur
+    await page.fill('#cw-key', 'sk-or-v1-abcdef123456');
+    await page.waitForSelector('[data-cw-switch="openrouter"]');
+    // Clé refusée
+    await page.fill('#cw-key', 'gsk_mauvaise_cle');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="error"]');
+    assert.match(await page.locator('[data-cw-diag]').innerText(), /Clé refusée \(erreur 401\)/);
+    // Quota
+    await page.fill('#cw-key', 'cle-quota');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="warn"]');
+    assert.match(await page.locator('[data-cw-diag]').innerText(), /Quota atteint[\s\S]*12 s/);
+    // CORS : un serveur qui répond mais sans en-têtes CORS (ici la fonction locale, autre origine)
+    await page.click('[data-cw-back]');
+    await page.click('#dlg-connect .brain-adv > summary');
+    await page.click('#dlg-connect [data-connect="local"]');
+    await page.click('[data-cw-prov="custom"]');
+    await page.fill('#cw-base', `${PROXY}api`);
+    await page.fill('#cw-key', 'peu-importe');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="error"]');
+    assert.match(await page.locator('[data-cw-diag]').innerText(), /CORS/);
+    assert.equal(await page.locator('[data-cw-diag] [data-go="serveur"]').count(), 1, 'le mode serveur est proposé');
+    // Rien qui réponde : réseau
+    await page.fill('#cw-base', 'http://127.0.0.1:9/v1');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="error"]:has-text("Rien ne répond")');
+    // Retour au cloud, Groq : la clé saisie est conservée, test réussi
+    await page.click('[data-cw-back]');
+    await page.click('#dlg-connect [data-connect="cloud"]');
+    await page.waitForSelector('[data-cw-prov="groq"][aria-pressed="true"]');
+    assert.equal(await page.inputValue('#cw-key'), 'cle-quota');
+    await page.fill('#cw-key', '  Bearer cle-valide  ');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="ok"]');
+    assert.equal(await page.inputValue('#cw-key'), 'cle-valide', 'clé nettoyée');
+    assert.equal(await page.locator('input[name="cw-model"]:checked').getAttribute('value'), 'openai/gpt-oss-120b', 'modèle conseillé présélectionné');
+    assert.equal(await page.locator('.cw-model').count() >= 3, true);
+    await page.click('.cw-model:has(input[value="meta-llama/llama-3.3-70b-instruct"])');
+    assert.match(await page.locator('[data-cw-finish]').innerText(), /Utiliser Groq · llama-3\.3-70b-instruct/);
+    await page.screenshot({ path: `${SHOTS}/41-cerveau-cloud-teste-desktop.png` });
+    await page.click('[data-cw-finish]');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
+    assert.equal(await page.locator('#model-chip-label').innerText(), 'llama-3.3-70b-instruct');
+    assert.equal(await page.locator('#conn-status').getAttribute('data-state'), 'ok');
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('nour.keys'))), { groq: 'cle-valide' }, 'seule la clé validée est enregistrée');
+    await page.waitForSelector('.suggestion');
+    await sendMessage(page, 'Bonjour depuis le cloud');
+    await waitDone(page);
+    assert.match(await lastAssistantText(page), /Bonjour depuis le cloud/);
+    assert.equal((await mockLast()).model, 'meta-llama/llama-3.3-70b-instruct');
+    expectNetErrors = false;
+    await ctx.close();
+  });
+
+  await test('cerveau serveur : générateur dans le navigateur, empreinte vérifiée par la fonction, connexion de bout en bout', async () => {
+    const { ctx, page } = await newPage(browser, { label: 'cerveau-serveur' });
+    await page.click('.welcome [data-connect="serveur"]');
+    await page.waitForSelector('[data-cw-srv-status][data-state="absent"]');
+    assert.equal(await page.locator('[data-cw-finish]').isHidden(), true, 'pas de bouton « Utiliser » sans serveur');
+    await page.fill('#cw-newpass', 'court');
+    await page.click('[data-cw-generate]');
+    assert.equal(await page.getAttribute('#cw-newpass', 'aria-invalid'), 'true');
+    await page.click('[data-cw-genpass]');
+    const pass = await page.inputValue('#cw-newpass');
+    assert.ok(pass.length >= 10, `phrase proposée : ${pass}`);
+    await page.selectOption('#cw-srv-prov', 'openrouter');
+    await page.fill('#cw-srv-model', 'qwen/qwen3-32b');
+    await page.click('[data-cw-generate]');
+    await page.waitForSelector('.cw-var[data-var="TOKEN_SECRET"]:not(.is-empty)');
+    const val = (name) => page.getAttribute(`.cw-var[data-var="${name}"] .cw-var-value`, 'title');
+    const hash = await val('ACCESS_PASSWORD_HASH');
+    const secret = await val('TOKEN_SECRET');
+    assert.equal(await val('PROVIDER_BASE_URL'), 'https://openrouter.ai/api/v1');
+    assert.equal(await val('PROVIDER_DEFAULT_MODEL'), 'qwen/qwen3-32b');
+    assert.match(hash, /^pbkdf2-sha256\$210000\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+$/);
+    assert.ok(secret.length >= 32);
+    const fn = await import(pathToFileURL(path.join(ROOT, 'netlify/functions/chat.mjs')).href);
+    assert.ok(fn.verifyPassword(pass, hash), 'empreinte acceptée par la fonction Netlify');
+    assert.ok(!fn.verifyPassword(`${pass}x`, hash));
+    await page.click('[data-copy-value="TOKEN_SECRET"]');
+    assert.equal(await clipboard(page), secret);
+    await page.click('[data-cw-copyenv]');
+    const env = await clipboard(page);
+    assert.match(env, /^PROVIDER_BASE_URL='https:\/\/openrouter\.ai\/api\/v1'$/m);
+    assert.match(env, /^ACCESS_PASSWORD_HASH='pbkdf2-sha256\$/m);
+    await page.locator('[data-cw-vars]').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${SHOTS}/42-cerveau-serveur-guide-desktop.png` });
+    await ctx.close();
+
+    // Un « déploiement » avec exactement ces valeurs (entre apostrophes, comme un import .env).
+    const port = PORT + 4;
+    launch(process.execPath, ['tests/serveur-local.mjs', String(port)], {
+      PROVIDER_BASE_URL: `${MOCK}/v1`, PROVIDER_API_KEY: 'cle-valide',
+      ACCESS_PASSWORD_HASH: `'${hash}'`, TOKEN_SECRET: `'${secret}'`, PROVIDER_DEFAULT_MODEL: '',
+    });
+    await waitFor(`http://127.0.0.1:${port}/`);
+    await mockReset();
+    const m = await newPage(browser, { label: 'cerveau-serveur-2', url: `http://127.0.0.1:${port}/` });
+    await m.page.waitForSelector('.welcome .brain-detected');
+    await m.page.screenshot({ path: `${SHOTS}/43-cerveau-serveur-detecte-desktop.png` });
+    await m.page.click('.welcome .brain-detected');
+    await m.page.fill('#cw-pass', pass);
+    await m.page.click('[data-cw-login-form] button[type="submit"]');
+    await m.page.waitForSelector('[data-cw-models-status][data-kind="ok"]');
+    // Pas de PROVIDER_DEFAULT_MODEL côté serveur : un modèle est choisi pour que la première question aboutisse.
+    await m.page.click('[data-cw-finish]');
+    await m.page.waitForSelector('#dlg-connect', { state: 'detached' });
+    await sendMessage(m.page, 'Bonjour serveur généré');
+    await waitDone(m.page);
+    assert.match(await lastAssistantText(m.page), /Bonjour serveur généré/);
+    assert.equal((await mockLast()).model, 'openai/gpt-oss-120b');
+    await m.ctx.close();
+  });
+
+  await test('cerveau : config.js présélectionne fournisseur et modèle (OpenRouter gratuit)', async () => {
+    await mockReset();
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    track(page, 'config');
+    await page.route('**/config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: "window.NOUR_CONFIG = { provider: 'openrouter', model: 'google/gemma-3-27b-it:free', freeOnly: true };" }));
+    await routeProvider(page, 'https://openrouter.ai', '/api');
+    await page.goto(BASE);
+    await page.waitForSelector('html.ready');
+    await page.click('.welcome [data-connect="cloud"]');
+    await page.waitForSelector('#cw-key:focus');
+    assert.equal(await page.locator('[data-cw-prov="openrouter"]').getAttribute('aria-pressed'), 'true');
+    await page.fill('#cw-key', 'sk-test-openrouter');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="ok"]');
+    assert.equal(await page.locator('input[name="cw-model"]:checked').getAttribute('value'), 'google/gemma-3-27b-it:free');
+    assert.equal(await page.isChecked('[data-cw-free]'), true);
+    await page.click('[data-cw-finish]');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
+    assert.equal(await page.locator('#model-chip-label').innerText(), 'gemma-3-27b-it:free');
+    await ctx.close();
+  });
+
+  await test('cerveau mobile 390 px : choix, cloud, serveur, sans défilement horizontal', async () => {
+    const { ctx, page } = await newPage(browser, { label: 'cerveau-mobile', mobile: true });
+    await routeProvider(page, 'https://api.groq.com', '/openai');
+    await page.screenshot({ path: `${SHOTS}/44-cerveau-accueil-mobile.png` });
+    // Pastille « Non connecté » du tiroir : ouvre l'assistant plutôt que les réglages bruts.
+    await page.click('#sidebar-toggle');
+    await page.waitForFunction(() => document.querySelector('#app').dataset.sidebar === 'open-mobile');
+    await page.click('#conn-status');
+    await page.waitForSelector('#dlg-connect[open] [data-connect="cloud"]');
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `${SHOTS}/45-cerveau-choix-mobile.png` });
+    const overflow = () => page.evaluate(() => {
+      const b = document.querySelector('#dlg-connect .modal-body');
+      return { doc: document.documentElement.scrollWidth - innerWidth, body: b.scrollWidth - b.clientWidth };
+    });
+    assert.deepEqual(await overflow(), { doc: 0, body: 0 });
+    await page.click('#dlg-connect [data-connect="cloud"]');
+    await page.fill('#cw-key', 'cle-valide');
+    await page.click('[data-cw-test]');
+    await page.waitForSelector('[data-cw-diag][data-kind="ok"]');
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `${SHOTS}/46-cerveau-cloud-mobile.png` });
+    assert.deepEqual(await overflow(), { doc: 0, body: 0 });
+    await page.click('[data-cw-back]');
+    await page.click('#dlg-connect [data-connect="serveur"]');
+    await page.waitForSelector('#cw-newpass');
+    await page.click('[data-cw-genpass]');
+    await page.click('[data-cw-generate]');
+    await page.waitForSelector('.cw-var[data-var="TOKEN_SECRET"]:not(.is-empty)');
+    await page.locator('.cw-var[data-var="ACCESS_PASSWORD_HASH"]').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: `${SHOTS}/47-cerveau-serveur-mobile.png` });
+    assert.deepEqual(await overflow(), { doc: 0, body: 0 });
+    await page.click('[data-cw-back]');
+    await page.click('#dlg-connect [data-connect="cloud"]');
+    await page.click('[data-cw-finish]');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
+    assert.equal(await page.locator('#conn-status').getAttribute('data-state'), 'ok');
+    await ctx.close();
   });
 
   await browser.close();

@@ -99,6 +99,11 @@ export function openSettings(app, { tab = 'connexion', provider = null, focus = 
 function renderConnection(root, app) {
   const c = settings.get().connection;
   root.innerHTML = `
+    <div class="cw-banner">
+      <span class="cw-banner-ico">${icon('sparkle')}</span>
+      <div class="grow"><b>Choisir le cerveau de Nour</b><span>Assistant pas à pas : modèle open source dans le cloud (recommandé), serveur Netlify, ou local.</span></div>
+      <button class="btn btn-sm" type="button" data-open-wizard>Ouvrir l’assistant${icon('arrow-right')}</button>
+    </div>
     <div class="field">
       <span class="field-label" id="mode-label">Mode de connexion</span>
       <p class="hint" style="margin-bottom:4px">« Clé locale » : votre clé reste dans ce navigateur. « Serveur sécurisé » : la clé reste sur votre fonction Netlify.</p>
@@ -109,6 +114,10 @@ function renderConnection(root, app) {
     </div>
     <div data-mode-panel></div>`;
   const panel = $('[data-mode-panel]', root);
+  $('[data-open-wizard]', root).addEventListener('click', () => {
+    root.closest('dialog')?.close();
+    setTimeout(() => app.openConnect({ step: 'choix' }), 0);
+  });
   const draw = () => (settings.get().connection.mode === 'server' ? drawServer(panel, app) : drawBrowser(panel, app));
   $$('input[name="conn-mode"]', root).forEach((r) => r.addEventListener('change', () => {
     settings.set('connection', { mode: r.value });

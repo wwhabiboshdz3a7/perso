@@ -11,11 +11,12 @@
 //  - seule une réponse HTML 200 de la page d'accueil remplace la copie hors ligne d'index.html.
 // VERSION ne sert qu'à renouveler entièrement le cache (liste SHELL modifiée, par exemple).
 
-const VERSION = 'nour-v2';
+const VERSION = 'nour-v3';
 const SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './config.js',
   './assets/css/app.css',
   './assets/icons/favicon.svg',
   './assets/icons/icon-192.png',
@@ -39,11 +40,13 @@ const SHELL = [
   './js/memory.js',
   './js/personas.js',
   './js/providers.js',
+  './js/server-setup.js',
   './js/settings.js',
   './js/sse.js',
   './js/sync.js',
   './js/templates.js',
   './js/ui/avatar.js',
+  './js/ui/connect-wizard.js',
   './js/ui/dialogs.js',
   './js/ui/errors.js',
   './js/ui/model-picker.js',
