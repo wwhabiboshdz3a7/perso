@@ -1,0 +1,18 @@
+{
+  "name": "nexora-prospecteur",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prospecteur NEXORA : trouver les commerces qui ont des avis Google mais pas de site web.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/unit/*.test.mjs",
+    "smoke": "node tests/smoke.cjs",
+    "serve": "python3 -m http.server 9741"
+  },
+  "dependencies": {
+    "@netlify/blobs": "11.1.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
