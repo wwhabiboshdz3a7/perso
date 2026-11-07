@@ -5,6 +5,7 @@ import { analyze, makeCards, makeQuiz, sentences } from './extract.js';
 import { SAMPLES } from './samples.js';
 import { Library, dueCards, grade, mastery, cardState, BOXES, encodeShare, decodeShare } from './store.js';
 import { renderMindmap } from './mindmap.js';
+import { readPdf } from './pdf.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -15,7 +16,7 @@ const plural = (n, one, many = `${one}s`) => `${n} ${n > 1 ? many : one}`;
 /** « Le 5 mai 1789, les États… » → « Les États… » (la date est déjà affichée). */
 const withoutDate = (d) => d.text.replace(new RegExp(`^(?:le |en |dans la nuit du |depuis |vers )?${d.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?\\s*`, 'i'), '').replace(/^./, (c) => c.toUpperCase());
 
-const state = { a: null, cards: [], deck: null, tab: 'fiche', mm: null };
+const state = { a: null, cards: [], deck: null, tab: 'fiche', mm: null, pdf: null };
 
 // ——— Saisie ——————————————————————————————————————————————————————
 
@@ -33,14 +34,54 @@ for (const s of SAMPLES) {
   b.addEventListener('click', () => { src.value = s.text; countWords(); generate(); });
   $('#samples').append(b);
 }
-$('#fileInput').addEventListener('change', async (e) => {
+$('#fileInput').addEventListener('change', (e) => {
   const f = e.target.files[0];
   e.target.value = '';
-  if (!f) return;
+  if (f) importFile(f);
+});
+
+const isPdf = (f) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+
+/** Import d'un fichier : un PDF est lu puis analysé aussitôt ; un texte est placé dans l'éditeur. */
+async function importFile(f) {
+  if (isPdf(f)) {
+    if (f.size > 40_000_000) { toast('PDF trop volumineux (40 Mo au plus).'); return; }
+    show('scan');
+    $('#scanFan').textContent = '';
+    $('#scanPaper').innerHTML = `<div class="scan__reading"><b>Lecture du PDF</b><span id="pdfProg">ouverture…</span><i class="scan__bar"><i id="pdfBar"></i></i></div>`;
+    $('#scanSteps').innerHTML = `<li class="is-on"><span class="dot"></span><span>« ${esc(f.name)} »</span><b></b></li>`;
+    try {
+      const r = await readPdf(f, { onProgress: (p, n) => { $('#pdfProg').textContent = `page ${p} / ${n}`; $('#pdfBar').style.width = `${(p / n) * 100}%`; } });
+      state.pdf = r;
+      src.value = r.text; countWords();
+      await generate(r.text, { title: r.title && r.title.length > 3 && !/^(untitled|sans titre|document|microsoft word)/i.test(r.title) ? r.title : undefined });
+      toast(`PDF importé : ${plural(r.pages, 'page')}.`);
+    } catch (err) {
+      console.warn('[synapse] PDF :', err);
+      show('screenInput');
+      toast(err.code === 'empty' ? err.message : 'Impossible de lire ce PDF (protégé ou endommagé ?).');
+    } finally { state.pdf = null; }
+    return;
+  }
   if (f.size > 1_000_000) { toast('Fichier trop volumineux (1 Mo au plus).'); return; }
   src.value = await f.text();
   countWords();
   toast(`« ${f.name} » importé.`);
+  if (!$('#btnGenerate').disabled) generate();
+}
+
+// Glisser-déposer n'importe où dans la page.
+let dragDepth = 0;
+const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+window.addEventListener('dragenter', (e) => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; $('#drop').hidden = false; });
+window.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('#drop').hidden = true; } });
+window.addEventListener('drop', (e) => {
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  dragDepth = 0; $('#drop').hidden = true;
+  const f = e.dataTransfer.files[0];
+  if (f) importFile(f);
 });
 $('#btnGenerate').addEventListener('click', () => generate());
 
@@ -75,7 +116,18 @@ async function generate(text = src.value, { animate = true, title } = {}) {
 
 async function scanAnimation(text, a, cards) {
   const paper = $('#scanPaper');
-  paper.innerHTML = text.split('\n').filter((l) => l.trim()).slice(0, 28).map((l) => `<p>${esc(l.replace(/^#+\s*/, '').slice(0, 120))}</p>`).join('');
+  const fan = $('#scanFan');
+  fan.textContent = '';
+  const imgs = state.pdf?.images || [];
+  if (imgs.length) {
+    // Les vraies pages du PDF : la première passe sous le scanner, les suivantes en éventail.
+    paper.innerHTML = `<img src="${imgs[0]}" alt="">`;
+    paper.classList.add('is-pdf');
+    imgs.slice(1).forEach((src, i) => { const im = new Image(); im.src = src; im.alt = ''; im.style.setProperty('--k', String(i + 1)); fan.append(im); });
+  } else {
+    paper.classList.remove('is-pdf');
+    paper.innerHTML = text.split('\n').filter((l) => l.trim()).slice(0, 28).map((l) => `<p>${esc(l.replace(/^#+\s*/, '').slice(0, 120))}</p>`).join('');
+  }
   const steps = [
     ['Lecture du plan', plural(a.sections.filter((s) => s.heading).length, 'partie')],
     ['Définitions', plural(a.definitions.length, 'notion')],
@@ -88,13 +140,44 @@ async function scanAnimation(text, a, cards) {
   show('scan');
   paper.classList.remove('is-scanning'); void paper.offsetWidth; paper.classList.add('is-scanning');
   const lis = $$('li', ol);
+  const fly = [
+    a.sections.filter((s) => s.heading).map((s) => s.heading),
+    a.definitions.map((d) => d.term),
+    [...a.dates.map((d) => d.label), ...a.formulas.map((f) => f.formula)],
+    [...a.lists.map((l) => l.label), ...a.acronyms.map((x) => x.abbr)],
+    [],
+  ];
   for (let i = 0; i < steps.length; i++) {
     lis[i].classList.add('is-on');
-    await wait(260);
+    flyChips(fly[i].slice(0, 6), paper, lis[i], i);
+    await wait(fly[i].length ? 520 : 260);
     lis[i].querySelector('b').textContent = steps[i][1];
     lis[i].classList.add('is-done');
   }
   await wait(380);
+}
+
+/** Les notions trouvées s'envolent du document vers le compteur de l'étape. */
+function flyChips(words, from, to, step) {
+  if (!words.length || reduced()) return;
+  const fr = from.getBoundingClientRect(), tr = to.getBoundingClientRect();
+  const colors = ['#9b87ff', '#ff6fa0', '#ffb347', '#20c997', '#3fa9ff'];
+  words.forEach((w, k) => {
+    const chip = document.createElement('span');
+    chip.className = 'flychip';
+    chip.textContent = w.length > 34 ? `${w.slice(0, 32)}…` : w;
+    chip.style.setProperty('--c', colors[step % colors.length]);
+    const x0 = fr.left + 30 + Math.random() * Math.max(10, fr.width - 220), y0 = fr.top + 30 + Math.random() * Math.max(10, fr.height - 80);
+    const x1 = tr.right - 120, y1 = tr.top + tr.height / 2 - 14;
+    chip.style.left = `${x0}px`; chip.style.top = `${y0}px`;
+    document.body.append(chip);
+    const anim = chip.animate([
+      { transform: 'translate(0,0) scale(.6)', opacity: 0 },
+      { transform: 'translate(0,-14px) scale(1.06)', opacity: 1, offset: 0.25 },
+      { transform: `translate(${x1 - x0}px, ${y1 - y0}px) scale(.5)`, opacity: 0.1 },
+    ], { duration: 820, delay: k * 70, easing: 'cubic-bezier(.5,0,.2,1)', fill: 'both' });
+    anim.onfinish = () => { chip.remove(); to.classList.remove('is-hit'); void to.offsetWidth; to.classList.add('is-hit'); };
+  });
 }
 
 // ——— Résultat ————————————————————————————————————————————————————
@@ -176,6 +259,7 @@ function renderPaper() {
 
 const TABS = ['fiche', 'carte', 'cartes', 'quiz', 'frise'];
 function selectTab(name) {
+  if (name !== 'fiche' && speech.on) stopListen();
   state.tab = name;
   for (const t of TABS) {
     const tab = $(`#tab-${t}`), on = t === name;
@@ -268,6 +352,17 @@ function renderStudy() {
     </div>
     <p class="hint">Glissez la carte à gauche ou à droite après l’avoir retournée.</p>`;
   const flip = $('#flip');
+  const front = $('.face--front', flip);
+  flip.addEventListener('pointermove', (e) => {
+    if (study.flipped || e.pointerType === 'touch') return;
+    const r = flip.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    front.style.setProperty('--ry', `${(px - 0.5) * 16}deg`);
+    front.style.setProperty('--rx', `${(0.5 - py) * 12}deg`);
+    front.style.setProperty('--mx', `${px * 100}%`);
+    front.style.setProperty('--my', `${py * 100}%`);
+  });
+  flip.addEventListener('pointerleave', () => { front.style.setProperty('--rx', '0deg'); front.style.setProperty('--ry', '0deg'); });
   flip.addEventListener('click', () => doFlip());
   $('#gKo').addEventListener('click', () => answer(false));
   $('#gOk').addEventListener('click', () => answer(true));
@@ -359,6 +454,49 @@ $('#btnShare').addEventListener('click', async () => {
     else { await navigator.clipboard.writeText(url); toast(`Lien copié (${Math.round(url.length / 100) / 10} k caractères) : le cours est dans le lien, sans serveur.`); }
   } catch { prompt('Copiez ce lien :', url); }
 });
+// ——— Lecture à voix haute, surlignée ————————————————————————————————
+
+const speech = { on: false, i: 0, blocks: [] };
+const sayable = (t) => t.replace(/×/g, ' fois ').replace(/÷/g, ' divisé par ').replace(/²/g, ' au carré').replace(/³/g, ' au cube')
+  .replace(/½/g, ' un demi ').replace(/→/g, ' donne ').replace(/\s=\s/g, ' égale ').replace(/\s\/\s/g, ' sur ').replace(/≈/g, ' environ ').replace(/_{3,}/g, ' blanc ');
+if ('speechSynthesis' in window) $('#btnListen').hidden = false;
+
+function stopListen() {
+  speech.on = false;
+  try { speechSynthesis.cancel(); } catch { /* indisponible */ }
+  $$('.is-reading').forEach((n) => n.classList.remove('is-reading'));
+  $('#btnListen').setAttribute('aria-pressed', 'false');
+  $('#btnListen span').textContent = 'Écouter';
+}
+
+function readNext() {
+  if (!speech.on) return;
+  $$('.is-reading').forEach((n) => n.classList.remove('is-reading'));
+  const node = speech.blocks[speech.i++];
+  if (!node) { stopListen(); return; }
+  node.classList.add('is-reading');
+  node.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+  const u = new SpeechSynthesisUtterance(sayable(node.innerText.replace(/\s+/g, ' ')));
+  u.lang = 'fr-FR';
+  const v = speechSynthesis.getVoices().find((x) => /^fr(-|_)FR/i.test(x.lang)) || speechSynthesis.getVoices().find((x) => /^fr/i.test(x.lang));
+  if (v) u.voice = v;
+  u.rate = 1.02;
+  u.onend = () => setTimeout(readNext, 180);
+  u.onerror = () => stopListen();
+  speechSynthesis.speak(u);
+}
+
+$('#btnListen').addEventListener('click', () => {
+  if (speech.on) { stopListen(); return; }
+  selectTab('fiche');
+  speech.blocks = $$('.paper h1, .paper .psec h2, .defs > div, .formula, .plist, .pdates li, .ideas li');
+  speech.i = 0; speech.on = true;
+  $('#btnListen').setAttribute('aria-pressed', 'true');
+  $('#btnListen span').textContent = 'Arrêter';
+  speechSynthesis.cancel();
+  readNext();
+});
+
 $('#btnPrint').addEventListener('click', () => { selectTab('fiche'); setTimeout(() => window.print(), 50); });
 $('#btnAnki').addEventListener('click', () => {
   const q = (s) => `"${String(s).replace(/"/g, '""').replace(/\n/g, '<br>')}"`;

@@ -42,12 +42,12 @@
         <textarea id="source" spellcheck="true" placeholder="# Titre du cours&#10;&#10;## Première partie&#10;La photosynthèse est le processus par lequel…&#10;En 1789, …&#10;Les trois ordres :&#10;- Le clergé&#10;- …"></textarea>
         <div class="composer__bar">
           <div class="samples" role="group" aria-label="Essayer avec un exemple">
-            <span class="samples__label">Essayer :</span>
+            <span class="samples__label">Ou glissez un PDF ici · Essayer :</span>
             <span id="samples"></span>
           </div>
           <div class="composer__actions">
             <span class="wordcount" id="wordCount" aria-live="polite">0 mot</span>
-            <label class="btn btn--ghost">Importer .txt / .md<input type="file" id="fileInput" accept=".txt,.md,.markdown,text/plain,text/markdown" class="visually-hidden"></label>
+            <label class="btn btn--ghost"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m-4.5 4.5L12 4l4.5 4.5M4 15v5h16v-5"/></svg>Importer PDF, .txt, .md<input type="file" id="fileInput" accept=".pdf,application/pdf,.txt,.md,.markdown,text/plain,text/markdown" class="visually-hidden"></label>
             <button type="button" class="btn btn--primary btn--lg" id="btnGenerate" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>Générer mes fiches</button>
           </div>
         </div>
@@ -58,13 +58,15 @@
         <li><b>Cartes</b> 3D avec répétition espacée</li>
         <li><b>Quiz</b> à choix multiples</li>
         <li><b>Frise</b> chronologique</li>
+        <li><b>Import PDF</b> glisser-déposer</li>
+        <li><b>Lecture à voix haute</b> surlignée</li>
         <li><b>Lien de partage</b> sans serveur</li>
       </ul>
     </section>
 
     <!-- Analyse en cours -->
     <section class="scan" id="scan" hidden aria-live="polite" aria-label="Analyse du cours">
-      <div class="scan__paper" id="scanPaper" aria-hidden="true"></div>
+      <div class="scan__stage" aria-hidden="true"><div class="scan__fan" id="scanFan"></div><div class="scan__paper" id="scanPaper"></div></div>
       <ol class="scan__steps" id="scanSteps"></ol>
     </section>
 
@@ -77,6 +79,7 @@
           <ul class="stats" id="deckStats" aria-label="Ce qui a été extrait"></ul>
         </div>
         <div class="deckhead__actions">
+          <button type="button" class="btn" id="btnListen" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Écouter</span></button>
           <button type="button" class="btn" id="btnShare"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Partager</button>
           <button type="button" class="btn" id="btnPrint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z"/></svg>Imprimer</button>
           <button type="button" class="btn" id="btnAnki"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M4 15v5h16v-5"/></svg>Anki</button>
@@ -117,6 +120,13 @@
 
   <footer class="foot">Synapse · analyse locale, sans IA ni serveur · <a href="https://github.com/wwhabiboshdz3a7" rel="noopener">wwhabiboshdz3a7</a></footer>
 
+  <div class="drop" id="drop" hidden aria-hidden="true">
+    <div class="drop__box">
+      <svg viewBox="0 0 24 24"><path d="M12 15V4m-4.5 4.5L12 4l4.5 4.5M4 15v5h16v-5"/></svg>
+      <p>Déposez votre cours</p>
+      <span>PDF, .txt ou .md : l’analyse démarre aussitôt</span>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
   <script type="module" src="js/app.js"></script>

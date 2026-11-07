@@ -97,6 +97,7 @@ export function renderMindmap(host, a, onTip) {
   const tl = wrap(a.title.replace(/\s*\([^)]*\)\s*$/, ''), 13);
   core.append(svgEl('circle', { r: 118, fill: 'url(#mmCore)', filter: 'url(#mmGlow)' }));
   core.append(svgEl('circle', { r: 134, class: 'mm__halo' }));
+  for (let k = 0; k < 3; k++) core.append(svgEl('circle', { r: 120, class: 'mm__ripple', style: `animation-delay:${1.2 + k * 1.3}s` }));
   tl.forEach((l, k) => core.append(svgEl('text', { y: (k - (tl.length - 1) / 2) * 26 + 8, class: 'mm__ct' }, l)));
   nodesG.append(core);
   host.append(svg);

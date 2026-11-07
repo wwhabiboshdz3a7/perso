@@ -87,7 +87,8 @@ export function analyze(raw) {
     if (isHeading(line, next)) {
       const level = (line.match(/^(#{1,4})\s/) || [, '##'])[1].length;
       const h = headingText(line);
-      if (!title && (level === 1 || sections.length === 0) && !sections.some((s) => s.paras.length || s.bullets.length)) {
+      if (!title && level === 1) { title = h; continue; }
+      if (!title && sections.length === 0) {
         if (level === 1 || !current) { title = h; if (level === 1) continue; }
       }
       push(h, level === 1 ? 2 : level);
@@ -176,7 +177,7 @@ export function analyze(raw) {
   const add = (w, k = 1) => freq.set(w, (freq.get(w) || 0) + k);
   const all = sections.flatMap((s) => [...s.paras, ...s.bullets]).join(' ');
   for (const w of all.match(/[A-Za-zÀ-ÖØ-öø-ÿ'’-]{4,}/g) || []) {
-    const n = w.toLowerCase().replace(/^[ldjmnst]['’]/, '');
+    const n = w.toLowerCase().replace(/^(?:[ldjmnst]|qu|lorsqu|puisqu|jusqu)['’]/, '');
     if (n.length < 4 || STOP.has(n)) continue;
     add(n, /^[A-ZÀ-Ö]/.test(w) && !/^[A-ZÀ-Ö][a-zà-ÿ]+$/.test(w) ? 2 : 1);
   }
