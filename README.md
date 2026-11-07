@@ -73,7 +73,7 @@ python3 -m http.server 9741
 # puis ouvrir http://localhost:9741
 ```
 
-En local, la fonction serveur n'existe pas : utilisez « Essayer avec des données de démonstration » ou la source **OpenStreetMap**. Pour tester la fonction Google en local, utilisez Netlify CLI (`npx -p netlify-cli netlify dev`) avec un fichier `.env` qui contient les variables ci-dessous. Ce fichier est exclu de Git.
+En local, la fonction serveur n'existe pas : le badge du haut indique « Google : fonction absente » (la console du navigateur signale aussi la requête refusée, c'est normal). Utilisez « Essayer avec des données de démonstration » ou la source **OpenStreetMap**. Pour tester la fonction Google en local, utilisez Netlify CLI (`npx -p netlify-cli netlify dev`) avec un fichier `.env` qui contient les variables ci-dessous. Ce fichier est exclu de Git.
 
 ---
 
