@@ -121,7 +121,8 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       : (cur.cloud && conn.mode === 'browser' ? cur.id : (preset.provider || 'groq')),
     localId: provider && !providerById(provider).cloud ? provider : (!cur.cloud ? cur.id : 'ollama'),
     keys: {}, bases: {}, models: {}, chosen: {}, tested: {}, diag: {},
-    freeOnly: conn.mode === 'browser' && conn.provider === 'openrouter' ? !!conn.freeOnly : (preset.freeOnly ?? true),
+    // Choix « gratuits uniquement » déjà fait sur OpenRouter, sinon préréglage (config.js), sinon oui.
+    freeOnly: conn.mode === 'browser' && conn.provider === 'openrouter' && settings.get().onboarded ? !!conn.freeOnly : (preset.freeOnly ?? true),
     server: serverState(),
     serverModels: null,
     serverModel: conn.serverModel || preset.serverModel || '',

@@ -28,7 +28,7 @@ export const DEFAULTS = {
     baseUrl: '',
     model: '',
     serverModel: preset.serverModel,
-    freeOnly: preset.freeOnly ?? false,
+    freeOnly: false, // préréglage OpenRouter (config.js) : appliqué par l'assistant de connexion
     showAll: false,
   },
   assistant: {

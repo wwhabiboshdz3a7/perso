@@ -12,7 +12,7 @@ const MAX_SHOWN = 400;
  */
 export function mountModelPicker(root, opts) {
   const uidp = `mp${++counter}`;
-  const st = { q: '', family: '', freeOnly: !!opts.freeOnly, showAll: !!opts.showAll, value: opts.value || '', models: opts.models || [] };
+  const st = { q: '', family: '', freeOnly: !!opts.freeFilter && !!opts.freeOnly, showAll: !!opts.showAll, value: opts.value || '', models: opts.models || [] };
 
   root.innerHTML = `
     <div class="field" style="margin-bottom:10px">

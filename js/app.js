@@ -348,6 +348,7 @@ function renderThread({ force = false } = {}) {
       server: serverState(),
     }));
     els.toBottom.hidden = true;
+    if (!isConfigured() && !serverState()) watchServer();
     return;
   }
   if (view.convId !== conv.id) { view.from = firstShown(conv); force = true; }
