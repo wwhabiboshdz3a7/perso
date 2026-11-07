@@ -1,6 +1,13 @@
 // Client de la fonction Netlify /api/places (jeton de session conservé localement).
 
 const TOKEN_KEY = 'nxp.token';
+const WINDOW_MS = 60_000;
+
+const sleep = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) { reject(new DOMException('Arrêt', 'AbortError')); return; }
+  const t = setTimeout(resolve, ms);
+  signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Arrêt', 'AbortError')); }, { once: true });
+});
 
 export class ApiError extends Error {
   constructor(status, code, message, data = {}) {
@@ -16,10 +23,30 @@ function safeStorage(kind) {
 }
 
 export class PlacesApi {
-  constructor({ endpoint = '/api/places', fetchImpl } = {}) {
+  constructor({ endpoint = '/api/places', fetchImpl, perMinute = 90, now = () => Date.now() } = {}) {
     this.endpoint = endpoint;
     this.fetchImpl = fetchImpl || ((...a) => globalThis.fetch(...a));
     this.session = this.#loadToken();
+    // Limite par minute de la fonction (renvoyée par « status » et « login ») : le client
+    // s'y tient de lui-même pour ne jamais se faire refuser une requête.
+    this.perMinute = perMinute;
+    this.now = now;
+    this.recent = [];
+    /** Appelé quand le client patiente pour respecter la limite : (millisecondes) => void */
+    this.onWait = null;
+  }
+
+  /** Attend si nécessaire pour rester sous la limite par minute (marge de 5 requêtes). */
+  async pace(signal) {
+    const limit = Math.max(1, this.perMinute - 5);
+    for (;;) {
+      const t = this.now();
+      this.recent = this.recent.filter((x) => t - x < WINDOW_MS);
+      if (this.recent.length < limit) { this.recent.push(t); return; }
+      const wait = WINDOW_MS - (t - this.recent[0]) + 50;
+      this.onWait?.(wait);
+      await sleep(wait, signal);
+    }
   }
 
   #loadToken() {
@@ -48,6 +75,7 @@ export class PlacesApi {
     if (auth) {
       if (!this.loggedIn) throw new ApiError(401, 'token', 'Connectez-vous pour utiliser Google Places.');
       headers.Authorization = `Bearer ${this.session.token}`;
+      await this.pace(signal);
     }
     let res;
     try {
@@ -65,6 +93,7 @@ export class PlacesApi {
       if (res.status === 404) throw new ApiError(404, 'nofunction', 'Fonction /api/places introuvable : le site doit être publié sur Netlify (ou lancé avec « netlify dev »).');
       throw new ApiError(res.status, 'http', `Réponse inattendue du serveur (${res.status}).`);
     }
+    if (Number.isFinite(data.perMinute) && data.perMinute > 0) this.perMinute = data.perMinute;
     if (!res.ok || data.ok === false) {
       if (res.status === 401 && data.error === 'token') this.logout();
       throw new ApiError(res.status, data.error || 'http', data.message || `Erreur ${res.status}`, data);

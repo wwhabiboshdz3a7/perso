@@ -466,7 +466,14 @@ textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
 .d-head__main { flex: 1; min-width: 0; display: grid; gap: 6px; }
 .d-title { font-size: 25px; font-weight: 800; letter-spacing: -.03em; line-height: 1.12; overflow-wrap: anywhere; }
 .d-sub { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--text-3); }
-.d-close { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; border: 1px solid var(--line-strong); flex: none; }
+/* bouton Fermer toujours visible : il reste collé en haut pendant le défilement de la fiche */
+.d-close {
+  position: sticky; top: 12px; z-index: 6; justify-self: end; margin-bottom: -58px;
+  width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
+  border: 1px solid var(--line-strong); background: rgba(22, 13, 48, .92); color: #fff;
+  box-shadow: 0 8px 22px -10px rgba(0, 0, 0, .9);
+}
+.d-close + * { margin-right: 52px; }
 .d-close svg { width: 18px; height: 18px; }
 .d-close:hover { border-color: var(--iris); }
 .d-stats { display: grid; grid-template-columns: auto repeat(2, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
@@ -542,7 +549,7 @@ textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
   :root { --topbar: 58px; --nav: 64px; }
   body { font-size: 14.5px; padding-bottom: calc(var(--nav) + env(safe-area-inset-bottom)); }
   /* barre du haut opaque (le flou créerait un bloc conteneur pour la navigation fixe) */
-  .topbar { padding: 0 14px; gap: 10px; backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(7, 3, 15, .96); }
+  .topbar { padding: 0 14px; gap: 10px; backdrop-filter: none; -webkit-backdrop-filter: none; background: #07030F; }
   .brand__logo { width: 32px; height: 32px; }
   .brand__name { font-size: 13.5px; }
   .brand__app { font-size: 11px; }
@@ -554,7 +561,7 @@ textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
     position: fixed; z-index: 950; left: 0; right: 0; bottom: 0;
     height: calc(var(--nav) + env(safe-area-inset-bottom)); padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
     border: 0; border-top: 1px solid var(--line-strong); border-radius: 0; gap: 6px;
-    background: rgba(11, 6, 24, .97); box-shadow: 0 -18px 40px -20px rgba(0, 0, 0, .8);
+    background: #0B0618; box-shadow: 0 -18px 40px -20px rgba(0, 0, 0, .8);
   }
   .tab { flex: 1; flex-direction: column; justify-content: center; gap: 3px; padding: 4px; font-size: 11.5px; border-radius: 12px; }
   .tab__icon { display: block; }

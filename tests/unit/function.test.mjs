@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { handle, resetRateLimits, SEARCH_FIELD_MASK, verifyToken, passwordFingerprint } from '../../netlify/functions/places.mjs';
 import { hashPassword } from '../../js/lib/hash.js';
 import { createMockGoogle, TEST_KEY } from '../fixtures/mock-google.mjs';
+import { PlacesApi } from '../../js/lib/api.js';
 
 const PASSWORD = 'Prospects-Toulouse-2026';
 const HASH = await hashPassword(PASSWORD, { iterations: 20000 });
@@ -57,6 +58,44 @@ test('connexion : limitation des tentatives par IP', async () => {
   for (let i = 0; i < 8; i++) await call({ action: 'login', password: 'faux' });
   const { res } = await call({ action: 'login', password: PASSWORD });
   assert.equal(res.status, 429);
+});
+
+test('limite par minute : annoncée au client, appliquée par IP, respectée par le client', async () => {
+  const env = { ...ENV, RATE_LIMIT_PER_MINUTE: '12' };
+  const { data: st } = await call({ action: 'status' }, { env });
+  assert.equal(st.perMinute, 12);
+  const token = await login(env);
+  const google = createMockGoogle();
+  const statuses = [];
+  for (let i = 0; i < 13; i++) {
+    const { res } = await call({ action: 'search', cell: SMALL_CELL, category: { query: 'restaurant', type: 'restaurant' } }, { token, env, google });
+    statuses.push(res.status);
+  }
+  assert.deepEqual(statuses.slice(0, 12), Array(12).fill(200));
+  assert.equal(statuses[12], 429, '13e appel de la minute refusé');
+  const other = await call({ action: 'search', cell: SMALL_CELL, category: { query: 'restaurant', type: 'restaurant' } }, { token, env, google, ip: '5.6.7.8' });
+  assert.equal(other.res.status, 200, 'une autre IP n\'est pas concernée');
+
+  // Côté navigateur : le client adopte la limite annoncée et patiente au lieu d'être refusé.
+  resetRateLimits();
+  let t = 1_000_000;
+  const client = new PlacesApi({
+    endpoint: 'https://prospecteur.test/api/places',
+    now: () => t,
+    fetchImpl: (url, init) => handle(new Request(url, init), { env, fetch: google.fetch, ip: '9.9.9.9', quotaStore: null }),
+  });
+  await client.login(PASSWORD);
+  assert.equal(client.perMinute, 12);
+  const waits = [];
+  const ctrl = new AbortController();
+  client.onWait = (ms) => { waits.push(ms); ctrl.abort(); };
+  for (let i = 0; i < 7; i++) await client.search({ cell: SMALL_CELL, category: { query: 'restaurant', type: 'restaurant' }, maxPages: 1 });
+  await assert.rejects(client.search({ cell: SMALL_CELL, category: { query: 'restaurant', type: 'restaurant' }, maxPages: 1 }, { signal: ctrl.signal }), { name: 'AbortError' });
+  assert.equal(waits.length, 1, 'pause annoncée avant de dépasser la limite (marge de 5)');
+  assert.ok(waits[0] > 59_000 && waits[0] <= 60_100);
+  t += 61_000;
+  const after = await client.search({ cell: SMALL_CELL, category: { query: 'restaurant', type: 'restaurant' }, maxPages: 1 });
+  assert.ok(after.ok, 'la fenêtre glissante libère des places');
 });
 
 test('recherche : refusée sans jeton, avec jeton falsifié ou expiré', async () => {

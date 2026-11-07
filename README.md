@@ -29,7 +29,7 @@ Le site est statique (HTML, CSS, JavaScript sans compilation) et se publie tel q
 - **Subdivision adaptative** : une cellule qui atteint 60 résultats est coupée en 4, jusqu'à 5 niveaux.
 - **Dédoublonnage** par identifiant de lieu. Seuls les établissements en activité (`OPERATIONAL`) sont gardés.
 - **Cache local (IndexedDB)** de 30 jours : relancer une recherche sur la même zone ne coûte rien.
-- **Côté serveur** : plafond quotidien (`MAX_REQUESTS_PER_DAY`, 400 par défaut) et limitation de débit (90 requêtes par minute et par adresse IP, 8 essais de mot de passe par quart d'heure).
+- **Côté serveur** : plafond quotidien (`MAX_REQUESTS_PER_DAY`, 400 par défaut) et limitation de débit (`RATE_LIMIT_PER_MINUTE`, 90 appels par minute et par adresse IP ; 8 essais de mot de passe par quart d'heure). Le navigateur connaît cette limite et s'y tient de lui-même : sur une très grande recherche, il marque une courte pause, affichée dans la barre de progression, au lieu de se faire refuser des requêtes.
 
 **Statut du site** (les deux premiers sont vos cibles)
 
@@ -103,6 +103,7 @@ Site configuration → Environment variables :
 | `ACCESS_PASSWORD_HASH` | oui | Empreinte PBKDF2 du mot de passe d'accès (voir ci-dessous). |
 | `TOKEN_SECRET` | oui | Secret aléatoire (64 caractères hexadécimaux) qui signe les jetons de session (HMAC-SHA256). |
 | `MAX_REQUESTS_PER_DAY` | non | Plafond quotidien de requêtes Google pour tout le site (400 par défaut). |
+| `RATE_LIMIT_PER_MINUTE` | non | Appels à la fonction par minute et par adresse IP (90 par défaut, de 10 à 600). |
 | `TOKEN_TTL_HOURS` | non | Durée d'une session en heures (12 par défaut, 720 au maximum). |
 
 ### Créer le mot de passe d'accès
@@ -189,7 +190,7 @@ NODE_PATH=$(npm root -g) node tests/smoke.cjs /tmp/captures   # test de fumée P
 ```
 
 - **Tests unitaires** (`tests/unit/`) : fonction Netlify appelée avec un faux Google (`tests/fixtures/mock-google.mjs`). Ils couvrent :
-  - le mot de passe, les jetons signés, expirés ou falsifiés, la limitation des essais et le plafond quotidien ;
+  - le mot de passe, les jetons signés, expirés ou falsifiés, la limitation des essais, la limite par minute (et la pause automatique du client) et le plafond quotidien ;
   - la pagination jusqu'à 60 résultats et le masque de champs, l'abandon du type refusé par Google et les entrées invalides ;
   - la correspondance OpenStreetMap → Google, la classification des sites, le quadrillage et la subdivision, l'estimation, le score, le CSV et la requête Overpass ;
   - l'orchestration complète : subdivision des cellules saturées, dédoublonnage, plafond et cache.

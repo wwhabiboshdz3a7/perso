@@ -5,6 +5,8 @@
 //   signé HMAC-SHA256 (TOKEN_SECRET) à durée limitée.
 // - Limitation de débit par adresse IP et plafond quotidien de requêtes Google
 //   (MAX_REQUESTS_PER_DAY, compteur partagé via Netlify Blobs quand il est disponible).
+//   La limite par minute (RATE_LIMIT_PER_MINUTE, 90 par défaut) est communiquée au client,
+//   qui la respecte de lui-même.
 //
 // Actions (POST JSON sur /api/places) :
 //   status  → configuration présente ou non (aucun secret renvoyé)
@@ -310,9 +312,10 @@ export async function handle(req, ctx = {}) {
   const ip = clientIp(req, ctx);
   const config = configState(env);
   const dailyLimit = Math.max(1, Number(env.MAX_REQUESTS_PER_DAY) || 400);
+  const perMinute = Math.min(600, Math.max(10, Number(env.RATE_LIMIT_PER_MINUTE) || 90));
 
   if (req.method === 'GET') {
-    return json(200, { ok: true, ready: config.ready, missing: config.missing, dailyLimit });
+    return json(200, { ok: true, ready: config.ready, missing: config.missing, dailyLimit, perMinute });
   }
   if (req.method !== 'POST') return fail(405, 'method', 'Méthode non autorisée.', {}, { Allow: 'GET, POST' });
 
@@ -323,7 +326,7 @@ export async function handle(req, ctx = {}) {
   const action = body?.action;
 
   if (action === 'status') {
-    return json(200, { ok: true, ready: config.ready, missing: config.missing, dailyLimit });
+    return json(200, { ok: true, ready: config.ready, missing: config.missing, dailyLimit, perMinute });
   }
 
   if (action === 'login') {
@@ -337,7 +340,7 @@ export async function handle(req, ctx = {}) {
     const ttlH = Math.min(24 * 30, Math.max(1, Number(env.TOKEN_TTL_HOURS) || 12));
     const exp = now + ttlH * 3600_000;
     const token = signToken({ v: 1, iat: now, exp, fp: passwordFingerprint(env.ACCESS_PASSWORD_HASH) }, env.TOKEN_SECRET);
-    return json(200, { ok: true, token, exp, ready: config.ready, missing: config.missing });
+    return json(200, { ok: true, token, exp, ready: config.ready, missing: config.missing, perMinute });
   }
 
   if (!['search', 'match', 'details'].includes(action)) return fail(400, 'action', 'Action inconnue.');
@@ -354,7 +357,7 @@ export async function handle(req, ctx = {}) {
     return fail(503, 'config', 'Clé Google absente : définissez GOOGLE_PLACES_API_KEY dans les variables Netlify.', { missing: config.missing });
   }
 
-  const rl = rateLimit(`api:${ip}`, 90, 60_000, now);
+  const rl = rateLimit(`api:${ip}`, perMinute, 60_000, now);
   if (!rl.ok) return fail(429, 'rate', 'Trop de requêtes en une minute : la recherche reprendra dans un instant.', { retryAfter: rl.retryAfter }, { 'Retry-After': String(rl.retryAfter) });
 
   const store = ctx.quotaStore !== undefined ? ctx.quotaStore : await defaultQuotaStore();

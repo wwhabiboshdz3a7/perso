@@ -52,7 +52,8 @@ async function main() {
     // Le refus du mauvais mot de passe (401) est attendu : le navigateur le journalise quand même.
     let expected401 = 0;
 
-    async function setup(context) {
+    // Chaque contexte simule un appareil distinct (adresse IP propre pour la limitation de débit).
+    async function setup(context, ip) {
       await context.route('https://tile.openstreetmap.org/**', (route) => {
         const m = route.request().url().match(/\/(\d+)\/(\d+)\/(\d+)\.png/);
         const i = m ? (Number(m[2]) * 7 + Number(m[3]) * 13) % TILES.length : 0;
@@ -67,7 +68,7 @@ async function main() {
         const req = route.request();
         const headers = await req.allHeaders();
         const request = new Request(`${BASE}/api/places`, { method: req.method(), headers, body: req.method() === 'POST' ? req.postData() : undefined });
-        const res = await fn.handle(request, { env, fetch: google.fetch, quotaStore: null, ip: '127.0.0.1' });
+        const res = await fn.handle(request, { env, fetch: google.fetch, quotaStore: null, ip });
         route.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() });
       });
     }
@@ -89,7 +90,7 @@ async function main() {
     // ------------------------------------------------------------------ 1440
     console.log('Bureau 1440 × 900');
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true, locale: 'fr-FR', colorScheme: 'dark' });
-    await setup(ctx);
+    await setup(ctx, '203.0.113.10');
     const page = await ctx.newPage();
     watch(page, '1440');
     await page.goto(BASE);
@@ -149,6 +150,8 @@ async function main() {
     await page.waitForTimeout(500);
     await page.click('#d-tab-email');
     check((await page.locator('#d-subject').innerText()).length > 10, 'email personnalisé (objet)');
+    const closeBox = await page.locator('#d-close').boundingBox();
+    check(closeBox && closeBox.y >= 0 && closeBox.y < 40, 'fiche : bouton Fermer toujours visible après défilement');
     await page.screenshot({ path: path.join(SHOTS, '04-fiche-1440.png') });
     await page.click('#d-close');
 
@@ -186,9 +189,9 @@ async function main() {
     check(Number((await page.locator('#kpi-total').innerText()).replace(/\D/g, '')) > 10, 'mode OSM : résultats');
     await page.click('#verify-btn');
     await page.click('dialog.modal[open] button[value="yes"]');
-    await page.waitForSelector('#progress', { state: 'hidden', timeout: 30000 });
+    const verified = await page.waitForFunction(() => document.querySelector('#results-body').innerText.includes('vérifié Google') && document.querySelector('#progress').hidden, null, { timeout: 30000 }).then(() => true, () => false);
     await page.waitForTimeout(300);
-    check((await page.locator('#results-body').innerText()).includes('vérifié Google'), 'vérification OSM → Google');
+    check(verified, 'vérification OSM → Google');
     await page.screenshot({ path: path.join(SHOTS, '06-osm-1440.png') });
 
     // Réglages + générateur d'empreinte
@@ -199,13 +202,15 @@ async function main() {
     await page.waitForSelector('#gen-out:not([hidden])');
     const hash = await page.locator('#gen-hash').innerText();
     check(/^pbkdf2_sha256\$210000\$/.test(hash) && await fn.verifyPassword('Un-Mot-De-Passe-Solide-42', hash), 'empreinte générée dans le navigateur, reconnue par la fonction');
-    await page.screenshot({ path: path.join(SHOTS, '07-reglages-1440.png'), fullPage: true });
+    await page.evaluate(() => { const c = document.querySelector('#gen-form').closest('section, .card') || document.querySelector('#gen-form'); window.scrollTo(0, c.getBoundingClientRect().top + scrollY - 300); });
+    await page.waitForTimeout(3500); // laisser le message disparaître
+    await page.screenshot({ path: path.join(SHOTS, '07-reglages-1440.png') });
     await ctx.close();
 
     // ------------------------------------------------------------------ 390
     console.log('Mobile 390 × 844');
     const m = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'fr-FR', colorScheme: 'dark' });
-    await setup(m);
+    await setup(m, '203.0.113.20');
     const mp = await m.newPage();
     watch(mp, '390');
     await mp.goto(BASE);

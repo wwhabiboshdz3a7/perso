@@ -132,6 +132,10 @@ const state = {
 let store;
 let map;
 const api = new PlacesApi();
+// Pause automatique pour rester sous la limite par minute de la fonction : on l'affiche.
+api.onWait = (ms) => {
+  if (state.running) setProgress(null, null, `Courte pause de ${Math.ceil(ms / 1000)} s pour respecter la limite de requêtes par minute…`);
+};
 
 function saveSettings() { ls.set('nxp.settings', state.settings); }
 
@@ -519,8 +523,10 @@ function setRunning(ctrl) {
 
 function setProgress(pct, title, text) {
   const bar = $('#progress-bar');
-  bar.setAttribute('aria-valuenow', String(Math.round(pct)));
-  bar.firstElementChild.style.width = `${Math.max(2, Math.min(100, pct))}%`;
+  if (pct != null) {
+    bar.setAttribute('aria-valuenow', String(Math.round(pct)));
+    bar.firstElementChild.style.width = `${Math.max(2, Math.min(100, pct))}%`;
+  }
   if (title) $('#progress-title').textContent = title;
   if (text !== undefined) $('#progress-text').textContent = text;
 }
@@ -1148,13 +1154,13 @@ function renderDrawer(p) {
   };
 
   $('#drawer-body').innerHTML = `
+    <button type="button" class="d-close" id="d-close" aria-label="Fermer la fiche"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     ${sessionBar}
     <div class="d-head">
       <div class="d-head__main">
         <h2 class="d-title" id="drawer-title">${escapeHtml(p.name)}</h2>
         <div class="d-sub">${escapeHtml(catLine(p))}${city ? ` · ${escapeHtml(city)}` : ''} ${p.expired ? '' : siteBadge(p)} <span id="d-status-badge">${statusBadge(rec)}</span>${p.source === 'demo' ? ' <span class="badge badge--demo">démo</span>' : ''}</div>
       </div>
-      <button type="button" class="d-close" id="d-close" aria-label="Fermer la fiche"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
     ${stats}
     ${call}
