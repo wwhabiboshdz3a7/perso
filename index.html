@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Synapse — vos cours deviennent des fiches de révision</title>
+  <meta name="description" content="Collez un cours : Synapse en tire une fiche de révision, une carte mentale, des cartes à retourner avec répétition espacée, un quiz et une frise. Sans IA, sans compte, rien ne quitte votre navigateur.">
+  <meta name="theme-color" content="#0b0a1a">
+  <meta property="og:title" content="Synapse — vos cours deviennent des fiches de révision">
+  <meta property="og:description" content="Fiche, carte mentale, cartes, quiz et frise en une seconde. Sans IA, sans compte.">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <a class="skip" href="#main">Aller au contenu</a>
+
+  <header class="top">
+    <a class="logo" href="./" aria-label="Synapse, accueil">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="6" /><circle cx="7" cy="9" r="3.4"/><circle cx="33" cy="9" r="3.4"/><circle cx="8" cy="31" r="3.4"/><circle cx="32" cy="31" r="3.4"/><path d="M15.5 16 9.5 11M24.5 16l6-5M15.5 24l-5 5M24.5 24l5 5"/></svg>
+      <span>Synapse</span>
+    </a>
+    <nav class="topnav" aria-label="Navigation">
+      <button type="button" class="navbtn" id="navNew" aria-current="page">Nouveau cours</button>
+      <button type="button" class="navbtn" id="navLib">Mes fiches <span class="badge" id="libCount">0</span></button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Saisie -->
+    <section class="screen screen--input" id="screenInput" aria-labelledby="heroTitle">
+      <div class="hero">
+        <p class="eyebrow">Sans IA · sans compte · rien ne quitte votre navigateur</p>
+        <h1 id="heroTitle">Collez votre cours.<br><span class="grad">Révisez-le dans une seconde.</span></h1>
+        <p class="lead">Synapse le lit, repère les définitions, les dates, les formules et les listes, puis en tire une <strong>fiche</strong>, une <strong>carte mentale</strong>, des <strong>cartes à retourner</strong>, un <strong>quiz</strong> et une <strong>frise</strong>.</p>
+      </div>
+      <div class="composer" id="composer">
+        <label for="source" class="visually-hidden">Texte du cours</label>
+        <textarea id="source" spellcheck="true" placeholder="# Titre du cours&#10;&#10;## Première partie&#10;La photosynthèse est le processus par lequel…&#10;En 1789, …&#10;Les trois ordres :&#10;- Le clergé&#10;- …"></textarea>
+        <div class="composer__bar">
+          <div class="samples" role="group" aria-label="Essayer avec un exemple">
+            <span class="samples__label">Essayer :</span>
+            <span id="samples"></span>
+          </div>
+          <div class="composer__actions">
+            <span class="wordcount" id="wordCount" aria-live="polite">0 mot</span>
+            <label class="btn btn--ghost">Importer .txt / .md<input type="file" id="fileInput" accept=".txt,.md,.markdown,text/plain,text/markdown" class="visually-hidden"></label>
+            <button type="button" class="btn btn--primary btn--lg" id="btnGenerate" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>Générer mes fiches</button>
+          </div>
+        </div>
+      </div>
+      <ul class="features" aria-label="Ce que Synapse produit">
+        <li><b>Fiche</b> mise en page, prête à imprimer</li>
+        <li><b>Carte mentale</b> animée, zoomable</li>
+        <li><b>Cartes</b> 3D avec répétition espacée</li>
+        <li><b>Quiz</b> à choix multiples</li>
+        <li><b>Frise</b> chronologique</li>
+        <li><b>Lien de partage</b> sans serveur</li>
+      </ul>
+    </section>
+
+    <!-- Analyse en cours -->
+    <section class="scan" id="scan" hidden aria-live="polite" aria-label="Analyse du cours">
+      <div class="scan__paper" id="scanPaper" aria-hidden="true"></div>
+      <ol class="scan__steps" id="scanSteps"></ol>
+    </section>
+
+    <!-- Résultat -->
+    <section class="screen screen--deck" id="screenDeck" hidden aria-labelledby="deckTitle">
+      <header class="deckhead">
+        <div>
+          <p class="eyebrow" id="deckMeta"></p>
+          <h2 id="deckTitle"></h2>
+          <ul class="stats" id="deckStats" aria-label="Ce qui a été extrait"></ul>
+        </div>
+        <div class="deckhead__actions">
+          <button type="button" class="btn" id="btnShare"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Partager</button>
+          <button type="button" class="btn" id="btnPrint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z"/></svg>Imprimer</button>
+          <button type="button" class="btn" id="btnAnki"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M4 15v5h16v-5"/></svg>Anki</button>
+          <button type="button" class="btn btn--ghost" id="btnEdit">Modifier le texte</button>
+        </div>
+      </header>
+      <div class="tabs" role="tablist" aria-label="Vues">
+        <button type="button" role="tab" class="tab" id="tab-fiche" aria-controls="view-fiche" aria-selected="true">Fiche</button>
+        <button type="button" role="tab" class="tab" id="tab-carte" aria-controls="view-carte" aria-selected="false" tabindex="-1">Carte mentale</button>
+        <button type="button" role="tab" class="tab" id="tab-cartes" aria-controls="view-cartes" aria-selected="false" tabindex="-1">Cartes <span class="badge" id="dueBadge"></span></button>
+        <button type="button" role="tab" class="tab" id="tab-quiz" aria-controls="view-quiz" aria-selected="false" tabindex="-1">Quiz</button>
+        <button type="button" role="tab" class="tab" id="tab-frise" aria-controls="view-frise" aria-selected="false" tabindex="-1">Frise</button>
+      </div>
+
+      <div role="tabpanel" class="view" id="view-fiche" aria-labelledby="tab-fiche"><article class="paper" id="paper"></article></div>
+      <div role="tabpanel" class="view" id="view-carte" aria-labelledby="tab-carte" hidden>
+        <div class="mmwrap" id="mmWrap"><div id="mm"></div>
+          <div class="mmtools"><button type="button" class="iconbtn" id="mmIn" aria-label="Zoomer">+</button><button type="button" class="iconbtn" id="mmOut" aria-label="Dézoomer">−</button><button type="button" class="iconbtn" id="mmReset" aria-label="Recentrer">⟲</button></div>
+          <div class="mmtip" id="mmTip" hidden></div>
+          <p class="hint">Molette ou pincement : zoom · glisser : déplacer · survol : définition</p>
+        </div>
+      </div>
+      <div role="tabpanel" class="view" id="view-cartes" aria-labelledby="tab-cartes" hidden>
+        <div class="study" id="study"></div>
+      </div>
+      <div role="tabpanel" class="view" id="view-quiz" aria-labelledby="tab-quiz" hidden><div class="quiz" id="quiz"></div></div>
+      <div role="tabpanel" class="view" id="view-frise" aria-labelledby="tab-frise" hidden><div class="frise" id="frise"></div></div>
+    </section>
+
+    <!-- Bibliothèque -->
+    <section class="screen screen--lib" id="screenLib" hidden aria-labelledby="libTitle">
+      <h2 id="libTitle">Mes fiches</h2>
+      <p class="lead">Elles restent dans ce navigateur, avec votre progression.</p>
+      <ul class="lib" id="lib"></ul>
+      <p class="empty" id="libEmpty">Aucune fiche pour l’instant. Collez un cours pour commencer.</p>
+    </section>
+  </main>
+
+  <footer class="foot">Synapse · analyse locale, sans IA ni serveur · <a href="https://github.com/wwhabiboshdz3a7" rel="noopener">wwhabiboshdz3a7</a></footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
