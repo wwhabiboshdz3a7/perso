@@ -34,6 +34,9 @@
       <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.6" fill="currentColor"/><circle cx="4.5" cy="12" r="1.6" fill="currentColor"/><circle cx="4.5" cy="18" r="1.6" fill="currentColor"/></symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path d="m9 4-5 2v14l5-2 6 2 5-2V4l-5 2-6-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" stroke="currentColor" stroke-width="2"/></symbol>
       <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
@@ -44,9 +47,9 @@
       <span class="brand__text"><span class="brand__name">NEXORA</span><span class="brand__app">Prospecteur</span></span>
     </a>
     <nav class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab" role="tab" id="tab-search" aria-selected="true" aria-controls="view-search" data-view="search">Recherche</button>
-      <button class="tab" role="tab" id="tab-crm" aria-selected="false" aria-controls="view-crm" data-view="crm" tabindex="-1">Mes prospects <span class="tab__badge" id="crm-badge" hidden>0</span></button>
-      <button class="tab" role="tab" id="tab-settings" aria-selected="false" aria-controls="view-settings" data-view="settings" tabindex="-1">Réglages</button>
+      <button class="tab" role="tab" id="tab-search" aria-selected="true" aria-controls="view-search" data-view="search"><svg class="tab__icon" aria-hidden="true"><use href="#i-map"/></svg><span class="tab__label">Recherche</span></button>
+      <button class="tab" role="tab" id="tab-crm" aria-selected="false" aria-controls="view-crm" data-view="crm" tabindex="-1"><svg class="tab__icon" aria-hidden="true"><use href="#i-list"/></svg><span class="tab__label">Mes prospects</span><span class="tab__badge" id="crm-badge" hidden>0</span></button>
+      <button class="tab" role="tab" id="tab-settings" aria-selected="false" aria-controls="view-settings" data-view="settings" tabindex="-1"><svg class="tab__icon" aria-hidden="true"><use href="#i-gear"/></svg><span class="tab__label">Réglages</span></button>
     </nav>
     <div class="topbar__meta">
       <span class="pill pill--usage" id="usage-month" title="Requêtes Google comptées dans ce navigateur ce mois-ci">Ce mois : 0 req.</span>
@@ -63,7 +66,7 @@
           <h1 class="panel__title">Les commerces <span class="gt">bien notés</span> qui n'ont <span class="gold">pas de site</span>.</h1>
         </div>
 
-        <section class="step" aria-labelledby="step-zone">
+        <section class="step step--zone" aria-labelledby="step-zone">
           <h2 class="step__title" id="step-zone"><span class="step__n">1</span> Zone</h2>
           <form class="place-search" id="place-form" role="search" autocomplete="off">
             <label class="sr-only" for="place-q">Ville, quartier ou adresse</label>
@@ -88,22 +91,26 @@
           <div class="zone-ctl" id="rect-row" hidden>
             <button class="btn btn--ghost btn--sm" type="button" id="draw-rect">Tracer un rectangle sur la carte</button>
           </div>
-          <p class="hint" id="zone-hint">Cliquez sur la carte pour déplacer le centre du cercle.</p>
+          <p class="hint" id="zone-hint">Touchez ou cliquez la carte, ou faites glisser le point doré, pour déplacer le cercle.</p>
           <p class="zone-info" id="zone-info" aria-live="polite"></p>
         </section>
 
-        <section class="step" aria-labelledby="step-cats">
+        <section class="step step--cats" aria-labelledby="step-cats">
           <h2 class="step__title" id="step-cats"><span class="step__n">2</span> Catégories <span class="step__count" id="cat-count">0</span></h2>
           <div class="presets" id="preset-list" aria-label="Sélections rapides"></div>
-          <div class="cat-tools">
-            <label class="sr-only" for="cat-filter">Filtrer les catégories</label>
-            <input id="cat-filter" type="search" placeholder="Filtrer : coiffeur, garage…">
-            <button class="btn btn--text btn--sm" type="button" id="cat-clear">Tout décocher</button>
-          </div>
-          <div class="cat-groups" id="cat-groups"></div>
+          <p class="cat-picked" id="cat-picked" aria-live="polite"></p>
+          <details class="cat-details" id="cat-details" open>
+            <summary class="cat-details__sum"><span>Toutes les catégories</span><small id="cat-total"></small></summary>
+            <div class="cat-tools">
+              <label class="sr-only" for="cat-filter">Filtrer les catégories</label>
+              <input id="cat-filter" type="search" placeholder="Filtrer : coiffeur, garage…">
+              <button class="btn btn--text btn--sm" type="button" id="cat-clear">Tout décocher</button>
+            </div>
+            <div class="cat-groups" id="cat-groups"></div>
+          </details>
         </section>
 
-        <section class="step" aria-labelledby="step-run">
+        <section class="step step--run" aria-labelledby="step-run">
           <h2 class="step__title" id="step-run"><span class="step__n">3</span> Source &amp; budget</h2>
           <fieldset class="seg seg--source" id="source-kind">
             <legend class="sr-only">Source des données</legend>
@@ -210,7 +217,7 @@
             <div class="field field--inline">
               <label for="f-sort">Tri</label>
               <select id="f-sort">
-                <option value="score">Score d'opportunité</option>
+                <option value="score">Score</option>
                 <option value="reviews">Nombre d'avis</option>
                 <option value="rating">Note</option>
                 <option value="name">Nom</option>
@@ -285,6 +292,7 @@
           </div>
         </div>
         <div class="crm-list" id="crm-list"></div>
+        <button class="btn btn--ghost btn--block" type="button" id="crm-more" hidden>Afficher plus</button>
         <div class="empty" id="crm-empty">
           <svg class="empty__logo" aria-hidden="true"><use href="#logo"/></svg>
           <p class="empty__title">Aucun prospect suivi pour l'instant.</p>
@@ -312,11 +320,11 @@
           </form>
           <p class="form-msg" id="login-msg" role="alert"></p>
           <button class="btn btn--ghost btn--sm" type="button" id="logout" hidden>Se déconnecter</button>
-          <div class="grid-2">
+          <div class="grid-2 grid-2--top">
             <div class="field">
               <label for="price-req">Prix d'une requête (USD)</label>
               <input id="price-req" type="number" min="0" step="0.001" value="0.035" inputmode="decimal">
-              <small>Text Search Enterprise : 35 $ / 1 000 requêtes au tarif public de base, après 1 000 requêtes offertes par mois (grille relevée en novembre 2026, à revérifier).</small>
+              <small>Les champs téléphone, site, note et avis relèvent du niveau « Text Search Enterprise » : 35 $ les 1 000 requêtes au premier palier, après 1 000 requêtes offertes par mois (grille publique consultée en novembre 2026). Google peut la modifier : vérifiez la page officielle des tarifs.</small>
             </div>
             <div class="field">
               <label for="free-quota">Requêtes offertes par mois</label>
@@ -381,7 +389,8 @@
             <li><strong>Informer dès le premier contact</strong> : qui vous êtes, d'où viennent ses coordonnées (fiche publique Google ou OpenStreetMap), et qu'il peut s'opposer à tout moment.</li>
             <li><strong>Droit d'opposition</strong> : le statut « Ne plus contacter » masque l'établissement de toutes vos recherches futures. Respectez-le sans délai.</li>
             <li><strong>Durée de conservation</strong> : la CNIL recommande de ne pas garder un prospect inactif plus de 3 ans après le dernier contact. Supprimez les fiches qui ne mènent à rien.</li>
-            <li><strong>Démarchage téléphonique</strong> : les règles évoluent, notamment pour les consommateurs. Vérifiez les dispositions en vigueur si votre interlocuteur peut être considéré comme un particulier.</li>
+            <li><strong>Démarchage téléphonique</strong> : l'encadrement se durcit pour les consommateurs (Bloctel, évolution vers un consentement préalable). Il vise surtout les particuliers ; vérifiez les règles en vigueur si votre interlocuteur peut être considéré comme tel (micro-entrepreneur contacté sur son numéro personnel, par exemple).</li>
+            <li><strong>Email</strong> : vers une adresse professionnelle, un message en rapport avec l'activité du destinataire est en général admis sans consentement préalable, à condition de vous identifier et d'offrir un moyen simple de refuser (les modèles d'email et de SMS le prévoient).</li>
             <li><strong>Conditions de Google Maps Platform</strong> : les données Google affichées sur cette carte (fond OpenStreetMap) portent la mention « Google Maps ». Seuls les identifiants de lieux sont conservés durablement ; le reste du contenu Google est effacé de ce navigateur après 30 jours. Les conditions de Google encadrent strictement la copie et l'export de leur contenu (noms, adresses, numéros…) hors de l'application : lisez-les avant d'exporter.</li>
             <li><strong>OpenStreetMap</strong> : données © contributeurs OpenStreetMap, licence ODbL (attribution obligatoire).</li>
           </ul>

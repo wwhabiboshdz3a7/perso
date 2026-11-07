@@ -49,6 +49,8 @@ async function main() {
 
     const browser = await chromium.launch();
     const errors = [];
+    // Le refus du mauvais mot de passe (401) est attendu : le navigateur le journalise quand même.
+    let expected401 = 0;
 
     async function setup(context) {
       await context.route('https://tile.openstreetmap.org/**', (route) => {
@@ -70,8 +72,17 @@ async function main() {
       });
     }
 
+    const tileZoom = (page) => page.evaluate(() => {
+      const zs = [...document.querySelectorAll('#map img.leaflet-tile')].map((i) => Number((i.src.match(/\/(\d+)\/\d+\/\d+\.png/) || [])[1])).filter(Number.isFinite);
+      return zs.length ? Math.max(...zs) : 0;
+    });
+
     function watch(page, label) {
-      page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${label}] ${m.text()}`); });
+      page.on('console', (m) => {
+        if (m.type() !== 'error') return;
+        if (expected401 > 0 && /status of 401/.test(m.text())) { expected401--; return; }
+        errors.push(`[${label}] ${m.text()}`);
+      });
       page.on('pageerror', (e) => errors.push(`[${label}] ${e.message}`));
     }
 
@@ -95,9 +106,17 @@ async function main() {
 
     // Quartier rapide + recherche Google avec connexion
     await page.click('#quick-places button:has-text("Capitole")');
+    await page.waitForTimeout(400);
+    // vue éloignée volontairement : la carte doit se recadrer sur les résultats
+    await page.click('.leaflet-control-zoom-out');
+    await page.waitForTimeout(350);
+    await page.click('.leaflet-control-zoom-out');
+    await page.waitForTimeout(500);
+    const zoomBefore = await tileZoom(page);
     await page.click('#run');
     await page.waitForSelector('#login-dialog[open]');
     await page.fill('#ld-pw', 'mauvais');
+    expected401 = 1;
     await page.click('#ld-ok');
     await page.waitForFunction(() => document.querySelector('#ld-msg').textContent.length > 0);
     check((await page.locator('#ld-msg').innerText()).includes('incorrect'), 'mauvais mot de passe refusé');
@@ -105,7 +124,9 @@ async function main() {
     await page.click('#ld-ok');
     await page.waitForSelector('#progress:not([hidden])');
     await page.waitForSelector('#progress', { state: 'hidden', timeout: 60000 });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(900);
+    const zoomAfter = await tileZoom(page);
+    check(zoomAfter > zoomBefore, `carte recadrée sur les résultats (zoom ${zoomBefore} → ${zoomAfter})`);
     const total = Number((await page.locator('#kpi-total').innerText()).replace(/\D/g, ''));
     const rows = await page.locator('#results-body tr').count();
     check(total > 30, `recherche Google simulée : ${total} établissements`);
@@ -114,7 +135,10 @@ async function main() {
     check((await page.locator('.leaflet-control-attribution').innerText()).includes('Google Maps'), 'attribution Google sur la carte');
     check(await page.locator('#results-body .badge--site').count() === 0, 'filtre par défaut : pas de « A un site »');
     await page.screenshot({ path: path.join(SHOTS, '02-resultats-google-1440.png') });
-    await page.locator('.results').screenshot({ path: path.join(SHOTS, '03-tableau-1440.png') });
+    await page.locator('#results-title').scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, document.querySelector('#results').getBoundingClientRect().top - 84));
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(SHOTS, '03-tableau-1440.png') });
 
     // Fiche prospect
     await page.locator('#results-body tr').first().locator('.r-name-btn').click();
@@ -134,7 +158,8 @@ async function main() {
     await page.click('#tab-crm');
     await page.waitForSelector('#crm-list .crm-card');
     const cards = await page.locator('#crm-list .crm-card').count();
-    check(cards > 1, `CRM : ${cards} prospects suivis`);
+    check(cards > 1, `CRM : ${cards} fiches affichées`);
+    check(await page.locator('#crm-more').isVisible(), 'CRM : affichage par pages (« Afficher plus »)');
     await page.screenshot({ path: path.join(SHOTS, '05-crm-1440.png') });
 
     // Export CSV (liste d'appel complète)
@@ -188,21 +213,60 @@ async function main() {
     await mp.waitForTimeout(500);
     const overflow = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check(overflow <= 0, `pas de défilement horizontal (écart ${overflow}px)`);
+    const layout = await mp.evaluate(() => {
+      const y = (s) => document.querySelector(s).getBoundingClientRect().top;
+      const nav = document.querySelector('.tabs').getBoundingClientRect();
+      return { zone: y('.step--zone'), map: y('.map-wrap'), cats: y('.step--cats'), run: y('.step--run'), navBottom: nav.bottom, navTop: nav.top, vh: innerHeight };
+    });
+    check(layout.zone < layout.map && layout.map < layout.cats && layout.cats < layout.run, 'mobile : zone, carte, catégories puis lancement');
+    check(Math.abs(layout.navBottom - layout.vh) < 2 && layout.navTop > layout.vh - 90, 'mobile : navigation en bas de l\'écran');
     await mp.screenshot({ path: path.join(SHOTS, '08-accueil-390.png') });
+    await mp.evaluate(() => window.scrollTo(0, document.querySelector('.map-wrap').getBoundingClientRect().top + scrollY - 70));
+    await mp.waitForTimeout(300);
+    await mp.screenshot({ path: path.join(SHOTS, '08b-carte-390.png') });
     await mp.click('#demo-btn');
-    await mp.waitForTimeout(900);
+    await mp.waitForTimeout(1200);
     const overflow2 = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check(overflow2 <= 0, `résultats sans défilement horizontal (écart ${overflow2}px)`);
-    await mp.locator('#results').scrollIntoViewIfNeeded();
+    await mp.evaluate(() => window.scrollTo(0, document.querySelector('#results').getBoundingClientRect().top + scrollY - 66));
+    await mp.waitForTimeout(3500); // laisser le message de démonstration disparaître
     await mp.screenshot({ path: path.join(SHOTS, '09-resultats-390.png') });
+    await mp.evaluate(() => window.scrollTo(0, document.querySelector('#results-body').getBoundingClientRect().top + scrollY - 66));
+    await mp.waitForTimeout(200);
+    await mp.screenshot({ path: path.join(SHOTS, '09b-liste-390.png') });
     await mp.locator('#results-body tr').first().locator('.r-name-btn').click();
     await mp.waitForSelector('#drawer[open]');
     await mp.waitForTimeout(400);
     await mp.screenshot({ path: path.join(SHOTS, '10-fiche-390.png') });
+    await mp.click('label.status-opt:has-text("Intéressé")');
+    await mp.waitForTimeout(200);
     await mp.keyboard.press('Escape');
-    await mp.click('#tab-crm');
+    await mp.click('#add-hot');
     await mp.waitForTimeout(300);
+    await mp.click('#tab-crm');
+    await mp.waitForSelector('#crm-list .crm-card');
+    await mp.waitForTimeout(3500);
+    check(await mp.evaluate(() => scrollY) === 0, 'changement d\'onglet : retour en haut de page');
     await mp.screenshot({ path: path.join(SHOTS, '11-crm-390.png') });
+
+    // Recherche Google sur téléphone : progression visible, puis résultats affichés
+    await mp.click('#tab-search');
+    await mp.click('#run');
+    await mp.waitForSelector('#login-dialog[open]');
+    await mp.fill('#ld-pw', PASSWORD);
+    await mp.click('#ld-ok');
+    await mp.waitForSelector('#progress:not([hidden])');
+    const prog = await mp.evaluate(() => {
+      const r = document.querySelector('#progress').getBoundingClientRect();
+      const nav = document.querySelector('.tabs').getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, navTop: nav.top };
+    });
+    check(prog.top >= 0 && prog.bottom <= prog.navTop, 'mobile : progression visible au-dessus de la navigation');
+    await mp.screenshot({ path: path.join(SHOTS, '12-progression-390.png') });
+    await mp.waitForSelector('#progress', { state: 'hidden', timeout: 60000 });
+    await mp.waitForTimeout(1200);
+    const resTop = await mp.evaluate(() => document.querySelector('#results').getBoundingClientRect().top);
+    check(resTop < 200, `mobile : résultats affichés après la recherche (haut à ${Math.round(resTop)} px)`);
     await m.close();
 
     await browser.close();

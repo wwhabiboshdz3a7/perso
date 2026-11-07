@@ -123,6 +123,7 @@ const state = {
   session: null,
   drawerId: null,
   crmFilter: 'all',
+  crmShown: 60,
   profile: { ...DEFAULT_PROFILE, ...ls.get('nxp.profile', {}) },
   settings: { price: 0.035, freeQuota: 1000, cap: 150, cellKm: 2, dark: true, ...ls.get('nxp.settings', {}) },
   placeLabel: ls.get('nxp.placeLabel', 'Capitole · Toulouse'),
@@ -155,7 +156,8 @@ function crmOf(id) { return state.crm.get(id) || null; }
 
 const VIEW_HASH = { search: '', crm: '#prospects', settings: '#reglages' };
 
-function showView(view, { focus = false, push = true } = {}) {
+function showView(view, { focus = false, push = true, scroll = true } = {}) {
+  const changed = state.view !== view;
   state.view = view;
   for (const tab of $$('.tab')) {
     const on = tab.dataset.view === view;
@@ -170,6 +172,7 @@ function showView(view, { focus = false, push = true } = {}) {
     const h = VIEW_HASH[view];
     if (location.hash !== h) history.replaceState(null, '', h || location.pathname + location.search);
   }
+  if (changed && scroll) window.scrollTo({ top: 0, behavior: 'instant' });
   if (view === 'search') requestAnimationFrame(() => map?.invalidate());
   if (view === 'crm') renderCrm();
   if (view === 'settings') renderSettings();
@@ -192,7 +195,7 @@ function initTabs() {
   });
   const fromHash = () => {
     const v = location.hash === '#prospects' ? 'crm' : (location.hash === '#reglages' || location.hash === '#legal') ? 'settings' : 'search';
-    showView(v, { push: false });
+    showView(v, { push: false, scroll: false });
     if (location.hash === '#legal') setTimeout(() => $('#legal').scrollIntoView({ block: 'start' }), 50);
   };
   window.addEventListener('hashchange', fromHash);
@@ -334,7 +337,7 @@ function initZoneControls() {
     $('#radius-row').hidden = kind !== 'circle';
     $('#rect-row').hidden = kind !== 'rect';
     $('#zone-hint').textContent = kind === 'circle'
-      ? 'Cliquez sur la carte ou faites glisser le point doré pour déplacer le cercle.'
+      ? 'Touchez ou cliquez la carte, ou faites glisser le point doré, pour déplacer le cercle.'
       : kind === 'rect' ? 'Tracez votre rectangle sur la carte (glisser du doigt ou de la souris).' : 'La zone suit la carte : déplacez-vous et zoomez.';
     map.setKind(kind);
   }));
@@ -374,11 +377,16 @@ function renderCategories() {
     }</div></fieldset>`;
   }).join('');
   $('#preset-list').innerHTML = PRESETS.map((p) => `<button type="button" data-preset="${p.id}">${escapeHtml(p.label)}</button>`).join('');
+  $('#cat-total').textContent = `${CATEGORIES.length} au choix`;
   updateCatCount();
 }
 
 function updateCatCount() {
   $('#cat-count').textContent = `${state.cats.size} sélectionnée${state.cats.size > 1 ? 's' : ''}`;
+  const labels = CATEGORIES.filter((c) => state.cats.has(c.id)).map((c) => c.label);
+  $('#cat-picked').textContent = labels.length
+    ? (labels.length > 5 ? `${labels.slice(0, 5).join(', ')} et ${labels.length - 5} autre${labels.length - 5 > 1 ? 's' : ''}` : labels.join(', '))
+    : 'Aucune catégorie cochée.';
   ls.set('nxp.cats', [...state.cats]);
   scheduleEstimate();
 }
@@ -406,6 +414,7 @@ function initCategories() {
     updateCatCount();
   });
   $('#cat-filter').addEventListener('input', (e) => {
+    $('#cat-details').open = true;
     const q = e.target.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
     for (const label of $$('#cat-groups .cat')) {
       const l = label.dataset.label.normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -532,13 +541,21 @@ function setResults(places, meta, { fit = true } = {}) {
 const throttledRender = (() => {
   let last = 0;
   let timer;
-  return (places, meta) => {
+  const fn = (places, meta) => {
     const now = performance.now();
     clearTimeout(timer);
     const go = () => { last = performance.now(); setResults(places, meta, { fit: false }); };
     if (now - last > 600) go(); else timer = setTimeout(go, 600 - (now - last));
   };
+  // Le résultat final ne doit jamais être écrasé par un affichage intermédiaire en retard.
+  fn.cancel = () => { clearTimeout(timer); last = 0; };
+  return fn;
 })();
+
+const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
+function revealResults() {
+  if (isNarrow()) $('#results').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
 
 async function ensureLogin(reason) {
   if (api.loggedIn) return true;
@@ -617,6 +634,7 @@ async function runSearch() {
         throttledRender(places, { ...meta });
       },
     });
+    throttledRender.cancel();
     meta.requests = res.stats.requests;
     meta.stats = { cached: res.stats.cachedTasks, subdivisions: res.stats.subdivisions, closed: res.stats.closed, pending: res.pending, stoppedByCap: res.stats.stoppedByCap };
     setResults(res.places, meta);
@@ -631,8 +649,10 @@ async function runSearch() {
     } else {
       toast(`${plural(res.places.length, 'établissement trouvé', 'établissements trouvés')} · ${plural(res.stats.requests, 'requête', 'requêtes')} (${fmtUsd(res.stats.requests * state.settings.price)}).`);
     }
+    revealResults();
     if (res.stats.errors.length) console.warn('Erreurs pendant la recherche :', res.stats.errors);
   } catch (e) {
+    throttledRender.cancel();
     if (e?.name !== 'AbortError') toast(`Recherche impossible : ${e.message}`, 'err');
   } finally {
     addUsage(0);
@@ -651,6 +671,7 @@ async function runOsm(zone, categoryIds, label) {
     setResults(res.places, { source: 'osm', at: Date.now(), label, zone, categoryIds, requests: 0 });
     const none = res.places.filter((p) => p.website.status === 'none').length;
     toast(`${plural(res.places.length, 'établissement', 'établissements')} dans OpenStreetMap, dont ${fmtInt(none)} sans site renseigné.`);
+    revealResults();
   } catch (e) {
     if (e?.name !== 'AbortError') toast(e.message || 'Overpass injoignable.', 'err');
   } finally {
@@ -663,7 +684,7 @@ function runDemo() {
   const places = demoPlaces({ zone, categoryIds: [...state.cats] });
   setResults(places, { source: 'demo', demo: true, at: Date.now(), label: state.placeLabel, zone, categoryIds: [...state.cats], requests: 0 });
   toast('Démonstration : données entièrement fictives, aucune requête envoyée.');
-  if (window.matchMedia('(max-width: 900px)').matches) $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  revealResults();
 }
 
 async function verifySelection() {
@@ -997,7 +1018,7 @@ async function renderCrm() {
   };
   rows.sort(sorters[sort] || sorters.callback);
   state.crmRows = rows;
-  $('#crm-list').innerHTML = rows.map(({ r, p }) => {
+  $('#crm-list').innerHTML = rows.slice(0, state.crmShown).map(({ r, p }) => {
     const isDue = r.status === 'rappeler' && r.callbackAt && r.callbackAt < endOfToday();
     const phone = p.phone ? `<a class="r-phone" href="${telHref(p.phoneIntl || p.phone)}"><svg aria-hidden="true"><use href="#i-phone"/></svg>${escapeHtml(formatPhoneFR(p.phone))}</a>` : '';
     return `<article class="crm-card${isDue ? ' is-due' : ''}" data-id="${escapeHtml(r.id)}">
@@ -1011,6 +1032,9 @@ async function renderCrm() {
       <div class="crm-card__row">${phone}<span class="crm-card__when">${r.contactName ? `Contact : ${escapeHtml(r.contactName)} · ` : ''}Modifié le ${fmtDate(r.updatedAt)}</span></div>
     </article>`;
   }).join('');
+  const more = $('#crm-more');
+  more.hidden = rows.length <= state.crmShown;
+  more.textContent = `Afficher plus (${fmtInt(rows.length - state.crmShown)} restants)`;
   $('#crm-empty').hidden = rows.length > 0;
   if (recs.length && !rows.length) {
     $('#crm-empty .empty__title').textContent = 'Aucun prospect dans ce filtre.';
@@ -1024,10 +1048,12 @@ function initCrm() {
     const b = e.target.closest('[data-f]');
     if (!b) return;
     state.crmFilter = b.dataset.f;
+    state.crmShown = 60;
     renderCrm();
   });
-  $('#crm-text').addEventListener('input', debounce(renderCrm, 150));
-  $('#crm-sort').addEventListener('change', renderCrm);
+  $('#crm-text').addEventListener('input', debounce(() => { state.crmShown = 60; renderCrm(); }, 150));
+  $('#crm-sort').addEventListener('change', () => { state.crmShown = 60; renderCrm(); });
+  $('#crm-more').addEventListener('click', () => { state.crmShown += 60; renderCrm(); });
   $('#crm-list').addEventListener('click', (e) => {
     if (e.target.closest('a')) return;
     const card = e.target.closest('[data-id]');
@@ -1573,6 +1599,7 @@ async function boot() {
     onDrawState: (on) => { $('#draw-rect').textContent = on ? 'Tracez sur la carte… (Échap pour annuler)' : 'Tracer un rectangle sur la carte'; },
   });
 
+  if (isNarrow()) $('#cat-details').open = false;
   initTabs();
   initPlaceSearch();
   initZoneControls();

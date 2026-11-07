@@ -21,3 +21,16 @@
   for = "/vendor/*"
   [headers.values]
     Cache-Control = "public, max-age=2592000, immutable"
+
+# Sources des tests et de la fonction : inutiles au public
+[[redirects]]
+  from = "/tests/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
