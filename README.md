@@ -9,9 +9,14 @@ Projets web personnels. Chaque branche est un site autonome, publiable tel quel 
 | `academy` | Plateforme de formation au code (C, Python, HTML/CSS, JS, C++, cyber, IA) et à la vidéo IA, du débutant à l'avancé, avec éditeur intégré. |
 | `nexora-v2` | Refonte complète du site de l'agence NEXORA. |
 
-## Plan d'attaque commercial (branche `claude/upbeat-curie-ofztql`)
+## Plan d'attaque commercial
 
-`index.html` à la racine : présentation HTML de 22 diapositives (inventaire des projets, ce qui se vend, offre de niche « Lumio Enquête », logique et grille de prix, techniques de vente, réseaux sociaux, plan sur 90 jours). Navigation au clavier (← →, O pour la vue d'ensemble, F pour le plein écran), lecture empilée sur mobile, export PDF par l'impression du navigateur.
+`index.html` à la racine : présentation HTML de 23 diapositives (inventaire des projets, ce qui se vend, démos en direct, offre de niche « Lumio Enquête », logique et grille de prix, techniques de vente, réseaux sociaux, plan sur 90 jours). Navigation au clavier (← →, O pour la vue d'ensemble, F pour le plein écran), lecture empilée sur mobile, export PDF par l'impression du navigateur.
+
+**Boutons « Voir la démo »** : ils s'affichent dès que l'URL Netlify de la branche correspondante est connue. Deux façons de la renseigner :
+
+- pendant la présentation, touche **D** (ou bouton « Démos ») : les adresses restent dans ce navigateur ;
+- pour tout le monde, l'objet `DEMOS` en bas de `index.html` (`ctf`, `toulouse`, `jarvis`, `levier`, `motion`, `nexora`).
 
 ## Publier sur Netlify
 

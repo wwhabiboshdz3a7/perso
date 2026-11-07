@@ -96,6 +96,22 @@ tr.total td{border-top:1px solid var(--iris);color:#fff;font-weight:600}
 .bar i{display:block;height:100%;border-radius:99px;background:var(--grad)}
 
 .tiers .card{padding:16px 24px}.tiers .card h3{margin-bottom:0}.tiers .price{margin:2px 0}
+.demo{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font:600 14px "JetBrains Mono",monospace;letter-spacing:.04em;color:#fff;text-decoration:none;padding:9px 14px;border-radius:12px;background:rgba(124,58,237,.22);border:1px solid rgba(167,139,250,.55)}
+.demo:hover,.demo:focus-visible{background:rgba(124,58,237,.4);outline:none}
+.demo[hidden]{display:none}
+.demo.big{font-size:18px;padding:14px 20px;margin-top:18px}
+.todo-url{display:none;margin-top:14px;font:500 13px "JetBrains Mono",monospace;color:var(--gold)}
+body.no-demos .todo-url{display:block}
+dialog.cfg{margin:auto;max-width:640px;width:calc(100% - 32px);background:var(--void2);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:26px}
+dialog.cfg::backdrop{background:rgba(7,3,15,.75)}
+dialog.cfg h3{font-size:22px}
+dialog.cfg p{font-size:15px;color:var(--fog);margin-bottom:14px}
+dialog.cfg label{display:block;font:600 12px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--iris);margin:12px 0 6px}
+dialog.cfg input{width:100%;font:400 15px Lexend,sans-serif;color:#fff;background:#0B0619;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+dialog.cfg input:focus{outline:2px solid var(--iris);outline-offset:1px}
+dialog.cfg .row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+dialog.cfg button{font:600 14px Lexend,sans-serif;border-radius:10px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--mist)}
+dialog.cfg button.primary{background:var(--purple);border-color:var(--purple);color:#fff}
 .split{display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:start}
 .cover{justify-content:center}
 .cover h1{font-size:120px;max-width:1300px}
@@ -139,6 +155,7 @@ body.overview .slide.active{border-color:var(--iris)}
   .cover .meta{flex-direction:column;gap:8px;margin-top:30px}
   .ui,.hint,.progress{display:none}
   .script{font-size:13.5px}
+  .demo.big{font-size:16px}
 }
 @media print{
   @page{size:1600px 900px;margin:0}
@@ -146,16 +163,17 @@ body.overview .slide.active{border-color:var(--iris)}
   .deck{position:static}
   .stage{position:static;transform:none!important}
   .slide{position:relative;opacity:1;visibility:visible;transform:none;page-break-after:always;break-after:page;height:900px;width:1600px}
-  .ui,.hint,.progress{display:none}
+  .ui,.hint,.progress,.demo,.todo-url{display:none!important}
 }
 @media (prefers-reduced-motion:reduce){.slide,.progress{transition:none}}
 </style>
 </head>
 <body>
-<div class="hint" aria-hidden="true">← → naviguer · O vue d'ensemble · F plein écran</div>
+<div class="hint" aria-hidden="true">← → naviguer · O vue d'ensemble · F plein écran · D adresses des démos</div>
 <div class="ui">
   <button type="button" id="b-prev" aria-label="Diapositive précédente">←</button>
   <button type="button" id="b-next" aria-label="Diapositive suivante">→</button>
+  <button type="button" id="b-cfg" aria-label="Adresses des démos">Démos</button>
   <button type="button" id="b-ov" aria-label="Vue d'ensemble">Vue d'ensemble</button>
   <button type="button" id="b-fs" aria-label="Plein écran">Plein écran</button>
 </div>
@@ -194,7 +212,7 @@ body.overview .slide.active{border-color:var(--iris)}
     <div>
       <ol class="steps">
         <li><b>Statique d'abord.</b> HTML, CSS et JS natifs, aucune étape de build. Netlify sert les fichiers, et des Functions n'interviennent que lorsqu'un secret doit rester côté serveur (paiement, clé API).</li>
-        <li><b>En binôme avec un agent IA de code</b> (Claude Code), par cycles <i>construire → auditer → corriger</i>. L'historique Git en garde la trace : « corrections de relecture », « finitions mobiles », « audit WCAG AA ».</li>
+        <li><b>Par cycles</b> <i>construire → auditer → corriger</i>. L'historique Git en garde la trace : « corrections de relecture », « finitions mobiles », « audit WCAG AA ».</li>
         <li><b>Tests réels.</b> Playwright de bout en bout (assistant, masterclass, Jarvis), <span class="mono">node --test</span> sur le cœur gestuel, scripts de vérification du contenu.</li>
         <li><b>RGPD dès la conception.</b> Aucun compte, la progression reste en localStorage, et la caméra de Jarvis ne quitte jamais l'appareil.</li>
         <li><b>Accessible et mobile.</b> Contrastes AA, clavier, <span class="mono">prefers-reduced-motion</span>, testé jusqu'à 390 px.</li>
@@ -217,15 +235,15 @@ body.overview .slide.active{border-color:var(--iris)}
   <p class="kicker">03 · Inventaire</p>
   <h2>Ce qu'il y a dans le dépôt</h2>
   <div class="grid g3" style="grid-auto-rows:1fr">
-    <div class="card"><h3>demos-toulouse</h3><p>23 sites de démonstration pour commerces toulousains, chacun avec <b>une vraie fonction métier</b> : réservation, devis, click &amp; collect, carnet vétérinaire…</p></div>
-    <div class="card hl"><h3>academy-ctf · Arène Lumio</h3><p><b>54 défis CTF/OSINT</b> en 9 catégories : géolocalisation, EXIF, Overpass, stéganographie, web, forensique. Flags vérifiés par empreinte, packs personnalisables.</p></div>
-    <div class="card"><h3>masterclass-ia · Levier</h3><p>Formation « Gagner de l'argent avec Claude » : 61 leçons, page de vente, <b>accès payant réel</b> (Stripe, Lemon Squeezy, Gumroad), 6 workflows n8n.</p></div>
-    <div class="card"><h3>jarvis</h3><p>HUD piloté à la main et à la voix : on <b>attrape une photo d'un poing</b> sur un écran et on la lâche sur un autre appareil (WebRTC). Hologramme 3D.</p></div>
+    <div class="card"><h3>demos-toulouse</h3><p>23 sites de démonstration pour commerces toulousains, chacun avec <b>une vraie fonction métier</b> : réservation, devis, click &amp; collect, carnet vétérinaire…</p><a class="demo" data-demo="toulouse" href="#" target="_blank" rel="noopener" hidden>Voir la démo ↗</a></div>
+    <div class="card hl"><h3>academy-ctf · Arène Lumio</h3><p><b>54 défis CTF/OSINT</b> en 9 catégories : géolocalisation, EXIF, Overpass, stéganographie, web, forensique. Flags vérifiés par empreinte, packs personnalisables.</p><a class="demo" data-demo="ctf" data-path="#/ctf" href="#" target="_blank" rel="noopener" hidden>Voir l'arène ↗</a></div>
+    <div class="card"><h3>masterclass-ia · Levier</h3><p>Formation « Gagner de l'argent avec Claude » : 61 leçons, page de vente, <b>accès payant réel</b> (Stripe, Lemon Squeezy, Gumroad), 6 workflows n8n.</p><a class="demo" data-demo="levier" href="#" target="_blank" rel="noopener" hidden>Voir la page de vente ↗</a></div>
+    <div class="card"><h3>jarvis</h3><p>HUD piloté à la main et à la voix : on <b>attrape une photo d'un poing</b> sur un écran et on la lâche sur un autre appareil (WebRTC). Hologramme 3D.</p><a class="demo" data-demo="jarvis" href="#" target="_blank" rel="noopener" hidden>Voir la démo ↗</a></div>
     <div class="card"><h3>academy · Lumio</h3><p>Plateforme de formation au code : 160 leçons, Python exécuté dans le navigateur, exercices corrigés, certificats.</p></div>
     <div class="card"><h3>assistant · Nour</h3><p>Interface de chat installable (PWA), branchée sur n'importe quel LLM open source, avec mémoire, modes et un serveur sécurisé facultatif.</p></div>
     <div class="card"><h3>kinetika</h3><p>Librairie d'animation JS open source (MIT) : moteur, timeline, ressorts, texte cinétique, CI, types TypeScript.</p></div>
-    <div class="card"><h3>motion-lab</h3><p>Showreel de typographie cinétique en 15 scènes, 25 effets réglables et un Labo maths (Lorenz, Fourier, Julia…).</p></div>
-    <div class="card"><h3>nexora-v2</h3><p>Site vitrine de l'agence, avec des tarifs affichés : Starter 500–800 €, Pro 1 500–2 500 €, Premium 3 000–5 000 €.</p></div>
+    <div class="card"><h3>motion-lab</h3><p>Showreel de typographie cinétique en 15 scènes, 25 effets réglables et un Labo maths (Lorenz, Fourier, Julia…).</p><a class="demo" data-demo="motion" href="#" target="_blank" rel="noopener" hidden>Voir la démo ↗</a></div>
+    <div class="card"><h3>nexora-v2</h3><p>Site vitrine de l'agence, avec des tarifs affichés : Starter 500–800 €, Pro 1 500–2 500 €, Premium 3 000–5 000 €.</p><a class="demo" data-demo="nexora" href="#" target="_blank" rel="noopener" hidden>Voir le site ↗</a></div>
   </div>
 </section>
 
@@ -249,9 +267,40 @@ body.overview .slide.active{border-color:var(--iris)}
   </table>
 </section>
 
+<!-- DÉMOS EN DIRECT -->
+<section class="slide" aria-label="Démos en direct">
+  <p class="kicker">05 · Démos en direct</p>
+  <h2>Place aux démos : <span class="gt">les 3 outils qui se vendent</span></h2>
+  <div class="grid g3" style="align-items:stretch">
+    <div class="card hl"><span class="tag star">3 min</span><h3 style="margin-top:14px;font-size:28px">Arène CTF · Lumio</h3>
+      <p>Faire résoudre au public le défi du <b>Capitole</b> : une scène de Toulouse, une carte, un clic. Tout le monde trouve en moins de 2 minutes, puis on montre l'inspecteur EXIF.</p>
+      <ul class="clean small" style="margin-top:10px"><li>Ouvrir le défi avant de commencer</li><li>Terminer sur le classement</li></ul>
+      <a class="demo big" data-demo="ctf" data-path="#/ctf/geo-capitole" href="#" target="_blank" rel="noopener" hidden>Ouvrir le défi Capitole ↗</a></div>
+    <div class="card"><span class="tag ok">1–2 min</span><h3 style="margin-top:14px;font-size:28px">Démo commerçant</h3>
+      <p>Le <b>restaurant des Carmes</b> : réserver une table en direct (date, service, couverts), puis montrer la même démo sur téléphone.</p>
+      <ul class="clean small" style="margin-top:10px"><li>Phrase clé : « c'est ce que je montre au commerçant avant de le démarcher »</li></ul>
+      <a class="demo big" data-demo="toulouse" data-path="demos/restaurant/" href="#" target="_blank" rel="noopener" hidden>Ouvrir le restaurant ↗</a></div>
+    <div class="card"><span class="tag ok">1 min</span><h3 style="margin-top:14px;font-size:28px">Jarvis</h3>
+      <p>Attraper une photo d'un poing et la lâcher sur le téléphone. <b>Plan B</b> si la caméra refuse : le mode simulation, où la souris devient une main.</p>
+      <ul class="clean small" style="margin-top:10px"><li>Caméra et téléphone testés la veille, sur le même Wi-Fi</li></ul>
+      <a class="demo big" data-demo="jarvis" href="#" target="_blank" rel="noopener" hidden>Lancer Jarvis ↗</a></div>
+  </div>
+  <div class="card" style="margin-top:22px">
+    <h3>Déroulé conseillé · 20 minutes</h3>
+    <div class="grid g5" style="gap:14px;margin-top:8px">
+      <p class="small"><b class="mono">0–1 min</b><br>Ouvrir sur Jarvis, sans un mot</p>
+      <p class="small"><b class="mono">1–5 min</b><br>Diapos 1 à 5 : constat, méthode, tri</p>
+      <p class="small"><b class="mono">5–11 min</b><br>Ces 3 démos</p>
+      <p class="small"><b class="mono">11–18 min</b><br>Offres, prix, réseaux, plan</p>
+      <p class="small"><b class="mono">18–20 min</b><br>Risques, actions, conclusion</p>
+    </div>
+  </div>
+  <p class="todo-url">Adresses des démos pas encore renseignées : touche D (ou bouton « Démos ») pour coller les URL Netlify.</p>
+</section>
+
 <!-- 6 · LE PARI NICHE -->
 <section class="slide" aria-label="Le pari niche">
-  <p class="kicker">05 · Le pari niche</p>
+  <p class="kicker">06 · Le pari niche</p>
   <h2><span class="gt">Lumio Enquête</span> : l'escape game OSINT &amp; cyber, clé en main, en français.</h2>
   <div class="split grow">
     <div>
@@ -273,14 +322,14 @@ body.overview .slide.active{border-color:var(--iris)}
           <tr><td>Tourisme, médiathèques</td><td>Géo-enquête avec les photos de la ville</td></tr>
         </table>
       </div>
-      <div class="card"><p class="small muted">Reste à faire (≈ 2 jours) : une page d'offre, une version démo publique de 10 défis, un pack « entreprise fictive » de 90 minutes et un livret animateur. Les packs JSON existent déjà.</p></div>
+      <div class="card"><p class="small muted">Reste à faire (≈ 2 jours) : une page d'offre, une version démo publique de 10 défis, un pack « entreprise fictive » de 90 minutes et un livret animateur. Les packs JSON existent déjà.</p><a class="demo" data-demo="ctf" data-path="#/ctf" href="#" target="_blank" rel="noopener" hidden>Ouvrir l'arène ↗</a></div>
     </div>
   </div>
 </section>
 
 <!-- 7 · OFFRE LUMIO ENQUÊTE -->
 <section class="slide" aria-label="Offre et prix Lumio Enquête">
-  <p class="kicker">06 · Lumio Enquête · Offre et prix</p>
+  <p class="kicker">07 · Lumio Enquête · Offre et prix</p>
   <h2>Du joueur sur TikTok au comité de direction</h2>
   <div class="grid g4 grow" style="align-items:stretch">
     <div class="card hl"><span class="tag star">Volume · réseaux sociaux</span><h3 style="margin-top:14px">Pass Enquêteur</h3><div class="price">9,90 €<span> une fois</span></div><p class="muted small">10 défis gratuits, puis le Pass débloque tout</p><ul class="clean small"><li>54 défis et writeups complets</li><li>Classement et badges</li><li>Nouveau pack chaque mois à 2,99 €</li></ul></div>
@@ -293,7 +342,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 8 · PLAN D'ATTAQUE LUMIO -->
 <section class="slide" aria-label="Plan d'attaque Lumio Enquête">
-  <p class="kicker">07 · Lumio Enquête · Plan d'attaque</p>
+  <p class="kicker">08 · Lumio Enquête · Plan d'attaque</p>
   <h2>L'arène gratuite attire, le Pass fait le volume, l'atelier fait la marge</h2>
   <div class="grid g3 grow">
     <div class="card"><h3>1 · Attirer</h3><ul class="clean"><li><b>Défi OSINT de la semaine</b> en vidéo : « Où cette photo a-t-elle été prise ? »</li><li>Version démo gratuite de l'arène (10 défis), le classement donne envie de revenir</li><li>Post LinkedIn « Ce que la photo de votre bureau révèle » (EXIF)</li></ul></div>
@@ -310,7 +359,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 9 · NEXORA SITES MÉTIERS -->
 <section class="slide" aria-label="NEXORA sites métiers">
-  <p class="kicker">08 · Cash rapide · NEXORA Sites métiers</p>
+  <p class="kicker">09 · Cash rapide · NEXORA Sites métiers</p>
   <h2>La technique de la <span class="gt">démo avant contact</span></h2>
   <div class="split grow">
     <div>
@@ -321,6 +370,7 @@ body.overview .slide.active{border-color:var(--iris)}
         <li><b>Passer en personne</b>, tablette en main, en dehors du rush : « J'ai préparé ça pour vous, 30 secondes ? »</li>
         <li><b>Laisser la démo active 7 jours</b> avec un QR code, puis rappeler à J+3.</li>
       </ol>
+      <a class="demo" data-demo="toulouse" href="#" target="_blank" rel="noopener" hidden>Voir les 23 démos ↗</a>
     </div>
     <div class="grid tiers" style="gap:14px">
       <div class="card"><h3>Starter</h3><div class="price">390 €<span> HT</span></div><p class="small muted">Site vitrine, fiche Google Business Profile, mise en ligne</p></div>
@@ -332,7 +382,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 10 · PACK FREELANCES + JARVIS -->
 <section class="slide" aria-label="Pack freelances et borne Jarvis">
-  <p class="kicker">09 · Deux produits de niche en plus</p>
+  <p class="kicker">10 · Deux produits de niche en plus</p>
   <h2>Revendre les démos aux freelances, louer Jarvis aux événements</h2>
   <div class="grid g2 grow">
     <div class="card">
@@ -344,6 +394,7 @@ body.overview .slide.active{border-color:var(--iris)}
         <div><div class="price">39 €</div><p class="small muted">Les 23 templates · 99 € en licence agence</p></div>
       </div>
       <p class="small muted" style="margin-top:12px">Vente via Stripe : sur un petit montant, ses frais (≈ 0,40 € sur 9 €) sont bien plus bas que ceux de Lemon Squeezy. Avant la vente, <b>remplacer les photos Unsplash</b> par des visuels libres de revente et retirer les noms toulousains.</p>
+      <a class="demo" data-demo="toulouse" href="#" target="_blank" rel="noopener" hidden>Voir les templates ↗</a>
     </div>
     <div class="card">
       <span class="tag ok">Location · Événementiel</span>
@@ -354,13 +405,14 @@ body.overview .slide.active{border-color:var(--iris)}
         <div><div class="price">690 €<span> HT</span></div><p class="small muted">Avec habillage marque et galerie souvenir</p></div>
       </div>
       <p class="small muted" style="margin-top:12px">Repère : un photobooth classique se loue de 99 à 855 € par jour. Vendre via les agences événementielles et les organisateurs de salons. Prévoir un réseau Wi-Fi dédié et un plan B en local si la signalisation PeerJS tombe.</p>
+      <a class="demo" data-demo="jarvis" href="#" target="_blank" rel="noopener" hidden>Lancer Jarvis ↗</a>
     </div>
   </div>
 </section>
 
 <!-- 11 · LEVIER -->
 <section class="slide" aria-label="Levier repositionné">
-  <p class="kicker">10 · Levier · Infoproduit</p>
+  <p class="kicker">11 · Levier · Infoproduit</p>
   <h2>Prêt à encaisser, mais à sortir du créneau saturé</h2>
   <div class="split grow">
     <div>
@@ -372,6 +424,7 @@ body.overview .slide.active{border-color:var(--iris)}
         <li><b>Offre équipe sur devis</b> : codes en lot pour les agences et les organismes de formation.</li>
         <li>Les modules 0 et 1, gratuits, servent d'aimant ; le plan sur 30 jours est déjà rédigé dans <span class="mono">VENTE.md</span>. Nouveaux prix à reporter dans <span class="mono">config.js</span>.</li>
       </ul>
+      <a class="demo" data-demo="levier" href="#" target="_blank" rel="noopener" hidden>Voir la page de vente ↗</a>
     </div>
     <div class="grid tiers" style="gap:14px">
       <div class="card"><h3>Essentiel</h3><div class="price">27 €</div><p class="small muted">Achat impulsif depuis une vidéo</p></div>
@@ -383,7 +436,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- LOGIQUE DE PRIX -->
 <section class="slide" aria-label="La logique de prix">
-  <p class="kicker">11 · La logique de prix</p>
+  <p class="kicker">12 · La logique de prix</p>
   <h2>Sur les réseaux, on vend <span class="gt">sous 50 €</span>. Le reste se vend en rendez-vous.</h2>
   <div class="grid g5" style="align-items:stretch">
     <div class="card"><span class="tag ok">0 €</span><h3 style="margin-top:12px">Gratuit</h3><p class="small">Défi de la semaine, 10 défis de l'arène, 1 template, modules 0 et 1 de Levier</p><p class="small muted" style="margin-top:8px">Objectif : l'email</p></div>
@@ -401,7 +454,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 12 · GRILLE GLOBALE -->
 <section class="slide" aria-label="Grille tarifaire globale">
-  <p class="kicker">12 · Les prix en un coup d'œil</p>
+  <p class="kicker">13 · Les prix en un coup d'œil</p>
   <h2>La grille complète</h2>
   <table>
     <thead><tr><th>Produit</th><th>Formule</th><th class="num">Prix</th><th>Type de revenu</th><th>Canal de vente</th></tr></thead>
@@ -422,7 +475,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 13 · TECHNIQUES PAR CIBLE -->
 <section class="slide" aria-label="Techniques de commercialisation">
-  <p class="kicker">13 · Techniques de commercialisation</p>
+  <p class="kicker">14 · Techniques de commercialisation</p>
   <h2>Une technique par type de client</h2>
   <div class="grid g3 grow">
     <div class="card"><h3>Commerçants locaux</h3><ul class="clean small"><li><b>Démo avant contact</b>, sur place</li><li>Prix affichés et payables en 3 fois</li><li><b>Parrainage</b> : 1 mois de Sérénité offert par client recommandé</li><li>Grouper par rue : « 3 commerces de la rue ont déjà leur site »</li></ul></div>
@@ -436,7 +489,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 14 · RÉSEAUX SOCIAUX : RÔLES -->
 <section class="slide" aria-label="Réseaux sociaux, rôle de chaque plateforme">
-  <p class="kicker">14 · Réseaux sociaux</p>
+  <p class="kicker">15 · Réseaux sociaux</p>
   <h2>Chaque réseau a un seul rôle</h2>
   <div class="grid g3 grow">
     <div class="card hl"><h3>TikTok · Reels · Shorts</h3><p><b>Attention.</b> Formats : « Où est-ce ? » (géolocalisation en 3 indices, réponse le lendemain), démos de Jarvis, avant/après de sites. Appel à l'action unique : le défi en ligne dans la bio.</p></div>
@@ -450,7 +503,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 15 · CALENDRIER ÉDITORIAL -->
 <section class="slide" aria-label="Calendrier éditorial">
-  <p class="kicker">15 · Calendrier éditorial type</p>
+  <p class="kicker">16 · Calendrier éditorial type</p>
   <h2>Une semaine, 7 contenus, 1 h par jour</h2>
   <div class="week">
     <div class="day"><b>LUN</b><p>« Ce que révèle la photo de votre bureau » : 3 traces EXIF expliquées</p><span class="net">LinkedIn</span></div>
@@ -470,7 +523,7 @@ body.overview .slide.active{border-color:var(--iris)}
 
 <!-- 16 · SCRIPTS -->
 <section class="slide" aria-label="Scripts prêts à l'emploi">
-  <p class="kicker">16 · Scripts prêts à copier</p>
+  <p class="kicker">17 · Scripts prêts à copier</p>
   <h2>Les premiers messages</h2>
   <div class="grid g2 grow" style="gap:18px">
     <div><h3>LinkedIn · RSSI, DRH</h3><div class="script">Bonjour {prénom}, j'ai conçu une enquête OSINT en équipe : en 2 h, vos collaborateurs découvrent ce qu'un attaquant trouve sur une entreprise fictive (photos, pseudos, fuites), avec ses vrais outils.
@@ -487,7 +540,7 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 
 <!-- 17 · PLAN 90 JOURS -->
 <section class="slide" aria-label="Plan sur 90 jours">
-  <p class="kicker">17 · Plan sur 90 jours</p>
+  <p class="kicker">18 · Plan sur 90 jours</p>
   <h2>De la mise en ligne aux premiers contrats récurrents</h2>
   <div class="tl grow">
     <div class="ph"><h3>Semaine 1 · Mettre en ligne</h3><ul class="clean small"><li>nexora-v2 en ligne, avec de vrais avis ou sans section avis</li><li>Arène démo publique et page de l'offre Lumio Enquête</li><li>Stripe ou Lemon Squeezy configuré, achat test</li><li>Profils LinkedIn, TikTok et Google Business Profile optimisés</li></ul></div>
@@ -499,7 +552,7 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 
 <!-- 18 · OBJECTIFS -->
 <section class="slide" aria-label="Objectifs chiffrés">
-  <p class="kicker">18 · Objectifs au mois 3</p>
+  <p class="kicker">19 · Objectifs au mois 3</p>
   <h2 style="margin-bottom:18px">Deux scénarios, des hypothèses explicites</h2>
   <div class="split grow">
     <table class="tight">
@@ -531,7 +584,7 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 
 <!-- 19 · RISQUES -->
 <section class="slide" aria-label="Risques et conformité">
-  <p class="kicker">19 · Risques et conformité</p>
+  <p class="kicker">20 · Risques et conformité</p>
   <h2>Ce qui peut tout faire tomber, et comment l'éviter</h2>
   <div class="grid g3 grow">
     <div class="card"><h3>Faux avis</h3><p class="small">Les avis de nexora-v2 sont des exemples : il faut les remplacer par de vrais avis ou supprimer la section. Le chiffre « 150+ projets » ne reste que s'il est démontrable. Une pratique commerciale trompeuse coûte bien plus cher qu'elle ne rapporte.</p></div>
@@ -545,7 +598,7 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 
 <!-- 20 · CETTE SEMAINE -->
 <section class="slide" aria-label="Actions de la semaine">
-  <p class="kicker">20 · À faire cette semaine</p>
+  <p class="kicker">21 · À faire cette semaine</p>
   <h2>7 actions, une par jour</h2>
   <div class="grid g2 grow" style="align-items:start">
     <ol class="steps">
@@ -576,7 +629,68 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 </div>
 </main>
 
+<dialog class="cfg" id="cfg" aria-labelledby="cfg-t">
+  <form method="dialog" id="cfg-form">
+    <h3 id="cfg-t">Adresses des démos</h3>
+    <p>Collez l'URL Netlify de chaque branche publiée. Elles restent dans ce navigateur. Pour les fixer pour tout le monde, renseignez l'objet <span class="mono">DEMOS</span> en bas de index.html.</p>
+    <div id="cfg-fields"></div>
+    <div class="row"><button type="button" id="cfg-reset">Effacer</button><button value="cancel">Annuler</button><button value="ok" class="primary">Enregistrer</button></div>
+  </form>
+</dialog>
+
 <script>
+/* URL publiques des branches (ex. 'https://lumio-arene.netlify.app'). Vide = bouton masqué.
+   Elles peuvent aussi être saisies pendant la présentation : touche D. */
+const DEMOS = {
+  ctf: '',       // branche academy-ctf
+  toulouse: '',  // branche demos-toulouse
+  jarvis: '',    // branche jarvis
+  levier: '',    // branche masterclass-ia
+  motion: '',    // branche motion-lab
+  nexora: ''     // branche nexora-v2
+};
+const DEMO_LABELS = { ctf: 'Arène CTF (academy-ctf)', toulouse: 'Démos Toulouse (demos-toulouse)', jarvis: 'Jarvis (jarvis)', levier: 'Levier (masterclass-ia)', motion: 'Motion Lab (motion-lab)', nexora: 'Site NEXORA (nexora-v2)' };
+
+(() => {
+  const KEY = 'plan-nexora-demos';
+  const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; } };
+  const write = v => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} };
+  const clean = u => { u = (u || '').trim(); if (!u) return ''; if (!/^https?:\/\//i.test(u)) u = 'https://' + u; try { return new URL(u).href; } catch { return ''; } };
+  const urls = () => { const saved = read(); const out = {}; for (const k in DEMOS) out[k] = clean(saved[k]) || clean(DEMOS[k]); return out; };
+  function apply() {
+    const u = urls();
+    document.querySelectorAll('a.demo').forEach(a => {
+      const base = u[a.dataset.demo];
+      if (!base) { a.hidden = true; return; }
+      const path = a.dataset.path || '';
+      a.href = path.startsWith('#') ? base.replace(/#.*$/, '') + path : new URL(path, base.endsWith('/') ? base : base + '/').href;
+      a.hidden = false;
+    });
+    document.body.classList.toggle('no-demos', !u.ctf && !u.toulouse && !u.jarvis);
+  }
+  const dlg = document.getElementById('cfg'), fields = document.getElementById('cfg-fields');
+  function open() {
+    const saved = read();
+    fields.innerHTML = '';
+    for (const k in DEMOS) {
+      const id = 'cfg-' + k;
+      const l = document.createElement('label'); l.htmlFor = id; l.textContent = DEMO_LABELS[k];
+      const i = document.createElement('input'); i.id = id; i.name = k; i.type = 'text'; i.inputMode = 'url'; i.autocomplete = 'off'; i.spellcheck = false; i.placeholder = 'https://….netlify.app'; i.value = saved[k] || DEMOS[k] || '';
+      fields.append(l, i);
+    }
+    dlg.showModal();
+  }
+  dlg.addEventListener('close', () => {
+    if (dlg.returnValue !== 'ok') return;
+    const v = {}; fields.querySelectorAll('input').forEach(i => { const c = clean(i.value); if (c) v[i.name] = c; });
+    write(v); apply();
+  });
+  document.getElementById('cfg-reset').onclick = () => { fields.querySelectorAll('input').forEach(i => { i.value = ''; }); };
+  document.getElementById('b-cfg').onclick = open;
+  window.__openDemos = open;
+  apply();
+})();
+
 (() => {
   const slides = [...document.querySelectorAll('.slide')];
   const stage = document.getElementById('stage');
@@ -610,7 +724,10 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
 
   addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (document.getElementById('cfg').open || e.target.closest?.('input,textarea')) return;
     const k = e.key;
+    if ((k === 'Enter' || k === ' ') && e.target.closest?.('a,button')) return;
+    if (k === 'd' || k === 'D') { e.preventDefault(); window.__openDemos(); return; }
     if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); go(i + 1); }
     else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); go(i - 1); }
     else if (k === 'Home') go(0);
@@ -618,7 +735,7 @@ Bonjour, Lumio est une arène CTF/OSINT en français qui tourne dans le navigate
     else if (k === 'o' || k === 'O' || (k === 'Escape' && document.body.classList.contains('overview'))) overview(!document.body.classList.contains('overview'));
     else if (k === 'f' || k === 'F') toggleFs();
   });
-  slides.forEach((s, k) => s.addEventListener('click', () => { if (document.body.classList.contains('overview')) { go(k); overview(false); } }));
+  slides.forEach((s, k) => s.addEventListener('click', e => { if (e.target.closest('a')) return; if (document.body.classList.contains('overview')) { go(k); overview(false); } }));
 
   let x0 = null;
   addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
