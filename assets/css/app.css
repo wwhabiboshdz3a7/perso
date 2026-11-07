@@ -967,6 +967,7 @@ dialog.modal.xl { width: min(1180px, calc(100vw - 40px)); height: min(90vh, 900p
 .cw-logged .grow { flex: 1; min-width: 0; }
 .cw-logged-dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 18%, transparent); }
 .cw-srv-models { margin-top: 18px; }
+.cw-srv-models .cw-diag { max-width: none; margin-bottom: 12px; }
 .cw-guide-title { margin: 0; font: italic 400 1.55rem/1.2 var(--font-voice); }
 .cw-guide { margin-top: 18px; }
 .cw-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -1005,6 +1006,11 @@ dialog.modal.xl { width: min(1180px, calc(100vw - 40px)); height: min(90vh, 900p
   .cw-list { flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 6px; margin: 0 -2px; scrollbar-width: thin; }
   .cw-prov { flex: 0 0 min(232px, 70%); scroll-snap-align: start; }
   .cw-side-note { display: none; }
+}
+@media (max-width: 520px) {
+  .cw-logged { flex-wrap: wrap; }
+  .cw-logged .grow { flex-basis: calc(100% - 30px); }
+  .cw-logged .btn { margin-left: 22px; }
 }
 
 /* ---------- Petits écrans ---------- */
