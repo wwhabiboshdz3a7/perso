@@ -1,0 +1,11 @@
+{
+  "name": "Prospecteur NEXORA",
+  "short_name": "Prospecteur",
+  "description": "Commerces avec avis Google mais sans site web : carte, numéros, suivi des appels.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07030F",
+  "theme_color": "#07030F",
+  "lang": "fr",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

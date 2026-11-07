@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Prospecteur NEXORA · commerces sans site web</title>
+  <meta name="description" content="Trouvez les commerces qui ont des avis Google mais pas de site web : carte, numéros, score d'opportunité, suivi des appels.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#07030F">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preload" href="vendor/fonts/lexend-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="vendor/fonts/lexend-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="vendor/leaflet/leaflet.js" defer></script>
+  <script src="js/app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <svg class="svg-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="nx-a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E879F9"/><stop offset="50%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient>
+      <linearGradient id="nx-b" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#C084FC"/><stop offset="100%" stop-color="#DDD6FE"/></linearGradient>
+      <symbol id="logo" viewBox="0 0 100 100"><polygon points="50,2 93,26 93,74 50,98 7,74 7,26" fill="#0F0720" stroke="url(#nx-a)" stroke-width="3"/><line x1="30" y1="18" x2="70" y2="82" stroke="url(#nx-b)" stroke-width="11" stroke-linecap="square"/><rect x="15" y="18" width="15" height="64" fill="url(#nx-a)" rx="1.5"/><rect x="70" y="18" width="15" height="64" fill="url(#nx-a)" rx="1.5"/><circle cx="85" cy="16" r="6" fill="#FBBF24"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z" fill="currentColor"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2 6.4 20.2l1.1-6.3L2.9 9.5l6.3-.9L12 2.8Z" fill="currentColor"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" fill="currentColor"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Prospecteur NEXORA, accueil">
+      <svg class="brand__logo" aria-hidden="true"><use href="#logo"/></svg>
+      <span class="brand__text"><span class="brand__name">NEXORA</span><span class="brand__app">Prospecteur</span></span>
+    </a>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-search" aria-selected="true" aria-controls="view-search" data-view="search">Recherche</button>
+      <button class="tab" role="tab" id="tab-crm" aria-selected="false" aria-controls="view-crm" data-view="crm" tabindex="-1">Mes prospects <span class="tab__badge" id="crm-badge" hidden>0</span></button>
+      <button class="tab" role="tab" id="tab-settings" aria-selected="false" aria-controls="view-settings" data-view="settings" tabindex="-1">Réglages</button>
+    </nav>
+    <div class="topbar__meta">
+      <span class="pill pill--usage" id="usage-month" title="Requêtes Google comptées dans ce navigateur ce mois-ci">Ce mois : 0 req.</span>
+      <button class="pill pill--conn" id="conn-pill" type="button">Google : hors ligne</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ========================= RECHERCHE ========================= -->
+    <section class="view view--search" id="view-search" role="tabpanel" aria-labelledby="tab-search">
+      <aside class="panel" aria-label="Paramètres de la recherche">
+        <div class="panel__intro">
+          <p class="eyebrow">Prospection locale</p>
+          <h1 class="panel__title">Les commerces <span class="gt">bien notés</span> qui n'ont <span class="gold">pas de site</span>.</h1>
+        </div>
+
+        <section class="step" aria-labelledby="step-zone">
+          <h2 class="step__title" id="step-zone"><span class="step__n">1</span> Zone</h2>
+          <form class="place-search" id="place-form" role="search" autocomplete="off">
+            <label class="sr-only" for="place-q">Ville, quartier ou adresse</label>
+            <svg class="place-search__icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <input id="place-q" type="search" placeholder="Ville, quartier, adresse…" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="place-suggest">
+            <button class="btn btn--sm btn--violet" type="submit">Aller</button>
+            <ul class="suggest" id="place-suggest" role="listbox" aria-label="Suggestions de lieux" hidden></ul>
+          </form>
+          <div class="quick" id="quick-places" aria-label="Quartiers de Toulouse"></div>
+
+          <fieldset class="seg" id="zone-kind">
+            <legend class="sr-only">Forme de la zone</legend>
+            <label class="seg__opt"><input type="radio" name="zone-kind" value="circle" checked><span>Cercle</span></label>
+            <label class="seg__opt"><input type="radio" name="zone-kind" value="rect"><span>Rectangle</span></label>
+            <label class="seg__opt"><input type="radio" name="zone-kind" value="view"><span>Vue de la carte</span></label>
+          </fieldset>
+          <div class="zone-ctl" id="radius-row">
+            <label for="radius">Rayon</label>
+            <input id="radius" type="range" min="0.3" max="15" step="0.1" value="1.5" aria-describedby="radius-out">
+            <output id="radius-out" for="radius">1,5 km</output>
+          </div>
+          <div class="zone-ctl" id="rect-row" hidden>
+            <button class="btn btn--ghost btn--sm" type="button" id="draw-rect">Tracer un rectangle sur la carte</button>
+          </div>
+          <p class="hint" id="zone-hint">Cliquez sur la carte pour déplacer le centre du cercle.</p>
+          <p class="zone-info" id="zone-info" aria-live="polite"></p>
+        </section>
+
+        <section class="step" aria-labelledby="step-cats">
+          <h2 class="step__title" id="step-cats"><span class="step__n">2</span> Catégories <span class="step__count" id="cat-count">0</span></h2>
+          <div class="presets" id="preset-list" aria-label="Sélections rapides"></div>
+          <div class="cat-tools">
+            <label class="sr-only" for="cat-filter">Filtrer les catégories</label>
+            <input id="cat-filter" type="search" placeholder="Filtrer : coiffeur, garage…">
+            <button class="btn btn--text btn--sm" type="button" id="cat-clear">Tout décocher</button>
+          </div>
+          <div class="cat-groups" id="cat-groups"></div>
+        </section>
+
+        <section class="step" aria-labelledby="step-run">
+          <h2 class="step__title" id="step-run"><span class="step__n">3</span> Source &amp; budget</h2>
+          <fieldset class="seg seg--source" id="source-kind">
+            <legend class="sr-only">Source des données</legend>
+            <label class="seg__opt"><input type="radio" name="source" value="google" checked><span>Google Maps<small>avis + téléphones</small></span></label>
+            <label class="seg__opt"><input type="radio" name="source" value="osm"><span>OpenStreetMap<small>gratuit, sans avis</small></span></label>
+          </fieldset>
+          <div class="budget" id="google-opts">
+            <div class="field">
+              <label for="cap">Plafond de requêtes</label>
+              <input id="cap" type="number" min="1" max="2000" step="1" value="150" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="cell-size">Taille des cellules</label>
+              <select id="cell-size">
+                <option value="1">1 km (centre-ville dense)</option>
+                <option value="2" selected>2 km (recommandé)</option>
+                <option value="3">3 km</option>
+                <option value="5">5 km (zone peu dense)</option>
+              </select>
+            </div>
+          </div>
+          <div class="estimate" id="estimate" aria-live="polite"></div>
+          <button class="btn btn--gold btn--xl btn--block" type="button" id="run">
+            <svg aria-hidden="true"><use href="#i-bolt"/></svg><span id="run-label">Lancer la recherche</span>
+          </button>
+          <button class="btn btn--text btn--block" type="button" id="demo-btn">Essayer avec des données de démonstration</button>
+        </section>
+      </aside>
+
+      <div class="stage">
+        <div class="map-wrap">
+          <div id="map" role="region" aria-label="Carte de la zone et des établissements"></div>
+          <div class="map-tools">
+            <button class="map-btn" type="button" id="locate" title="Me localiser" aria-label="Centrer sur ma position"><svg aria-hidden="true"><use href="#i-locate"/></svg></button>
+            <button class="map-btn map-btn--text" type="button" id="map-style" aria-pressed="true">Plan sombre</button>
+            <button class="map-btn map-btn--text" type="button" id="fit-results" disabled>Voir tous</button>
+          </div>
+          <div class="legend" id="legend" aria-label="Légende">
+            <span class="legend__item"><i class="dot dot--hot"></i>Chaud</span>
+            <span class="legend__item"><i class="dot dot--warm"></i>Tiède</span>
+            <span class="legend__item"><i class="dot dot--cold"></i>Froid</span>
+            <span class="legend__sep" aria-hidden="true"></span>
+            <span class="legend__item"><i class="dot dot--none"></i>Aucun site</span>
+            <span class="legend__item"><i class="dot dot--social"></i>Réseaux</span>
+            <span class="legend__item"><i class="dot dot--site"></i>Site</span>
+          </div>
+          <div class="progress" id="progress" hidden>
+            <div class="progress__head">
+              <strong id="progress-title">Recherche en cours…</strong>
+              <button class="btn btn--ghost btn--sm" type="button" id="progress-stop">Arrêter</button>
+            </div>
+            <div class="progress__bar" role="progressbar" aria-labelledby="progress-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar"><span></span></div>
+            <p class="progress__text" id="progress-text" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <section class="results" id="results" aria-labelledby="results-title">
+          <div class="results__head">
+            <div>
+              <h2 class="results__title" id="results-title">Résultats</h2>
+              <p class="results__sub" id="results-sub">Choisissez une zone et des catégories, puis lancez la recherche.</p>
+            </div>
+            <div class="results__actions">
+              <button class="btn btn--ghost btn--sm" type="button" id="verify-btn" hidden>Vérifier avec Google</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="add-hot" disabled>Ajouter les chauds à ma liste</button>
+              <button class="btn btn--violet btn--sm" type="button" id="session-btn" disabled><svg aria-hidden="true"><use href="#i-phone"/></svg>Session d'appels</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="export-btn" disabled><svg aria-hidden="true"><use href="#i-download"/></svg>Exporter</button>
+            </div>
+          </div>
+
+          <div class="kpis" id="kpis">
+            <div class="kpi"><span class="kpi__v" id="kpi-total">0</span><span class="kpi__l">établissements</span></div>
+            <div class="kpi kpi--gold"><span class="kpi__v" id="kpi-none">0</span><span class="kpi__l">sans aucun site</span></div>
+            <div class="kpi"><span class="kpi__v" id="kpi-social">0</span><span class="kpi__l">réseaux / annuaire seulement</span></div>
+            <div class="kpi kpi--hot"><span class="kpi__v" id="kpi-hot">0</span><span class="kpi__l">prospects chauds</span></div>
+            <div class="kpi kpi--muted"><span class="kpi__v" id="kpi-cost">0</span><span class="kpi__l" id="kpi-cost-l">requêtes Google</span></div>
+          </div>
+
+          <form class="filters" id="filters" aria-label="Filtres des résultats">
+            <fieldset class="chips">
+              <legend class="sr-only">Statut du site</legend>
+              <label class="chip chip--none"><input type="checkbox" id="f-none" checked><span>Aucun site</span></label>
+              <label class="chip chip--social"><input type="checkbox" id="f-social" checked><span>Réseaux / annuaire</span></label>
+              <label class="chip chip--site"><input type="checkbox" id="f-site"><span>A un site</span></label>
+            </fieldset>
+            <div class="field field--inline">
+              <label for="f-reviews">Avis min.</label>
+              <input id="f-reviews" type="number" min="0" step="1" value="0" inputmode="numeric">
+            </div>
+            <div class="field field--inline">
+              <label for="f-rating">Note min.</label>
+              <select id="f-rating">
+                <option value="0">Toutes</option>
+                <option value="3.5">3,5 et +</option>
+                <option value="4">4,0 et +</option>
+                <option value="4.5">4,5 et +</option>
+              </select>
+            </div>
+            <label class="check"><input type="checkbox" id="f-phone"><span>Avec téléphone</span></label>
+            <div class="field field--inline">
+              <label for="f-cat">Catégorie</label>
+              <select id="f-cat"><option value="">Toutes</option></select>
+            </div>
+            <div class="field field--inline">
+              <label for="f-sort">Tri</label>
+              <select id="f-sort">
+                <option value="score">Score d'opportunité</option>
+                <option value="reviews">Nombre d'avis</option>
+                <option value="rating">Note</option>
+                <option value="name">Nom</option>
+              </select>
+            </div>
+            <div class="field field--grow">
+              <label class="sr-only" for="f-text">Rechercher dans les résultats</label>
+              <input id="f-text" type="search" placeholder="Nom, adresse…">
+            </div>
+          </form>
+
+          <p class="attribution" id="data-attribution" hidden></p>
+
+          <div class="table-wrap">
+            <table class="rtable" id="results-table">
+              <caption class="sr-only">Établissements trouvés, triés par score d'opportunité</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Score</th>
+                  <th scope="col">Établissement</th>
+                  <th scope="col">Note</th>
+                  <th scope="col">Avis</th>
+                  <th scope="col">Téléphone</th>
+                  <th scope="col" class="col-addr">Adresse</th>
+                  <th scope="col">Site</th>
+                  <th scope="col">Suivi</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="results-body"></tbody>
+            </table>
+            <div class="empty" id="results-empty">
+              <svg class="empty__logo" aria-hidden="true"><use href="#logo"/></svg>
+              <p class="empty__title">Votre prochaine liste d'appels apparaîtra ici.</p>
+              <p class="empty__text">Choisissez un quartier, cochez des catégories, puis lancez la recherche. Pas encore de clé Google ? Essayez la démonstration ou le mode OpenStreetMap gratuit.</p>
+            </div>
+            <button class="btn btn--ghost btn--block" type="button" id="results-more" hidden>Afficher plus</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ========================= CRM ========================= -->
+    <section class="view view--crm" id="view-crm" role="tabpanel" aria-labelledby="tab-crm" hidden>
+      <div class="wrap">
+        <div class="view__head">
+          <div>
+            <p class="eyebrow">Mini CRM</p>
+            <h1 class="view__title">Mes prospects</h1>
+            <p class="view__sub">Votre suivi est enregistré dans ce navigateur. Pensez à l'exporter de temps en temps.</p>
+          </div>
+          <div class="results__actions">
+            <button class="btn btn--violet btn--sm" type="button" id="crm-session" disabled><svg aria-hidden="true"><use href="#i-phone"/></svg>Session d'appels</button>
+            <button class="btn btn--ghost btn--sm" type="button" id="crm-export"><svg aria-hidden="true"><use href="#i-download"/></svg>Exporter / importer</button>
+          </div>
+        </div>
+        <div class="pipeline" id="crm-pipeline" role="group" aria-label="Filtrer par statut"></div>
+        <div class="due" id="crm-due" hidden></div>
+        <div class="filters filters--crm">
+          <div class="field field--grow">
+            <label class="sr-only" for="crm-text">Rechercher un prospect</label>
+            <input id="crm-text" type="search" placeholder="Rechercher un prospect, une note…">
+          </div>
+          <div class="field field--inline">
+            <label for="crm-sort">Tri</label>
+            <select id="crm-sort">
+              <option value="callback">Rappel le plus proche</option>
+              <option value="updated">Dernière modification</option>
+              <option value="score">Score d'opportunité</option>
+              <option value="name">Nom</option>
+            </select>
+          </div>
+        </div>
+        <div class="crm-list" id="crm-list"></div>
+        <div class="empty" id="crm-empty">
+          <svg class="empty__logo" aria-hidden="true"><use href="#logo"/></svg>
+          <p class="empty__title">Aucun prospect suivi pour l'instant.</p>
+          <p class="empty__text">Ouvrez une fiche depuis les résultats et choisissez un statut, ou ajoutez d'un clic tous les prospects chauds.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= RÉGLAGES ========================= -->
+    <section class="view view--settings" id="view-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+      <div class="wrap wrap--narrow">
+        <p class="eyebrow">Réglages</p>
+        <h1 class="view__title">Configuration</h1>
+
+        <section class="card" aria-labelledby="set-google">
+          <h2 class="card__title" id="set-google">Connexion Google Places</h2>
+          <p class="card__text" id="fn-status">Vérification de la fonction serveur…</p>
+          <form class="inline-form" id="login-form" autocomplete="on">
+            <div class="field">
+              <label for="login-pw">Mot de passe d'accès</label>
+              <input id="login-pw" type="password" autocomplete="current-password" required>
+            </div>
+            <label class="check"><input type="checkbox" id="login-remember"><span>Rester connecté sur cet appareil</span></label>
+            <button class="btn btn--violet" type="submit">Se connecter</button>
+          </form>
+          <p class="form-msg" id="login-msg" role="alert"></p>
+          <button class="btn btn--ghost btn--sm" type="button" id="logout" hidden>Se déconnecter</button>
+          <div class="grid-2">
+            <div class="field">
+              <label for="price-req">Prix d'une requête (USD)</label>
+              <input id="price-req" type="number" min="0" step="0.001" value="0.035" inputmode="decimal">
+              <small>Text Search Enterprise : 35 $ / 1 000 requêtes au tarif public de base, après 1 000 requêtes offertes par mois (grille relevée en novembre 2026, à revérifier).</small>
+            </div>
+            <div class="field">
+              <label for="free-quota">Requêtes offertes par mois</label>
+              <input id="free-quota" type="number" min="0" step="1" value="1000" inputmode="numeric">
+              <small>Compteur local : seules les recherches faites depuis ce navigateur sont comptées.</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="set-profile">
+          <h2 class="card__title" id="set-profile">Votre profil (scripts et emails)</h2>
+          <form class="grid-2" id="profile-form">
+            <div class="field"><label for="pf-firstName">Prénom</label><input id="pf-firstName" name="firstName" autocomplete="given-name"></div>
+            <div class="field"><label for="pf-agency">Agence</label><input id="pf-agency" name="agency"></div>
+            <div class="field"><label for="pf-phone">Téléphone</label><input id="pf-phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="pf-email">Email</label><input id="pf-email" name="email" type="email" autocomplete="email"></div>
+            <div class="field"><label for="pf-site">Site de l'agence</label><input id="pf-site" name="site"></div>
+            <div class="field"><label for="pf-city">Ville</label><input id="pf-city" name="city"></div>
+            <div class="field"><label for="pf-offer">Offre mise en avant</label><input id="pf-offer" name="offer"></div>
+            <div class="field"><label for="pf-price">Prix de l'offre</label><input id="pf-price" name="price"></div>
+          </form>
+          <p class="hint">Enregistré automatiquement dans ce navigateur.</p>
+        </section>
+
+        <section class="card" aria-labelledby="set-gen">
+          <h2 class="card__title" id="set-gen">Créer le mot de passe d'accès</h2>
+          <p class="card__text">Le calcul se fait dans votre navigateur : le mot de passe n'est envoyé nulle part. Copiez ensuite les deux valeurs dans Netlify (Site configuration → Environment variables), puis redéployez.</p>
+          <form class="grid-2" id="gen-form">
+            <div class="field"><label for="gen-pw">Nouveau mot de passe</label><input id="gen-pw" type="password" autocomplete="new-password" minlength="10" required></div>
+            <div class="field"><label for="gen-pw2">Confirmation</label><input id="gen-pw2" type="password" autocomplete="new-password" minlength="10" required></div>
+            <p class="form-msg" id="gen-msg" role="alert"></p>
+            <button class="btn btn--violet" type="submit">Générer</button>
+          </form>
+          <div class="gen-out" id="gen-out" hidden>
+            <div class="secret">
+              <span class="secret__k">ACCESS_PASSWORD_HASH</span>
+              <code class="secret__v" id="gen-hash"></code>
+              <button class="btn btn--ghost btn--sm" type="button" data-copy="gen-hash"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copier</button>
+            </div>
+            <div class="secret">
+              <span class="secret__k">TOKEN_SECRET</span>
+              <code class="secret__v" id="gen-secret"></code>
+              <button class="btn btn--ghost btn--sm" type="button" data-copy="gen-secret"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copier</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="set-data">
+          <h2 class="card__title" id="set-data">Données et cache</h2>
+          <p class="card__text" id="cache-stats">…</p>
+          <div class="row-btns">
+            <button class="btn btn--ghost btn--sm" type="button" id="purge">Effacer le contenu de plus de 30 jours</button>
+            <button class="btn btn--ghost btn--sm" type="button" id="clear-cache">Vider tout le cache de recherche</button>
+          </div>
+        </section>
+
+        <section class="card card--legal" id="legal" aria-labelledby="set-legal">
+          <h2 class="card__title" id="set-legal">À savoir : RGPD et conditions de Google</h2>
+          <p class="card__text">Repères généraux, pas un avis juridique : en cas de doute, vérifiez les textes à jour (CNIL, conditions de Google Maps Platform) ou demandez à un professionnel.</p>
+          <ul class="legal-list">
+            <li><strong>Prospection B2B.</strong> Contacter un professionnel par téléphone ou email pour une offre liée à son activité repose en général sur l'intérêt légitime (RGPD). Les coordonnées d'un artisan ou d'un entrepreneur individuel restent des données personnelles.</li>
+            <li><strong>Informer dès le premier contact</strong> : qui vous êtes, d'où viennent ses coordonnées (fiche publique Google ou OpenStreetMap), et qu'il peut s'opposer à tout moment.</li>
+            <li><strong>Droit d'opposition</strong> : le statut « Ne plus contacter » masque l'établissement de toutes vos recherches futures. Respectez-le sans délai.</li>
+            <li><strong>Durée de conservation</strong> : la CNIL recommande de ne pas garder un prospect inactif plus de 3 ans après le dernier contact. Supprimez les fiches qui ne mènent à rien.</li>
+            <li><strong>Démarchage téléphonique</strong> : les règles évoluent, notamment pour les consommateurs. Vérifiez les dispositions en vigueur si votre interlocuteur peut être considéré comme un particulier.</li>
+            <li><strong>Conditions de Google Maps Platform</strong> : les données Google affichées sur cette carte (fond OpenStreetMap) portent la mention « Google Maps ». Seuls les identifiants de lieux sont conservés durablement ; le reste du contenu Google est effacé de ce navigateur après 30 jours. Les conditions de Google encadrent strictement la copie et l'export de leur contenu (noms, adresses, numéros…) hors de l'application : lisez-les avant d'exporter.</li>
+            <li><strong>OpenStreetMap</strong> : données © contributeurs OpenStreetMap, licence ODbL (attribution obligatoire).</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Prospecteur <strong>NEXORA</strong> · fond de carte © contributeurs OpenStreetMap · <a href="#legal" data-goto="settings">RGPD &amp; conditions</a></p>
+  </footer>
+
+  <!-- Fiche prospect -->
+  <dialog class="drawer" id="drawer" aria-labelledby="drawer-title">
+    <div class="drawer__inner" id="drawer-body"></div>
+  </dialog>
+
+  <!-- Connexion -->
+  <dialog class="modal" id="login-dialog" aria-labelledby="login-dialog-title">
+    <form class="modal__inner" id="login-dialog-form" method="dialog">
+      <h2 class="modal__title" id="login-dialog-title">Connexion à Google Places</h2>
+      <p class="modal__text" id="login-dialog-text">Entrez le mot de passe d'accès défini dans Netlify.</p>
+      <div class="field">
+        <label for="ld-pw">Mot de passe</label>
+        <input id="ld-pw" type="password" autocomplete="current-password">
+      </div>
+      <label class="check"><input type="checkbox" id="ld-remember"><span>Rester connecté sur cet appareil</span></label>
+      <p class="form-msg" id="ld-msg" role="alert"></p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" type="button" value="cancel" id="ld-cancel">Annuler</button>
+        <button class="btn btn--gold" type="submit" value="ok" id="ld-ok">Se connecter et lancer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Export -->
+  <dialog class="modal" id="export-dialog" aria-labelledby="export-title">
+    <div class="modal__inner">
+      <h2 class="modal__title" id="export-title">Exporter</h2>
+      <p class="modal__text" id="export-scope"></p>
+      <div class="export-list">
+        <button class="export-opt" type="button" data-export="csv-full"><strong>CSV · liste d'appel complète</strong><span>Nom, téléphone, adresse, note, avis, site, score, suivi. Excel français (séparateur « ; », UTF-8).</span></button>
+        <button class="export-opt" type="button" data-export="csv-light"><strong>CSV · suivi sans contenu Google</strong><span>Identifiants, liens Google Maps, statuts, notes et rappels. Les données OpenStreetMap restent complètes.</span></button>
+        <button class="export-opt" type="button" data-export="json"><strong>JSON · sauvegarde du CRM</strong><span>Pour restaurer votre suivi sur un autre navigateur.</span></button>
+        <label class="export-opt export-opt--file"><strong>Importer une sauvegarde JSON</strong><span>Fusionne avec le suivi existant (la version la plus récente l'emporte).</span><input type="file" id="import-file" accept="application/json,.json"></label>
+      </div>
+      <p class="modal__note">Les conditions de Google Maps Platform encadrent la copie et la conservation de leur contenu hors de l'application : vérifiez-les avant d'exporter des données Google, et supprimez les fichiers dont vous n'avez plus besoin.</p>
+      <div class="modal__actions"><button class="btn btn--ghost" type="button" id="export-close">Fermer</button></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
