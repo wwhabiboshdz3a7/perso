@@ -5,6 +5,7 @@ import { $, el, icon, clamp, reducedMotion } from './dom.js';
 import { db } from './db.js';
 import { generateDemoImages, DEMO_COUNT, decodeImage, resizeToJpeg } from './images.js';
 import { formatBytes } from '../core/protocol.js';
+import { C } from './theme.js';
 
 const SRC_LABEL = { démo: 'démo', import: 'importée', capture: 'capture', dessin: 'dessin', reçue: 'reçue' };
 
@@ -333,7 +334,7 @@ export class Gallery {
       if (ev.type === 'gesture' && ev.name === 'Thumb_Up') {
         this.toggleFav(this.viewerId, true).then(() => {
           const r = $('#viewerFav').getBoundingClientRect();
-          this.app.fx.burst(r.left + r.width / 2, r.top + r.height / 2, { color: '#ffb547', count: 36 });
+          this.app.fx.burst(r.left + r.width / 2, r.top + r.height / 2, { color: C.accent, count: 36 });
           this.app.ui.toast('Ajoutée aux favoris', this.get(this.viewerId)?.name || '', { kind: 'ok', sound: false });
         });
         return true;

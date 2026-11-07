@@ -4,6 +4,7 @@ import { $, $$, el } from './dom.js';
 import { PROVIDERS } from './ai.js';
 import { DEFAULTS } from './store.js';
 import { db } from './db.js';
+import { THEMES } from './theme.js';
 
 const FORMAT = {
   sensitivity: (v) => `${(+v).toFixed(2).replace('.', ',')}×`,
@@ -13,6 +14,7 @@ const FORMAT = {
   swipeSpeed: (v) => (+v).toFixed(2).replace('.', ','),
   rate: (v) => `${(+v).toFixed(2).replace('.', ',')}×`,
   volume: (v) => `${Math.round(v * 100)} %`,
+  pitch: (v) => (+v).toFixed(2).replace('.', ','),
 };
 
 export class SettingsUI {
@@ -37,6 +39,8 @@ export class SettingsUI {
   }
 
   _providers() {
+    const th = $('#themeSelect');
+    for (const t of THEMES) th.append(el('option', { value: t.id, text: t.label }));
     const sel = $('#aiProvider');
     for (const [k, p] of Object.entries(PROVIDERS)) sel.append(el('option', { value: k, text: p.label }));
   }
@@ -106,7 +110,7 @@ export class SettingsUI {
   }
 
   _fields() {
-    const numeric = new Set(['sensitivity', 'smoothing', 'pinchOn', 'debounce', 'swipeSpeed', 'rate', 'volume']);
+    const numeric = new Set(['sensitivity', 'smoothing', 'pinchOn', 'debounce', 'swipeSpeed', 'rate', 'volume', 'pitch']);
     const onChange = (e) => {
       const input = e.target;
       const k = input.name;
@@ -172,6 +176,7 @@ export class SettingsUI {
     $('#btnResetAll').addEventListener('click', async () => {
       if (!confirm('Réinitialiser JARVIS (réglages, photos, gestes enregistrés, clé IA) ?')) return;
       this.app.settings.reset();
+      try { localStorage.removeItem('jarvis.notes.v1'); } catch { /* stockage indisponible */ }
       try {
         await db.destroy();
         location.reload();

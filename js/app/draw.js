@@ -2,6 +2,7 @@
 // poing = gomme, deux index levés = tout effacer. Souris et doigt aussi.
 
 import { $, el, fitCanvas } from './dom.js';
+import { C } from './theme.js';
 
 export const PALETTE = [
   ['Cyan', '#6ee7ff'], ['Ambre', '#ffb547'], ['Magenta', '#ff6bd5'], ['Vert', '#6effc1'], ['Blanc', '#f2fbff'], ['Rouge', '#ff6b78'],
@@ -204,7 +205,7 @@ export class Draw {
       this.app.sound.play('swipe');
       this.app.ui.log('dessin', 'ardoise effacée');
       const r = this.canvas.getBoundingClientRect();
-      this.app.fx.ring(r.left + r.width / 2, r.top + r.height / 2, { r0: 20, r1: Math.max(r.width, r.height) * 0.6, color: '#6ee7ff', dur: 0.6 });
+      this.app.fx.ring(r.left + r.width / 2, r.top + r.height / 2, { r0: 20, r1: Math.max(r.width, r.height) * 0.6, color: C.primary, dur: 0.6 });
     }
   }
 

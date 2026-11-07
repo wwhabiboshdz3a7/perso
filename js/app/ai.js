@@ -13,8 +13,8 @@ export const PROVIDERS = {
   custom: { label: 'Autre point d’accès compatible OpenAI', base: '', model: '' },
 };
 
-export function defaultSystemPrompt(name) {
-  return `Tu es JARVIS, l’assistant personnel de ${name || 'l’utilisateur'}, fondateur de l’agence NEXORA. `
+export function defaultSystemPrompt(name, assistant = 'JARVIS') {
+  return `Tu es ${assistant || 'JARVIS'}, l’assistant personnel de ${name || 'l’utilisateur'}, fondateur de l’agence NEXORA. `
     + 'Réponds toujours en français, avec un ton posé, précis et une pointe d’humour pince-sans-rire. '
     + 'Tes réponses sont lues à voix haute : une à trois phrases courtes, sans liste, sans markdown, sans émoji.';
 }
@@ -43,7 +43,7 @@ export class Brain {
       base: (s.aiBase || p.base || '').replace(/\/+$/, ''),
       model: s.aiModel || p.model,
       key: this.settings.aiKey,
-      system: s.aiSystem || defaultSystemPrompt(s.userName),
+      system: s.aiSystem || defaultSystemPrompt(s.userName, s.assistantName),
     };
   }
 

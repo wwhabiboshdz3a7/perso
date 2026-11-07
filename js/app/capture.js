@@ -2,6 +2,7 @@
 
 import { $, sleep, reducedMotion } from './dom.js';
 import { simulatedFeed } from './demo-images.js';
+import { C } from './theme.js';
 
 export class Capture {
   constructor(app) {
@@ -80,7 +81,7 @@ export class Capture {
 
   _hud(ctx, w, h, via = 'geste victoire') {
     const u = Math.max(1, Math.round(Math.min(w, h) / 360));
-    const cyan = '#6ee7ff', amber = '#ffb547';
+    const cyan = C.primary, amber = C.accent;
     const v = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.35, w / 2, h / 2, Math.max(w, h) * 0.75);
     v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,10,16,0.55)');
     ctx.fillStyle = v; ctx.fillRect(0, 0, w, h);
@@ -89,7 +90,7 @@ export class Capture {
     const corner = (x, y, dx, dy) => { ctx.beginPath(); ctx.moveTo(x, y + dy * L); ctx.lineTo(x, y); ctx.lineTo(x + dx * L, y); ctx.stroke(); };
     corner(m, m, 1, 1); corner(w - m, m, -1, 1); corner(m, h - m, 1, -1);
     ctx.strokeStyle = amber; ctx.shadowColor = amber; corner(w - m, h - m, -1, -1);
-    ctx.strokeStyle = 'rgba(110,231,255,0.75)'; ctx.shadowColor = cyan; ctx.lineWidth = 1.2 * u;
+    ctx.strokeStyle = C.primaryA(0.75); ctx.shadowColor = cyan; ctx.lineWidth = 1.2 * u;
     const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.11;
     ctx.beginPath(); ctx.arc(cx, cy, R, -0.3, Math.PI * 0.5); ctx.stroke();
     ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 0.75, Math.PI * 1.55); ctx.stroke();

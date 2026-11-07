@@ -3,9 +3,9 @@
 
 import { $, fitCanvas, reducedMotion } from './dom.js';
 import { HAND_CONNECTIONS, POSE_LABELS, GESTURE_LABELS } from '../core/hand.js';
+import { C } from './theme.js';
 
 const TIPS = [4, 8, 12, 16, 20];
-const COLORS = ['#6ee7ff', '#ffb547'];
 
 function drawHand(ctx, pts, map, o) {
   // Halo obtenu par un trait large et translucide : bien plus léger qu'un
@@ -37,7 +37,7 @@ function drawHand(ctx, pts, map, o) {
     const P = map(pts[i]);
     ctx.beginPath();
     ctx.arc(P.x, P.y, TIPS.includes(i) ? r * 1.5 : r, 0, Math.PI * 2);
-    ctx.fillStyle = TIPS.includes(i) ? (i === 8 ? '#ffb547' : color) : '#03080c';
+    ctx.fillStyle = TIPS.includes(i) ? (i === 8 ? C.accent : color) : C.bg;
     ctx.fill();
     ctx.stroke();
   }
@@ -79,7 +79,7 @@ export class HUD {
     if (simulated) {
       // Image de synthèse : grille de profondeur discrète.
       ctx.save();
-      ctx.strokeStyle = 'rgba(110,231,255,0.08)';
+      ctx.strokeStyle = C.primaryA(0.08);
       ctx.lineWidth = 1;
       for (let i = 1; i < 8; i++) {
         ctx.beginPath(); ctx.moveTo((w * i) / 8, 0); ctx.lineTo((w * i) / 8, h); ctx.stroke();
@@ -93,14 +93,14 @@ export class HUD {
     const a = map({ x: reg.x0, y: reg.y0 }), b = map({ x: reg.x1, y: reg.y1 });
     ctx.save();
     ctx.setLineDash([4 * dpr, 5 * dpr]);
-    ctx.strokeStyle = 'rgba(255,181,71,0.35)';
+    ctx.strokeStyle = C.accentA(0.35);
     ctx.lineWidth = dpr;
     ctx.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
     ctx.restore();
 
     if (!result) return;
     result.hands.forEach((hand, i) => {
-      const color = hand.primary ? COLORS[0] : COLORS[1];
+      const color = hand.primary ? C.primary : C.accent;
       drawHand(ctx, hand.landmarks, map, { color, width: 2 * dpr, joint: 2.2 * dpr, glow: 10 * dpr });
       const wrist = map(hand.landmarks[0]);
       ctx.save();
@@ -116,7 +116,7 @@ export class HUD {
       if (hand.pinching) {
         const p4 = map(hand.landmarks[4]), p8 = map(hand.landmarks[8]);
         ctx.save();
-        ctx.strokeStyle = '#ffb547';
+        ctx.strokeStyle = C.accent;
         ctx.lineWidth = 2 * dpr;
         ctx.beginPath(); ctx.arc((p4.x + p8.x) / 2, (p4.y + p8.y) / 2, 9 * dpr, 0, Math.PI * 2); ctx.stroke();
         ctx.restore();
@@ -200,7 +200,7 @@ export class HUD {
       const y = H - 2 - (v / max) * (H - 4);
       if (i) c.lineTo(x, y); else c.moveTo(x, y);
     });
-    c.strokeStyle = '#6ee7ff';
+    c.strokeStyle = C.primary;
     c.lineWidth = 1.2;
     c.stroke();
   }
@@ -230,7 +230,7 @@ export class FX {
   burst(x, y, o = {}) {
     if (reducedMotion()) return;
     const n = o.count ?? 42;
-    const color = o.color ?? '#6ee7ff';
+    const color = o.color ?? C.primary;
     const inward = o.inward ?? false;
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -248,7 +248,7 @@ export class FX {
 
   ring(x, y, o = {}) {
     if (reducedMotion()) return;
-    this.rings.push({ x, y, r0: o.r0 ?? 10, r1: o.r1 ?? 160, t: 0, dur: o.dur ?? 0.7, color: o.color ?? '#6ee7ff', width: o.width ?? 2 });
+    this.rings.push({ x, y, r0: o.r0 ?? 10, r1: o.r1 ?? 160, t: 0, dur: o.dur ?? 0.7, color: o.color ?? C.primary, width: o.width ?? 2 });
     this._dirty = true;
   }
 
@@ -290,7 +290,7 @@ export class FX {
         return { x: s.x * dpr, y: s.y * dpr };
       };
       for (const hand of this.result.hands) {
-        drawHand(ctx, hand.landmarks, map, { color: hand.primary ? '#6ee7ff' : '#ffb547', alpha: 0.22, width: 2.5 * dpr, joint: 3 * dpr, glow: 14 * dpr });
+        drawHand(ctx, hand.landmarks, map, { color: hand.primary ? C.primary : C.accent, alpha: 0.22, width: 2.5 * dpr, joint: 3 * dpr, glow: 14 * dpr });
       }
     }
 

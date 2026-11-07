@@ -25,12 +25,19 @@ import { Capture } from './capture.js';
 import { SleepMode } from './sleep.js';
 import { Tutorial } from './tutorial.js';
 import { SettingsUI } from './settings-ui.js';
+import { Notes } from './notes.js';
+import { Arcade } from './arcade.js';
+import { applyTheme } from './theme.js';
+import { setWakeWord } from '../core/commands.js';
 import { db } from './db.js';
 
 const ENGINE_KEYS = ['mirror', 'dominant', 'pinchOn', 'debounce', 'swipeSpeed', 'smoothing'];
 
 const CAMERA_KEYS = ['facing', 'quality', 'model', 'delegate'];
 const DIR_FR = { left: '←', right: '→', up: '↑', down: '↓' };
+const MODE_KEYS = { dessin: 'showDraw', holo: 'showHolo', arcade: 'showArcade' };
+const PANEL_KEYS = { showSensors: '.panel--sensors', showLog: '.panel--log', showClock: '.panel--clock', showLink: '.panel--link', showTimers: '.panel--timers', showNotes: '.panel--notes' };
+const MODE_NAMES = { galerie: 'galerie', dessin: 'dessin', holo: 'hologramme', arcade: 'arcade' };
 
 class App {
   constructor() {
@@ -61,11 +68,16 @@ class App {
     this.holo = new Holo(this);
     this.weather = new Weather(this);
     this.timers = new Timers(this);
+    this.notes = new Notes(this);
     this.capture = new Capture(this);
     this.sleep = new SleepMode(this);
     this.assistant = new Assistant(this);
     this.tutorial = new Tutorial(this);
     this.settingsUI = new SettingsUI(this);
+    this.arcade = new Arcade(this);
+    applyTheme(this.settings.get('theme'));
+    this._applyIdentity();
+    this._applyModules();
     this._wire();
   }
 
@@ -166,6 +178,9 @@ class App {
     if ('delegate' in c) this.camera._preferCpu = false;
     if ('motion' in c) document.documentElement.dataset.motion = c.motion;
     if ('userName' in c) $('#welcomeName').textContent = c.userName ? ` ${c.userName}` : '';
+    if ('theme' in c) applyTheme(c.theme);
+    if ('assistantName' in c || 'assistantTagline' in c) this._applyIdentity();
+    if (keys.some((k) => k.startsWith('show'))) this._applyModules();
     if (keys.some((k) => CAMERA_KEYS.includes(k)) && this.camera.active) {
       clearTimeout(this._restartT);
       this._restartT = setTimeout(() => { this.stopCamera(true); this.startCamera({ silent: true }); }, 400);
@@ -179,6 +194,7 @@ class App {
     if (e.key === '1') this.setMode('galerie');
     else if (e.key === '2') this.setMode('dessin');
     else if (e.key === '3') this.setMode('holo');
+    else if (e.key === '4') this.setMode('arcade');
     else if (e.key === '/') { e.preventDefault(); $('#cmdInput').focus(); }
     else if (e.key === 'Escape') { if (this.player.active) this.stopPlayback(); else if (!$('#simPanel').hidden) this.openSim(false); else if (this.gallery.viewerId) this.gallery.close(); }
     else return;
@@ -203,6 +219,8 @@ class App {
       consumed = this.draw.onGesture(ev);
     } else if (this.mode === 'holo') {
       consumed = this.holo.onGesture(ev);
+    } else if (this.mode === 'arcade') {
+      consumed = this.arcade.onGesture(ev);
     }
     if (ev.type === 'swipe' && consumed) this.sound.play('swipe');
     if ((!consumed && isPrimary) || ev.type === 'twohand:start') this.cursor.onEvent(ev);
@@ -224,12 +242,16 @@ class App {
 
   // ——— Modes ————————————————————————————————————————————————————
 
+  /** Module affiché (non masqué dans les réglages › Identité). */
+  moduleOn(m) { return !MODE_KEYS[m] || this.settings.get(MODE_KEYS[m]) !== false; }
+
   setMode(m) {
-    if (!['galerie', 'dessin', 'holo'].includes(m)) return;
+    if (!['galerie', 'dessin', 'holo', 'arcade'].includes(m) || !this.moduleOn(m)) return;
     if (m === this.mode) return;
     const prev = this.mode;
     if (prev === 'holo') this.holo.stop();
     if (prev === 'dessin') this.draw.stop();
+    if (prev === 'arcade') this.arcade.leave();
     this.mode = m;
     for (const v of $$('[data-view]')) v.hidden = v.dataset.view !== m;
     for (const b of $$('.mode-tab')) b.setAttribute('aria-pressed', String(b.dataset.mode === m));
@@ -237,8 +259,34 @@ class App {
     if (m === 'holo') this.holo.start();
     if (m === 'dessin') this.draw.start();
     this.sound.play('click');
-    this.ui.log('système', `module : ${{ galerie: 'galerie', dessin: 'dessin', holo: 'hologramme' }[m]}`);
+    this.ui.log('système', `module : ${MODE_NAMES[m]}`);
     this.bus.emit('mode', m);
+  }
+
+  get assistantName() { return (this.settings.get('assistantName') || '').trim() || 'JARVIS'; }
+
+  /** Nom et sous-titre de l'assistant partout dans l'interface. */
+  _applyIdentity() {
+    const name = this.assistantName;
+    const tag = (this.settings.get('assistantTagline') || '').trim();
+    for (const n of $$('[data-ai-name]')) n.textContent = name;
+    const sub = $('#brandSub');
+    sub.textContent = tag;
+    sub.hidden = !tag;
+    document.title = `${name} — ${tag || 'Interface gestuelle et vocale'}`;
+    $('#boot')?.setAttribute('aria-label', `Démarrage de ${name}`);
+    $('.brand')?.setAttribute('aria-label', `${name}, accueil`);
+    const h1 = $('#app > h1');
+    if (h1) h1.textContent = `${name}, interface gestuelle et vocale`;
+    setWakeWord(name);
+    this.assistant?.renderState();
+  }
+
+  /** Modules et panneaux masqués ou affichés (réglages › Identité). */
+  _applyModules() {
+    for (const [k, sel] of Object.entries(PANEL_KEYS)) { const p = $(sel); if (p) p.hidden = this.settings.get(k) === false; }
+    for (const [m, k] of Object.entries(MODE_KEYS)) { const b = $(`.mode-tab[data-mode="${m}"]`); if (b) b.hidden = this.settings.get(k) === false; }
+    if (!this.moduleOn(this.mode)) this.setMode('galerie');
   }
 
   openDialog(dlg) {
@@ -555,7 +603,7 @@ class App {
     }
     const log = $('#bootLog');
     const lines = [
-      ['Noyau JARVIS', 'v1.0'],
+      [`Noyau ${this.assistantName}`, 'v1.1'],
       ['Moteur de gestes · 2 × 21 points', 'OK'],
       ['Optique · modèle embarqué', 'PRÊT'],
       ['Liaison · locale + WebRTC', 'PRÊT'],

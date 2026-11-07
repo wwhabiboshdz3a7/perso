@@ -21,6 +21,10 @@ Site **100 % statique** (aucune commande de build), publiable tel quel sur Netli
 | **Captures** | Geste *victoire* (ou « prends une capture ») : compte à rebours, photo webcam avec cadre HUD (la source, geste ou commande, y est inscrite), ajoutée à la galerie. Sans caméra, JARVIS demande de l’activer ; seule la démonstration produit une « capture simulée », nommée comme telle. |
 | **HUD** | Démarrage court et passable (Échap), horloge, météo (Open-Meteo), capteurs (images/s, mains, latence, geste et score du modèle), journal, minuteries, notifications, sons synthétisés en WebAudio (aucun fichier), squelette des mains en miroir sur l’aperçu et en fantôme plein écran, veille. |
 | **Accueil, tutoriel, calibration** | Explication avant toute demande de caméra ou de micro, tutoriel animé de chaque geste (mains en SVG), calibration du pincement et du poing, main dominante, miroir, sensibilité, lissage, anti-rebond. Page [confidentialité](confidentialite.html). |
+| **Arcade** (module 04) | Jeu de cibles en 30 secondes, pensé pour les salons et les démonstrations : pincement ou poing sur la cible (souris et doigt aussi), cibles dorées ×3, leurres rouges à éviter, multiplicateur de série, trois niveaux, compte à rebours, record conservé. « Lance la partie » à la voix. |
+| **Cerveau local** (sans IA) | Calculs dictés (« combien font 12 fois 8 », racines, puissances, pourcentages, parenthèses), conversions d’unités (longueurs, masses, volumes, températures, vitesses, durées, données), mémo vocal (« note : … », « lis mes notes »), alarme à heure fixe (« réveille-moi à 7 h 30 »), chronomètre, pile ou face, dés, nombre au hasard, blagues, citations, jours restants avant une date ou une fête, recherche web (« cherche … sur YouTube »), ouverture de sites, rapport d’état, batterie, volume, « répète ». |
+| **Identité et personnalisation** | Réglages → Identité : **nom de l’assistant** (il devient aussi le mot d’éveil ; « Jarvis » reste reconnu), sous-titre, **six thèmes** (Arc, Mark, Matrice, NEXORA, Glace, Solaire) appliqués à toute l’interface, au HUD, aux particules, aux captures et à l’hologramme, hauteur de la voix, **modules et panneaux à masquer** (dessin, hologramme, arcade, capteurs, journal, horloge, liaison, minuteries, mémo). À la voix : « appelle-toi Friday », « thème rouge », « change de thème ». |
+| **Raccourcis personnels** | Une ligne par raccourci, `phrase = commande ; commande ; "texte dit"` : une phrase déclenche une suite de commandes, une réponse parlée ou l’ouverture d’un site (`ouvre https://…`). Exemple : `mode présentation = plein écran ; affiche l’hologramme ; "C’est parti."` |
 | **Mode simulation** | Banc qui rejoue des gestes synthétiques ou **enregistrés depuis la vraie caméra** (« Enregistrer un geste », export/import JSON) à travers le **même pipeline** que la caméra. **Main virtuelle** : la souris, ou le doigt sur écran tactile, devient une main (clic bref = pincement, appui maintenu = poing, relâcher = main ouverte ; au doigt, lever le doigt juste après avoir attrapé une photo la garde en main). Gestes importés vérifiés (horodatages croissants, 60 s au plus) ; « Arrêter la lecture » (ou Échap) interrompt un rejeu. |
 
 ### Gestes
@@ -41,7 +45,11 @@ Site **100 % statique** (aucune commande de build), publiable tel quel sur Netli
 
 ### Commandes vocales (exemples)
 
-« Jarvis, ouvre la galerie » · « mode dessin » · « affiche l’hologramme » · « envoie la photo » · « quelle heure est-il ? » · « météo à Toulouse » · « minuterie de 5 minutes » · « annule la minuterie » · « prends une capture » · « photo suivante » · « efface tout » · « mode veille » / « réveille-toi » · « coupe le son » · « aide ». Toute autre question part au cerveau IA s’il est configuré.
+« Jarvis, ouvre la galerie » · « mode dessin » · « affiche l’hologramme » · « envoie la photo » · « quelle heure est-il ? » · « météo à Toulouse » · « minuterie de 5 minutes » · « annule la minuterie » · « prends une capture » · « photo suivante » · « efface tout » · « mode veille » / « réveille-toi » · « coupe le son » · « aide ».
+
+Sans IA : « combien font 15 % de 80 » · « convertis 30 degrés en fahrenheit » · « note : rappeler le client » · « lis mes notes » · « réveille-moi à 7 h 30 » · « lance le chrono » / « arrête le chrono » · « pile ou face » · « lance deux dés » · « un nombre entre 1 et 50 » · « raconte une blague » · « une citation » · « combien de jours avant Noël » · « cherche la tour Eiffel sur YouTube » · « ouvre Gmail » · « rapport » · « batterie » · « monte le son » · « répète » · « lance la partie » · « thème matrice » · « appelle-toi Friday ».
+
+Toute autre question part au cerveau IA s’il est configuré.
 
 ---
 
@@ -52,7 +60,7 @@ index.html                 Application (HUD, modules, dialogues)
 confidentialite.html       Ce qui est traité, où, et ce qui sort de l’appareil
 netlify.toml               Publication « . », en-têtes (CSP, Permissions-Policy, cache)
 manifest.webmanifest       Installation en application
-css/jarvis.css             Identité visuelle (cyan/ambre, crochets, grilles, scanlines)
+css/jarvis.css             Identité visuelle (crochets, grilles, scanlines) et six thèmes de couleur
 assets/icon.svg
 js/core/                   Cœur pur, sans DOM, testé avec node --test
   one-euro.js              Filtre One Euro (lissage)
@@ -62,7 +70,9 @@ js/core/                   Cœur pur, sans DOM, testé avec node --test
   handpose.js              Mains synthétiques au format MediaPipe (21 points)
   sequences.js             Séquences de gestes interpolées + catalogue de scénarios
   protocol.js              Paquets binaires, découpage/réassemblage, SHA-256, codes de liaison
-  commands.js              Analyse des commandes vocales (mot d’éveil, durées, villes…)
+  commands.js              Analyse des commandes vocales (mot d’éveil personnalisable, durées, villes,
+                           raccourcis personnels)
+  local.js                 Cerveau local : calculs, conversions, heure d’alarme, jours restants, blagues
 js/app/                    Interface
   main.js                  Assemblage, routage des gestes, modes, caméra, simulation
   tracker.js               Caméra + MediaPipe (GPU avec repli CPU, mode léger 640×480)
@@ -74,6 +84,8 @@ js/app/                    Interface
   gallery.js · images.js   Galerie IndexedDB · traitement d’images hors du fil principal
   image-worker.js          Worker (OffscreenCanvas) : JPEG, visuels de démonstration
   draw.js · holo.js        Dessin dans l’air · hologramme Three.js
+  arcade.js                Module 04 : jeu de cibles
+  notes.js · theme.js      Mémo · thèmes de couleur partagés avec les canevas
   assistant.js · ai.js     Voix, commandes, cerveau IA compatible OpenAI
   hud.js · ui.js · sound.js · weather.js · timers.js · capture.js · sleep.js
   tutorial.js · settings-ui.js · store.js · db.js · dom.js · demo-images.js

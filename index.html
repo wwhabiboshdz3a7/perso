@@ -50,6 +50,8 @@
     <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v6L4.8 18.6A1.3 1.3 0 0 0 6 20.5h12a1.3 1.3 0 0 0 1.2-1.9L13.5 9.5v-6"/><path d="M7.5 14.5h9"/></symbol>
     <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2.8l8.2 4.6v9.2L12 21.2l-8.2-4.6V7.4z"/><path d="M3.8 7.4L12 12l8.2-4.6M12 12v9.2"/></symbol>
     <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 3h5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" class="fill"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 2-2 0-1.5-1.3-1.8-1.3-3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7" r="1.2"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="1"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
   </svg>
 
@@ -78,7 +80,7 @@
         <g class="b-ticks"></g>
       </svg>
     </div>
-    <p class="boot__title">JARVIS</p>
+    <p class="boot__title" data-ai-name>JARVIS</p>
     <ol class="boot__log" id="bootLog"></ol>
     <button type="button" class="btn btn--ghost boot__skip" id="bootSkip">Passer <kbd>Échap</kbd></button>
   </div>
@@ -88,11 +90,11 @@
     <div class="welcome__inner">
       <p class="eyebrow">Système d’interface gestuelle · NEXORA</p>
       <h1 id="welcomeTitle" class="welcome__title">Bonjour<span id="welcomeName"></span>.<br>Prenez la main sur l’écran.</h1>
-      <p class="welcome__lead">JARVIS lit vos gestes avec la caméra et écoute vos commandes vocales. Attrapez une photo d’un poing fermé sur un appareil, ouvrez la main devant un autre : elle y atterrit.</p>
+      <p class="welcome__lead"><span data-ai-name>JARVIS</span> lit vos gestes avec la caméra et écoute vos commandes vocales. Attrapez une photo d’un poing fermé sur un appareil, ouvrez la main devant un autre : elle y atterrit.</p>
       <ul class="welcome__points">
         <li><svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg><span><strong>Tout reste sur votre appareil.</strong> L’image de la caméra est analysée localement et n’est jamais envoyée. Seule la photo que vous attrapez quitte l’appareil, en direct, vers les appareils que vous avez reliés.</span></li>
         <li><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span><strong>Caméra</strong> : suivi des deux mains à 21 points, avec un modèle embarqué (pas de serveur).</span></li>
-        <li><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span><strong>Micro</strong> (facultatif) : dites « Jarvis » puis votre commande. Le clavier fonctionne aussi.</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span><strong>Micro</strong> (facultatif) : dites « <span data-ai-name>JARVIS</span> » puis votre commande. Le clavier fonctionne aussi.</span></li>
       </ul>
       <div class="welcome__actions">
         <button type="button" class="btn btn--primary btn--lg" id="welcomeStart"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Activer la caméra</button>
@@ -115,12 +117,13 @@
           <path d="M8.4 15A18 18 0 0 1 17 7.3" class="bm-arc bm-arc--amber"/>
           <circle cx="24" cy="24" r="8" class="bm-core"/>
         </svg>
-        <span class="brand__text"><span class="brand__name">JARVIS</span><span class="brand__sub">Interface gestuelle · NEXORA</span></span>
+        <span class="brand__text"><span class="brand__name" data-ai-name>JARVIS</span><span class="brand__sub" id="brandSub">Interface gestuelle · NEXORA</span></span>
       </a>
       <nav class="modes" aria-label="Modules">
         <button type="button" class="mode-tab" data-mode="galerie" aria-pressed="true" data-air><span class="mode-tab__n">01</span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg><span>Galerie</span></button>
         <button type="button" class="mode-tab" data-mode="dessin" aria-pressed="false" data-air><span class="mode-tab__n">02</span><svg class="ic" aria-hidden="true"><use href="#i-pen"/></svg><span>Dessin</span></button>
         <button type="button" class="mode-tab" data-mode="holo" aria-pressed="false" data-air><span class="mode-tab__n">03</span><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg><span>Hologramme</span></button>
+        <button type="button" class="mode-tab" data-mode="arcade" aria-pressed="false" data-air><span class="mode-tab__n">04</span><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg><span>Arcade</span></button>
       </nav>
       <div class="topbar__status" role="group" aria-label="État des capteurs">
         <span class="chip" id="chipCam" data-state="off" title="Caméra"><span class="chip__dot"></span><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg><span class="chip__label">Caméra</span><span class="chip__val" id="chipCamVal">éteinte</span></span>
@@ -270,6 +273,46 @@
         </div>
       </section>
 
+      <!-- Arcade -->
+      <section class="view view--arcade" id="viewArcade" data-view="arcade" hidden aria-labelledby="arcTitle">
+        <header class="view__head">
+          <div class="view__titles">
+            <p class="eyebrow">Module 04 · Arcade</p>
+            <h2 id="arcTitle" class="view__title">Cibles</h2>
+          </div>
+          <dl class="arc-hud" aria-live="off">
+            <div><dt>Score</dt><dd id="arcScore">0</dd></div>
+            <div><dt>Série</dt><dd id="arcCombo">×1</dd></div>
+            <div><dt>Temps</dt><dd id="arcTime">30</dd></div>
+            <div><dt>Record</dt><dd id="arcBest">0</dd></div>
+          </dl>
+          <div class="view__actions">
+            <div class="seg" role="group" aria-label="Niveau">
+              <button type="button" class="seg__btn" data-level="facile" aria-pressed="false" data-air>Facile</button>
+              <button type="button" class="seg__btn" data-level="normal" aria-pressed="true" data-air>Normal</button>
+              <button type="button" class="seg__btn" data-level="expert" aria-pressed="false" data-air>Expert</button>
+            </div>
+          </div>
+        </header>
+        <p class="canvas-hint"><span>Pincez</span> ou <span>fermez le poing</span> sur une cible · <span>dorée</span> ×3 · <span>rouge</span> à éviter · une série de 3 augmente le multiplicateur</p>
+        <div class="arena" id="arena">
+          <span class="arena__timebar" aria-hidden="true"><i id="arcTimeBar"></i></span>
+          <div class="arena__intro" id="arcadeIntro">
+            <svg class="arena__icon" aria-hidden="true"><use href="#i-target"/></svg>
+            <p class="arena__title">30 secondes. Touchez un maximum de cibles.</p>
+            <p class="arena__sub">À la main, à la souris ou au doigt. Dites « lance la partie » ou :</p>
+            <button type="button" class="btn btn--primary btn--lg" id="btnArcadeStart" data-air><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Jouer</button>
+          </div>
+          <p class="arena__count" id="arcadeCount" hidden aria-live="assertive"></p>
+          <div class="arena__end" id="arcadeEnd" hidden role="status">
+            <p class="eyebrow" id="arcEndTitle">Partie terminée</p>
+            <p class="arena__score"><span id="arcEndScore">0</span> pts</p>
+            <p class="arena__sub" id="arcEndInfo"></p>
+            <button type="button" class="btn btn--primary btn--lg" id="btnArcadeAgain" data-air><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Rejouer</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Réception -->
       <div class="incoming" id="incoming" hidden role="status" aria-live="polite">
         <div class="incoming__ghost" id="incomingThumb" aria-hidden="true"></div>
@@ -333,15 +376,32 @@
 
       <section class="panel panel--timers" aria-labelledby="timersTitle">
         <header class="panel__head"><h2 id="timersTitle" class="panel__title">Minuteries</h2><span class="panel__meta" id="timersCount">0</span></header>
+        <div class="chrono" id="chrono">
+          <span class="chrono__label">Chrono</span>
+          <span class="chrono__time" id="chronoTime" aria-live="off">00:00,0</span>
+          <button type="button" class="btn btn--xs" id="chronoToggle" aria-pressed="false" data-air><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span>Démarrer</span></button>
+          <button type="button" class="icon-btn icon-btn--sm" id="chronoReset" aria-label="Remettre le chrono à zéro" data-air disabled><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
         <ul class="timers" id="timers"></ul>
-        <p class="panel__empty" id="timersEmpty">Aucune. Dites « Jarvis, minuterie de 5 minutes ».</p>
+        <p class="panel__empty" id="timersEmpty">Aucune. Dites « <span data-ai-name>JARVIS</span>, minuterie de 5 minutes ».</p>
+      </section>
+
+      <section class="panel panel--notes" aria-labelledby="notesTitle">
+        <header class="panel__head"><h2 id="notesTitle" class="panel__title">Mémo<span class="note-count" id="notesCount">0</span></h2><button type="button" class="link-btn" id="btnNotesClear" hidden>effacer</button></header>
+        <form class="note-form" id="noteForm">
+          <label for="noteInput" class="visually-hidden">Nouvelle note</label>
+          <input id="noteInput" type="text" maxlength="280" autocomplete="off" placeholder="Nouvelle note… ou dites « note : … »">
+          <button type="submit" class="icon-btn icon-btn--sm" aria-label="Ajouter la note" data-air><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></button>
+        </form>
+        <ul class="notes" id="notes" aria-label="Notes"></ul>
+        <p class="panel__empty" id="notesEmpty">Vide. Dites « note : rappeler le client ».</p>
       </section>
 
       <section class="panel panel--assistant" aria-labelledby="asstTitle">
         <header class="panel__head"><h2 id="asstTitle" class="panel__title">Assistant</h2><span class="panel__meta" id="asstBrain">local</span></header>
         <div class="assistant" id="assistant" aria-live="polite">
           <p class="assistant__line assistant__line--you" id="asstYou"><span>Vous</span><q>…</q></p>
-          <p class="assistant__line assistant__line--jarvis" id="asstJarvis"><span>JARVIS</span><q>À votre service.</q></p>
+          <p class="assistant__line assistant__line--jarvis" id="asstJarvis"><span data-ai-name>JARVIS</span><q>À votre service.</q></p>
         </div>
         <div class="voicewave" id="voiceWave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </section>
@@ -349,7 +409,7 @@
 
     <!-- Barre de commande -->
     <footer class="cmdbar">
-      <p class="cmd-bubble" id="cmdBubble" aria-hidden="true" hidden><span>JARVIS</span><q></q></p>
+      <p class="cmd-bubble" id="cmdBubble" aria-hidden="true" hidden><span data-ai-name>JARVIS</span><q></q></p>
       <form class="cmd" id="cmdForm" role="search" aria-label="Commande">
         <button type="button" class="cmd__mic" id="btnMic" aria-pressed="false" aria-label="Écoute vocale" data-air><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg><span class="cmd__micring" aria-hidden="true"></span></button>
         <label for="cmdInput" class="visually-hidden">Commande</label>
@@ -393,7 +453,7 @@
   <div id="sleep" class="sleep" hidden>
     <div class="sleep__core" aria-hidden="true"><i></i><i></i><i></i></div>
     <p class="sleep__title">Veille</p>
-    <p class="sleep__hint">Dites « Jarvis, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
+    <p class="sleep__hint">Dites « <span data-ai-name>JARVIS</span>, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
     <button type="button" class="btn" id="btnWake">Réveiller</button>
   </div>
   <div id="countdown" class="countdown" aria-hidden="true"></div>
@@ -406,14 +466,41 @@
         <button class="icon-btn" value="close" aria-label="Fermer les réglages"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
       </header>
       <div class="tabs" role="tablist" aria-label="Rubriques des réglages">
-        <button type="button" role="tab" class="tab" aria-selected="true" aria-controls="setGestes" id="tabGestes">Gestes</button>
+        <button type="button" role="tab" class="tab" aria-selected="true" aria-controls="setIdentite" id="tabIdentite">Identité</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setGestes" id="tabGestes" tabindex="-1">Gestes</button>
         <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setCamera" id="tabCamera" tabindex="-1">Caméra</button>
         <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setVoix" id="tabVoix" tabindex="-1">Voix &amp; IA</button>
         <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setLiaison" id="tabLiaison" tabindex="-1">Liaison</button>
         <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="setGeneral" id="tabGeneral" tabindex="-1">Général</button>
       </div>
       <div class="dialog__body">
-        <section role="tabpanel" id="setGestes" aria-labelledby="tabGestes" class="tabpanel">
+        <section role="tabpanel" id="setIdentite" aria-labelledby="tabIdentite" class="tabpanel">
+          <div class="fields">
+            <label class="field"><span>Nom de l’assistant (aussi mot d’éveil)</span><input type="text" name="assistantName" maxlength="20" autocomplete="off" spellcheck="false" placeholder="JARVIS"></label>
+            <label class="field"><span>Sous-titre</span><input type="text" name="assistantTagline" maxlength="48" autocomplete="off" placeholder="Interface gestuelle · NEXORA"></label>
+            <label class="field"><span>Thème</span><select name="theme" id="themeSelect"></select></label>
+            <label class="field field--range"><span>Hauteur de la voix <output name="pitchOut"></output></span><input type="range" name="pitch" min="0.5" max="1.6" step="0.02"></label>
+          </div>
+          <h3 class="fields__title">Modules affichés</h3>
+          <p class="fields__hint">Masquez ce qui ne vous sert pas : l’interface se réorganise, et les commandes des modules masqués sont désactivées.</p>
+          <div class="fields fields--checks">
+            <label class="check"><input type="checkbox" name="showDraw"><span>Dessin dans l’air</span></label>
+            <label class="check"><input type="checkbox" name="showHolo"><span>Hologramme</span></label>
+            <label class="check"><input type="checkbox" name="showArcade"><span>Arcade (jeu de cibles)</span></label>
+            <label class="check"><input type="checkbox" name="showSensors"><span>Capteurs</span></label>
+            <label class="check"><input type="checkbox" name="showLog"><span>Journal</span></label>
+            <label class="check"><input type="checkbox" name="showClock"><span>Horloge et météo</span></label>
+            <label class="check"><input type="checkbox" name="showLink"><span>Liaison entre appareils</span></label>
+            <label class="check"><input type="checkbox" name="showTimers"><span>Minuteries et chrono</span></label>
+            <label class="check"><input type="checkbox" name="showNotes"><span>Mémo</span></label>
+          </div>
+          <h3 class="fields__title">Raccourcis personnels</h3>
+          <p class="fields__hint">Une ligne par raccourci : <code>phrase = commande ; commande</code>. Une commande entre guillemets est dite à voix haute ; <code>ouvre https://…</code> ouvre un site. Exemple : <code>mode présentation = plein écran ; affiche l’hologramme ; "C’est parti."</code></p>
+          <div class="fields">
+            <label class="field field--area"><span>Raccourcis</span><textarea name="customCommands" rows="5" spellcheck="false" placeholder="bonne nuit = coupe le son ; mode veille&#10;pause café = minuterie de 10 minutes pour le café ; &quot;Bonne pause.&quot;&#10;mes mails = ouvre https://mail.google.com"></textarea></label>
+          </div>
+        </section>
+        <section role="tabpanel" id="setGestes" aria-labelledby="tabGestes" class="tabpanel" hidden>
           <div class="calib" id="calib">
             <div class="calib__text">
               <h3>Calibration</h3>
@@ -455,7 +542,7 @@
         </section>
         <section role="tabpanel" id="setVoix" aria-labelledby="tabVoix" class="tabpanel" hidden>
           <div class="fields">
-            <label class="check"><input type="checkbox" name="wake"><span>Mot d’éveil « Jarvis » (sinon, chaque phrase est une commande)</span></label>
+            <label class="check"><input type="checkbox" name="wake"><span>Mot d’éveil « <span data-ai-name>JARVIS</span> » (sinon, chaque phrase est une commande)</span></label>
             <label class="check"><input type="checkbox" name="speak"><span>Réponses parlées</span></label>
             <label class="field"><span>Voix</span><select name="voice" id="voiceSelect"><option value="">Voix française par défaut</option></select></label>
             <label class="field field--range"><span>Débit <output name="rateOut"></output></span><input type="range" name="rate" min="0.7" max="1.4" step="0.05"></label>
@@ -464,7 +551,7 @@
           </div>
           <div class="brain">
             <h3>Cerveau IA <span class="badge" id="brainBadge">désactivé</span></h3>
-            <p class="brain__text">Pour les questions libres, JARVIS peut interroger un modèle via une API compatible OpenAI (Groq, OpenRouter, Mistral, Ollama ou LM Studio en local…). La clé reste dans ce navigateur et n’est envoyée qu’au point d’accès choisi.</p>
+            <p class="brain__text">Pour les questions libres, <span data-ai-name>JARVIS</span> peut interroger un modèle via une API compatible OpenAI (Groq, OpenRouter, Mistral, Ollama ou LM Studio en local…). La clé reste dans ce navigateur et n’est envoyée qu’au point d’accès choisi.</p>
             <div class="fields">
               <label class="field"><span>Fournisseur</span>
                 <select name="aiProvider" id="aiProvider"></select></label>

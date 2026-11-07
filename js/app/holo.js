@@ -2,6 +2,7 @@
 // Toulouse, ou réacteur à anneaux. Rotation à la main, zoom à deux mains.
 
 import { $, el, clamp, reducedMotion } from './dom.js';
+import { C, onTheme } from './theme.js';
 
 const CITIES = [
   ['Toulouse', 43.6047, 1.4442, true], ['Paris', 48.8566, 2.3522], ['Londres', 51.5074, -0.1278], ['Alger', 36.7538, 3.0588],
@@ -27,6 +28,25 @@ export class Holo {
     this.lastInteract = 0;
     this._loop = this._loop.bind(this);
     this._bindUi();
+    onTheme((_, old) => this.retheme(old));
+  }
+
+  /** Nouveau thème : les couleurs de la scène suivent, sans la reconstruire. */
+  retheme(old) {
+    if (!this.ready) return;
+    const T = this.THREE;
+    const swap = new Map([[new T.Color(old.primary).getHex(), new T.Color(C.primary)], [new T.Color(old.accent).getHex(), new T.Color(C.accent)]]);
+    this.root.traverse((o) => {
+      const m = o.material;
+      if (!m?.color) return;
+      const to = swap.get(m.color.getHex());
+      if (to) m.color.copy(to);
+    });
+    if (this.core) {
+      this.core.material.map?.dispose();
+      this.core.material.map = this._glowTexture(T, C.primaryA(0.9));
+      this.core.material.needsUpdate = true;
+    }
   }
 
   async init() {
@@ -76,8 +96,8 @@ export class Holo {
 
   _buildGlobe(T) {
     const g = new T.Group();
-    const cyan = new T.Color('#6ee7ff');
-    const amber = new T.Color('#ffb547');
+    const cyan = new T.Color(C.primary);
+    const amber = new T.Color(C.accent);
     // Sphère sombre : masque les lignes de la face arrière.
     g.add(new T.Mesh(new T.SphereGeometry(0.985, 48, 32), new T.MeshBasicMaterial({ color: 0x041821, transparent: true, opacity: 0.82 })));
     // Parallèles et méridiens.
@@ -162,7 +182,7 @@ export class Holo {
 
   _buildReactor(T) {
     const g = new T.Group();
-    const cyan = new T.Color('#6ee7ff'), amber = new T.Color('#ffb547');
+    const cyan = new T.Color(C.primary), amber = new T.Color(C.accent);
     this.reactorRings = [];
     const specs = [[0.35, 0.025, cyan, 0.9], [0.55, 0.012, amber, 0.8], [0.78, 0.03, cyan, 0.55], [1.02, 0.01, cyan, 0.8], [1.25, 0.018, amber, 0.5]];
     specs.forEach(([r, tube, color, op], i) => {
@@ -181,7 +201,7 @@ export class Holo {
     seg.rotation.x = Math.PI / 2;
     g.add(seg);
     this.rotor = seg;
-    const core = new T.Sprite(new T.SpriteMaterial({ map: this._glowTexture(T, 'rgba(110,231,255,0.9)'), transparent: true, depthWrite: false, blending: T.AdditiveBlending }));
+    const core = new T.Sprite(new T.SpriteMaterial({ map: this._glowTexture(T, C.primaryA(0.9)), transparent: true, depthWrite: false, blending: T.AdditiveBlending }));
     core.scale.set(1.1, 1.1, 1);
     g.add(core);
     this.core = core;

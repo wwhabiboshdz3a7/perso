@@ -6,6 +6,7 @@
 
 import { $, reducedMotion } from './dom.js';
 import { resizeToJpeg } from './images.js';
+import { C } from './theme.js';
 import {
   encodePacket, decodePacket, chunkify, Assembler, sha256Hex, makeTransferId, CHUNK_SIZE, formatBytes,
   validThumb, validDim, sniffImage,
@@ -105,8 +106,8 @@ export class Share {
     this.app.ui.log('geste', `photo attrapée : ${rec.name}`);
     const screen = this.app.cursor.screen || this.app.mapToScreen({ x: ev.x, y: ev.y });
     this._flyIntoHand(id, screen);
-    this.app.fx.burst(screen.x, screen.y, { color: '#ffb547', count: 48, inward: true, radius: 120, speed: 300, life: 0.5 });
-    this.app.fx.ring(screen.x, screen.y, { r0: 140, r1: 20, color: '#ffb547', dur: 0.45 });
+    this.app.fx.burst(screen.x, screen.y, { color: C.accent, count: 48, inward: true, radius: 120, speed: 300, life: 0.5 });
+    this.app.fx.ring(screen.x, screen.y, { r0: 140, r1: 20, color: C.accent, dur: 0.45 });
     if (!(await this._prepareCarry(tid, rec))) return true;
     for (const p of this.app.link.list()) this._offerTo(p.key);
     if (this.carry.pendingThrow) this.throwCarry(this.carry.pendingThrow);
@@ -656,7 +657,7 @@ export class Share {
     if (!img || reducedMotion()) return;
     const r = img.getBoundingClientRect();
     const ghost = img.cloneNode();
-    Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none', boxShadow: '0 0 0 2px #ffb547, 0 0 40px rgba(255,181,71,.5)' });
+    Object.assign(ghost.style, { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none', boxShadow: `0 0 0 2px ${C.accent}, 0 0 40px ${C.accentA(0.5)}` });
     document.body.append(ghost);
     const dx = to.x - (r.left + r.width / 2), dy = to.y - (r.top + r.height / 2);
     const s = 76 / Math.max(r.width, r.height, 1);
@@ -690,7 +691,7 @@ export class Share {
     const s = this.app.cursor.screen || { x: innerWidth / 2, y: innerHeight / 2 };
     const d = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] }[direction] || [1, 0];
     const tx = s.x + d[0] * innerWidth, ty = s.y + d[1] * innerHeight;
-    this.app.fx.burst(s.x, s.y, { color: '#ffb547', count: 30, speed: 420 });
+    this.app.fx.burst(s.x, s.y, { color: C.accent, count: 30, speed: 420 });
     if (reducedMotion()) { el.classList.remove('is-on'); return; }
     el.animate([
       { transform: `translate3d(${s.x}px, ${s.y}px, 0) scale(1)`, opacity: 1 },
@@ -702,8 +703,8 @@ export class Share {
     const s = this.app.cursor.screen;
     const el = this.carryEl;
     if (s) {
-      this.app.fx.burst(s.x, s.y, { color: '#6ee7ff', count: 60, speed: 380 });
-      this.app.fx.ring(s.x, s.y, { r0: 20, r1: 200, color: '#6ee7ff' });
+      this.app.fx.burst(s.x, s.y, { color: C.primary, count: 60, speed: 380 });
+      this.app.fx.ring(s.x, s.y, { r0: 20, r1: 200, color: C.primary });
     }
     el.classList.remove('is-on');
     this.app.sound.play('throw');
@@ -727,7 +728,7 @@ export class Share {
     const img = document.createElement('img');
     img.src = url;
     img.alt = '';
-    Object.assign(img.style, { position: 'fixed', left: `${cx - w / 2}px`, top: `${cy - h / 2}px`, width: `${w}px`, height: `${h}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none', boxShadow: '0 0 0 1px rgba(110,231,255,.8), 0 0 80px rgba(110,231,255,.35)' });
+    Object.assign(img.style, { position: 'fixed', left: `${cx - w / 2}px`, top: `${cy - h / 2}px`, width: `${w}px`, height: `${h}px`, objectFit: 'cover', zIndex: 86, pointerEvents: 'none', boxShadow: `0 0 0 1px ${C.primaryA(0.8)}, 0 0 80px ${C.primaryA(0.35)}` });
     document.body.append(img);
     const dx = start.x - cx, dy = start.y - cy;
     await img.animate([
@@ -735,8 +736,8 @@ export class Share {
       { transform: 'translate(0,0) scale(1.04) rotate(0)', opacity: 1, filter: 'brightness(1.4)', offset: 0.7 },
       { transform: 'translate(0,0) scale(1)', opacity: 1, filter: 'brightness(1)' },
     ], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' }).finished.catch(() => {});
-    this.app.fx.ring(cx, cy, { r0: Math.max(w, h) * 0.4, r1: Math.max(w, h) * 0.9, color: '#6ee7ff', dur: 0.8, width: 3 });
-    this.app.fx.burst(cx, cy, { color: '#6ee7ff', count: 70, speed: 520 });
+    this.app.fx.ring(cx, cy, { r0: Math.max(w, h) * 0.4, r1: Math.max(w, h) * 0.9, color: C.primary, dur: 0.8, width: 3 });
+    this.app.fx.burst(cx, cy, { color: C.primary, count: 70, speed: 520 });
     await new Promise((r) => setTimeout(r, 700));
     // Vol final vers la vignette (si elle est déjà en place), sinon vers le haut de la grille.
     const slot = inc.recId ? this.app.gallery.cardEl(inc.recId)?.querySelector('.photo__img')?.getBoundingClientRect() : null;

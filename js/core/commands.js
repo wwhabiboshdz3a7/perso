@@ -2,7 +2,23 @@
 // intentions, durées (« cinq minutes et demie »), ville pour la météo.
 // Module pur, sans DOM.
 
+import { parseMath, parseConvert, parseClock, parseDaysUntil } from './local.js';
+
 const WAKE_RE = /(^|[\s,.;:!?«"'(])(d?jarv[iy]s+e?|jarvice|jarvi|jervis|gervais|jarwis|charvis)(?=$|[\s,.;:!?»"')-])[\s,.;:!?»"')-]*/i;
+let customWake = null;
+
+const ACCENTS = { a: 'aàâä', e: 'eéèêë', i: 'iîï', o: 'oôö', u: 'uùûü', c: 'cç', y: 'yÿ' };
+
+/**
+ * Nom de l'assistant utilisé comme mot d'éveil, en plus de « Jarvis »
+ * (qui reste toujours reconnu). Accents et casse indifférents.
+ */
+export function setWakeWord(name) {
+  const base = String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/g, '').trim();
+  if (!base || /^d?jarvis$/.test(base) || base.length < 2) { customWake = null; return; }
+  const body = [...base].map((ch) => (ch === ' ' || ch === '-' ? '[\\s-]?' : ACCENTS[ch] ? `[${ACCENTS[ch]}]` : ch)).join('');
+  customWake = new RegExp(`(^|[\\s,.;:!?«"'(])(${body})(?=$|[\\s,.;:!?»"')-])[\\s,.;:!?»"')-]*`, 'i');
+}
 
 /** Minuscules, sans accents, ponctuation remplacée par des espaces. */
 export function normalize(text) {
@@ -21,7 +37,7 @@ export function normalize(text) {
 /** Détecte le mot d'éveil « Jarvis » (et ses transcriptions approximatives). */
 export function extractWake(text) {
   const raw = String(text || '');
-  const m = raw.match(WAKE_RE);
+  const m = (customWake && raw.match(customWake)) || raw.match(WAKE_RE);
   if (!m) return { woke: false, rest: raw.trim() };
   const before = raw.slice(0, m.index + m[1].length);
   const after = raw.slice(m.index + m[0].length);
@@ -141,6 +157,7 @@ const MODE_WORDS = [
   ['tutoriel', /\b(tutoriel|tuto|didacticiel|apprendre les gestes|liste des gestes|gestes)\b/],
   ['liaison', /\b(appairage|liaison|appairer|connecte|connecter|relier|associer)\b/],
   ['confidentialite', /\b(confidentialite|vie privee|donnees personnelles)\b/],
+  ['arcade', /\b(arcade|jeu de cibles|jeu|jouer|joue|partie|cibles)\b/],
 ];
 
 const has = (n, re) => re.test(n);
@@ -182,6 +199,9 @@ export function parseCommand(input) {
   if (TIME_RE.test(core)) return out('time');
   if (DATE_RE.test(core)) return out('date');
   if (WHO_RE.test(core)) return out('who');
+
+  const local = localIntent(core, text, n);
+  if (local) return out(local[0], local[1] || {});
 
   if (question) {
     // Seules les questions météo explicites restent locales.
@@ -249,6 +269,127 @@ export function parseCommand(input) {
   return out('unknown');
 }
 
+const THEME_WORDS = [
+  ['arc', /\b(arc|cyan|bleu cyan|d origine|par defaut|classique)\b/],
+  ['mark', /\b(mark|rouge|iron man)\b/],
+  ['matrix', /\b(matrice|matrix|vert)\b/],
+  ['nexora', /\b(nexora|violet)\b/],
+  ['glace', /\b(glace|blanc|givre)\b/],
+  ['solaire', /\b(solaire|orange|soleil)\b/],
+];
+
+/**
+ * Intentions traitées localement, sans IA : calcul, conversion, mémo, alarme,
+ * chrono, hasard, blagues, citations, jours restants, recherche web, thème,
+ * changement de nom, état des systèmes. Testées avant les questions ouvertes.
+ */
+function localIntent(core, text, n) {
+  // Mémo
+  const noteAdd = core.match(/^(?:note|notes|prends? note|prendre note|ajoute au memo|memo|retiens|souviens toi|rappelle toi|n oublie pas)(?: que| de| d| bien)?\s+(.{2,})$/)
+    || core.match(/^ajoute (.{2,}?) (?:a|au|dans) (?:ma liste|la liste|mon memo|le memo|mes notes|ma liste de courses|la liste de courses)$/);
+  if (noteAdd && !/^(mes notes|les notes|le memo|mon memo)$/.test(noteAdd[1])) {
+    const raw = String(text).replace(/^\s*(?:(?:est-ce que |)(?:tu peux |peux-tu |s'il te pla[iî]t |stp |ok |dis |)\s*)?(?:note|notes|prends? note|prendre note|ajoute au m[ée]mo|m[ée]mo|retiens|souviens-toi|souviens toi|rappelle-toi|rappelle toi|n['’ ]oublie pas)\s*(?:que |qu['’]|de |d['’]|bien |:\s*)?/i, '').replace(/^ajoute\s+/i, '').replace(/\s+(?:à|a|au|dans)\s+(?:ma liste|la liste|mon m[ée]mo|le m[ée]mo|mes notes|ma liste de courses|la liste de courses)\s*[.!]?$/i, '').trim();
+    return ['note-add', { text: raw || noteAdd[1] }];
+  }
+  if (/^(lis|lire|relis|affiche|montre|donne moi|dis moi|quelles sont|c est quoi)( moi)? (mes|les) notes$|^(mes notes|mon memo|le memo|qu est ce que j ai note|qu ai je note|ma liste|ma liste de courses)$/.test(core)) return ['note-list'];
+  if (/^(efface|supprime|vide|oublie|nettoie)( toutes)? (mes|les) notes$|^(vide|efface|supprime) (le|mon) memo$|^(vide|efface) (ma|la) liste( de courses)?$/.test(core)) return ['note-clear'];
+
+  // Chronomètre (sans durée : sinon c'est une minuterie)
+  if (/\b(chrono|chronometre)\b/.test(core) && !parseDuration(text)) {
+    if (/^(arrete|stop|stoppe|pause|mets en pause|fige|met en pause)\b/.test(core) || /\b(stop|arrete)$/.test(core)) return ['chrono-stop'];
+    if (/^(remets? a zero|reinitialise|raz|efface|remise a zero|annule)\b/.test(core)) return ['chrono-reset'];
+    if (/^(combien|ou en est|temps du)\b/.test(core)) return ['chrono-read'];
+    return ['chrono-start'];
+  }
+
+  // Alarme à une heure précise
+  if (/^(reveille moi|alarme|mets une alarme|mets un reveil|programme une alarme|programme un reveil|reveil|rappelle moi|previens moi|sonne)\b/.test(core) && /\b(a|vers|pour) (midi|minuit|\d|[a-z]+ heure|[a-z]+ h\b|\d+h)/.test(core) && !/\bdans\b/.test(core)) {
+    const at = parseClock(core);
+    if (at) {
+      const m = String(text).match(/\b(?:pour|de)\s+((?!\d)[\p{L}][\p{L} '’-]{1,40})[\s?!.…]*$/iu);
+      return ['alarm', { ...at, label: m && !parseClock(normalize(` a ${m[1]}`)) ? m[1].trim() : '' }];
+    }
+  }
+
+  // Jours restants
+  const until = parseDaysUntil(core);
+  if (until) return ['days-until', until];
+
+  // Conversion puis calcul
+  const conv = parseConvert(text);
+  if (conv) return ['convert', conv];
+  if (!/\b(minuterie|minuteur|timer|alarme|meteo|photo|dessin|galerie)\b/.test(core)) {
+    const math = parseMath(text);
+    if (math) return ['calc', math];
+  }
+
+  // Hasard
+  if (/^(pile ou face|lance une piece|tire a pile ou face|fais un pile ou face|joue a pile ou face)$/.test(core)) return ['coin'];
+  const dice = core.match(/^(?:lance|jette|tire|roule)(?: moi)? (un|une|deux|trois|quatre|cinq|six|\d+) des?$/);
+  if (dice) return ['dice', { count: Math.min(10, Math.max(1, readNumber([dice[1]], 0)?.value || 1)) }];
+  const rnd = core.match(/(?:nombre|chiffre)(?: au hasard| aleatoire)? entre (.+?) et (.+)$/);
+  if (rnd) {
+    const a = readNumber(rnd[1].split(' '), 0), b = readNumber(rnd[2].split(' '), 0);
+    if (a && b) return ['random', { min: Math.min(a.value, b.value), max: Math.max(a.value, b.value) }];
+  }
+  if (/^(choisis|donne moi|tire) un nombre( au hasard)?$/.test(core)) return ['random', { min: 1, max: 100 }];
+
+  // Petites réponses
+  if (/^(raconte|dis|fais|donne)( moi| nous)? une (autre )?blague$|^(une )?(autre )?blague$|^fais moi rire$/.test(core)) return ['joke'];
+  if (/^(donne|dis|lis)( moi)? une citation$|^(une )?citation$|^motive moi$|^(un peu de |de la )?motivation$|^inspire moi$/.test(core)) return ['quote'];
+  if (/^(repete|repete ca|tu peux repeter|redis|redis le|pardon|quoi|hein)$/.test(core)) return ['repeat'];
+
+  // État des systèmes, batterie
+  if (/^(rapport|etat des systemes|etat du systeme|diagnostic|statut|status|bilan|rapport d etat|fais un diagnostic|fais le point)$/.test(core)) return ['status'];
+  if (/\b(batterie|autonomie)\b/.test(core) && core.split(' ').length <= 6) return ['battery'];
+
+  // Volume
+  if (/^(monte|augmente|plus fort)( le son| le volume)?$|^(monte|augmente) (le son|le volume)$/.test(core)) return ['volume', { delta: 0.2 }];
+  if (/^(baisse|diminue|moins fort)( le son| le volume)?$|^(baisse|diminue) (le son|le volume)$/.test(core)) return ['volume', { delta: -0.2 }];
+
+  // Thème et nom
+  if (/\b(theme|couleurs?|style|habillage|skin)\b/.test(core) || /^(passe|mets toi|mode) en (rouge|vert|violet|blanc|orange|cyan)$/.test(core)) {
+    const hit = THEME_WORDS.find(([, re]) => re.test(core));
+    if (hit) return ['theme', { theme: hit[0] }];
+    if (/^(change|changer|autre|suivant|change de|prochain)\b/.test(core) || /theme suivant/.test(core)) return ['theme', { theme: 'next' }];
+  }
+  const rename = String(text).match(/(?:appelle[- ]toi|tu t['’ ]appelles(?: maintenant| desormais| dorenavant)?|change(?:r)? (?:ton|de) nom (?:en|pour)|ton nom (?:est|sera)(?: maintenant| desormais)?|je vais t['’ ]appeler|je t['’ ]appelle(?: maintenant)?)\s+([\p{L}][\p{L}0-9 -]{0,18})\s*[.!]?$/iu);
+  if (rename) return ['rename', { name: rename[1].trim() }];
+
+  // Recherche et sites
+  const url = String(text).match(/\b(?:ouvre|va sur|affiche|lance)\s+(https?:\/\/\S+)/i);
+  if (url) return ['open-url', { url: url[1] }];
+  const site = core.match(/^(?:ouvre|va sur|lance|affiche)( le site)? (youtube|google|gmail|google maps|maps|wikipedia|github|linkedin|instagram|tiktok|netflix|spotify|deepl|google traduction|traducteur|calendrier|agenda)$/);
+  if (site) return ['open-site', { site: site[2] }];
+  const search = String(text).match(/^\s*(?:(?:jarvis|ok|dis)[, ]+)?(?:cherche|recherche|trouve|google)(?:[- ]moi)?\s+(.+?)(?:\s+sur\s+(youtube|google|wikip[ée]dia|maps|google maps|github))?\s*[?.!]?$/i);
+  if (search && search[1] && !/^(une? |la |le )?(photo|image|minuterie)$/i.test(search[1])) return ['search', { q: search[1].trim(), on: (search[2] || 'google').toLowerCase() }];
+  void n;
+  return null;
+}
+
+/** Phrase réduite à son noyau (sans mot d'éveil ni formules de politesse). */
+export function commandCore(input) {
+  const n = normalize(extractWake(input).rest);
+  return n.replace(POLITE_START, '').replace(POLITE_END, '').trim() || n;
+}
+
+/**
+ * Raccourcis personnels : « phrase = commande ; commande ; "texte dit" ».
+ * @returns {{phrase:string, key:string, actions:string[]}[]}
+ */
+export function parseShortcuts(text) {
+  const out = [];
+  for (const line of String(text || '').split(/\r?\n/)) {
+    const i = line.indexOf('=');
+    if (i < 1) continue;
+    const phrase = line.slice(0, i).trim();
+    const key = normalize(phrase);
+    const actions = line.slice(i + 1).split(';').map((a) => a.trim()).filter(Boolean);
+    if (key && actions.length) out.push({ phrase, key, actions });
+  }
+  return out;
+}
+
 /** Liste lisible des commandes (aide). */
 export const COMMAND_HELP = [
   ['« Jarvis, ouvre la galerie »', 'affiche la galerie et le partage'],
@@ -264,4 +405,16 @@ export const COMMAND_HELP = [
   ['« efface tout »', 'efface le dessin'],
   ['« mode veille » / « réveille-toi »', 'mise en veille'],
   ['« coupe le son »', 'sons et voix désactivés'],
+  ['« combien font 12 fois 8 »', 'calcul, sans IA'],
+  ['« convertis 10 km en miles »', 'conversions d’unités'],
+  ['« note : acheter du pain »', 'mémo (« lis mes notes »)'],
+  ['« réveille-moi à 7 h 30 »', 'alarme à une heure précise'],
+  ['« lance le chrono »', 'chronomètre'],
+  ['« pile ou face » · « lance un dé »', 'hasard'],
+  ['« raconte une blague »', 'blagues et citations'],
+  ['« combien de jours avant Noël »', 'jours restants'],
+  ['« cherche la tour Eiffel sur YouTube »', 'recherche web'],
+  ['« thème rouge » · « appelle-toi Friday »', 'personnalisation'],
+  ['« lance le jeu »', 'arcade (jeu de cibles)'],
+  ['« rapport »', 'état des systèmes'],
 ];
