@@ -339,6 +339,9 @@ function localIntent(core, text, n) {
   if (/^(donne|dis|lis)( moi)? une citation$|^(une )?citation$|^motive moi$|^(un peu de |de la )?motivation$|^inspire moi$/.test(core)) return ['quote'];
   if (/^(repete|repete ca|tu peux repeter|redis|redis le|pardon|quoi|hein)$/.test(core)) return ['repeat'];
 
+  // Mode borne
+  if (/\b(mode borne|mode kiosque|mode salon|mode vitrine)\b/.test(core)) return ['kiosk', { on: !/^(quitte|desactive|sors|arrete|coupe|stop|ferme|enleve)\b/.test(core) }];
+
   // État des systèmes, batterie
   if (/^(rapport|etat des systemes|etat du systeme|diagnostic|statut|status|bilan|rapport d etat|fais un diagnostic|fais le point)$/.test(core)) return ['status'];
   if (/\b(batterie|autonomie)\b/.test(core) && core.split(' ').length <= 6) return ['battery'];
@@ -417,4 +420,5 @@ export const COMMAND_HELP = [
   ['« thème rouge » · « appelle-toi Friday »', 'personnalisation'],
   ['« lance le jeu »', 'arcade (jeu de cibles)'],
   ['« rapport »', 'état des systèmes'],
+  ['« mode borne »', 'écran d’attraction pour salons'],
 ];

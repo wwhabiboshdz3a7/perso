@@ -15,6 +15,7 @@ const FORMAT = {
   rate: (v) => `${(+v).toFixed(2).replace('.', ',')}×`,
   volume: (v) => `${Math.round(v * 100)} %`,
   pitch: (v) => (+v).toFixed(2).replace('.', ','),
+  kioskIdle: (v) => (+v >= 60 ? `${Math.floor(v / 60)} min${v % 60 ? ` ${v % 60} s` : ''}` : `${v} s`),
 };
 
 export class SettingsUI {
@@ -110,7 +111,7 @@ export class SettingsUI {
   }
 
   _fields() {
-    const numeric = new Set(['sensitivity', 'smoothing', 'pinchOn', 'debounce', 'swipeSpeed', 'rate', 'volume', 'pitch']);
+    const numeric = new Set(['sensitivity', 'smoothing', 'pinchOn', 'debounce', 'swipeSpeed', 'rate', 'volume', 'pitch', 'kioskIdle']);
     const onChange = (e) => {
       const input = e.target;
       const k = input.name;

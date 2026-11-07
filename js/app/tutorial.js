@@ -4,6 +4,7 @@
 import { $, el, reducedMotion } from './dom.js';
 import { renderHand, blendPoses, resolvePose, POSES } from '../core/handpose.js';
 import { HAND_CONNECTIONS } from '../core/hand.js';
+import { COMMAND_HELP } from '../core/commands.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -64,9 +65,22 @@ export class Tutorial {
     this.cards = [];
     this._loop = this._loop.bind(this);
     this._build();
+    this._buildCommands();
     $('#tutoClose').addEventListener('click', () => this.dialog.close());
     $('#tutoDone').addEventListener('click', () => { this.app.settings.set({ tutoSeen: true }); this.dialog.close(); });
     this.dialog.addEventListener('close', () => { this.running = false; });
+  }
+
+  /** Liste des commandes vocales, sous les gestes (cliquer une ligne l'exécute). */
+  _buildCommands() {
+    const ul = $('#voiceCommands');
+    if (!ul) return;
+    for (const [cmd, what] of COMMAND_HELP) {
+      const phrase = cmd.split(' · ')[0].replace(/^«\s*|\s*»$/g, '').replace(/[\u202f\u00a0]/g, ' ').replace(/^Jarvis,\s*/, '').trim();
+      const btn = el('button', { type: 'button', class: 'vcmd', 'data-air': '', title: `Essayer : ${phrase}`, onclick: () => { this.dialog.close(); this.app.assistant.handle(phrase, { source: 'clavier' }); } },
+        el('span', { class: 'vcmd__say', text: cmd }), el('span', { class: 'vcmd__does', text: what }));
+      ul.append(el('li', {}, btn));
+    }
   }
 
   _build() {

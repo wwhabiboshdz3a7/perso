@@ -95,7 +95,7 @@ export class Assistant {
 
   _renderState() {
     const chipState = !this.supported ? 'off' : this.listening ? (Date.now() < this.awaitUntil ? 'active' : 'on') : 'off';
-    const label = !this.supported ? 'clavier' : this.listening ? (this.app.settings.get('wake') ? `« ${this.app.assistantName || 'Jarvis'} »` : 'écoute') : 'coupée';
+    const label = !this.supported ? 'clavier' : this.listening ? (this.app.settings.get('wake') ? `« ${this._wakeLabel()} »` : 'écoute') : 'coupée';
     this.app.ui.chip('Mic', chipState, label);
     $('#btnMic').setAttribute('aria-pressed', String(this.listening));
     $('#btnMic').setAttribute('aria-label', this.listening ? 'Arrêter l’écoute vocale' : 'Activer l’écoute vocale');
@@ -103,6 +103,12 @@ export class Assistant {
   }
 
   renderState() { this._renderState(); }
+
+  /** Mot d'éveil tel qu'on le prononce : « JARVIS » s'affiche « Jarvis ». */
+  _wakeLabel() {
+    const n = this.app.assistantName || 'Jarvis';
+    return n === n.toUpperCase() && n.length > 1 ? n.charAt(0) + n.slice(1).toLowerCase() : n;
+  }
 
   toggle() {
     if (this.wanted) this.stop(); else this.start();
@@ -337,7 +343,7 @@ export class Assistant {
           this.reply(`Oui${name ? `, ${name}` : ''} ?`);
           return;
         case 'help':
-          this.reply('Sans IA, je sais calculer, convertir, noter, lancer une minuterie, une alarme ou un chrono, donner l’heure, la météo et les jours restants, chercher sur le web, jouer, et changer de nom ou de thème.');
+          this.reply('Je peux ouvrir la galerie, le dessin, l’hologramme ou l’arcade, envoyer une photo, calculer, convertir, noter, lancer une minuterie, une alarme ou un chrono, donner l’heure, la météo et les jours restants, chercher sur le web, et changer de nom ou de thème. Tout cela sans IA.');
           app.ui.toast('Commandes', COMMAND_HELP.map(([c]) => c).join(' · '), { ms: 14000, sound: false });
           return;
         case 'open-mode': {
@@ -551,6 +557,10 @@ export class Assistant {
         }
         case 'repeat':
           this.reply(this.lastReply || 'Je n’ai encore rien dit.');
+          return;
+        case 'kiosk':
+          app.settings.set({ kiosk: p.on });
+          this.reply(p.on ? `Mode borne activé : écran d’attraction après ${app.settings.get('kioskIdle')} secondes sans personne.` : 'Mode borne désactivé.');
           return;
         case 'status':
           this.reply(await this._status());

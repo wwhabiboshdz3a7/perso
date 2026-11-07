@@ -27,6 +27,7 @@ import { Tutorial } from './tutorial.js';
 import { SettingsUI } from './settings-ui.js';
 import { Notes } from './notes.js';
 import { Arcade } from './arcade.js';
+import { Kiosk } from './kiosk.js';
 import { applyTheme } from './theme.js';
 import { setWakeWord } from '../core/commands.js';
 import { db } from './db.js';
@@ -75,6 +76,7 @@ class App {
     this.tutorial = new Tutorial(this);
     this.settingsUI = new SettingsUI(this);
     this.arcade = new Arcade(this);
+    this.kiosk = new Kiosk(this);
     applyTheme(this.settings.get('theme'));
     this._applyIdentity();
     this._applyModules();
@@ -181,6 +183,7 @@ class App {
     if ('theme' in c) applyTheme(c.theme);
     if ('assistantName' in c || 'assistantTagline' in c) this._applyIdentity();
     if (keys.some((k) => k.startsWith('show'))) this._applyModules();
+    if ('kiosk' in c) this.kiosk.apply();
     if (keys.some((k) => CAMERA_KEYS.includes(k)) && this.camera.active) {
       clearTimeout(this._restartT);
       this._restartT = setTimeout(() => { this.stopCamera(true); this.startCamera({ silent: true }); }, 400);

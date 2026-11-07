@@ -452,8 +452,11 @@
   <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
   <div id="sleep" class="sleep" hidden>
     <div class="sleep__core" aria-hidden="true"><i></i><i></i><i></i></div>
-    <p class="sleep__title">Veille</p>
-    <p class="sleep__hint">Dites « <span data-ai-name>JARVIS</span>, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
+    <p class="sleep__title" id="sleepTitle">Veille</p>
+    <p class="sleep__tag" id="sleepTag" hidden></p>
+    <p class="sleep__attract" id="sleepAttract" hidden><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg>Levez la main ouverte devant la caméra pour commencer</p>
+    <p class="sleep__record" id="sleepRecord" hidden></p>
+    <p class="sleep__hint" id="sleepHint">Dites « <span data-ai-name>JARVIS</span>, réveille-toi », levez la main ouverte une seconde, ou appuyez sur une touche.</p>
     <button type="button" class="btn" id="btnWake">Réveiller</button>
   </div>
   <div id="countdown" class="countdown" aria-hidden="true"></div>
@@ -493,6 +496,13 @@
             <label class="check"><input type="checkbox" name="showLink"><span>Liaison entre appareils</span></label>
             <label class="check"><input type="checkbox" name="showTimers"><span>Minuteries et chrono</span></label>
             <label class="check"><input type="checkbox" name="showNotes"><span>Mémo</span></label>
+          </div>
+          <h3 class="fields__title">Mode borne (salons, vitrines, accueil)</h3>
+          <p class="fields__hint">Après un temps sans personne, un écran d’attraction s’affiche avec le nom, le sous-titre et le record de l’arcade. Une main ouverte tenue une seconde relance le module choisi. Les outils de simulation sont masqués. À la voix : « mode borne » / « quitte le mode borne ».</p>
+          <div class="fields">
+            <label class="check"><input type="checkbox" name="kiosk"><span>Activer le mode borne</span></label>
+            <label class="field field--range"><span>Écran d’attraction après <output name="kioskIdleOut"></output></span><input type="range" name="kioskIdle" min="15" max="300" step="5"></label>
+            <label class="field"><span>Module de départ</span><select name="kioskStart"><option value="arcade">Arcade (jeu de cibles)</option><option value="galerie">Galerie</option><option value="holo">Hologramme</option><option value="dessin">Dessin</option></select></label>
           </div>
           <h3 class="fields__title">Raccourcis personnels</h3>
           <p class="fields__hint">Une ligne par raccourci : <code>phrase = commande ; commande</code>. Une commande entre guillemets est dite à voix haute ; <code>ouvre https://…</code> ouvre un site. Exemple : <code>mode présentation = plein écran ; affiche l’hologramme ; "C’est parti."</code></p>
@@ -619,6 +629,9 @@
           <li><span class="share-steps__n">3</span><span><strong>Ouvrez la main</strong> devant la caméra de l’appareil B — ou lancez-la.</span></li>
         </ol>
         <ul class="gesture-cards" id="gestureCards"></ul>
+        <h3 class="fields__title">Commandes vocales et clavier</h3>
+        <p class="fields__hint">Dites le nom de l’assistant puis la phrase, ou tapez-la dans la barre du bas. Touchez une ligne pour l’essayer.</p>
+        <ul class="vcmds" id="voiceCommands" aria-label="Commandes vocales"></ul>
       </div>
       <footer class="dialog__foot">
         <p class="fields__hint">Astuce : tenez la main à 40–80 cm de la caméra, paume vers l’écran, dans un endroit éclairé.</p>
