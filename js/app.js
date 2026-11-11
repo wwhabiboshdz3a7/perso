@@ -1,16 +1,17 @@
 // Prospecteur NEXORA : interface principale.
 import { CATEGORIES, GROUPS, PRESETS, categoryById, categoryLabel } from './lib/categories.js';
-import { zoneToCells, zoneAreaKm2, bboxSizeKm, estimateCost, pagesPerTaskFor } from './lib/geo.js';
+import { zoneAreaKm2, bboxSizeKm } from './lib/geo.js';
+import { estimateSearch, learnDensity } from './lib/estimate.js';
 import { opportunityScore, LEVELS } from './lib/score.js';
 import { websiteLabel } from './lib/website.js';
 import {
   escapeHtml, fmtInt, fmtRating, fmtUsd, fmtKm, plural, formatPhoneFR, telHref, smsHref, isMobileFR,
-  cityFromAddress, fmtDate, fmtDateTime, fmtShortDateTime, toLocalInput, fromLocalInput, monthKey,
+  cityFromAddress, fmtDate, fmtDateTime, fmtShortDateTime, toLocalInput, fromLocalInput, monthKey, shortAddress,
 } from './lib/format.js';
 import { toCSV } from './lib/csv.js';
 import { openStore, GOOGLE_TTL_MS } from './lib/store.js';
 import { PlacesApi, ApiError } from './lib/api.js';
-import { runGoogleSearch, runOsmSearch, verifyWithGoogle, countCachedTasks } from './lib/search.js';
+import { runGoogleSearch, runOsmSearch, verifyWithGoogle, cachedTaskKeys, taskKey } from './lib/search.js';
 import { demoPlaces } from './lib/demo.js';
 import { buildCallScript, buildEmail, buildSms, buildObjections, DEFAULT_PROFILE } from './lib/templates.js';
 import { hashPassword, randomSecret, passwordStrength } from './lib/hash.js';
@@ -35,13 +36,35 @@ function debounce(fn, ms) {
 }
 
 let toastTimer;
-function toast(msg, kind = '') {
+/** Message bref ; `action` ajoute un bouton (par exemple « Annuler ») et prolonge l'affichage. */
+function toast(msg, kind = '', { action } = {}) {
   const el = $('#toast');
+  // Une fenêtre modale rend inerte tout ce qui est hors d'elle : le message (et son bouton
+  // « Annuler ») s'affiche donc dans la fenêtre ouverte, sinon dans la page.
+  const host = document.querySelector('dialog[open]:modal') || document.body;
+  if (el.parentElement !== host) host.appendChild(el);
   el.textContent = msg;
-  el.className = `toast is-on${kind ? ` is-${kind}` : ''}`;
+  if (action) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'toast__btn';
+    b.textContent = action.label;
+    b.addEventListener('click', () => { hideToast(); action.run(); }, { once: true });
+    el.append(b);
+  }
+  el.className = `toast is-on${kind ? ` is-${kind}` : ''}${action ? ' has-action' : ''}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = 'toast'; }, kind === 'err' ? 6000 : 3200);
+  toastTimer = setTimeout(hideToast, action ? 8000 : kind === 'err' ? 6000 : 3200);
 }
+function hideToast() {
+  clearTimeout(toastTimer);
+  $('#toast').className = 'toast';
+}
+// À la fermeture d'une fenêtre, le message encore affiché revient dans la page (il reste lisible).
+document.addEventListener('close', (e) => {
+  const el = $('#toast');
+  if (el && e.target instanceof HTMLDialogElement && e.target.contains(el)) document.body.appendChild(el);
+}, true);
 
 async function copyText(text) {
   try {
@@ -90,6 +113,25 @@ function askConfirm({ title, text, ok = 'Confirmer', cancel = 'Annuler' }) {
   });
 }
 
+/** Boîte à plusieurs choix (dialog natif) : renvoie la valeur choisie, ou '' si annulé. */
+function askChoice({ title, text, choices, cancel = 'Annuler' }) {
+  return new Promise((resolve) => {
+    const d = document.createElement('dialog');
+    d.className = 'modal';
+    d.setAttribute('aria-labelledby', 'ch-title');
+    d.innerHTML = `<form class="modal__inner" method="dialog">
+      <h2 class="modal__title" id="ch-title">${escapeHtml(title)}</h2>
+      <p class="modal__text">${escapeHtml(text)}</p>
+      <div class="modal__actions"><button class="btn btn--ghost" value="">${escapeHtml(cancel)}</button>${
+  choices.map((c) => `<button class="btn ${c.primary ? 'btn--gold' : 'btn--violet'}" value="${escapeHtml(c.value)}">${escapeHtml(c.label)}</button>`).join('')}</div>
+    </form>`;
+    document.body.appendChild(d);
+    d.addEventListener('close', () => { resolve(d.returnValue || ''); d.remove(); });
+    d.showModal();
+    d.querySelector('.btn--gold, .btn--violet')?.focus();
+  });
+}
+
 // ===========================================================================
 // État
 // ===========================================================================
@@ -127,6 +169,9 @@ const state = {
   profile: { ...DEFAULT_PROFILE, ...ls.get('nxp.profile', {}) },
   settings: { price: 0.035, freeQuota: 1000, cap: 150, cellKm: 2, dark: true, ...ls.get('nxp.settings', {}) },
   placeLabel: ls.get('nxp.placeLabel', 'Capitole · Toulouse'),
+  density: ls.get('nxp.density', {}),
+  lastEstimate: null,
+  filtersOpen: false,
 };
 
 let store;
@@ -359,10 +404,12 @@ function initZoneControls() {
   });
   const wrap = $('.map-wrap');
   const styleBtn = $('#map-style');
+  // Le bouton annonce l'action (passer en clair ou en sombre), pas l'état courant.
   const applyStyle = () => {
-    wrap.classList.toggle('is-dark', state.settings.dark);
-    styleBtn.setAttribute('aria-pressed', String(state.settings.dark));
-    styleBtn.textContent = state.settings.dark ? 'Plan sombre' : 'Plan clair';
+    const dark = state.settings.dark;
+    wrap.classList.toggle('is-dark', dark);
+    styleBtn.innerHTML = `<svg aria-hidden="true"><use href="#i-${dark ? 'sun' : 'moon'}"/></svg><span>${dark ? 'Plan clair' : 'Plan sombre'}</span>`;
+    styleBtn.setAttribute('aria-label', dark ? 'Passer en plan clair' : 'Passer en plan sombre');
   };
   styleBtn.addEventListener('click', () => { state.settings.dark = !state.settings.dark; saveSettings(); applyStyle(); });
   applyStyle();
@@ -387,10 +434,12 @@ function renderCategories() {
 
 function updateCatCount() {
   $('#cat-count').textContent = `${state.cats.size} sélectionnée${state.cats.size > 1 ? 's' : ''}`;
-  const labels = CATEGORIES.filter((c) => state.cats.has(c.id)).map((c) => c.label);
-  $('#cat-picked').textContent = labels.length
-    ? (labels.length > 5 ? `${labels.slice(0, 5).join(', ')} et ${labels.length - 5} autre${labels.length - 5 > 1 ? 's' : ''}` : labels.join(', '))
-    : 'Aucune catégorie cochée.';
+  const picked = CATEGORIES.filter((c) => state.cats.has(c.id));
+  const MAX = 8;
+  $('#cat-picked').innerHTML = picked.length
+    ? picked.slice(0, MAX).map((c) => `<button type="button" class="picked" data-unpick="${c.id}" aria-label="Retirer ${escapeHtml(c.label)}">${escapeHtml(c.label)}<svg aria-hidden="true"><use href="#i-close"/></svg></button>`).join('')
+      + (picked.length > MAX ? `<span class="picked picked--more">+ ${picked.length - MAX}</span>` : '')
+    : '<span class="picked-empty">Aucune catégorie : choisissez une sélection rapide ou ouvrez la liste.</span>';
   ls.set('nxp.cats', [...state.cats]);
   scheduleEstimate();
 }
@@ -412,6 +461,15 @@ function initCategories() {
     updateCatCount();
     toast(`Sélection « ${preset.label} » : ${preset.ids.length} catégories.`);
   });
+  $('#cat-picked').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-unpick]');
+    if (!b) return;
+    state.cats.delete(b.dataset.unpick);
+    const cb = $(`#cat-groups input[value="${CSS.escape(b.dataset.unpick)}"]`);
+    if (cb) cb.checked = false;
+    updateCatCount();
+    $('#cat-picked [data-unpick]')?.focus();
+  });
   $('#cat-clear').addEventListener('click', () => {
     state.cats.clear();
     $$('#cat-groups input').forEach((cb) => { cb.checked = false; });
@@ -432,14 +490,17 @@ function initCategories() {
 // Source, budget, estimation
 // ===========================================================================
 
+function setSource(src) {
+  state.source = src;
+  ls.set('nxp.source', src);
+  $$('input[name="source"]').forEach((r) => { r.checked = r.value === src; });
+  applySource();
+}
+
 function initSource() {
   $$('input[name="source"]').forEach((r) => {
     r.checked = r.value === state.source;
-    r.addEventListener('change', () => {
-      state.source = $('input[name="source"]:checked').value;
-      ls.set('nxp.source', state.source);
-      applySource();
-    });
+    r.addEventListener('change', () => setSource($('input[name="source"]:checked').value));
   });
   $('#cap').value = String(state.settings.cap);
   $('#cell-size').value = String(state.settings.cellKm);
@@ -468,6 +529,7 @@ let estimateSeq = 0;
 async function renderEstimate() {
   if (!map) return;
   const el = $('#estimate');
+  const bar = $('#runbar-est');
   const zone = map.zone;
   const cats = state.cats.size;
   const run = $('#run');
@@ -475,6 +537,8 @@ async function renderEstimate() {
   if (!cats) {
     el.className = 'estimate';
     el.innerHTML = '<p class="estimate__warn">Cochez au moins une catégorie.</p>';
+    bar.innerHTML = '<span class="runbar__warn">Choisissez au moins une catégorie.</span>';
+    state.lastEstimate = null;
     return;
   }
   if (state.source === 'osm') {
@@ -485,28 +549,50 @@ async function renderEstimate() {
       <div class="estimate__row"><span>Avis et notes</span><strong>non disponibles</strong></div>
       <p class="estimate__note">Repère les établissements sans site renseigné dans OpenStreetMap. Ensuite, vous pourrez vérifier les meilleurs sur Google (avis, note, site) : 1 requête par établissement.</p>
       ${area > 300 ? '<p class="estimate__warn">Zone très étendue : le serveur Overpass risque de refuser. Réduisez-la si besoin.</p>' : ''}`;
+    bar.innerHTML = `<strong class="runbar__free">Gratuit</strong><span>OpenStreetMap · ${plural(cats, 'catégorie', 'catégories')}</span>`;
+    state.lastEstimate = null;
     return;
   }
   const seq = ++estimateSeq;
   const cellKm = state.settings.cellKm;
-  const cells = zoneToCells(zone, cellKm).length;
-  const cached = store ? await countCachedTasks(store, zone, [...state.cats], cellKm) : 0;
+  const categoryIds = [...state.cats];
+  const cachedKeys = store ? await cachedTaskKeys(store, zone, categoryIds, cellKm) : new Set();
   if (seq !== estimateSeq) return;
   const price = Number(state.settings.price) || 0;
   const cap = state.settings.cap;
-  const e = estimateCost({ cells, categories: cats, cachedTasks: cached, pricePerRequest: price, cap, pagesPerTask: pagesPerTaskFor(cellKm) });
+  const e = estimateSearch({ zone, categoryIds, cellKm, cachedKeys, taskKeyOf: taskKey, learned: state.density, pricePerRequest: price, cap });
+  state.lastEstimate = e;
   const freeLeft = Math.max(0, (Number(state.settings.freeQuota) || 0) - usedThisMonth());
-  const typicalBillable = Math.max(0, e.typical - freeLeft);
-  el.className = 'estimate';
+  const billable = Math.max(0, e.probable - freeLeft);
+  const calib = e.calibrated
+    ? `Calibrée sur vos recherches précédentes (${plural(e.calibrated, 'catégorie', 'catégories')} sur ${cats}).`
+    : 'Densités par défaut d\'un centre-ville dense : l\'estimation s\'ajuste après chaque recherche.';
+  el.className = `estimate${e.probableCapped ? ' estimate--capped' : ''}`;
+  if (!e.toFetch) {
+    el.innerHTML = `
+      <div class="estimate__row"><span>Quadrillage</span><strong>${plural(e.cells, 'cellule', 'cellules')} × ${plural(cats, 'catégorie', 'catégories')}</strong></div>
+      <div class="estimate__big">0 requête · tout est en cache</div>
+      <p class="estimate__note">Cette zone a déjà été explorée pour ces catégories il y a moins de 30 jours : la recherche relit le cache local, sans rien demander à Google.</p>`;
+    bar.innerHTML = '<strong class="runbar__free">0 requête</strong><span>tout est déjà en cache (moins de 30 jours)</span>';
+    return;
+  }
+  const big = e.probableCapped
+    ? `Plafond atteint : ${fmtInt(e.worst)} req. · ${fmtUsd(e.cost.worst)}`
+    : `≈ ${fmtInt(e.probable)} requêtes · ${fmtUsd(e.cost.probable)}`;
   el.innerHTML = `
-    <div class="estimate__row"><span>Estimation</span><strong>${cells} cellule${cells > 1 ? 's' : ''} × ${cats} catégorie${cats > 1 ? 's' : ''}</strong></div>
-    <div class="estimate__big">≈ ${fmtInt(e.typical)} requêtes · ${fmtUsd(e.cost.typical)}</div>
-    <div class="estimate__row"><span>Fourchette</span><strong>${fmtInt(e.min)} à ${fmtInt(e.max)} req. (${fmtUsd(e.cost.min)} à ${fmtUsd(e.cost.max)})</strong></div>
+    <div class="estimate__row"><span>Quadrillage</span><strong>${plural(e.cells, 'cellule', 'cellules')} × ${plural(cats, 'catégorie', 'catégories')}</strong></div>
+    <div class="estimate__big">${big}</div>
+    <div class="estimate__row"><span>Sans aucun redécoupage</span><strong>${fmtInt(e.min)} req. · ${fmtUsd(e.cost.min)}</strong></div>
+    <div class="estimate__row"><span>Probable, selon la densité</span><strong>${fmtInt(e.unbounded.low)} à ${fmtInt(e.unbounded.high)} req.${e.capped ? ' (plafonné)' : ''}</strong></div>
+    <div class="estimate__row estimate__row--worst"><span>Au pire (plafond réglé)</span><strong>${fmtInt(e.worst)} req. · ${fmtUsd(e.cost.worst)}</strong></div>
     ${e.cachedTasks ? `<div class="estimate__row"><span>Déjà en cache (gratuit)</span><strong>${fmtInt(e.cachedTasks)} sur ${fmtInt(e.tasks)}</strong></div>` : ''}
-    <div class="estimate__row"><span>Offertes restantes ce mois</span><strong>${fmtInt(freeLeft)} req.${typicalBillable === 0 ? ' · probablement 0 $' : ''}</strong></div>
-    ${e.capped ? `<p class="estimate__warn">La recherche s'arrêtera au plafond de ${fmtInt(cap)} requêtes (les cellules restantes seront signalées).</p>` : ''}
+    <div class="estimate__row"><span>Offertes restantes ce mois</span><strong>${fmtInt(freeLeft)} req.${billable === 0 ? ' · probablement 0 $' : ''}</strong></div>
+    ${e.probableCapped ? `<p class="estimate__warn">Zone dense : il faudrait ≈ ${fmtInt(e.unbounded.probable)} requêtes pour tout couvrir. La recherche s'arrêtera au plafond de ${fmtInt(cap)} et signalera les cellules restantes (relancez pour continuer : le déjà-vu reste en cache). Réduisez la zone ou le nombre de catégories pour tout voir d'un coup.</p>` : ''}
     ${e.capTooLow ? '<p class="estimate__warn">Plafond trop bas pour couvrir toute la zone : agrandissez les cellules, réduisez la zone ou relevez le plafond.</p>' : ''}
-    <p class="estimate__note">Chaque page de 20 résultats compte pour une requête (3 au plus par cellule, puis la cellule est redécoupée si elle est saturée). Tarif indicatif « Text Search Enterprise » : vérifiez la grille officielle de Google Maps Platform.</p>`;
+    <p class="estimate__note">Une requête = une page de 20 résultats, 3 au plus par cellule. Une cellule saturée (60 résultats) est redécoupée en quatre : c'est ce qui fait grimper le coût en centre-ville. ${calib} Le plafond est la seule vraie garantie. Tarif indicatif « Text Search Enterprise » : vérifiez la grille officielle de Google Maps Platform.</p>`;
+  bar.innerHTML = e.probableCapped
+    ? `<strong>${fmtInt(e.worst)} req. · ${fmtUsd(e.cost.worst)}</strong><span>plafond atteint · zone dense<span class="runbar__more"> (≈ ${fmtInt(e.unbounded.probable)} req. pour tout couvrir)</span></span>`
+    : `<strong>≈ ${fmtInt(e.probable)} req. · ${fmtUsd(e.cost.probable)}</strong><span>au plus ${fmtInt(e.worst)} req. · ${fmtUsd(e.cost.worst)}<span class="runbar__more"> (plafond)</span></span>`;
 }
 
 // ===========================================================================
@@ -517,7 +603,10 @@ function setRunning(ctrl) {
   state.running = ctrl;
   $('#run').disabled = Boolean(ctrl) || !state.cats.size;
   $('#demo-btn').disabled = Boolean(ctrl);
+  $('#empty-demo').disabled = Boolean(ctrl);
   $('#progress').hidden = !ctrl;
+  document.body.classList.toggle('is-running', Boolean(ctrl));
+  map?.setScan(ctrl ? 'active' : state.places.length ? 'off' : 'idle');
   if (!ctrl) scheduleEstimate();
 }
 
@@ -609,6 +698,18 @@ async function runSearch() {
   const label = state.placeLabel;
   if (state.source === 'osm') return runOsm(zone, categoryIds, label);
 
+  if (!state.fn) await fnCheck;
+  if (state.fn?.error) {
+    // Pas de fonction serveur ici (site lancé en local sans Netlify) : inutile de demander le mot de passe.
+    const choice = await askChoice({
+      title: 'Recherche Google indisponible ici',
+      text: 'La fonction serveur qui interroge Google ne répond pas sur ce site (lancement local sans Netlify, ou déploiement incomplet). Vous pouvez essayer la démonstration ou le mode OpenStreetMap gratuit.',
+      choices: [{ value: 'osm', label: 'Passer en OpenStreetMap' }, { value: 'demo', label: 'Voir la démonstration', primary: true }],
+    });
+    if (choice === 'demo') runDemo();
+    if (choice === 'osm') { setSource('osm'); return runOsm(zone, categoryIds, label); }
+    return;
+  }
   if (state.fn && !state.fn.ready && state.fn.missing?.includes('GOOGLE_PLACES_API_KEY')) {
     toast('Clé Google absente sur Netlify : voir Réglages (ou essayez le mode OpenStreetMap / la démo).', 'warn');
     showView('settings');
@@ -621,7 +722,7 @@ async function runSearch() {
   const startUsage = usedThisMonth();
   let lastReq = 0;
   setProgress(2, 'Recherche Google en cours…', 'Préparation du quadrillage…');
-  const meta = { source: 'google', at: Date.now(), label, zone, categoryIds, requests: 0 };
+  const meta = { source: 'google', at: Date.now(), label, zone, categoryIds, requests: 0, estimate: state.lastEstimate?.probable ?? null };
   try {
     const res = await runGoogleSearch({
       api,
@@ -643,6 +744,13 @@ async function runSearch() {
     throttledRender.cancel();
     meta.requests = res.stats.requests;
     meta.stats = { cached: res.stats.cachedTasks, subdivisions: res.stats.subdivisions, closed: res.stats.closed, pending: res.pending, stoppedByCap: res.stats.stoppedByCap };
+    const complete = !res.fatal && !res.aborted && !res.stats.stoppedByCap;
+    // Recherche complète : on apprend la densité réelle de chaque catégorie pour les prochaines estimations.
+    if (complete && res.stats.requests > 0) {
+      state.density = learnDensity(state.density, { zone, places: res.places, categoryIds });
+      ls.set('nxp.density', state.density);
+    }
+    meta.gap = estimateGap(meta.estimate, res.stats.requests);
     setResults(res.places, meta);
     if (res.fatal) {
       const msg = res.fatal instanceof ApiError || res.fatal.message ? res.fatal.message : 'Erreur inconnue';
@@ -653,7 +761,7 @@ async function runSearch() {
     } else if (res.stats.stoppedByCap) {
       toast(`Plafond de ${state.settings.cap} requêtes atteint : ${res.pending} cellules non explorées. Relancez pour continuer (le déjà-vu est en cache).`, 'warn');
     } else {
-      toast(`${plural(res.places.length, 'établissement trouvé', 'établissements trouvés')} · ${plural(res.stats.requests, 'requête', 'requêtes')} (${fmtUsd(res.stats.requests * state.settings.price)}).`);
+      toast(`${plural(res.places.length, 'établissement trouvé', 'établissements trouvés')} · ${plural(res.stats.requests, 'requête', 'requêtes')} (${fmtUsd(res.stats.requests * state.settings.price)}).${meta.gap ? ` ${meta.gap}` : ''}`, meta.gap ? 'warn' : '');
     }
     revealResults();
     if (res.stats.errors.length) console.warn('Erreurs pendant la recherche :', res.stats.errors);
@@ -665,6 +773,14 @@ async function runSearch() {
     if (usedThisMonth() < startUsage) ls.set(usageKey(), startUsage);
     setRunning(null);
   }
+}
+
+/** Écart notable entre l'estimation et le réel, expliqué en une phrase (ou ''). */
+function estimateGap(estimate, real) {
+  if (!Number.isFinite(estimate) || !real) return '';
+  if (real > estimate * 1.5 && real - estimate >= 10) return `${fmtInt(real)} req. au lieu de ≈ ${fmtInt(estimate)} estimées : zone plus dense que prévu, les prochaines estimations en tiennent compte.`;
+  if (real < estimate / 2 && estimate - real >= 10) return `${fmtInt(real)} req. au lieu de ≈ ${fmtInt(estimate)} estimées : zone moins dense que prévu, les prochaines estimations en tiennent compte.`;
+  return '';
 }
 
 async function runOsm(zone, categoryIds, label) {
@@ -714,8 +830,10 @@ async function verifySelection() {
         addUsage(s.requests - used);
         used = s.requests;
         const i = state.places.findIndex((p) => p.id === next.id);
-        if (i >= 0) state.places[i] = decorate(next);
-        state.byId.set(next.id, state.places[i]);
+        if (i >= 0) {
+          state.places[i] = decorate(next);
+          state.byId.set(next.id, state.places[i]);
+        }
         setProgress((s.done / s.total) * 100, null, `${s.done} / ${s.total} · ${s.matched} retrouvés sur Google`);
       },
     });
@@ -806,24 +924,28 @@ function catLine(p) {
 function rowHtml(p) {
   const rec = crmOf(p.id);
   const phone = p.phone ? `<a class="r-phone" href="${telHref(p.phoneIntl || p.phone)}"><svg aria-hidden="true"><use href="#i-phone"/></svg>${escapeHtml(formatPhoneFR(p.phone))}</a>` : '<span class="r-muted">Pas de numéro</span>';
-  const rating = Number.isFinite(p.rating) ? `<span class="r-rating"><svg aria-hidden="true"><use href="#i-star"/></svg>${fmtRating(p.rating)}</span>` : '<span class="r-muted">–</span>';
-  const reviews = Number.isFinite(p.reviews) ? `<span class="r-reviews">${fmtInt(p.reviews)}</span>` : '<span class="r-muted">?</span>';
-  const mobileMeta = Number.isFinite(p.reviews)
-    ? `${rating}<span>${fmtInt(p.reviews)} avis</span>`
-    : '<span class="r-muted">Avis inconnus (OpenStreetMap)</span>';
+  const rating = Number.isFinite(p.rating) ? `<span class="r-rating"><svg aria-hidden="true"><use href="#i-star"/></svg>${fmtRating(p.rating)}</span>` : '';
+  const reviews = Number.isFinite(p.reviews)
+    ? `<span class="r-rv">${rating}${rating ? '<span class="r-sep" aria-hidden="true">·</span>' : ''}<span class="r-reviews">${fmtInt(p.reviews)}<span class="r-unit"> avis</span></span></span>`
+    : '<span class="r-muted">Avis inconnus</span>';
   const maps = p.mapsUrl ? `<a class="icon-btn" href="${escapeHtml(p.mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Ouvrir dans Google Maps" aria-label="Ouvrir ${escapeHtml(p.name)} dans Google Maps"><svg aria-hidden="true"><use href="#i-pin"/></svg></a>` : '';
+  const extra = `${p.source === 'demo' ? ' <span class="badge badge--demo">démo</span>' : ''}${p.verified === 'ok' ? ' · vérifié Google' : ''}`;
+  const addr = shortAddress(p.address);
   return `<tr data-id="${escapeHtml(p.id)}">
     <td class="c-score">${scoreRing(p)}</td>
-    <td class="c-name"><button type="button" class="r-name-btn" data-open="${escapeHtml(p.id)}">${escapeHtml(p.name)}</button><span class="r-cat">${escapeHtml(catLine(p))}${p.source === 'demo' ? ' · <span class="badge badge--demo">démo</span>' : ''}${p.verified === 'ok' ? ' · vérifié Google' : ''}</span></td>
-    <td class="c-rating r-num">${rating}</td>
+    <td class="c-name"><button type="button" class="r-name-btn" data-open="${escapeHtml(p.id)}">${escapeHtml(p.name)}</button><span class="r-cat">${escapeHtml(catLine(p))}${extra}${rec ? ` ${statusBadge(rec)}` : ''}</span></td>
     <td class="c-reviews r-num">${reviews}</td>
-    <td class="c-meta-m">${mobileMeta}</td>
     <td class="c-phone">${phone}</td>
-    <td class="c-addr col-addr"><span class="r-addr">${escapeHtml(p.address || '–')}</span></td>
+    <td class="c-addr col-addr"><span class="r-addr" title="${escapeHtml(addr)}">${escapeHtml(addr || '–')}</span></td>
     <td class="c-site">${siteBadge(p)}</td>
-    <td class="c-status">${statusBadge(rec)}</td>
     <td class="c-actions"><div class="r-actions">${maps}</div></td>
   </tr>`;
+}
+
+/** Nombre de filtres actifs (hors tri), pour le bouton « Filtres » sur téléphone. */
+function activeFilterCount() {
+  const f = readFilters();
+  return [!f.none, !f.social, f.site, f.minReviews > 0, f.minRating > 0, f.phone, Boolean(f.cat), Boolean(f.text)].filter(Boolean).length;
 }
 
 function renderResults() {
@@ -833,10 +955,17 @@ function renderResults() {
   const meta = state.meta;
   const hasGoogle = state.places.some((p) => p.source === 'google' || p.verified === 'ok');
 
-  $('#kpi-total').textContent = fmtInt(all.length);
-  $('#kpi-none').textContent = fmtInt(all.filter((p) => p.website.status === 'none').length);
-  $('#kpi-social').textContent = fmtInt(all.filter((p) => p.website.status === 'social').length);
-  $('#kpi-hot').textContent = fmtInt(all.filter((p) => p.level === 'chaud').length);
+  const osm = meta?.source === 'osm';
+  const hotCount = all.filter((p) => p.level === 'chaud').length;
+  // En mode OpenStreetMap, sans avis connus, aucun établissement ne peut être « chaud » :
+  // on compte plutôt les candidats à vérifier (aucun site et un téléphone).
+  const candidates = all.filter((p) => p.source === 'osm' && !p.verified && p.website.status === 'none' && p.phone).length;
+  $('#results').classList.toggle('is-empty', !state.places.length);
+  setCount($('#kpi-total'), all.length);
+  setCount($('#kpi-none'), all.filter((p) => p.website.status === 'none').length);
+  setCount($('#kpi-social'), all.filter((p) => p.website.status === 'social').length);
+  setCount($('#kpi-hot'), osm && !hotCount ? candidates : hotCount);
+  $('#kpi-hot-l').textContent = osm && !hotCount ? 'candidats à vérifier (sans site, avec téléphone)' : 'prospects chauds';
   if (meta?.source === 'google' || meta?.verified) {
     $('#kpi-cost').textContent = `${fmtInt(meta.requests || 0)} req.`;
     $('#kpi-cost-l').textContent = `≈ ${fmtUsd((meta.requests || 0) * state.settings.price)} · requêtes Google`;
@@ -852,6 +981,7 @@ function renderResults() {
     if (opposed) bits.push(`${opposed} masqué${opposed > 1 ? 's' : ''} (ne plus contacter)`);
     if (meta.stats?.stoppedByCap) bits.push(`${meta.stats.pending} cellules non explorées (plafond)`);
     if (meta.stats?.cached) bits.push(`${meta.stats.cached} cellules depuis le cache`);
+    if (meta.gap) bits.push(meta.gap);
     $('#results-sub').textContent = bits.filter(Boolean).join(' · ');
   }
 
@@ -864,10 +994,13 @@ function renderResults() {
   const body = $('#results-body');
   body.innerHTML = list.slice(0, state.shown).map(rowHtml).join('');
   $('#results-empty').hidden = list.length > 0;
-  if (state.places.length && !list.length) {
-    $('#results-empty .empty__title').textContent = 'Aucun établissement ne correspond aux filtres.';
-    $('#results-empty .empty__text').textContent = 'Élargissez les filtres (statut du site, avis minimum, note) pour voir plus de résultats.';
-  }
+  $('#empty-start').hidden = state.places.length > 0;
+  $('#results-empty .empty__title').textContent = state.places.length
+    ? 'Aucun établissement ne correspond aux filtres.'
+    : 'Votre prochaine liste d\'appels apparaîtra ici.';
+  $('#results-empty .empty__text').textContent = state.places.length
+    ? 'Élargissez les filtres (statut du site, avis minimum, note) pour voir plus de résultats.'
+    : 'Choisissez un quartier, cochez des métiers, puis lancez la recherche : les commerces bien notés sans site arrivent en tête, avec leur numéro.';
   const more = $('#results-more');
   more.hidden = list.length <= state.shown;
   more.textContent = `Afficher plus (${fmtInt(list.length - state.shown)} restants)`;
@@ -876,10 +1009,42 @@ function renderResults() {
   $('#export-btn').disabled = !state.places.length;
   $('#session-btn').disabled = !list.some((p) => p.phone && !CLOSED_STATUSES.has(crmOf(p.id)?.status));
   $('#add-hot').disabled = !list.some((p) => p.level === 'chaud' && !crmOf(p.id));
-  $('#fit-results').disabled = !any;
-  $('#verify-btn').hidden = meta?.source !== 'osm';
+  $('#add-hot').hidden = osm && !hotCount;
+  $('#fit-results').hidden = !any;
+  const toVerify = Math.min(20, list.filter((p) => p.source === 'osm' && !p.verified).length);
+  $('#verify-btn').hidden = !osm;
+  $('#verify-btn').disabled = !toVerify;
+  $('#verify-label').textContent = toVerify > 1 ? `Vérifier les ${toVerify} meilleurs sur Google` : 'Vérifier sur Google';
+  $('#show-list-n').textContent = state.places.length ? `(${fmtInt(list.length)})` : '';
+  const toList = $('#map-to-list');
+  toList.hidden = !any;
+  toList.querySelector('span').textContent = `Liste (${fmtInt(list.length)})`;
+  const nf = activeFilterCount();
+  $('#filters-n').hidden = !nf;
+  $('#filters-n').textContent = String(nf);
 
   map.setPlaces(list, { google: hasGoogle });
+  map.setScan(state.running ? 'active' : state.places.length ? 'off' : 'idle');
+}
+
+/** Compteur animé (montée rapide vers la nouvelle valeur), sans animation si elle est refusée. */
+const countFrames = new WeakMap();
+function setCount(el, n) {
+  const prev = Number(el.dataset.v || 0);
+  el.dataset.v = String(n);
+  cancelAnimationFrame(countFrames.get(el));
+  if (prev === n || document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = fmtInt(n);
+    return;
+  }
+  const t0 = performance.now();
+  const D = 650;
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / D);
+    el.textContent = fmtInt(Math.round(prev + (n - prev) * (1 - (1 - k) ** 3)));
+    if (k < 1) countFrames.set(el, requestAnimationFrame(step));
+  };
+  countFrames.set(el, requestAnimationFrame(step));
 }
 
 function initResults() {
@@ -888,6 +1053,20 @@ function initResults() {
   $('#filters').addEventListener('input', rerender);
   $('#filters').addEventListener('change', rerender);
   $('#results-more').addEventListener('click', () => { state.shown += 200; renderResults(); });
+  // Téléphone : filtres repliés derrière un bouton, bascule liste / carte.
+  $('#filters-toggle').addEventListener('click', () => {
+    state.filtersOpen = !state.filtersOpen;
+    $('#filters').classList.toggle('is-open', state.filtersOpen);
+    $('#filters-toggle').setAttribute('aria-expanded', String(state.filtersOpen));
+  });
+  const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+  const scrollToEl = (el, offset) => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - offset, behavior: smooth() });
+  const topbarH = () => $('.topbar').getBoundingClientRect().height;
+  const toMap = () => scrollToEl($('.map-wrap'), topbarH() + 8);
+  const toList = () => scrollToEl($('#results-body').closest('.table-wrap'), topbarH() + $('.results__bar').getBoundingClientRect().height + 8);
+  $('#show-map').addEventListener('click', toMap);
+  $('#show-list').addEventListener('click', toList);
+  $('#map-to-list').addEventListener('click', toList);
   const body = $('#results-body');
   body.addEventListener('click', (e) => {
     if (e.target.closest('a')) return;
@@ -904,6 +1083,7 @@ function initResults() {
   });
   $('#run').addEventListener('click', runSearch);
   $('#demo-btn').addEventListener('click', runDemo);
+  $('#empty-demo').addEventListener('click', runDemo);
   $('#progress-stop').addEventListener('click', () => state.running?.abort());
   $('#verify-btn').addEventListener('click', verifySelection);
   $('#add-hot').addEventListener('click', async () => {
@@ -959,6 +1139,12 @@ async function removeCrm(id) {
   renderCrmBadge();
 }
 
+/** Dernier statut connu avant « Ne plus contacter » (pour réautoriser), sinon « À appeler ». */
+function previousStatus(rec) {
+  const past = (rec.history || []).filter((h) => h.status && h.status !== 'opposition');
+  return past.length ? past[past.length - 1].status : 'a_appeler';
+}
+
 function renderCrmBadge() {
   const open = [...state.crm.values()].filter((r) => !CLOSED_STATUSES.has(r.status)).length;
   const b = $('#crm-badge');
@@ -993,8 +1179,15 @@ async function renderCrm() {
   const recs = [...state.crm.values()];
   const counts = Object.fromEntries(STATUSES.map((s) => [s.id, 0]));
   for (const r of recs) counts[r.status] = (counts[r.status] || 0) + 1;
-  $('#crm-pipeline').innerHTML = [`<button type="button" class="stage-btn" data-f="all" aria-pressed="${state.crmFilter === 'all'}"><span class="stage-btn__v">${recs.length}</span><span class="stage-btn__l">Tous</span></button>`,
-    ...STATUSES.filter((s) => s.id !== 'opposition').map((s) => `<button type="button" class="stage-btn" data-f="${s.id}" aria-pressed="${state.crmFilter === s.id}"><span class="stage-btn__v">${counts[s.id] || 0}</span><span class="stage-btn__l">${escapeHtml(s.label.replace('…', ''))}</span></button>`)].join('');
+  // « Tous » = ce qui est affiché par défaut (la liste d'opposition a son propre filtre).
+  const visibleCount = recs.length - (counts.opposition || 0);
+  const stage = (id, n, label, extra = '') => `<button type="button" class="stage-btn${extra}" data-f="${id}" aria-pressed="${state.crmFilter === id}"><span class="stage-btn__v">${n}</span><span class="stage-btn__l">${escapeHtml(label)}</span></button>`;
+  $('#crm-pipeline').innerHTML = [stage('all', visibleCount, 'Tous'),
+    ...STATUSES.filter((s) => s.id !== 'opposition').map((s) => stage(s.id, counts[s.id] || 0, s.label.replace('…', ''))),
+    stage('opposition', counts.opposition || 0, 'Ne plus contacter', ' stage-btn--stop')].join('');
+  const note = $('#crm-note');
+  note.hidden = state.crmFilter !== 'opposition';
+  if (!note.hidden) note.textContent = 'Ces établissements ont demandé à ne plus être contactés : ils sont masqués de vos recherches et des sessions d\'appels. En cas d\'erreur, utilisez « Réautoriser » ou changez le statut dans la fiche.';
 
   const now = Date.now();
   const due = recs.filter((r) => r.status === 'rappeler' && r.callbackAt && r.callbackAt < endOfToday());
@@ -1011,13 +1204,15 @@ async function renderCrm() {
   const rows = [];
   for (const r of recs) {
     if (state.crmFilter !== 'all' && r.status !== state.crmFilter) continue;
-    if (state.crmFilter === 'all' && r.status === 'opposition') continue;
+    // La recherche par nom retrouve aussi les établissements en opposition.
+    if (state.crmFilter === 'all' && r.status === 'opposition' && !q) continue;
     const p = await placeForCrm(r);
     if (q && !`${p.name} ${p.address} ${r.notes} ${r.contactName}`.toLowerCase().includes(q)) continue;
     rows.push({ r, p });
   }
   const sorters = {
-    callback: (a, b) => (a.r.callbackAt || Infinity) - (b.r.callbackAt || Infinity) || b.r.updatedAt - a.r.updatedAt,
+    // rappels datés d'abord (le plus proche en tête), puis les meilleurs scores
+    callback: (a, b) => (a.r.callbackAt || 9e15) - (b.r.callbackAt || 9e15) || (b.p.score || 0) - (a.p.score || 0) || b.r.updatedAt - a.r.updatedAt,
     updated: (a, b) => b.r.updatedAt - a.r.updatedAt,
     score: (a, b) => b.p.score - a.p.score,
     name: (a, b) => a.p.name.localeCompare(b.p.name, 'fr'),
@@ -1035,7 +1230,7 @@ async function renderCrm() {
       <div class="crm-card__row">${statusBadge(r)}${p.expired ? '' : siteBadge(p)}${r.source === 'demo' ? '<span class="badge badge--demo">démo</span>' : ''}${r.source === 'osm' ? '<span class="badge badge--osm">OSM</span>' : ''}</div>
       ${p.expired ? '<p class="crm-card__expired">Contenu Google effacé après 30 jours : ouvrez la fiche pour l\'actualiser.</p>' : ''}
       ${r.notes ? `<p class="crm-card__note">${escapeHtml(r.notes)}</p>` : ''}
-      <div class="crm-card__row">${phone}<span class="crm-card__when">${r.contactName ? `Contact : ${escapeHtml(r.contactName)} · ` : ''}Modifié le ${fmtDate(r.updatedAt)}</span></div>
+      <div class="crm-card__row">${r.status === 'opposition' ? '<button type="button" class="btn btn--ghost btn--sm" data-unoppose>Réautoriser</button>' : phone}<span class="crm-card__when">${r.contactName ? `Contact : ${escapeHtml(r.contactName)} · ` : ''}Modifié le ${fmtDate(r.updatedAt)}</span></div>
     </article>`;
   }).join('');
   const more = $('#crm-more');
@@ -1060,10 +1255,21 @@ function initCrm() {
   $('#crm-text').addEventListener('input', debounce(() => { state.crmShown = 60; renderCrm(); }, 150));
   $('#crm-sort').addEventListener('change', () => { state.crmShown = 60; renderCrm(); });
   $('#crm-more').addEventListener('click', () => { state.crmShown += 60; renderCrm(); });
-  $('#crm-list').addEventListener('click', (e) => {
+  $('#crm-list').addEventListener('click', async (e) => {
     if (e.target.closest('a')) return;
     const card = e.target.closest('[data-id]');
-    if (card) openDrawer(card.dataset.id);
+    if (!card) return;
+    if (e.target.closest('[data-unoppose]')) {
+      const rec = crmOf(card.dataset.id);
+      if (!rec) return;
+      const p = await placeForCrm(rec);
+      await saveCrm(p, { status: previousStatus(rec) });
+      renderResults();
+      renderCrm();
+      toast('Établissement réautorisé : il réapparaît dans vos recherches.');
+      return;
+    }
+    openDrawer(card.dataset.id);
   });
   $('#crm-session').addEventListener('click', () => {
     const ids = (state.crmRows || []).filter(({ r, p }) => p.phone && !CLOSED_STATUSES.has(r.status)).map(({ r }) => r.id);
@@ -1096,14 +1302,17 @@ let drawerTab = 'script';
 async function openDrawer(id, { focusCall = false } = {}) {
   const p = await resolvePlace(id);
   if (!p) { toast('Établissement introuvable.', 'warn'); return; }
+  const d = $('#drawer');
+  const fresh = state.drawerId !== id || !d.open;
   state.drawerId = id;
   renderDrawer(p);
-  const d = $('#drawer');
   if (!d.open) d.showModal();
+  // Nouveau prospect (ou fiche rouverte) : on repart du haut (nom, compteur de session, bouton d'appel).
+  if (fresh) $('#drawer-body').scrollTop = 0;
   map.highlight(id, true);
   if (state.view === 'search') map.panTo(id);
   const target = focusCall ? $('#d-call') : $('#d-close');
-  (target || $('#d-close'))?.focus();
+  (target || $('#d-close'))?.focus({ preventScroll: true });
 }
 
 function renderDrawer(p) {
@@ -1118,7 +1327,7 @@ function renderDrawer(p) {
   const city = p.city || cityFromAddress(p.address);
 
   const sessionBar = sess ? `<div class="d-session" role="group" aria-label="Session d'appels">
-      <span><strong>Session d'appels</strong> · ${sess.index + 1} / ${sess.ids.length}</span>
+      <span class="d-session__count"><strong>Session d'appels</strong> · ${sess.index + 1} / ${sess.ids.length}</span>
       <div class="d-session__nav">
         <button type="button" class="btn btn--ghost btn--sm" data-act="prev" ${sess.index === 0 ? 'disabled' : ''}>Précédent</button>
         <button type="button" class="btn btn--ghost btn--sm" data-act="next">${sess.index + 1 >= sess.ids.length ? 'Terminer' : 'Suivant'}</button>
@@ -1154,14 +1363,14 @@ function renderDrawer(p) {
   };
 
   $('#drawer-body').innerHTML = `
-    <button type="button" class="d-close" id="d-close" aria-label="Fermer la fiche"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
-    ${sessionBar}
-    <div class="d-head">
-      <div class="d-head__main">
+    <header class="d-top">
+      ${sessionBar}
+      <div class="d-top__row">
         <h2 class="d-title" id="drawer-title">${escapeHtml(p.name)}</h2>
-        <div class="d-sub">${escapeHtml(catLine(p))}${city ? ` · ${escapeHtml(city)}` : ''} ${p.expired ? '' : siteBadge(p)} <span id="d-status-badge">${statusBadge(rec)}</span>${p.source === 'demo' ? ' <span class="badge badge--demo">démo</span>' : ''}</div>
+        <button type="button" class="d-close" id="d-close" aria-label="Fermer la fiche"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
-    </div>
+    </header>
+    <div class="d-sub">${escapeHtml(catLine(p))}${city ? ` · ${escapeHtml(city)}` : ''} ${p.expired ? '' : siteBadge(p)} <span id="d-status-badge">${statusBadge(rec)}</span>${p.source === 'demo' ? ' <span class="badge badge--demo">démo</span>' : ''}</div>
     ${stats}
     ${call}
     ${p.address ? `<div class="d-info"><div class="d-info__row"><svg aria-hidden="true"><use href="#i-pin"/></svg><span>${escapeHtml(p.address)}</span></div></div>` : ''}
@@ -1203,15 +1412,33 @@ async function setStatusFromDrawer(status, extra = {}) {
   if (!p) return;
   const patch = { status, ...extra };
   if (status === 'rappeler' && !extra.callbackAt) patch.callbackAt = fromLocalInput($('#d-callback')?.value) || tomorrowAt10();
+  const before = crmOf(p.id) ? structuredClone(crmOf(p.id)) : null;
   const rec = await saveCrm(p, patch);
   const badge = $('#d-status-badge');
   if (badge) badge.innerHTML = statusBadge(rec);
   const row = $('#d-callback-row');
   if (row) row.hidden = status !== 'rappeler';
   $$('input[name="d-status"]').forEach((r) => { r.checked = r.value === status; });
-  if (status === 'opposition') toast('Noté : cet établissement ne sera plus proposé dans vos recherches.');
+  if (status === 'opposition') {
+    toast('Noté : cet établissement ne sera plus proposé dans vos recherches.', '', { action: { label: 'Annuler', run: () => undoStatus(p, before) } });
+  }
   renderResults();
   if (state.view === 'crm') renderCrm();
+}
+
+/** Annule un changement de statut : remet la fiche telle qu'elle était (ou la retire du suivi). */
+async function undoStatus(p, before) {
+  if (before) {
+    state.crm.set(before.id, before);
+    await store.crmPut(before);
+    renderCrmBadge();
+  } else {
+    await removeCrm(p.id);
+  }
+  if (state.drawerId === p.id && $('#drawer').open) renderDrawer(p);
+  renderResults();
+  if (state.view === 'crm') renderCrm();
+  toast('Statut annulé.');
 }
 
 function initDrawer() {
@@ -1303,13 +1530,12 @@ async function refreshFromGoogle() {
   try {
     const res = await api.details(rec.googleId);
     addUsage(res.requests || 1);
-    const place = { ...res.place, categories: rec.snap?.categories || [] };
-    if (rec.source === 'google') {
-      await store.putPlaces([place]);
-      renderDrawer(decorate(place));
-    } else {
-      toast('Fiche Google actualisée.');
-    }
+    const fresh = { ...res.place, categories: rec.snap?.categories || [] };
+    // Fiche OpenStreetMap vérifiée : on garde son identifiant OSM et on la réenrichit avec Google.
+    const place = rec.source === 'google' ? fresh : { ...fresh, id: rec.id, source: rec.source, googleId: rec.googleId, verified: 'ok', verifiedAt: Date.now() };
+    await store.putPlaces([place]);
+    renderDrawer(decorate(place));
+    toast('Fiche actualisée depuis Google.');
     if (state.view === 'crm') renderCrm();
   } catch (e) {
     toast(e.message, 'err');
@@ -1455,6 +1681,10 @@ function initExport() {
 // Réglages
 // ===========================================================================
 
+function fmtPrice(v) {
+  return String(Number(v) || 0).replace('.', ',');
+}
+
 function renderUsage() {
   const used = usedThisMonth();
   const free = Number(state.settings.freeQuota) || 0;
@@ -1474,6 +1704,7 @@ function renderConn() {
   if (state.view === 'settings') renderSettings();
 }
 
+let fnCheck = Promise.resolve();
 async function checkFunction() {
   try {
     const s = await api.status();
@@ -1493,12 +1724,12 @@ async function renderSettings() {
   else el.innerHTML = `Fonction prête : clé Google et mot de passe configurés côté serveur (plafond de ${fmtInt(fn.dailyLimit)} requêtes par jour). ${api.loggedIn ? `<strong>Connecté</strong> jusqu'au ${escapeHtml(fmtDateTime(api.session.exp))}.` : 'Connectez-vous pour lancer des recherches.'}`;
   $('#login-form').hidden = api.loggedIn || Boolean(fn?.error);
   $('#logout').hidden = !api.loggedIn;
-  $('#price-req').value = String(state.settings.price);
+  if (document.activeElement !== $('#price-req')) $('#price-req').value = fmtPrice(state.settings.price);
   $('#free-quota').value = String(state.settings.freeQuota);
   const form = $('#profile-form');
   for (const [k, v] of Object.entries(state.profile)) { if (form.elements[k] && document.activeElement !== form.elements[k]) form.elements[k].value = v; }
   const c = await store.counts();
-  $('#cache-stats').textContent = `${plural(c.places, 'lieu', 'lieux')} en cache · ${plural(c.cells, 'cellule interrogée', 'cellules interrogées')} · ${plural(c.crm, 'prospect suivi', 'prospects suivis')}. Stockage : ${store.persistent ? 'base locale de ce navigateur' : 'mémoire seulement (navigation privée : rien ne sera conservé)'}. Le contenu Google est effacé automatiquement après 30 jours.`;
+  $('#cache-stats').textContent = `${plural(c.places, 'lieu', 'lieux')} en cache · ${plural(c.cells, 'cellule interrogée', 'cellules interrogées')} · ${plural(c.crm, 'prospect suivi', 'prospects suivis')}. Stockage : ${store.persistent ? 'base locale de ce navigateur' : 'mémoire seulement (navigation privée : rien ne sera conservé)'}. Le contenu Google est effacé automatiquement après 30 jours.${Object.keys(state.density || {}).length ? ` Estimation des coûts calibrée sur ${plural(Object.keys(state.density).length, 'catégorie', 'catégories')} déjà recherchée${Object.keys(state.density).length > 1 ? 's' : ''}.` : ''}`;
 }
 
 function initSettings() {
@@ -1519,8 +1750,18 @@ function initSettings() {
   });
   $('#logout').addEventListener('click', () => { api.logout(); renderConn(); toast('Déconnecté.'); });
   $('#price-req').addEventListener('input', (e) => {
-    const v = Number(e.target.value);
-    if (v >= 0) { state.settings.price = v; saveSettings(); scheduleEstimate(); renderResults(); }
+    const v = Number(e.target.value.trim().replace(/\s/g, '').replace(',', '.'));
+    const ok = e.target.value.trim() !== '' && Number.isFinite(v) && v >= 0 && v < 10;
+    e.target.setAttribute('aria-invalid', String(!ok));
+    if (ok) { state.settings.price = v; saveSettings(); scheduleEstimate(); renderResults(); }
+  });
+  $('#price-req').addEventListener('blur', (e) => { e.target.value = fmtPrice(state.settings.price); e.target.removeAttribute('aria-invalid'); });
+  $('#reset-density').addEventListener('click', () => {
+    state.density = {};
+    ls.set('nxp.density', {});
+    scheduleEstimate();
+    renderSettings();
+    toast('Estimation des coûts réinitialisée (densités par défaut).');
   });
   $('#free-quota').addEventListener('input', (e) => {
     const v = Number(e.target.value);
@@ -1602,7 +1843,10 @@ async function boot() {
       const tr = $(`#results-body tr[data-id="${CSS.escape(id)}"]`);
       tr?.classList.toggle('is-hl', on);
     },
-    onDrawState: (on) => { $('#draw-rect').textContent = on ? 'Tracez sur la carte… (Échap pour annuler)' : 'Tracer un rectangle sur la carte'; },
+    onDrawState: (on) => {
+      $('#draw-rect').textContent = on ? 'Tracez sur la carte… (Échap pour annuler)' : 'Tracer un rectangle sur la carte';
+      if (!on) hideToast();
+    },
   });
 
   if (isNarrow()) $('#cat-details').open = false;
@@ -1623,7 +1867,7 @@ async function boot() {
   renderCrmBadge();
   renderResults();
   await restoreLast();
-  checkFunction();
+  fnCheck = checkFunction();
   document.documentElement.dataset.ready = 'true';
 }
 

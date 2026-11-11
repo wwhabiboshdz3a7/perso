@@ -80,6 +80,11 @@ const dateFmt = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-dig
 const dateTimeFmt = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const relFmt = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
+/** Adresse affichée dans les listes : sans le pays (« , France »). */
+export function shortAddress(address) {
+  return String(address || '').replace(/,\s*(France|FR)\s*$/i, '').trim();
+}
+
 export function fmtDate(ts) {
   return Number.isFinite(ts) ? dateFmt.format(new Date(ts)) : '';
 }

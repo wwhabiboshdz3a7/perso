@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { classifyWebsite, websiteLabel } from '../../js/lib/website.js';
-import { gridCells, zoneToCells, splitCell, estimateCost, bboxSizeKm, pointInZone } from '../../js/lib/geo.js';
+import { gridCells, zoneToCells, splitCell, bboxSizeKm, pointInZone } from '../../js/lib/geo.js';
+import { estimateSearch, requestsForCount, learnDensity } from '../../js/lib/estimate.js';
 import { opportunityScore } from '../../js/lib/score.js';
 import { toCSV, csvCell, BOM } from '../../js/lib/csv.js';
 import { formatPhoneFR, telHref, cityFromAddress, nameSimilarity } from '../../js/lib/format.js';
@@ -50,15 +51,40 @@ test('quadrillage : cellules d\'environ la taille demandée, cercle filtré, sub
   assert.ok(!pointInZone({ lat: 43.7, lng: 1.4442 }, circle));
 });
 
-test('estimation : bornée par le plafond, cache déduit', () => {
-  const e = estimateCost({ cells: 10, categories: 3, cachedTasks: 5, pricePerRequest: 0.035, cap: 50, pagesPerTask: 2 });
-  assert.equal(e.tasks, 30);
-  assert.equal(e.toFetch, 25);
-  assert.equal(e.min, 25);
-  assert.equal(e.typical, 50);
-  assert.equal(e.max, 50);
-  assert.equal(e.capped, true);
-  assert.ok(Math.abs(e.cost.min - 0.875) < 1e-9);
+test('estimation : redécoupage modélisé, plafond comme pire cas, cache déduit, calibration', () => {
+  // une cellule de 120 établissements : 3 pages, saturée, puis 4 quarts de 30 (2 pages chacun)
+  assert.equal(requestsForCount(10), 1);
+  assert.equal(requestsForCount(45), 3);
+  assert.equal(requestsForCount(120), 3 + 4 * 2);
+  const zone = { kind: 'circle', center: { lat: 43.6045, lng: 1.4442 }, radiusKm: 0.8 };
+  const cats = ['restaurant', 'boulangerie', 'coiffeur', 'barbier', 'institut', 'garage'];
+  const e = estimateSearch({ zone, categoryIds: cats, cellKm: 2, pricePerRequest: 0.035, cap: 150 });
+  assert.equal(e.tasks, 6);
+  assert.equal(e.min, 6, 'sans redécoupage : 1 requête par tâche');
+  assert.ok(e.probable > 40, `centre dense : le redécoupage domine (${e.probable})`);
+  assert.ok(e.low <= e.probable && e.probable <= e.high);
+  assert.equal(e.worst, 150, 'le vrai pire cas est le plafond');
+  assert.ok(Math.abs(e.cost.worst - 5.25) < 1e-9);
+  // cache : les tâches déjà vues ne coûtent rien
+  const keys = new Set(['restaurant']);
+  const cached = estimateSearch({ zone, categoryIds: cats, cellKm: 2, cachedKeys: keys, taskKeyOf: (c) => c, cap: 150 });
+  assert.equal(cached.cachedTasks, 1);
+  assert.ok(cached.probable < e.probable);
+  // tout en cache : rien à payer, même au pire
+  const all = estimateSearch({ zone, categoryIds: cats, cellKm: 2, cachedKeys: new Set(cats), taskKeyOf: (c) => c, cap: 150 });
+  assert.equal(all.toFetch, 0);
+  assert.equal(all.worst, 0);
+  assert.equal(all.probable, 0);
+  // calibration : une densité apprise faible fait baisser l'estimation
+  const learned = learnDensity({}, { zone, categoryIds: ['restaurant'], places: Array.from({ length: 20 }, () => ({ categories: ['restaurant'] })) });
+  assert.ok(learned.restaurant.d > 0 && learned.restaurant.d < 20);
+  const calibrated = estimateSearch({ zone, categoryIds: ['restaurant'], cellKm: 2, learned, cap: 150 });
+  assert.equal(calibrated.calibrated, 1);
+  assert.ok(calibrated.probable < estimateSearch({ zone, categoryIds: ['restaurant'], cellKm: 2, cap: 150 }).probable);
+  // plafond trop bas
+  const big = estimateSearch({ zone: { kind: 'circle', center: zone.center, radiusKm: 6 }, categoryIds: cats, cellKm: 1, cap: 50 });
+  assert.equal(big.capTooLow, true);
+  assert.equal(big.probable, 50);
 });
 
 test('score : beaucoup d\'avis + bonne note + pas de site = chaud', () => {

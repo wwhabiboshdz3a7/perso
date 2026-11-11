@@ -12,8 +12,10 @@
   <link rel="preload" href="vendor/fonts/lexend-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="vendor/fonts/lexend-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
   <link rel="stylesheet" href="css/app.css">
   <script src="vendor/leaflet/leaflet.js" defer></script>
+  <script src="vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="js/app.js" type="module"></script>
 </head>
 <body>
@@ -37,6 +39,9 @@
       <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.6" fill="currentColor"/><circle cx="4.5" cy="12" r="1.6" fill="currentColor"/><circle cx="4.5" cy="18" r="1.6" fill="currentColor"/></symbol>
       <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-map" viewBox="0 0 24 24"><path d="m9 4-5 2v14l5-2 6 2 5-2V4l-5 2-6-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" stroke="currentColor" stroke-width="2"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
       <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
@@ -85,7 +90,7 @@
           </fieldset>
           <div class="zone-ctl" id="radius-row">
             <label for="radius">Rayon</label>
-            <input id="radius" type="range" min="0.3" max="15" step="0.1" value="1.5" aria-describedby="radius-out">
+            <input id="radius" type="range" min="0.3" max="15" step="0.1" value="1" aria-describedby="radius-out">
             <output id="radius-out" for="radius">1,5 km</output>
           </div>
           <div class="zone-ctl" id="rect-row" hidden>
@@ -98,8 +103,8 @@
         <section class="step step--cats" aria-labelledby="step-cats">
           <h2 class="step__title" id="step-cats"><span class="step__n">2</span> Catégories <span class="step__count" id="cat-count">0</span></h2>
           <div class="presets" id="preset-list" aria-label="Sélections rapides"></div>
-          <p class="cat-picked" id="cat-picked" aria-live="polite"></p>
-          <details class="cat-details" id="cat-details" open>
+          <div class="cat-picked" id="cat-picked" aria-live="polite"></div>
+          <details class="cat-details" id="cat-details">
             <summary class="cat-details__sum"><span>Toutes les catégories</span><small id="cat-total"></small></summary>
             <div class="cat-tools">
               <label class="sr-only" for="cat-filter">Filtrer les catégories</label>
@@ -132,12 +137,16 @@
               </select>
             </div>
           </div>
-          <div class="estimate" id="estimate" aria-live="polite"></div>
-          <button class="btn btn--gold btn--xl btn--block" type="button" id="run">
-            <svg aria-hidden="true"><use href="#i-bolt"/></svg><span id="run-label">Lancer la recherche</span>
-          </button>
-          <button class="btn btn--text btn--block" type="button" id="demo-btn">Essayer avec des données de démonstration</button>
+          <div class="estimate" id="estimate"></div>
         </section>
+
+        <div class="runbar" id="runbar">
+          <p class="runbar__est" id="runbar-est" aria-live="polite"></p>
+          <button class="btn btn--gold btn--xl btn--block" type="button" id="run">
+            <svg aria-hidden="true"><use href="#i-bolt"/></svg><span class="lbl-long" id="run-label">Lancer la recherche</span><span class="lbl-short">Rechercher</span>
+          </button>
+          <button class="btn btn--text btn--sm btn--block" type="button" id="demo-btn">Essayer avec des données de démonstration</button>
+        </div>
       </aside>
 
       <div class="stage">
@@ -145,8 +154,8 @@
           <div id="map" role="region" aria-label="Carte de la zone et des établissements"></div>
           <div class="map-tools">
             <button class="map-btn" type="button" id="locate" title="Me localiser" aria-label="Centrer sur ma position"><svg aria-hidden="true"><use href="#i-locate"/></svg></button>
-            <button class="map-btn map-btn--text" type="button" id="map-style" aria-pressed="true">Plan sombre</button>
-            <button class="map-btn map-btn--text" type="button" id="fit-results" disabled>Voir tous</button>
+            <button class="map-btn map-btn--text" type="button" id="map-style"><svg aria-hidden="true"><use href="#i-sun"/></svg><span>Plan clair</span></button>
+            <button class="map-btn map-btn--text" type="button" id="fit-results" hidden>Voir tous</button>
           </div>
           <div class="legend" id="legend" aria-label="Légende">
             <span class="legend__item"><i class="dot dot--hot"></i>Chaud</span>
@@ -156,7 +165,9 @@
             <span class="legend__item"><i class="dot dot--none"></i>Aucun site</span>
             <span class="legend__item"><i class="dot dot--social"></i>Réseaux</span>
             <span class="legend__item"><i class="dot dot--site"></i>Site</span>
+            <span class="legend__item legend__item--rank"><i class="dot dot--rank">1</i>Top 10</span>
           </div>
+          <button class="map-list-btn" type="button" id="map-to-list" hidden><svg aria-hidden="true"><use href="#i-list"/></svg><span>Liste</span></button>
           <div class="progress" id="progress" hidden>
             <div class="progress__head">
               <strong id="progress-title">Recherche en cours…</strong>
@@ -174,10 +185,10 @@
               <p class="results__sub" id="results-sub">Choisissez une zone et des catégories, puis lancez la recherche.</p>
             </div>
             <div class="results__actions">
-              <button class="btn btn--ghost btn--sm" type="button" id="verify-btn" hidden>Vérifier avec Google</button>
-              <button class="btn btn--ghost btn--sm" type="button" id="add-hot" disabled>Ajouter les chauds à ma liste</button>
+              <button class="btn btn--gold btn--sm" type="button" id="verify-btn" hidden><svg aria-hidden="true"><use href="#i-check"/></svg><span id="verify-label">Vérifier avec Google</span></button>
+              <button class="btn btn--ghost btn--sm" type="button" id="add-hot" disabled aria-label="Ajouter les chauds à ma liste"><span class="lbl-long">Ajouter les chauds à ma liste</span><span class="lbl-short">+ Chauds</span></button>
               <button class="btn btn--violet btn--sm" type="button" id="session-btn" disabled><svg aria-hidden="true"><use href="#i-phone"/></svg>Session d'appels</button>
-              <button class="btn btn--ghost btn--sm" type="button" id="export-btn" disabled><svg aria-hidden="true"><use href="#i-download"/></svg>Exporter</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="export-btn" disabled aria-label="Exporter"><svg aria-hidden="true"><use href="#i-download"/></svg><span class="lbl-long">Exporter</span></button>
             </div>
           </div>
 
@@ -185,8 +196,16 @@
             <div class="kpi"><span class="kpi__v" id="kpi-total">0</span><span class="kpi__l">établissements</span></div>
             <div class="kpi kpi--gold"><span class="kpi__v" id="kpi-none">0</span><span class="kpi__l">sans aucun site</span></div>
             <div class="kpi"><span class="kpi__v" id="kpi-social">0</span><span class="kpi__l">réseaux / annuaire seulement</span></div>
-            <div class="kpi kpi--hot"><span class="kpi__v" id="kpi-hot">0</span><span class="kpi__l">prospects chauds</span></div>
+            <div class="kpi kpi--hot"><span class="kpi__v" id="kpi-hot">0</span><span class="kpi__l" id="kpi-hot-l">prospects chauds</span></div>
             <div class="kpi kpi--muted"><span class="kpi__v" id="kpi-cost">0</span><span class="kpi__l" id="kpi-cost-l">requêtes Google</span></div>
+          </div>
+
+          <div class="results__bar">
+            <div class="viewswitch" role="group" aria-label="Affichage des résultats">
+              <button type="button" class="viewswitch__opt" aria-pressed="true" id="show-list"><svg aria-hidden="true"><use href="#i-list"/></svg>Liste <span id="show-list-n"></span></button>
+              <button type="button" class="viewswitch__opt" aria-pressed="false" id="show-map"><svg aria-hidden="true"><use href="#i-map"/></svg>Carte</button>
+            </div>
+            <button type="button" class="btn btn--ghost btn--sm filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="filters"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filtres<span class="filters-toggle__n" id="filters-n" hidden></span></button>
           </div>
 
           <form class="filters" id="filters" aria-label="Filtres des résultats">
@@ -238,13 +257,11 @@
                 <tr>
                   <th scope="col">Score</th>
                   <th scope="col">Établissement</th>
-                  <th scope="col">Note</th>
-                  <th scope="col">Avis</th>
+                  <th scope="col">Note · avis</th>
                   <th scope="col">Téléphone</th>
                   <th scope="col" class="col-addr">Adresse</th>
                   <th scope="col">Site</th>
-                  <th scope="col">Suivi</th>
-                  <th scope="col"><span class="sr-only">Actions</span></th>
+                  <th scope="col"><span class="sr-only">Google Maps</span></th>
                 </tr>
               </thead>
               <tbody id="results-body"></tbody>
@@ -252,7 +269,18 @@
             <div class="empty" id="results-empty">
               <svg class="empty__logo" aria-hidden="true"><use href="#logo"/></svg>
               <p class="empty__title">Votre prochaine liste d'appels apparaîtra ici.</p>
-              <p class="empty__text">Choisissez un quartier, cochez des catégories, puis lancez la recherche. Pas encore de clé Google ? Essayez la démonstration ou le mode OpenStreetMap gratuit.</p>
+              <p class="empty__text">Choisissez un quartier, cochez des métiers, puis lancez la recherche : les commerces bien notés sans site arrivent en tête, avec leur numéro.</p>
+              <div class="empty__start" id="empty-start">
+                <ol class="howto">
+                  <li><span class="howto__n">1</span><strong>Une zone</strong><small>un quartier, un cercle ou un rectangle tracé sur la carte</small></li>
+                  <li><span class="howto__n">2</span><strong>Des métiers</strong><small>restaurants, coiffeurs, garages, artisans…</small></li>
+                  <li><span class="howto__n">3</span><strong>Une liste à appeler</strong><small>« 233 avis à 4,8 et pas de site » : le script d'appel est prêt</small></li>
+                </ol>
+                <div class="empty__actions">
+                  <button class="btn btn--violet" type="button" id="empty-demo"><svg aria-hidden="true"><use href="#i-bolt"/></svg>Voir la démonstration</button>
+                  <span class="empty__alt">Pas encore de clé Google ? La démonstration (données fictives) et le mode OpenStreetMap sont gratuits.</span>
+                </div>
+              </div>
             </div>
             <button class="btn btn--ghost btn--block" type="button" id="results-more" hidden>Afficher plus</button>
           </div>
@@ -275,6 +303,7 @@
           </div>
         </div>
         <div class="pipeline" id="crm-pipeline" role="group" aria-label="Filtrer par statut"></div>
+        <p class="crm-note" id="crm-note" hidden></p>
         <div class="due" id="crm-due" hidden></div>
         <div class="filters filters--crm">
           <div class="field field--grow">
@@ -323,8 +352,8 @@
           <div class="grid-2 grid-2--top">
             <div class="field">
               <label for="price-req">Prix d'une requête (USD)</label>
-              <input id="price-req" type="number" min="0" step="0.001" value="0.035" inputmode="decimal">
-              <small>Les champs téléphone, site, note et avis relèvent du niveau « Text Search Enterprise » : 35 $ les 1 000 requêtes au premier palier, après 1 000 requêtes offertes par mois (grille publique consultée en novembre 2026). Google peut la modifier : vérifiez la page officielle des tarifs.</small>
+              <input id="price-req" type="text" value="0,035" inputmode="decimal" autocomplete="off" pattern="[0-9]+([,.][0-9]+)?" aria-describedby="price-help">
+              <small id="price-help">Les champs téléphone, site, note et avis relèvent du niveau « Text Search Enterprise ». D'après les informations publiques disponibles en novembre 2026 : environ 35 $ les 1 000 requêtes au premier palier, après 1 000 requêtes offertes par mois. À vérifier sur la page officielle des tarifs de Google Maps Platform, qui peut changer.</small>
             </div>
             <div class="field">
               <label for="free-quota">Requêtes offertes par mois</label>
@@ -378,6 +407,7 @@
           <div class="row-btns">
             <button class="btn btn--ghost btn--sm" type="button" id="purge">Effacer le contenu de plus de 30 jours</button>
             <button class="btn btn--ghost btn--sm" type="button" id="clear-cache">Vider tout le cache de recherche</button>
+            <button class="btn btn--ghost btn--sm" type="button" id="reset-density">Réinitialiser l'estimation des coûts</button>
           </div>
         </section>
 
@@ -387,7 +417,7 @@
           <ul class="legal-list">
             <li><strong>Prospection B2B.</strong> Contacter un professionnel par téléphone ou email pour une offre liée à son activité repose en général sur l'intérêt légitime (RGPD). Les coordonnées d'un artisan ou d'un entrepreneur individuel restent des données personnelles.</li>
             <li><strong>Informer dès le premier contact</strong> : qui vous êtes, d'où viennent ses coordonnées (fiche publique Google ou OpenStreetMap), et qu'il peut s'opposer à tout moment.</li>
-            <li><strong>Droit d'opposition</strong> : le statut « Ne plus contacter » masque l'établissement de toutes vos recherches futures. Respectez-le sans délai.</li>
+            <li><strong>Droit d'opposition</strong> : le statut « Ne plus contacter » masque l'établissement de toutes vos recherches futures. Respectez-le sans délai. La liste reste consultable (et une erreur rectifiable) dans « Mes prospects », filtre « Ne plus contacter ».</li>
             <li><strong>Durée de conservation</strong> : la CNIL recommande de ne pas garder un prospect inactif plus de 3 ans après le dernier contact. Supprimez les fiches qui ne mènent à rien.</li>
             <li><strong>Démarchage téléphonique</strong> : l'encadrement se durcit pour les consommateurs (Bloctel, évolution vers un consentement préalable). Il vise surtout les particuliers ; vérifiez les règles en vigueur si votre interlocuteur peut être considéré comme tel (micro-entrepreneur contacté sur son numéro personnel, par exemple).</li>
             <li><strong>Email</strong> : vers une adresse professionnelle, un message en rapport avec l'activité du destinataire est en général admis sans consentement préalable, à condition de vous identifier et d'offrir un moyen simple de refuser (les modèles d'email et de SMS le prévoient).</li>

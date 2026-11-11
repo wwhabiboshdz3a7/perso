@@ -12,18 +12,24 @@ export function taskKey(catId, cell) {
   return `${catId}|${cellKey(cell)}`;
 }
 
-/** Nombre de tâches (cellule × catégorie) déjà en cache et encore valides. */
-export async function countCachedTasks(store, zone, categoryIds, cellKm, now = Date.now()) {
-  if (!store) return 0;
+/** Clés des tâches (cellule × catégorie) déjà en cache et encore valides. */
+export async function cachedTaskKeys(store, zone, categoryIds, cellKm, now = Date.now()) {
+  const keys = new Set();
+  if (!store) return keys;
   const cells = zoneToCells(zone, cellKm);
-  let n = 0;
   for (const catId of categoryIds) {
     for (const cell of cells) {
-      const rec = await store.getCell(taskKey(catId, cell));
-      if (rec && !rec.partial && rec.fetchedAt > now - GOOGLE_TTL_MS) n++;
+      const key = taskKey(catId, cell);
+      const rec = await store.getCell(key);
+      if (rec && !rec.partial && rec.fetchedAt > now - GOOGLE_TTL_MS) keys.add(key);
     }
   }
-  return n;
+  return keys;
+}
+
+/** Nombre de tâches (cellule × catégorie) déjà en cache et encore valides. */
+export async function countCachedTasks(store, zone, categoryIds, cellKm, now = Date.now()) {
+  return (await cachedTaskKeys(store, zone, categoryIds, cellKm, now)).size;
 }
 
 const sleep = (ms, signal) => new Promise((resolve, reject) => {

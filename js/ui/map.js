@@ -7,8 +7,42 @@ import { websiteLabel } from '../lib/website.js';
 const L = () => globalThis.L;
 const REDUCED = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-const HEAT = { chaud: '#FBBF24', tiede: '#C084FC', froid: '#6E61A0' };
 const GOOGLE_ATTR = '<span class="google-attr">Google Maps</span>';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/**
+ * Balayage façon radar dans la zone (SVG pur) : une traînée de fines parts de disque dont
+ * l'opacité décroît, qui tourne autour du centre. Lent et discret au repos, plus vif pendant
+ * la recherche. Sans animation si l'utilisateur la refuse (prefers-reduced-motion).
+ */
+function scanSvg(round, mode) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 200 200');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('aria-hidden', 'true');
+  const active = mode === 'active';
+  const N = 26;
+  const STEP = (active ? 4 : 3) * (Math.PI / 180);
+  const R = round ? 100 : 142;
+  let wedges = '';
+  for (let i = 0; i < N; i++) {
+    const a0 = -i * STEP - STEP;
+    const a1 = -i * STEP + 0.002;
+    const p = (a) => `${(100 + R * Math.sin(a)).toFixed(2)} ${(100 - R * Math.cos(a)).toFixed(2)}`;
+    const op = ((active ? 0.5 : 0.3) * (1 - i / N) ** 1.6).toFixed(3);
+    wedges += `<path d="M100 100 L${p(a0)} A${R} ${R} 0 0 1 ${p(a1)} Z" fill="#FBBF24" fill-opacity="${op}"/>`;
+  }
+  const dur = active ? '1.8s' : '7s';
+  const spin = REDUCED() ? '' : `<animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="${dur}" repeatCount="indefinite"/>`;
+  const clip = round ? '<circle cx="100" cy="100" r="99"/>' : '<rect width="200" height="200"/>';
+  const id = `nx-scan-${Math.random().toString(36).slice(2, 8)}`;
+  const rings = round && active && !REDUCED()
+    ? '<circle cx="100" cy="100" r="10" fill="none" stroke="#FBBF24" stroke-width="1.2" vector-effect="non-scaling-stroke"><animate attributeName="r" from="6" to="99" dur="1.8s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" from=".8" to="0" dur="1.8s" repeatCount="indefinite"/></circle>'
+    : '';
+  svg.innerHTML = `<defs><clipPath id="${id}">${clip}</clipPath></defs>
+    <g clip-path="url(#${id})"><g>${wedges}<line x1="100" y1="100" x2="100" y2="${100 - R}" stroke="#FDE68A" stroke-opacity="${active ? 0.9 : 0.45}" stroke-width="1.4" vector-effect="non-scaling-stroke"/>${spin}</g>${rings}</g>`;
+  return svg;
+}
 
 export class MapView {
   constructor(el, { wrap, onZoneChange, onMarkerClick, onMarkerHover, onDrawState } = {}) {
@@ -20,23 +54,36 @@ export class MapView {
     this.onDrawState = onDrawState || (() => {});
     this.kind = 'circle';
     this.center = { lat: 43.6045, lng: 1.4442 };
-    this.radiusKm = 1.5;
+    this.radiusKm = 1;
     this.rectBbox = null;
     this.markers = new Map();
     this.highlighted = null;
     this.googleAttr = false;
     this.drawing = false;
+    this.scanMode = 'off';
+    this.scanLayer = null;
 
     const Lf = L();
-    this.map = Lf.map(el, { zoomControl: true, preferCanvas: true, attributionControl: true, worldCopyJump: true });
+    this.map = Lf.map(el, { zoomControl: true, attributionControl: true, worldCopyJump: true, zoomSnap: 0.5 });
     this.map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="Bibliothèque de cartes">Leaflet</a>');
     this.tiles = Lf.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© <a href="https://www.openstreetmap.org/copyright">contributeurs OpenStreetMap</a>',
       crossOrigin: true,
     }).addTo(this.map);
-    this.renderer = Lf.canvas({ padding: 0.3 });
-    this.markerLayer = Lf.layerGroup().addTo(this.map);
+    this.clusterLayer = (Lf.markerClusterGroup ? Lf.markerClusterGroup({
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      disableClusteringAtZoom: 18,
+      maxClusterRadius: (z) => (z >= 17 ? 44 : 84),
+      chunkedLoading: true,
+      animate: !REDUCED(),
+      iconCreateFunction: (c) => this.clusterIcon(c),
+    }) : Lf.featureGroup()).addTo(this.map);
+    if (!this.clusterLayer.getVisibleParent) this.clusterLayer.getVisibleParent = (m) => m;
+    if (!this.clusterLayer.addLayers) this.clusterLayer.addLayers = (ls) => ls.forEach((l) => this.clusterLayer.addLayer(l));
+    this.rankLayer = Lf.layerGroup().addTo(this.map);
+    this.points = [];
     this.zoneLayer = Lf.layerGroup().addTo(this.map);
     this.map.setView([this.center.lat, this.center.lng], 14);
 
@@ -120,12 +167,41 @@ export class MapView {
         const p = e.target.getLatLng();
         this.center = { lat: p.lat, lng: p.lng };
         this.zoneLayer.eachLayer((l) => { if (l instanceof Lf.Circle) l.setLatLng(p); });
+        if (this.scanLayer) this.scanLayer.setBounds(this.#scanBounds());
       });
       handle.on('dragend', () => this.onZoneChange(this.zone));
     } else if (this.kind === 'rect' && this.rectBbox) {
       const b = this.rectBbox;
       Lf.rectangle([[b.south, b.west], [b.north, b.east]], style).addTo(this.zoneLayer);
     }
+    this.#renderScan();
+  }
+
+  // ------------------------------------------------------------ balayage
+  /** 'off' (résultats affichés), 'idle' (zone prête) ou 'active' (recherche en cours). */
+  setScan(mode) {
+    if (mode === this.scanMode) return;
+    this.scanMode = mode;
+    this.wrap?.classList.toggle('is-scanning', mode === 'active');
+    this.#renderScan();
+  }
+
+  #scanBounds() {
+    const z = this.zone;
+    const b = z.kind === 'circle' ? bboxFromCircle(z.center, z.radiusKm) : z.bbox;
+    return [[b.south, b.west], [b.north, b.east]];
+  }
+
+  #renderScan() {
+    this.scanLayer?.remove();
+    this.scanLayer = null;
+    // Pas de balayage sur « vue de la carte » : la zone suit la carte elle-même.
+    if (this.scanMode === 'off' || this.kind === 'view' || (this.kind === 'rect' && !this.rectBbox)) return;
+    const Lf = L();
+    if (!Lf.svgOverlay) return;
+    this.scanLayer = Lf.svgOverlay(scanSvg(this.kind === 'circle', this.scanMode), this.#scanBounds(), {
+      interactive: false, className: `nx-scan nx-scan--${this.scanMode}`,
+    }).addTo(this.map);
   }
 
   /** Tracé d'un rectangle au doigt ou à la souris. */
@@ -191,37 +267,68 @@ export class MapView {
   cancelDraw() { this.finishDraw(); }
 
   // ------------------------------------------------------------- marqueurs
+  // Les établissements sont regroupés en grappes (Leaflet.markercluster) : chaque grappe
+  // indique son nombre d'établissements et, en or, la part de prospects chauds. Le statut
+  // du site se lit à la forme (disque plein = aucun site, anneau = réseaux, petit point
+  // pâle = vrai site). Les 10 meilleurs scores restent toujours visibles, numérotés.
   setPlaces(places, { google = false } = {}) {
     const Lf = L();
-    this.markerLayer.clearLayers();
+    this.clusterLayer.clearLayers();
+    this.rankLayer.clearLayers();
     this.markers.clear();
+    this.points = [];
     this.highlighted = null;
-    // les prospects chauds sont dessinés en dernier, au-dessus
-    const order = { froid: 0, tiede: 1, chaud: 2 };
-    const sorted = [...places].filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
-      .sort((a, b) => (order[a.level] - order[b.level]) || (a.score - b.score));
-    for (const p of sorted) {
+    const valid = places.filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+    const top = [...valid].sort((a, b) => b.score - a.score || (b.reviews || 0) - (a.reviews || 0)).slice(0, 10);
+    const rank = new Map(top.map((p, i) => [p.id, i + 1]));
+    const batch = [];
+    for (const p of valid) {
       const st = p.website?.status || 'none';
-      const radius = 5 + 6 * (Number.isFinite(p.reviews) ? reviewsFactor(p.reviews) : 0.3);
-      const m = Lf.circleMarker([p.lat, p.lng], {
-        renderer: this.renderer,
-        radius,
-        fillColor: HEAT[p.level] || HEAT.froid,
-        fillOpacity: st === 'site' ? 0.55 : 0.95,
-        color: st === 'site' ? 'rgba(255,255,255,.25)' : '#FFFFFF',
-        weight: st === 'site' ? 1 : 2,
-        dashArray: st === 'social' ? '3 3' : null,
-        bubblingMouseEvents: false,
-      });
+      const r = rank.get(p.id);
       const reviews = Number.isFinite(p.reviews) ? `${fmtInt(p.reviews)} avis · ${fmtRating(p.rating)} ★` : 'avis inconnus';
-      m.bindTooltip(`<strong>${escapeHtml(p.name)}</strong><small>${reviews} · ${escapeHtml(websiteLabel(p.website))}</small>`, { className: 'nx-tip', direction: 'top', offset: [0, -6] });
+      const tip = `${r ? `<em>N° ${r} au score</em>` : ''}<strong>${escapeHtml(p.name)}</strong><small>${reviews} · ${escapeHtml(websiteLabel(p.website))}</small>`;
+      let m;
+      if (r) {
+        m = Lf.marker([p.lat, p.lng], {
+          icon: Lf.divIcon({ className: `nx-rank nx-rank--${p.level}`, html: `<span><b>${r}</b></span>`, iconSize: [30, 38], iconAnchor: [15, 36] }),
+          keyboard: false, zIndexOffset: 1000 - r, riseOnHover: true,
+        });
+        m.bindTooltip(tip, { className: 'nx-tip', direction: 'top', offset: [0, -34] });
+        m.addTo(this.rankLayer);
+      } else {
+        const size = Math.round(st === 'site' ? 9 : 12 + 10 * (Number.isFinite(p.reviews) ? reviewsFactor(p.reviews) : 0.3));
+        m = Lf.marker([p.lat, p.lng], {
+          icon: Lf.divIcon({ className: `nx-pin nx-pin--${p.level} nx-pin--${st}`, html: '<i></i>', iconSize: [size, size], iconAnchor: [size / 2, size / 2] }),
+          keyboard: false,
+          level: p.level,
+        });
+        m.bindTooltip(tip, { className: 'nx-tip', direction: 'top', offset: [0, -size / 2] });
+        batch.push(m);
+      }
       m.on('click', () => this.onMarkerClick(p.id));
       m.on('mouseover', () => this.onMarkerHover(p.id, true));
       m.on('mouseout', () => this.onMarkerHover(p.id, false));
-      m.addTo(this.markerLayer);
-      this.markers.set(p.id, { m, radius });
+      this.markers.set(p.id, { m, ranked: Boolean(r) });
+      this.points.push([p.lat, p.lng]);
     }
+    this.clusterLayer.addLayers(batch);
     this.setGoogleAttribution(google);
+  }
+
+  /** Grappe : nombre d'établissements, anneau or proportionnel à la part de chauds. */
+  clusterIcon(cluster) {
+    const Lf = L();
+    const kids = cluster.getAllChildMarkers();
+    const n = kids.length;
+    const hot = kids.filter((k) => k.options.level === 'chaud').length;
+    const pct = Math.round((hot / Math.max(1, n)) * 100);
+    const size = n < 10 ? 36 : n < 50 ? 44 : n < 200 ? 52 : 60;
+    return Lf.divIcon({
+      className: 'nx-cluster',
+      html: `<span style="--p:${pct}%"><b>${n}</b></span>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+    });
   }
 
   setGoogleAttribution(on) {
@@ -231,21 +338,25 @@ export class MapView {
     this.googleAttr = on;
   }
 
+  /** Met en avant un établissement (ou la grappe qui le contient). */
   highlight(id, on = true) {
-    if (this.highlighted && this.highlighted !== id) {
-      const prev = this.markers.get(this.highlighted);
-      prev?.m.setRadius(prev.radius);
+    if (this.highlighted && (this.highlighted !== id || !on)) {
+      this.#markEl(this.highlighted, false);
       this.highlighted = null;
     }
+    if (!on || !this.markers.has(id)) return;
+    this.#markEl(id, true);
+    this.highlighted = id;
+  }
+
+  #markEl(id, on) {
     const cur = this.markers.get(id);
     if (!cur) return;
-    if (on) {
-      cur.m.setRadius(cur.radius + 5).bringToFront();
-      this.highlighted = id;
-    } else {
-      cur.m.setRadius(cur.radius);
-      if (this.highlighted === id) this.highlighted = null;
-    }
+    let layer = cur.m;
+    if (!cur.ranked) layer = this.clusterLayer.getVisibleParent(cur.m) || cur.m;
+    layer.getElement?.()?.classList.toggle('is-hl', on);
+    if (on && layer === cur.m && cur.ranked === false) cur.m.setZIndexOffset(2000);
+    else if (!on && !cur.ranked) cur.m.setZIndexOffset(0);
   }
 
   panTo(id) {
@@ -254,9 +365,8 @@ export class MapView {
   }
 
   fitResults() {
-    const pts = [...this.markers.values()].map((x) => x.m.getLatLng());
-    if (!pts.length) return;
-    this.map.fitBounds(L().latLngBounds(pts), { padding: [40, 40], maxZoom: 16, animate: !REDUCED() });
+    if (!this.points?.length) return;
+    this.map.fitBounds(L().latLngBounds(this.points), { padding: [40, 40], maxZoom: 16, animate: !REDUCED() });
   }
 
   invalidate() { this.map.invalidateSize(); }
