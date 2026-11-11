@@ -96,7 +96,12 @@ async function main() {
     await page.goto(BASE);
     await page.waitForSelector('html[data-ready="true"]');
     await page.waitForTimeout(600);
-    check(await page.locator('#estimate').innerText().then((t) => /requêtes/.test(t)), 'estimation du coût affichée avant lancement');
+    check(await page.locator('#estimate').innerText().then((t) => /requêtes|req\./.test(t)), 'estimation du coût affichée avant lancement');
+    const runBox = await page.locator('#run').boundingBox();
+    check(runBox && runBox.y > 0 && runBox.y + runBox.height <= 900, `bouton « Lancer » visible au premier écran (bas à ${Math.round(runBox.y + runBox.height)} px)`);
+    check(/plafond/.test(await page.locator('#runbar-est').innerText()), 'pied collant : estimation résumée et pire cas (plafond)');
+    check(await page.locator('#kpis').isHidden(), 'premier regard : pas de compteurs à zéro avant la recherche');
+    check(await page.locator('.nx-scan').count() === 1, 'balayage de la zone affiché au repos');
     await page.screenshot({ path: path.join(SHOTS, '01-accueil-1440.png') });
 
     // Recherche de lieu (Nominatim simulé)
@@ -108,6 +113,8 @@ async function main() {
     // Quartier rapide + recherche Google avec connexion
     await page.click('#quick-places button:has-text("Capitole")');
     await page.waitForTimeout(400);
+    const estText = await page.locator('#estimate').innerText();
+    const estProbable = Number((estText.match(/≈\s*([\d\s\u202f]+)\s*requêtes/) || [])[1]?.replace(/\D/g, '') || NaN);
     // vue éloignée volontairement : la carte doit se recadrer sur les résultats
     await page.click('.leaflet-control-zoom-out');
     await page.waitForTimeout(350);
@@ -135,10 +142,21 @@ async function main() {
     check(await page.locator('#data-attribution .google-attr').count() === 1, 'attribution « Google Maps » affichée');
     check((await page.locator('.leaflet-control-attribution').innerText()).includes('Google Maps'), 'attribution Google sur la carte');
     check(await page.locator('#results-body .badge--site').count() === 0, 'filtre par défaut : pas de « A un site »');
+    const realReq = Number((await page.locator('#kpi-cost').innerText()).replace(/\D/g, ''));
+    check(Number.isFinite(estProbable) && realReq <= estProbable * 2 && realReq >= estProbable / 2, `estimation réaliste : ≈ ${estProbable} annoncées, ${realReq} consommées`);
+    const clusters = await page.locator('.nx-cluster').count();
+    const ranks = await page.locator('.nx-rank').count();
+    check(clusters > 0 && clusters < 60 && ranks === 10, `carte lisible : ${clusters} grappes et 10 meilleurs numérotés (${ranks})`);
+    check(await page.locator('.nx-scan').count() === 0, 'balayage retiré une fois les résultats affichés');
+    await page.waitForTimeout(2500); // laisser le message de fin disparaître
     await page.screenshot({ path: path.join(SHOTS, '02-resultats-google-1440.png') });
     await page.locator('#results-title').scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, document.querySelector('#results').getBoundingClientRect().top - 84));
     await page.waitForTimeout(200);
+    const rowH = await page.locator('#results-body tr').first().evaluate((tr) => tr.getBoundingClientRect().height);
+    check(rowH <= 64, `tableau compact (lignes de ${Math.round(rowH)} px)`);
+    const tblOver = await page.locator('.table-wrap').evaluate((w) => w.scrollWidth - w.clientWidth);
+    check(tblOver <= 0, `tableau sans débordement horizontal (écart ${tblOver} px)`);
     await page.screenshot({ path: path.join(SHOTS, '03-tableau-1440.png') });
 
     // Fiche prospect
@@ -172,20 +190,59 @@ async function main() {
     const csv = fs.readFileSync(await dl.path(), 'utf8');
     check(csv.charCodeAt(0) === 0xfeff && csv.split('\r\n')[0].includes('Nom;Catégorie;Note'), 'CSV Excel : BOM + séparateur « ; »');
 
-    // Session d'appels
+    // Session d'appels : la fiche suivante repart du haut (nom et compteur visibles)
     await page.click('#session-btn');
     await page.waitForSelector('#drawer[open] .d-session');
+    await page.evaluate(() => { document.querySelector('#drawer-body').scrollTop = 400; });
+    await page.waitForTimeout(150);
     await page.click('[data-outcome="noanswer"]');
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(400);
     check((await page.locator('.d-session').innerText()).includes('2 /'), 'session d\'appels : passage au suivant');
+    const sess = await page.evaluate(() => ({
+      title: document.querySelector('#drawer-title').getBoundingClientRect().top,
+      bar: document.querySelector('.d-session').getBoundingClientRect().top,
+      scroll: document.querySelector('#drawer-body').scrollTop,
+    }));
+    check(sess.title > 0 && sess.bar >= 0 && sess.scroll === 0, `session : fiche suivante en haut (titre à ${Math.round(sess.title)} px, défilement ${sess.scroll})`);
+    await page.evaluate(() => { document.querySelector('#drawer-body').scrollTop = 900; });
+    await page.waitForTimeout(150);
+    const stuck = await page.evaluate(() => ({ title: document.querySelector('#drawer-title').getBoundingClientRect().top, bar: document.querySelector('.d-session').getBoundingClientRect().top }));
+    check(stuck.title > 0 && stuck.bar >= 0, 'session : nom et compteur restent visibles en défilant');
+    await page.screenshot({ path: path.join(SHOTS, '04b-session-1440.png') });
     await page.keyboard.press('Escape');
+
+    // « Ne plus contacter » : annulable tout de suite, consultable et réversible ensuite
+    await page.locator('#results-body tr').nth(2).locator('.r-name-btn').click();
+    await page.waitForSelector('#drawer[open]');
+    const opposedName = await page.locator('#drawer-title').innerText();
+    await page.click('label.status-opt:has-text("Ne plus contacter")');
+    await page.waitForSelector('#toast.is-on .toast__btn');
+    check((await page.locator('#toast .toast__btn').innerText()).includes('Annuler'), 'opposition : bouton « Annuler » proposé');
+    await page.click('#toast .toast__btn');
+    await page.waitForTimeout(300);
+    check(!(await page.locator('label.status-opt:has-text("Ne plus contacter") input').isChecked()), 'opposition : annulée en un geste');
+    await page.click('label.status-opt:has-text("Ne plus contacter")');
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Escape');
+    await page.click('#tab-crm');
+    await page.waitForSelector('#crm-list .crm-card');
+    await page.click('.stage-btn[data-f="opposition"]');
+    await page.waitForTimeout(300);
+    const oppCards = await page.locator('#crm-list .crm-card').count();
+    check(oppCards === 1 && (await page.locator('#crm-list').innerText()).includes(opposedName), `opposition : liste consultable (${oppCards} fiche)`);
+    await page.screenshot({ path: path.join(SHOTS, '05b-opposition-1440.png') });
+    await page.click('[data-unoppose]');
+    await page.waitForTimeout(300);
+    check(await page.locator('#crm-list .crm-card').count() === 0, 'opposition : « Réautoriser » rend l\'établissement à nouveau joignable');
+    await page.click('#tab-search');
 
     // Mode OpenStreetMap
     await page.click('label.seg__opt:has-text("OpenStreetMap")');
     await page.click('#run');
     await page.waitForSelector('#progress', { state: 'hidden', timeout: 30000 });
     await page.waitForTimeout(400);
-    check(await page.locator('#verify-btn').isVisible(), 'mode OSM : bouton « Vérifier avec Google »');
+    check(await page.locator('#verify-btn').isVisible() && /meilleurs/.test(await page.locator('#verify-btn').innerText()), 'mode OSM : « Vérifier les meilleurs sur Google » en action principale');
+    check(/candidats/.test(await page.locator('#kpi-hot-l').innerText()), 'mode OSM : compteur de candidats à vérifier');
     check(Number((await page.locator('#kpi-total').innerText()).replace(/\D/g, '')) > 10, 'mode OSM : résultats');
     await page.click('#verify-btn');
     await page.click('dialog.modal[open] button[value="yes"]');
@@ -207,6 +264,24 @@ async function main() {
     await page.screenshot({ path: path.join(SHOTS, '07-reglages-1440.png') });
     await ctx.close();
 
+    // ------------------------------------------------- 1440 sans la fonction
+    console.log('Bureau 1440 sans fonction serveur (lancement local)');
+    const nf = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'fr-FR', colorScheme: 'dark' });
+    await nf.route('https://tile.openstreetmap.org/**', (route) => route.fulfill({ status: 200, contentType: 'image/png', body: TILES[0], headers: { 'Access-Control-Allow-Origin': '*' } }));
+    const np = await nf.newPage();
+    // le serveur statique répond 501 ou 404 à /api/places : erreurs réseau attendues ici
+    np.on('pageerror', (e) => errors.push(`[sans fonction] ${e.message}`));
+    await np.goto(BASE);
+    await np.waitForSelector('html[data-ready="true"]');
+    await np.waitForFunction(() => /absente|indisponible/i.test(document.querySelector('#conn-pill, .pill--conn')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+    await np.click('#run');
+    await np.waitForSelector('dialog.modal[open]');
+    check(await np.locator('#login-dialog[open]').count() === 0 && /indisponible/.test(await np.locator('dialog.modal[open]').innerText()), 'sans fonction : pas de mot de passe demandé, choix démo ou OpenStreetMap');
+    await np.click('dialog.modal[open] button[value="demo"]');
+    await np.waitForTimeout(1200);
+    check(Number((await np.locator('#kpi-total').innerText()).replace(/\D/g, '')) > 10, 'sans fonction : la démonstration se lance');
+    await nf.close();
+
     // ------------------------------------------------------------------ 390
     console.log('Mobile 390 × 844');
     const m = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'fr-FR', colorScheme: 'dark' });
@@ -225,17 +300,45 @@ async function main() {
     });
     check(layout.zone < layout.map && layout.map < layout.cats && layout.cats < layout.run, 'mobile : zone, carte, catégories puis lancement');
     check(Math.abs(layout.navBottom - layout.vh) < 2 && layout.navTop > layout.vh - 90, 'mobile : navigation en bas de l\'écran');
+    const mRun = await mp.locator('#run').boundingBox();
+    check(mRun && mRun.y + mRun.height <= layout.navTop + 1, 'mobile : bouton « Rechercher » visible au-dessus de la navigation');
+    const sizes = await mp.evaluate(() => {
+      const fs = (s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize);
+      const h = (s) => Math.min(...[...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect().height));
+      return { legend: fs('.legend'), tab: fs('.tab'), chips: h('#quick-places button'), zoom: h('.leaflet-control-zoom a') };
+    });
+    check(sizes.legend >= 12 && sizes.tab >= 12, `mobile : textes utiles ≥ 12 px (légende ${sizes.legend}, onglets ${sizes.tab})`);
+    check(sizes.chips >= 40 && sizes.zoom >= 40, `mobile : cibles tactiles ≥ 40 px (pastilles ${sizes.chips}, zoom ${sizes.zoom})`);
     await mp.screenshot({ path: path.join(SHOTS, '08-accueil-390.png') });
     await mp.evaluate(() => window.scrollTo(0, document.querySelector('.map-wrap').getBoundingClientRect().top + scrollY - 70));
     await mp.waitForTimeout(300);
     await mp.screenshot({ path: path.join(SHOTS, '08b-carte-390.png') });
-    await mp.click('#demo-btn');
+    await mp.click('#empty-demo');
     await mp.waitForTimeout(1200);
     const overflow2 = await mp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check(overflow2 <= 0, `résultats sans défilement horizontal (écart ${overflow2}px)`);
     await mp.evaluate(() => window.scrollTo(0, document.querySelector('#results').getBoundingClientRect().top + scrollY - 66));
     await mp.waitForTimeout(3500); // laisser le message de démonstration disparaître
+    const firstGap = await mp.evaluate(() => document.querySelector('#results-body tr').getBoundingClientRect().top - document.querySelector('#results').getBoundingClientRect().top);
+    check(firstGap < 420, `mobile : premier prospect à ${Math.round(firstGap)} px du haut des résultats`);
     await mp.screenshot({ path: path.join(SHOTS, '09-resultats-390.png') });
+    await mp.click('#filters-toggle');
+    await mp.waitForTimeout(200);
+    const fSizes = await mp.evaluate(() => ({
+      check: document.querySelector('#filters label.check').getBoundingClientRect().height,
+      chip: Math.min(...[...document.querySelectorAll('#filters .chip')].map((e) => e.getBoundingClientRect().height)),
+    }));
+    check(fSizes.check >= 40 && fSizes.chip >= 40, `mobile : filtres dépliables, cibles ≥ 40 px (case ${Math.round(fSizes.check)}, pastilles ${Math.round(fSizes.chip)})`);
+    await mp.screenshot({ path: path.join(SHOTS, '09d-filtres-390.png') });
+    await mp.click('#filters-toggle');
+    // bascule Carte / Liste
+    await mp.click('#show-map');
+    await mp.waitForTimeout(700);
+    const mapTop = await mp.evaluate(() => document.querySelector('.map-wrap').getBoundingClientRect().top);
+    check(mapTop >= 0 && mapTop < 120, `mobile : « Carte » amène la carte à l'écran (${Math.round(mapTop)} px)`);
+    await mp.screenshot({ path: path.join(SHOTS, '09c-carte-resultats-390.png') });
+    await mp.click('#map-to-list');
+    await mp.waitForTimeout(700);
     await mp.evaluate(() => window.scrollTo(0, document.querySelector('#results-body').getBoundingClientRect().top + scrollY - 66));
     await mp.waitForTimeout(200);
     await mp.screenshot({ path: path.join(SHOTS, '09b-liste-390.png') });
@@ -264,9 +367,10 @@ async function main() {
     const prog = await mp.evaluate(() => {
       const r = document.querySelector('#progress').getBoundingClientRect();
       const nav = document.querySelector('.tabs').getBoundingClientRect();
-      return { top: r.top, bottom: r.bottom, navTop: nav.top };
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return { top: r.top, bottom: r.bottom, navTop: nav.top, onTop: Boolean(hit?.closest('#progress')) };
     });
-    check(prog.top >= 0 && prog.bottom <= prog.navTop, 'mobile : progression visible au-dessus de la navigation');
+    check(prog.top >= 0 && prog.bottom <= prog.navTop && prog.onTop, 'mobile : progression visible (non recouverte) au-dessus de la navigation');
     await mp.screenshot({ path: path.join(SHOTS, '12-progression-390.png') });
     await mp.waitForSelector('#progress', { state: 'hidden', timeout: 60000 });
     await mp.waitForTimeout(1200);

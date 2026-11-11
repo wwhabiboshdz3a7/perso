@@ -22,14 +22,14 @@ Le site est statique (HTML, CSS, JavaScript sans compilation) et se publie tel q
 - Sélections rapides : Classique commerces, Artisans, Beauté, Restauration, Auto. Sélection multiple et filtre texte.
 
 **Recherche Google, avec les coûts maîtrisés**
-- **Estimation avant lancement** : nombre de cellules × catégories, nombre probable de requêtes, fourchette, prix, partie déjà en cache (gratuite) et requêtes offertes restantes ce mois-ci.
+- **Estimation avant lancement**, toujours visible au-dessus du bouton « Lancer » : nombre probable de requêtes et prix, **pire cas** (le plafond réglé), borne basse « sans redécoupage », partie déjà en cache (gratuite) et requêtes offertes restantes ce mois-ci. L'estimation modélise le redécoupage des cellules saturées à partir d'une densité d'établissements par catégorie (ordres de grandeur d'un centre-ville dense), puis **se recale sur vos propres recherches** : après chaque recherche complète, la densité réellement observée est retenue pour les suivantes (bouton de remise à zéro dans Réglages). Un écart important entre l'estimation et le réel est signalé à la fin de la recherche.
 - **Plafond de requêtes** réglable pour chaque recherche (150 par défaut). Arrivée au plafond, la recherche s'arrête proprement : relancez-la et ce qui a déjà été vu est repris depuis le cache.
 - **Quadrillage** : la zone est découpée en cellules (1, 2, 3 ou 5 km). Chaque cellule est interrogée par catégorie avec `locationRestriction` (rectangle), `includedType` et le texte de la catégorie.
 - **Pagination** : jusqu'à 3 pages de 20, soit 60 résultats, la limite de Text Search.
 - **Subdivision adaptative** : une cellule qui atteint 60 résultats est coupée en 4, jusqu'à 5 niveaux.
 - **Dédoublonnage** par identifiant de lieu. Seuls les établissements en activité (`OPERATIONAL`) sont gardés.
 - **Cache local (IndexedDB)** de 30 jours : relancer une recherche sur la même zone ne coûte rien.
-- **Côté serveur** : plafond quotidien (`MAX_REQUESTS_PER_DAY`, 400 par défaut) et limitation de débit (`RATE_LIMIT_PER_MINUTE`, 90 appels par minute et par adresse IP ; 8 essais de mot de passe par quart d'heure). Le navigateur connaît cette limite et s'y tient de lui-même : sur une très grande recherche, il marque une courte pause, affichée dans la barre de progression, au lieu de se faire refuser des requêtes.
+- **Côté serveur** : plafond quotidien (`MAX_REQUESTS_PER_DAY`, 400 par défaut) et limitation de débit (`RATE_LIMIT_PER_MINUTE`, 90 appels par minute et par adresse IP). Les échecs de connexion sont comptés dans Netlify Blobs, donc partagés entre toutes les instances de la fonction : 8 échecs par adresse en 15 minutes, et 40 échecs toutes adresses confondues en une heure (contre une attaque répartie). Les adresses IP n'y sont conservées que sous forme d'empreinte. Le navigateur connaît cette limite et s'y tient de lui-même : sur une très grande recherche, il marque une courte pause, affichée dans la barre de progression, au lieu de se faire refuser des requêtes.
 
 **Statut du site** (les deux premiers sont vos cibles)
 
@@ -127,7 +127,7 @@ Changer le mot de passe déconnecte toutes les sessions ouvertes. Changer `TOKEN
 
 ## Coûts
 
-**Grille utilisée par l'outil** (consultée en novembre 2026, à revérifier sur la [page officielle des tarifs Google Maps Platform](https://developers.google.com/maps/billing-and-pricing/pricing)) :
+**Grille utilisée par l'outil**, d'après les informations publiques disponibles en novembre 2026. La page officielle n'a pas pu être consultée directement pendant le développement : **vérifiez ces chiffres sur la [page des tarifs Google Maps Platform](https://developers.google.com/maps/billing-and-pricing/pricing)** avant de vous y fier.
 - Le téléphone, le site, la note et le nombre d'avis relèvent du niveau **Text Search Enterprise**.
 - Ce niveau coûte **35 $ les 1 000 requêtes** au premier palier, après **1 000 requêtes offertes par mois** pour ce niveau.
 - Le prix baisse ensuite par paliers de volume.
@@ -135,20 +135,23 @@ Changer le mot de passe déconnecte toutes les sessions ouvertes. Changer `TOKEN
 Le prix par requête et le nombre de requêtes offertes se modifient dans Réglages si Google change sa grille.
 
 **Ce qui compte pour une requête**
-- Chaque page de 20 résultats compte pour une requête, avec au plus 3 pages par cellule et par catégorie, avant subdivision.
+- Chaque page de 20 résultats compte pour une requête, avec au plus 3 pages par cellule et par catégorie. Une cellule qui renvoie 60 résultats (le maximum) est coupée en quatre, et chaque quart est interrogé à son tour : en centre-ville dense, c'est ce redécoupage qui fait l'essentiel du coût.
 - Les cellules déjà en cache (moins de 30 jours) ne coûtent rien.
 - « Vérifier avec Google » (mode OpenStreetMap) coûte 1 requête par établissement, avec 20 établissements au plus par lot.
 - « Actualiser depuis Google » sur une fiche coûte 1 requête de type Place Details.
 
-**Ordres de grandeur** (cellules de 2 km, avant cache, estimation de l'outil) :
+**Ordres de grandeur** (cellules de 2 km, centre de Toulouse, avant cache et avant calibration, sans plafond) :
 
 | Zone | Catégories | Requêtes probables | Prix indicatif hors requêtes offertes |
 |---|---|---|---|
-| Cercle de 1,5 km (centre de Toulouse) | 6 | environ 46 (de 24 à 72) | environ 1,60 $ |
-| Cercle de 3 km | 6 | environ 100 | environ 3,60 $ |
-| Cercle de 5 km | 10 | environ 475 | environ 16,60 $ |
+| Cercle de 1 km (réglage par défaut) | 6 | environ 120 (de 20 à 200) | environ 4,30 $ |
+| Cercle de 1,5 km | 6 | environ 240 | environ 8,40 $ |
+| Cercle de 3 km | 6 | environ 440 | environ 15,40 $ |
+| Cercle de 5 km | 10 | environ 800 | environ 28 $ |
 
-En centre-ville dense, les cellules saturées sont redécoupées, ce qui ajoute des requêtes. Le plafond par recherche borne toujours la dépense. Avec les 1 000 requêtes offertes chaque mois, un usage de prospection régulier reste souvent gratuit. Le compteur « Ce mois » en haut de l'écran ne compte que les recherches faites depuis ce navigateur. La console Google Cloud fait foi.
+Ces chiffres supposent la densité d'un centre-ville : en périphérie, c'est nettement moins. Avec le plafond par défaut (150 requêtes, soit 5,25 $ au plus), les grandes zones s'arrêtent avant la fin : l'outil le dit avant de lancer (« plafond atteint · zone dense ») et signale ensuite les cellules non explorées. Relancez pour continuer (le déjà-vu vient du cache), ou réduisez la zone et le nombre de catégories.
+
+Le plafond par recherche est la seule vraie garantie : il borne toujours la dépense. Avec les 1 000 requêtes offertes chaque mois, un usage de prospection régulier reste souvent gratuit. Le compteur « Ce mois » en haut de l'écran ne compte que les recherches faites depuis ce navigateur. La console Google Cloud fait foi.
 
 ---
 
@@ -190,15 +193,18 @@ NODE_PATH=$(npm root -g) node tests/smoke.cjs /tmp/captures   # test de fumée P
 ```
 
 - **Tests unitaires** (`tests/unit/`) : fonction Netlify appelée avec un faux Google (`tests/fixtures/mock-google.mjs`). Ils couvrent :
-  - le mot de passe, les jetons signés, expirés ou falsifiés, la limitation des essais, la limite par minute (et la pause automatique du client) et le plafond quotidien ;
+  - le mot de passe, les jetons signés, expirés ou falsifiés, la limitation des essais (partagée entre instances via un faux Netlify Blobs), la limite par minute (et la pause automatique du client) et le plafond quotidien ;
   - la pagination jusqu'à 60 résultats et le masque de champs, l'abandon du type refusé par Google et les entrées invalides ;
   - la correspondance OpenStreetMap → Google, la classification des sites, le quadrillage et la subdivision, l'estimation, le score, le CSV et la requête Overpass ;
   - l'orchestration complète : subdivision des cellules saturées, dédoublonnage, plafond et cache.
 - **Test de fumée** (`tests/smoke.cjs`) : écrans principaux en 1440 et 390 px. La vraie fonction Netlify est branchée sur le faux Google ; Overpass, Nominatim et les tuiles sont simulés. Le test couvre :
-  - l'estimation, la connexion, la recherche, l'attribution et la fiche ;
-  - le CRM, l'export CSV et la session d'appels ;
+  - le bouton « Lancer » visible dès le premier écran, l'estimation (comparée aux requêtes réellement consommées), la connexion, la recherche, l'attribution et la fiche ;
+  - la carte lisible (grappes et 10 meilleurs numérotés) et le tableau compact ;
+  - le CRM, l'export CSV, la session d'appels (la fiche suivante repart du haut) et « Ne plus contacter » (annulation, liste consultable, réautorisation) ;
   - le mode OpenStreetMap, la vérification Google et le générateur d'empreinte ;
-  - la mise en page mobile (aucun défilement horizontal) et l'absence d'erreur dans la console.
+  - le lancement local sans fonction serveur (pas de mot de passe demandé, démonstration proposée) ;
+  - la mise en page mobile : aucun défilement horizontal, bouton de lancement au-dessus de la navigation, liste proche du haut des résultats, bascule Liste / Carte, filtres repliés, textes ≥ 12 px et cibles tactiles ≥ 40 px ;
+  - l'absence d'erreur dans la console.
 
 Il demande Playwright (`npm i -g playwright && npx playwright install chromium`).
 
@@ -210,10 +216,11 @@ Il demande Playwright (`npm i -g playwright && npx playwright install chromium`)
 index.html                  interface (recherche, mes prospects, réglages)
 css/app.css                 identité NEXORA (nuit violette, accents or), responsive, mouvement réduit
 js/app.js                   interface : carte, résultats, fiche, CRM, export, réglages
-js/ui/map.js                carte Leaflet : zones, tracé du rectangle, marqueurs, attribution
+js/ui/map.js                carte Leaflet : zones, tracé du rectangle, balayage, grappes, marqueurs, attribution
 js/lib/                     modules partagés navigateur / fonction / tests
   categories.js             catégories FR ↔ types Places ↔ étiquettes OSM
-  geo.js                    zones, quadrillage, subdivision, estimation du coût
+  geo.js                    zones, quadrillage, subdivision
+  estimate.js               estimation du coût (redécoupage modélisé, calibration)
   search.js                 orchestration (cache, plafond, subdivision, vérification Google)
   website.js                classement « aucun site / réseaux-annuaire / site »
   score.js                  score d'opportunité
@@ -222,7 +229,7 @@ js/lib/                     modules partagés navigateur / fonction / tests
   templates.js              scripts d'appel, emails, SMS, objections
   api.js, csv.js, format.js, hash.js, places-data.js, demo.js
 netlify/functions/places.mjs   passerelle Google Places (clé côté serveur, mot de passe, quotas)
-vendor/                     Leaflet 1.9.4 et police Lexend, hébergés avec le site
+vendor/                     Leaflet 1.9.4, Leaflet.markercluster 1.5.3 et police Lexend, hébergés avec le site
 tests/                      tests unitaires, faux Google, test de fumée
 ```
 
@@ -230,6 +237,7 @@ tests/                      tests unitaires, faux Google, test de fumée
 
 - Text Search renvoie au plus 60 résultats par requête. La subdivision contourne cette limite, mais une catégorie très dense dans une petite cellule peut rester incomplète au-delà de 5 niveaux de découpage.
 - Le compteur de requêtes du mois est local au navigateur.
-- La limitation de débit de la fonction est tenue en mémoire de l'instance Netlify. Le plafond quotidien est partagé grâce à Netlify Blobs, avec un repli en mémoire si ce service est indisponible.
+- La limite par minute de la fonction est tenue en mémoire de l'instance Netlify. Le plafond quotidien et les échecs de connexion sont partagés grâce à Netlify Blobs, avec un repli en mémoire si ce service est indisponible.
+- L'estimation du coût reste une estimation : elle part d'ordres de grandeur de centre-ville, puis se recale sur vos recherches. Le plafond, lui, est une garantie.
 - La correspondance OpenStreetMap → Google repose sur le nom et la position : un établissement renommé ou mal placé peut ne pas être retrouvé.
 - Le CRM vit dans le navigateur : exportez-le régulièrement en JSON.
