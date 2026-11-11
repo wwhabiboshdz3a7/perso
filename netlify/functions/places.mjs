@@ -5,6 +5,8 @@
 //   signé HMAC-SHA256 (TOKEN_SECRET) à durée limitée.
 // - Limitation de débit par adresse IP et plafond quotidien de requêtes Google
 //   (MAX_REQUESTS_PER_DAY, compteur partagé via Netlify Blobs quand il est disponible).
+// - Échecs de connexion comptés dans Netlify Blobs (partagés entre les instances) :
+//   8 par adresse en 15 min, 40 toutes adresses confondues en 1 h.
 //   La limite par minute (RATE_LIMIT_PER_MINUTE, 90 par défaut) est communiquée au client,
 //   qui la respecte de lui-même.
 //
@@ -123,6 +125,7 @@ export function rateLimit(key, limit, windowMs, now) {
 export function resetRateLimits() {
   buckets.clear();
   memoryDaily.clear();
+  memoryFails.clear();
 }
 
 const memoryDaily = new Map();
@@ -133,6 +136,68 @@ async function defaultQuotaStore() {
     return getStore({ name: 'prospecteur-quota', consistency: 'strong' });
   } catch {
     return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Échecs de connexion, partagés entre instances (Netlify Blobs, repli mémoire)
+// ---------------------------------------------------------------------------
+
+export const LOGIN_FAILS_PER_IP = 8;
+export const LOGIN_FAILS_GLOBAL = 40;
+const LOGIN_IP_WINDOW = 15 * 60_000;
+const LOGIN_GLOBAL_WINDOW = 60 * 60_000;
+const memoryFails = new Map();
+
+/** Adresse IP réduite à une empreinte : rien de lisible n'est conservé. */
+function ipKey(ip) {
+  return `echecs-${createHash('sha256').update(`prospecteur:${ip}`).digest('hex').slice(0, 24)}`;
+}
+
+async function readFails(store, key, now, windowMs) {
+  let list = memoryFails.get(key) || [];
+  if (store) {
+    try {
+      const v = await store.get(key, { type: 'json' });
+      if (Array.isArray(v?.t)) list = v.t;
+    } catch { /* repli mémoire */ }
+  }
+  return list.filter((t) => Number.isFinite(t) && now - t < windowMs);
+}
+
+async function writeFails(store, key, list) {
+  memoryFails.set(key, list);
+  if (store) {
+    try { await store.setJSON(key, { t: list }); } catch { /* repli mémoire */ }
+  }
+}
+
+/** Refus éventuel avant de vérifier le mot de passe (trop d'échecs récents). */
+async function loginBlocked(store, ip, now) {
+  const mine = await readFails(store, ipKey(ip), now, LOGIN_IP_WINDOW);
+  if (mine.length >= LOGIN_FAILS_PER_IP) {
+    return Math.max(60, Math.ceil((LOGIN_IP_WINDOW - (now - mine[0])) / 1000));
+  }
+  const all = await readFails(store, 'echecs-global', now, LOGIN_GLOBAL_WINDOW);
+  if (all.length >= LOGIN_FAILS_GLOBAL) {
+    return Math.max(60, Math.ceil((LOGIN_GLOBAL_WINDOW - (now - all[0])) / 1000));
+  }
+  return 0;
+}
+
+async function recordLoginFailure(store, ip, now) {
+  const k = ipKey(ip);
+  const mine = await readFails(store, k, now, LOGIN_IP_WINDOW);
+  await writeFails(store, k, [...mine, now].slice(-LOGIN_FAILS_PER_IP * 2));
+  const all = await readFails(store, 'echecs-global', now, LOGIN_GLOBAL_WINDOW);
+  await writeFails(store, 'echecs-global', [...all, now].slice(-LOGIN_FAILS_GLOBAL * 2));
+}
+
+async function clearLoginFailures(store, ip) {
+  const k = ipKey(ip);
+  memoryFails.delete(k);
+  if (store) {
+    try { await store.delete(k); } catch { /* sans gravité */ }
   }
 }
 
@@ -335,8 +400,15 @@ export async function handle(req, ctx = {}) {
     if (config.missing.includes('ACCESS_PASSWORD_HASH') || config.missing.includes('TOKEN_SECRET')) {
       return fail(503, 'config', 'Accès non configuré : définissez ACCESS_PASSWORD_HASH et TOKEN_SECRET dans les variables Netlify.', { missing: config.missing });
     }
+    const loginStore = ctx.quotaStore !== undefined ? ctx.quotaStore : await defaultQuotaStore();
+    const wait = await loginBlocked(loginStore, ip, now);
+    if (wait) return fail(429, 'rate', `Trop de tentatives. Réessayez dans ${Math.ceil(wait / 60)} min.`, {}, { 'Retry-After': String(wait) });
     const ok = await verifyPassword(body.password, env.ACCESS_PASSWORD_HASH);
-    if (!ok) return fail(401, 'password', 'Mot de passe incorrect.');
+    if (!ok) {
+      await recordLoginFailure(loginStore, ip, now);
+      return fail(401, 'password', 'Mot de passe incorrect.');
+    }
+    await clearLoginFailures(loginStore, ip);
     const ttlH = Math.min(24 * 30, Math.max(1, Number(env.TOKEN_TTL_HOURS) || 12));
     const exp = now + ttlH * 3600_000;
     const token = signToken({ v: 1, iat: now, exp, fp: passwordFingerprint(env.ACCESS_PASSWORD_HASH) }, env.TOKEN_SECRET);

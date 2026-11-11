@@ -60,6 +60,33 @@ test('connexion : limitation des tentatives par IP', async () => {
   assert.equal(res.status, 429);
 });
 
+test('connexion : échecs partagés entre instances (Netlify Blobs), sans IP en clair', async () => {
+  // faux magasin Netlify Blobs, commun à toutes les « instances » de la fonction
+  const data = new Map();
+  const blobs = {
+    async get(k) { return data.has(k) ? JSON.parse(data.get(k)) : null; },
+    async setJSON(k, v) { data.set(k, JSON.stringify(v)); },
+    async delete(k) { data.delete(k); },
+  };
+  const attempt = (password, ip) => handle(post({ action: 'login', password }), { env: ENV, quotaStore: blobs, ip });
+  for (let i = 0; i < 7; i++) assert.equal((await attempt('faux', '5.6.7.8')).status, 401);
+  // une nouvelle instance (mémoire vide) voit toujours les échecs précédents
+  resetRateLimits();
+  assert.equal((await attempt('faux', '5.6.7.8')).status, 401);
+  resetRateLimits();
+  assert.equal((await attempt(PASSWORD, '5.6.7.8')).status, 429, 'bloqué même avec le bon mot de passe');
+  assert.ok([...data.keys()].every((k) => !k.includes('5.6.7.8')), 'adresse IP stockée sous forme d\'empreinte');
+  // une autre adresse n'est pas bloquée, et une connexion réussie efface ses échecs
+  resetRateLimits();
+  assert.equal((await attempt('faux', '9.8.7.6')).status, 401);
+  assert.equal((await attempt(PASSWORD, '9.8.7.6')).status, 200);
+  // plafond global : une attaque répartie sur de nombreuses adresses finit bloquée
+  resetRateLimits();
+  data.clear();
+  for (let i = 0; i < 40; i++) await attempt('faux', `10.0.0.${i}`);
+  assert.equal((await attempt(PASSWORD, '10.0.1.1')).status, 429);
+});
+
 test('limite par minute : annoncée au client, appliquée par IP, respectée par le client', async () => {
   const env = { ...ENV, RATE_LIMIT_PER_MINUTE: '12' };
   const { data: st } = await call({ action: 'status' }, { env });
