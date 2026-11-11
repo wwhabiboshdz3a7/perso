@@ -60,12 +60,13 @@ export const PROVIDERS = [
   },
   {
     id: 'cerebras', name: 'Cerebras', baseUrl: 'https://api.cerebras.ai/v1', cloud: true,
-    keyUrl: 'https://cloud.cerebras.ai/', blurb: 'Inférence ultra-rapide', tag: 'Rapide', keyPrefix: /^csk-/,
+    // Pas d'adresse stable pour la page des clés (elle dépend de l'organisation) : la console.
+    keyUrl: 'https://cloud.cerebras.ai/', keyLabel: 'Ouvrir la console Cerebras', blurb: 'Inférence ultra-rapide', tag: 'Rapide', keyPrefix: /^csk-/,
     keyHint: 'Commence généralement par « csk- ».',
     pitch: 'Parmi les plus rapides au monde',
     what: 'Des puces géantes (« wafer-scale ») qui comptent parmi les inférences les plus rapides du marché, sur des modèles ouverts (gpt-oss, Llama, Qwen).',
     price: { kind: 'free', label: 'Gratuit (limité)', note: `Offre gratuite avec des quotas journaliers (${CHECK}).` },
-    steps: 'Créez un compte sur cloud.cerebras.ai, puis ouvrez la rubrique « API Keys ».',
+    steps: 'Créez un compte sur cloud.cerebras.ai, puis ouvrez la rubrique « API Keys » du menu de gauche et « Generate API key ».',
     suggest: [
       { re: /gpt-oss-120b/i, label: 'gpt-oss 120B', why: 'Polyvalent, très rapide ici' },
       { re: /llama-?3\.3-70b/i, label: 'Llama 3.3 70B', why: 'Fiable en français' },
@@ -239,9 +240,20 @@ export function localCorsHelp(provider) {
 
 /* ---------- Assistant de connexion ---------- */
 
-/** Modèles « ouverts » d'une liste : modèles de discussion d'une famille à poids ouverts. */
+// Modèles propriétaires vendus sous le nom d'une famille ouverte (API seulement, poids non publiés) :
+// Qwen Max / Plus / Turbo / Flash / Long, Qwen3 Max, Qwen VL Max / Plus, Qwen3 Coder Plus / Flash,
+// Mistral Medium et Large « latest », Magistral et Devstral Medium, Codestral, Saba, Ministral 3B,
+// Moonshot v1, GLM-4 Plus / Air / Flash / Long.
+export const CLOSED_WEIGHTS = /\bqwen(?:[-_.]?\d+(?:\.\d+)?)?[-_](?:max|plus|turbo|flash|long)\b|qwen[-_]?vl[-_](?:max|plus)|qwen3[-_]coder[-_](?:plus|flash)|mistral[-_]medium|mistral[-_]large[-_]latest|magistral[-_]medium|devstral[-_]medium|codestral|mistral[-_]saba|ministral[-_]3b|moonshot[-_]v1|kimi[-_]latest|glm[-_]4[-_](?:plus|air|airx|flash|flashx|long)\b/i;
+
+/** Le modèle appartient-il à une famille ouverte et ses poids sont-ils publiés ? */
+export function isOpenWeights(m) {
+  return !!(m && m.family && !CLOSED_WEIGHTS.test(m.id));
+}
+
+/** Modèles « ouverts » d'une liste : modèles de discussion à poids ouverts. */
 export function openModels(models, { freeOnly = false } = {}) {
-  return (models || []).filter((m) => m.chat && m.family && (!freeOnly || m.free));
+  return (models || []).filter((m) => m.chat && isOpenWeights(m) && (!freeOnly || m.free));
 }
 
 /**
@@ -251,7 +263,7 @@ export function openModels(models, { freeOnly = false } = {}) {
 export function recommendedModels(provider, models, { freeOnly = false, max = 5 } = {}) {
   const out = [];
   const used = new Set();
-  const chat = (models || []).filter((m) => m.chat);
+  const chat = (models || []).filter((m) => m.chat && !CLOSED_WEIGHTS.test(m.id));
   for (const s of provider.suggest || []) {
     const matches = chat.filter((m) => s.re.test(m.id) && !used.has(m.id) && (!freeOnly || m.free));
     if (!matches.length) continue;

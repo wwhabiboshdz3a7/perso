@@ -4,7 +4,8 @@
 //
 // Variables d'environnement :
 //   PROVIDER_BASE_URL      ex. https://api.groq.com/openai/v1
-//   PROVIDER_API_KEY       clé du fournisseur (facultative pour un serveur local)
+//   PROVIDER_API_KEY       clé du fournisseur (facultative pour une adresse locale ou privée ;
+//                          « aucune » pour un serveur compatible OpenAI sans authentification)
 //   ACCESS_PASSWORD_HASH   empreinte du mot de passe (node scripts/hash-password.mjs)
 //   TOKEN_SECRET           secret aléatoire d'au moins 32 caractères
 // Facultatives :
@@ -148,17 +149,38 @@ function clientIp(req, context) {
     || 'inconnue';
 }
 
+// Valeur d'exemple restée telle quelle (bloc .env collé sans remplacer la clé, modèle de documentation).
+const PLACEHOLDER_KEY = /^(collez-votre-cle-ici|votre[-_ ]?cle.*|your[-_ ]?(api[-_ ]?)?key.*|x{4,}|changeme|<.*>|\.\.\.|…)$/i;
+// Serveur compatible OpenAI sans authentification (vLLM sans --api-key…) : à écrire explicitement.
+const NO_KEY = /^(aucune|none)$/i;
+
+/** Adresse locale ou privée : un serveur maison peut se passer de clé. */
+export function isLocalUrl(url) {
+  let h;
+  try { h = new URL(url).hostname.replace(/^\[|\]$/g, ''); } catch { return false; }
+  const ipv4 = /^\d{1,3}(\.\d{1,3}){3}$/.test(h);
+  return h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h === '::1' || h === '0.0.0.0'
+    || h === 'host.docker.internal'
+    || (ipv4 && (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h)));
+}
+
 /** Variables manquantes ou invalides (noms seuls, jamais de valeur). */
 export function missingVariables() {
   const missing = [];
-  if (!env('PROVIDER_BASE_URL')) missing.push('PROVIDER_BASE_URL');
+  const base = env('PROVIDER_BASE_URL');
+  const key = env('PROVIDER_API_KEY');
+  if (!base) missing.push('PROVIDER_BASE_URL');
+  // Sans clé (ou avec le texte d'exemple), un fournisseur cloud refuserait chaque requête :
+  // le serveur n'est pas annoncé « prêt ». « aucune » assume un serveur sans authentification.
+  if (PLACEHOLDER_KEY.test(key) || (!key && !isLocalUrl(base))) missing.push('PROVIDER_API_KEY');
   if (!/^pbkdf2-sha256\$\d+\$[^$]+\$[^$]+$/.test(env('ACCESS_PASSWORD_HASH'))) missing.push('ACCESS_PASSWORD_HASH');
   if (env('TOKEN_SECRET').length < 32) missing.push('TOKEN_SECRET');
   return missing;
 }
 
 function missingConfig() {
-  return missingVariables().map((n) => (n === 'TOKEN_SECRET' ? 'TOKEN_SECRET (32 caractères minimum)' : n));
+  return missingVariables().map((n) => (n === 'TOKEN_SECRET' ? 'TOKEN_SECRET (32 caractères minimum)'
+    : n === 'PROVIDER_API_KEY' ? 'PROVIDER_API_KEY (clé du fournisseur absente ou laissée sur « collez-votre-cle-ici »)' : n));
 }
 
 function upstreamUrl(path) {
@@ -168,7 +190,7 @@ function upstreamUrl(path) {
 function upstreamHeaders(extra = {}) {
   const h = { ...extra };
   const key = env('PROVIDER_API_KEY');
-  if (key) h.Authorization = `Bearer ${key}`;
+  if (key && !NO_KEY.test(key)) h.Authorization = `Bearer ${key}`;
   return h;
 }
 

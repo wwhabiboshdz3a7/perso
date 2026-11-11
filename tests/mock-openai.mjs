@@ -160,6 +160,7 @@ export function startMock({ port = 0, host = '127.0.0.1', log = false } = {}) {
       else if (/^Continue ta réponse/i.test(text)) answer = 'et voici la fin de la réponse.';
       else if (/coupure/i.test(text)) { answer = 'Voici les trois étapes : 1) préparer le devis, 2) envoyer'; cutStream = true; }
       else if (/^longue/i.test(text)) { answer = LONG; delay = 3; }
+      else if (/^Présente-toi/i.test(text)) answer = 'Bonjour Ibrahim ! Je suis Nour, votre assistante personnelle : je réfléchis dans le cloud sur un modèle ouvert et je vous réponds en un éclair.';
       else if (images) answer = `J'ai bien reçu ${images} image${images > 1 ? 's' : ''}.`;
       else if (/Fichier joint : (.+)/.test(text)) answer = `J'ai lu le fichier « ${/Fichier joint : ([^\n(]+)/.exec(text)[1].trim()} ».`;
       else answer = `Bonjour ! Vous avez écrit : « ${text.slice(0, 120)} ». Réponse n°${state.count}.`;

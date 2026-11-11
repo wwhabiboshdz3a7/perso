@@ -58,21 +58,70 @@ function randomInt(n) {
 }
 
 const WORDS = [
-  'aube', 'ambre', 'atlas', 'azur', 'balise', 'boussole', 'braise', 'cedre', 'comete', 'corail',
-  'cristal', 'dune', 'eclat', 'escale', 'etoile', 'falaise', 'flamme', 'fleuve', 'galaxie', 'givre',
-  'horizon', 'jasmin', 'lagune', 'lanterne', 'lumiere', 'lune', 'marbre', 'medina', 'meteore', 'mirage',
-  'nacre', 'nuage', 'oasis', 'olivier', 'onyx', 'opale', 'orage', 'orbite', 'palmier', 'phare',
-  'plume', 'prisme', 'quartz', 'rivage', 'saphir', 'sirocco', 'soleil', 'source', 'tempete', 'zellige',
+  'abeille', 'abricot', 'acacia', 'agate', 'aigle', 'albatros', 'alcove', 'algue', 'almanach',
+  'amande', 'ambre', 'ananas', 'ancre', 'anis', 'antilope', 'arbre', 'arc', 'archipel', 'argile',
+  'armoire', 'artichaut', 'atlas', 'atoll', 'aube', 'auberge', 'aurore', 'autruche', 'avion', 'azur',
+  'badiane', 'baie', 'baleine', 'balise', 'bambou', 'banane', 'banquise', 'baobab', 'barque',
+  'basalte', 'bateau', 'baume', 'berger', 'biscuit', 'bison', 'bleuet', 'bobine', 'bocal', 'bougie',
+  'boussole', 'braise', 'brioche', 'brise', 'brume', 'buffle', 'cabane', 'cactus', 'cadran',
+  'calcaire', 'camelia', 'canard', 'canyon', 'capitaine', 'caramel', 'caravane', 'carillon',
+  'carrousel', 'castor', 'cedre', 'cerise', 'chalet', 'chameau', 'chandelle', 'chardon', 'chateau',
+  'chevreuil', 'citron', 'clairiere', 'clementine', 'cobalt', 'colibri', 'colline', 'comete',
+  'compas', 'concerto', 'coquille', 'corail', 'corbeau', 'cormoran', 'coton', 'courant', 'crayon',
+  'criquet', 'cristal', 'cumulus', 'dahlia', 'dauphin', 'delta', 'desert', 'diamant', 'dragon',
+  'dune', 'ebene', 'ecaille', 'echarpe', 'eclair', 'ecureuil', 'emeraude', 'encre', 'epice',
+  'erable', 'escale', 'espadon', 'etoile', 'faucon', 'fenouil', 'figue', 'flamant', 'flamme',
+  'fleuve', 'flocon', 'fontaine', 'foret', 'fougere', 'framboise', 'fregate', 'galet', 'galaxie',
+  'gazelle', 'geyser', 'girafe', 'givre', 'glacier', 'glycine', 'gondole', 'goyave', 'granit',
+  'grenade', 'grillon', 'guitare', 'harpe', 'hautbois', 'hermine', 'heron', 'hibou', 'horizon',
+  'houblon', 'iceberg', 'igloo', 'indigo', 'iris', 'jade', 'jaguar', 'jardin', 'jasmin', 'jonquille',
+  'kayak', 'kiwi', 'koala', 'lagune', 'lavande', 'lezard', 'licorne', 'lilas', 'limon', 'loutre',
+  'lumiere', 'lune', 'luth', 'lynx', 'magnolia', 'mandarine', 'mangue', 'marbre', 'marmotte',
+  'medina', 'melodie', 'mesange', 'meteore', 'mimosa', 'mirage', 'montagne', 'mouette', 'muscade',
+  'myrtille', 'nacre', 'narval', 'nectar', 'neige', 'noisette', 'nougat', 'nuage', 'oasis', 'ocean',
+  'ocre', 'olivier', 'ombre', 'onyx', 'opale', 'orage', 'orbite', 'orchidee', 'origami', 'ortie',
+  'osier', 'ourson', 'pagode', 'palmier', 'panda', 'papaye', 'papillon', 'parasol', 'pastel',
+  'pelican', 'perle', 'phare', 'piano', 'pinson', 'pistache', 'planete', 'plume', 'poivre', 'pollen',
+  'pommier', 'prairie', 'prisme', 'quartz', 'quetzal', 'radeau', 'raisin', 'renard', 'requin',
+  'rivage', 'riviere', 'roseau', 'rubis', 'safran', 'saphir', 'sardine', 'saule', 'sequoia',
+  'sirocco', 'soleil', 'sorbet', 'source', 'sphinx', 'tambour', 'tempete', 'theiere', 'tigre',
+  'tilleul', 'tonnerre', 'topaze', 'torrent', 'toucan', 'tournesol', 'trefle', 'tulipe', 'turquoise',
+  'vague', 'vallee', 'vanille', 'velours', 'verger', 'violette', 'voilier', 'volcan', 'zebre',
+  'zellige', 'zephyr',
 ];
 
-/** Phrase de passe facile à retenir : quatre mots, un nombre (≈ 29 bits d'entropie + mots). */
-export function generatePassphrase(words = 4) {
+/** Nombre de mots de la liste (≈ 8 bits d'entropie par mot tiré au hasard). */
+export const PASSPHRASE_WORDS = WORDS.length;
+
+/**
+ * Phrase de passe facile à retenir : cinq mots tirés au hasard et un nombre de 100 à 999,
+ * soit environ 50 bits d'entropie (5 × log2(nombre de mots) + log2(900)).
+ */
+export function generatePassphrase(words = 5) {
   const parts = [];
   for (let i = 0; i < words; i++) {
     const w = WORDS[randomInt(WORDS.length)];
     parts.push(i === 0 ? w[0].toUpperCase() + w.slice(1) : w);
   }
-  return `${parts.join('-')}-${10 + randomInt(90)}`;
+  return `${parts.join('-')}-${100 + randomInt(900)}`;
+}
+
+/**
+ * Entropie réelle d'une phrase construite avec la liste de mots (« Mot-mot-…-123 »), en bits ;
+ * null si ce n'est pas une telle phrase. Une phrase de mots courants se devine bien plus
+ * facilement que sa longueur ne le laisse croire : on la note sur ce qu'elle contient vraiment.
+ */
+export function passphraseBits(pw) {
+  const parts = String(pw || '').trim().toLowerCase().split(/[-\s_.]+/).filter(Boolean);
+  if (parts.length < 2) return null;
+  let bits = 0;
+  let words = 0;
+  for (const part of parts) {
+    if (WORDS.includes(part)) { bits += Math.log2(WORDS.length); words++; }
+    else if (/^\d{1,4}$/.test(part)) bits += Math.log2(10 ** part.length);
+    else return null;
+  }
+  return words >= 2 ? Math.round(bits) : null;
 }
 
 /** Appréciation simple d'un mot de passe : { ok, level: 0..3, text } */
@@ -80,14 +129,20 @@ export function passwordStrength(pw) {
   const s = String(pw || '');
   if (!s) return { ok: false, level: 0, text: '' };
   if (s.length < MIN_PASSWORD) return { ok: false, level: 0, text: `Au moins ${MIN_PASSWORD} caractères.` };
+  const common = /^(.)\1+$|password|motdepasse|azerty|qwerty|123456|nour|nexora/i.test(s);
+  if (common) return { ok: true, level: 1, text: 'Accepté, mais trop facile à deviner.' };
+  // Phrase de mots de la liste : note fondée sur son entropie réelle, pas sur sa longueur.
+  const bits = passphraseBits(s);
+  if (bits !== null) {
+    if (bits >= 44) return { ok: true, level: 3, text: `Solide : phrase tirée au hasard (environ ${bits} bits).` };
+    return { ok: true, level: 2, text: `Correct, mais ces mots se devinent plus vite que sa longueur ne le laisse croire (environ ${bits} bits) : ajoutez un mot.` };
+  }
   let variety = 0;
   if (/[a-z]/.test(s)) variety++;
   if (/[A-Z]/.test(s)) variety++;
   if (/\d/.test(s)) variety++;
   if (/[^A-Za-z0-9]/.test(s)) variety++;
-  const common = /^(.)\1+$|password|motdepasse|azerty|qwerty|123456|nour|nexora/i.test(s);
-  if (common) return { ok: true, level: 1, text: 'Accepté, mais trop facile à deviner.' };
-  if (s.length >= 16 || (s.length >= 12 && variety >= 3)) return { ok: true, level: 3, text: 'Solide.' };
+  if (s.length >= 20 || (s.length >= 14 && variety >= 3)) return { ok: true, level: 3, text: 'Solide.' };
   return { ok: true, level: 2, text: 'Correct. Plus long, il serait plus sûr.' };
 }
 
