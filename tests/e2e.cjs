@@ -10,6 +10,7 @@
 //   - le site + la fonction Netlify (tests/serveur-local.mjs) port E2E_PORT + 2
 //   - le même, sans aucune variable d'environnement          port E2E_PORT + 3
 //   - le même, avec les variables produites par le générateur de l'assistant (port E2E_PORT + 4)
+//   - le même, avec une clé laissée sur « collez-votre-cle-ici » puis une clé refusée (E2E_PORT + 5 et + 6)
 // Les captures d'écran vont dans E2E_SHOTS (défaut : dossier temporaire du système).
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
@@ -1340,12 +1341,29 @@ async function noHorizontalScroll(page) {
     expectNetErrors = true;
     const { ctx, page } = await newPage(browser, { label: 'cerveau-cloud' });
     await routeProvider(page, 'https://api.groq.com', '/openai');
+    // Carte « où réfléchit le cerveau » : chemin du cloud animé, celui survolé s'allume.
+    await page.click('#conn-status');
+    await page.waitForSelector('#dlg-connect[open] .cw-map[data-hl="cloud"]');
+    await page.hover('#dlg-connect [data-connect="serveur"]');
+    await page.waitForSelector('.cw-map[data-hl="serveur"]');
+    await page.click('#dlg-connect .brain-adv > summary');
+    await page.waitForSelector('.cw-map[data-hl="local"]');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#dlg-connect', { state: 'detached' });
     await page.click('.welcome [data-connect="cloud"]');
     await page.waitForSelector('#cw-key:focus');
     assert.equal(await page.locator('[data-cw-prov]').count(), 7, 'sept fournisseurs cloud');
     assert.equal(await page.locator('[data-cw-prov="groq"]').getAttribute('aria-pressed'), 'true');
     assert.match(await page.locator('.cw-price-note').innerText(), /à vérifier/);
-    assert.equal(await page.locator('[data-cw-finish]').isDisabled(), true);
+    assert.equal(await page.locator('[data-cw-finish]').isHidden(), true, 'pas de gros bouton inerte avant le test');
+    assert.match(await page.locator('[data-cw-note]').innerText(), /Testez la connexion pour continuer/);
+    // Changer de fournisseur depuis une fiche défilée : on repart du haut.
+    await page.evaluate(() => { document.querySelector('#dlg-connect .modal-body').scrollTop = 200; });
+    await page.click('[data-cw-prov="huggingface"]');
+    assert.equal(await page.evaluate(() => document.querySelector('#dlg-connect .modal-body').scrollTop), 0);
+    await page.click('[data-cw-prov="cerebras"]');
+    assert.match(await page.locator('.cw-steps a.btn').first().innerText(), /Ouvrir la console Cerebras/);
+    await page.click('[data-cw-prov="groq"]');
     await page.screenshot({ path: `${SHOTS}/40-cerveau-cloud-desktop.png` });
     // Clé d'un autre fournisseur
     await page.fill('#cw-key', 'sk-or-v1-abcdef123456');
@@ -1384,10 +1402,21 @@ async function noHorizontalScroll(page) {
     await page.click('[data-cw-test]');
     await page.waitForSelector('[data-cw-diag][data-kind="ok"]');
     assert.equal(await page.inputValue('#cw-key'), 'cle-valide', 'clé nettoyée');
+    assert.match(await page.locator('[data-cw-diag]').innerText(), /Connexion réussie · réponse en \d+ ms/);
+    assert.equal(await page.locator('[data-cw-diag] .cw-link').count(), 1, 'liaison Nour ⇄ fournisseur');
     assert.equal(await page.locator('input[name="cw-model"]:checked').getAttribute('value'), 'openai/gpt-oss-120b', 'modèle conseillé présélectionné');
     assert.equal(await page.locator('.cw-model').count() >= 3, true);
     await page.click('.cw-model:has(input[value="meta-llama/llama-3.3-70b-instruct"])');
     assert.match(await page.locator('[data-cw-finish]').innerText(), /Utiliser Groq · llama-3\.3-70b-instruct/);
+    // Essai en direct avec le modèle choisi, avant tout enregistrement.
+    await page.click('[data-cw-try-btn]');
+    await page.waitForSelector('[data-cw-try-out][data-state="ok"]');
+    assert.match(await page.locator('.cw-try-text').innerText(), /Je suis Nour/);
+    // L'interception réseau de Playwright livre la réponse d'un bloc : seul le délai est affiché.
+    assert.match(await page.locator('.cw-try-stats').innerText(), /avant le premier mot/);
+    assert.equal((await mockLast()).model, 'meta-llama/llama-3.3-70b-instruct');
+    assert.equal(await page.evaluate(() => localStorage.getItem('nour.keys')), null, 'rien d’enregistré pendant l’essai');
+    await page.locator('[data-cw-try]').scrollIntoViewIfNeeded();
     await page.screenshot({ path: `${SHOTS}/41-cerveau-cloud-teste-desktop.png` });
     await page.click('[data-cw-finish]');
     await page.waitForSelector('#dlg-connect', { state: 'detached' });
@@ -1412,20 +1441,46 @@ async function noHorizontalScroll(page) {
     await page.click('[data-cw-generate]');
     assert.equal(await page.getAttribute('#cw-newpass', 'aria-invalid'), 'true');
     await page.click('[data-cw-genpass]');
-    const pass = await page.inputValue('#cw-newpass');
-    assert.ok(pass.length >= 10, `phrase proposée : ${pass}`);
+    const pass0 = await page.inputValue('#cw-newpass');
+    assert.match(pass0, /^[A-Z][a-z]+(-[a-z]+){4}-\d{3}$/, `phrase proposée : ${pass0}`);
+    assert.match(await page.locator('[data-cw-strength]').innerText(), /Solide/);
+    assert.equal(await page.isDisabled('[data-cw-copyenv]'), true, 'bloc .env indisponible avant la génération');
     await page.selectOption('#cw-srv-prov', 'openrouter');
     await page.fill('#cw-srv-model', 'qwen/qwen3-32b');
     await page.click('[data-cw-generate]');
     await page.waitForSelector('.cw-var[data-var="TOKEN_SECRET"]:not(.is-empty)');
+    // Le focus revient sur le bouton (désactivé pendant le calcul).
+    await page.waitForFunction(() => document.activeElement?.matches('[data-cw-generate]'));
     const val = (name) => page.getAttribute(`.cw-var[data-var="${name}"] .cw-var-value`, 'title');
+    const fn = await import(pathToFileURL(path.join(ROOT, 'netlify/functions/chat.mjs')).href);
+    const firstHash = await val('ACCESS_PASSWORD_HASH');
+    assert.ok(fn.verifyPassword(pass0, firstHash));
+    // Nouvelle proposition après génération : l'ancienne empreinte n'est plus affichée ni copiable.
+    await page.click('[data-cw-genpass]');
+    const pass = await page.inputValue('#cw-newpass');
+    assert.notEqual(pass, pass0);
+    await page.waitForSelector('.cw-var.is-stale[data-var="ACCESS_PASSWORD_HASH"]');
+    assert.match(await page.locator('.cw-stale').innerText(), /Le mot de passe a changé/);
+    assert.equal(await page.locator('[data-copy-value="ACCESS_PASSWORD_HASH"]').count(), 0, 'empreinte périmée non copiable');
+    assert.equal(await page.isDisabled('[data-cw-copyenv]'), true, 'bloc .env bloqué tant que l’empreinte est périmée');
+    assert.match(await page.locator('[data-cw-generate]').innerText(), /Recalculer l’empreinte/);
+    await page.screenshot({ path: `${SHOTS}/42b-cerveau-empreinte-perimee-desktop.png` });
+    // Revenir au mot de passe d'origine lève l'alerte ; un autre la remet.
+    await page.fill('#cw-newpass', pass0);
+    await page.waitForSelector('.cw-stale', { state: 'detached' });
+    await page.fill('#cw-newpass', pass);
+    await page.waitForSelector('.cw-stale');
+    await page.click('[data-cw-generate]');
+    await page.waitForSelector('.cw-var[data-var="ACCESS_PASSWORD_HASH"]:not(.is-stale):not(.is-empty)');
     const hash = await val('ACCESS_PASSWORD_HASH');
     const secret = await val('TOKEN_SECRET');
+    assert.notEqual(hash, firstHash);
+    assert.ok(fn.verifyPassword(pass, hash) && !fn.verifyPassword(pass0, hash), 'empreinte du nouveau mot de passe');
+    assert.equal(await page.isDisabled('[data-cw-copyenv]'), false);
     assert.equal(await val('PROVIDER_BASE_URL'), 'https://openrouter.ai/api/v1');
     assert.equal(await val('PROVIDER_DEFAULT_MODEL'), 'qwen/qwen3-32b');
     assert.match(hash, /^pbkdf2-sha256\$210000\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+$/);
     assert.ok(secret.length >= 32);
-    const fn = await import(pathToFileURL(path.join(ROOT, 'netlify/functions/chat.mjs')).href);
     assert.ok(fn.verifyPassword(pass, hash), 'empreinte acceptée par la fonction Netlify');
     assert.ok(!fn.verifyPassword(`${pass}x`, hash));
     await page.click('[data-copy-value="TOKEN_SECRET"]');
@@ -1453,6 +1508,12 @@ async function noHorizontalScroll(page) {
     await m.page.fill('#cw-pass', pass);
     await m.page.click('[data-cw-login-form] button[type="submit"]');
     await m.page.waitForSelector('[data-cw-models-status][data-kind="ok"]');
+    assert.equal(await m.page.locator('#dlg-connect [data-free]').isVisible(), true, 'le serveur renvoie des prix : filtre « gratuits » proposé');
+    await m.page.click('#dlg-connect [data-cw-try-btn]');
+    await m.page.waitForSelector('#dlg-connect [data-cw-try-out][data-state="ok"]');
+    assert.match(await m.page.locator('#dlg-connect .cw-try-text').innerText(), /Je suis Nour/);
+    // Flux réel relayé par la fonction : vitesse mesurée.
+    assert.match(await m.page.locator('#dlg-connect .cw-try-stats').innerText(), /avant le premier mot[\s\S]*jetons\/s/);
     // Pas de PROVIDER_DEFAULT_MODEL côté serveur : un modèle est choisi pour que la première question aboutisse.
     await m.page.click('[data-cw-finish]');
     await m.page.waitForSelector('#dlg-connect', { state: 'detached' });
@@ -1486,6 +1547,63 @@ async function noHorizontalScroll(page) {
     await ctx.close();
   });
 
+  await test('cerveau serveur : clé factice non annoncée « prête », clé refusée bloquante, serveur mis en avant', async () => {
+    expectNetErrors = true;
+    const common = { PROVIDER_BASE_URL: `${MOCK}/v1`, ACCESS_PASSWORD_HASH: TEST_PASSWORD_HASH, TOKEN_SECRET: 'secret-de-test-tres-long-0123456789abcdef', RATE_LIMIT_PER_MINUTE: '500' };
+    // 1. Bloc .env importé sans remplacer la clé : « À terminer », PROVIDER_API_KEY nommée.
+    launch(process.execPath, ['tests/serveur-local.mjs', String(PORT + 5)], { ...common, PROVIDER_API_KEY: "'collez-votre-cle-ici'" });
+    // 2. Clé présente mais refusée par le fournisseur.
+    launch(process.execPath, ['tests/serveur-local.mjs', String(PORT + 6)], { ...common, PROVIDER_API_KEY: 'mauvaise-cle' });
+    await Promise.all([waitFor(`http://127.0.0.1:${PORT + 5}/`), waitFor(`http://127.0.0.1:${PORT + 6}/`)]);
+
+    const a = await newPage(browser, { label: 'cle-factice', url: `http://127.0.0.1:${PORT + 5}/` });
+    await a.page.waitForSelector('.welcome .brain-badge.warn');
+    assert.equal(await a.page.locator('.welcome .brain-detected').count(), 0, 'pas de « serveur prêt » avec une clé factice');
+    await a.page.click('.welcome [data-connect="serveur"]');
+    await a.page.waitForSelector('[data-cw-srv-status][data-state="incomplete"]');
+    assert.match(await a.page.locator('[data-cw-srv-status]').innerText(), /PROVIDER_API_KEY[\s\S]*collez-votre-cle-ici/);
+    await a.page.screenshot({ path: `${SHOTS}/48-cerveau-cle-factice-desktop.png` });
+    await a.ctx.close();
+
+    const b = await newPage(browser, { label: 'cle-refusee', url: `http://127.0.0.1:${PORT + 6}/` });
+    await b.page.waitForSelector('.welcome .brain-detected');
+    // Serveur détecté : c'est lui qui est mis en avant, en premier.
+    assert.equal(await b.page.locator('.welcome .brain-card').first().getAttribute('data-connect'), 'serveur');
+    assert.equal(await b.page.locator('.welcome .brain-card.reco').getAttribute('data-connect'), 'serveur');
+    await b.page.screenshot({ path: `${SHOTS}/49-cerveau-serveur-en-avant-desktop.png` });
+    await b.page.click('.welcome .brain-detected');
+    await b.page.fill('#cw-pass', 'acces-nour-2026');
+    await b.page.click('[data-cw-login-form] button[type="submit"]');
+    await b.page.waitForSelector('[data-cw-models-status][data-kind="error"]');
+    assert.match(await b.page.locator('[data-cw-models-status]').innerText(), /refuse la clé du serveur[\s\S]*PROVIDER_API_KEY/);
+    assert.equal(await b.page.isDisabled('[data-cw-finish]'), true, '« Utiliser mon serveur » bloqué');
+    assert.match(await b.page.locator('[data-cw-finish]').innerText(), /Clé du serveur à corriger/);
+    assert.equal(await b.page.getAttribute('[data-cw-srv-status]', 'data-state'), 'key-refused', 'plus annoncé « configuré » une fois la clé refusée');
+    assert.match(await b.page.locator('[data-cw-srv-status]').innerText(), /clé est refusée/);
+    assert.equal(await b.page.locator('[data-cw-srv-picker]').isHidden(), true, 'pas de liste vide « Testez la connexion » en mode serveur');
+    assert.equal(await b.page.locator('#dlg-connect [data-cw-try]').isHidden(), true);
+    assert.equal(await b.page.locator('#dlg-connect [data-free]').isVisible(), false);
+    await b.page.screenshot({ path: `${SHOTS}/50-cerveau-cle-refusee-desktop.png` });
+    await b.ctx.close();
+
+    // 3. config.js « path: 'server' » : la carte Serveur passe devant, même sans serveur détecté.
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    track(page, 'config-path');
+    await page.route('**/config.js', (route) => route.fulfill({ contentType: 'text/javascript', body: "window.NOUR_CONFIG = { path: 'server' };" }));
+    await page.goto(BASE);
+    await page.waitForSelector('.welcome .brain-card');
+    assert.equal(await page.locator('.welcome .brain-card').first().getAttribute('data-connect'), 'serveur');
+    assert.match(await page.locator('.welcome .brain-card.reco').innerText(), /Recommandé[\s\S]*Mon serveur Netlify/i);
+    // Puce « Choisir un modèle » au premier lancement : l'assistant, pas les réglages bruts.
+    await page.click('#model-chip');
+    await page.waitForSelector('#dlg-connect[open]');
+    assert.equal(await page.locator('#dlg-settings').count(), 0);
+    assert.equal(await page.getAttribute('#dlg-connect .cw-map', 'data-featured'), 'serveur', 'chemin du serveur mis en avant sur la carte');
+    expectNetErrors = false;
+    await ctx.close();
+  });
+
   await test('cerveau mobile 390 px : choix, cloud, serveur, sans défilement horizontal', async () => {
     const { ctx, page } = await newPage(browser, { label: 'cerveau-mobile', mobile: true });
     await routeProvider(page, 'https://api.groq.com', '/openai');
@@ -1508,6 +1626,15 @@ async function noHorizontalScroll(page) {
     await page.waitForSelector('[data-cw-diag][data-kind="ok"]');
     await page.waitForTimeout(300);
     await page.screenshot({ path: `${SHOTS}/46-cerveau-cloud-mobile.png` });
+    assert.deepEqual(await overflow(), { doc: 0, body: 0 });
+    await page.click('.cw-all > summary');
+    await page.locator('.cw-all .model-opt').last().scrollIntoViewIfNeeded();
+    const cramped = await page.evaluate(() => [...document.querySelectorAll('.cw-all .model-opt')].filter((o) => {
+      const id = o.querySelector('.id').getBoundingClientRect();
+      return id.width < o.getBoundingClientRect().width * 0.7 || id.height > 60;
+    }).map((o) => o.title));
+    assert.deepEqual(cramped, [], 'identifiants lisibles sur toute la largeur');
+    await page.screenshot({ path: `${SHOTS}/46b-cerveau-tous-modeles-mobile.png` });
     assert.deepEqual(await overflow(), { doc: 0, body: 0 });
     await page.click('[data-cw-back]');
     await page.click('#dlg-connect [data-connect="serveur"]');

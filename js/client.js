@@ -173,7 +173,7 @@ async function errorFromResponse(res, conn) {
     session.clear();
     clientEvents.dispatchEvent(new Event('status'));
   }
-  if (kind === 'auth') authState.fail(conn);
+  if (kind === 'auth' && !conn.candidate) authState.fail(conn);
   return new ApiError(kind, message || `Erreur ${res.status}`, {
     status: res.status,
     detail: message,
@@ -229,8 +229,9 @@ function idleTimeouts(conn) {
  * onDelta reçoit l'état cumulé { content, reasoning } à chaque morceau.
  * Le résultat indique `complete` : faux si le flux s'est fermé sans « [DONE] » ni finish_reason.
  */
-export async function streamChat({ messages, model, temperature, maxTokens, signal, onDelta }) {
-  const conn = connection();
+export async function streamChat({ messages, model, temperature, maxTokens, signal, onDelta, conn: given = null }) {
+  // `given` : connexion candidate de l'assistant de connexion (essai avant enregistrement).
+  const conn = given || connection();
   const useModel = model || conn.model;
   checkReady({ ...conn, model: useModel });
   const body = { model: useModel, messages, stream: true };

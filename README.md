@@ -12,7 +12,7 @@ Application web progressive (PWA) installable, 100 % statique, publiable telle q
 
 Les modèles **ouverts** (gpt-oss, Llama, Qwen, Kimi, Mistral, DeepSeek, Gemma…) sont hébergés par des fournisseurs cloud qui exposent une API compatible OpenAI. Nour leur envoie le texte de la conversation et affiche la réponse : votre ordinateur ou votre téléphone ne font aucun calcul, et vous n'installez rien.
 
-Au premier lancement (ou à tout moment : **Réglages → Connexion → Ouvrir l'assistant**, ou la pastille « Non connecté » en bas de la barre latérale), l'assistant propose trois chemins :
+Au premier lancement (ou à tout moment : **Réglages → Connexion → Ouvrir l'assistant**, ou la pastille « Non connecté » en bas de la barre latérale), l'assistant propose trois chemins. En tête, une carte animée montre où réfléchit le cerveau (vous → Nour → cloud, serveur Netlify ou cet ordinateur) : le chemin conseillé s'allume, et celui que vous survolez ou atteignez au clavier prend le relais.
 
 | | Cloud open source (recommandé) | Mon serveur Netlify | Local (avancé) |
 |---|---|---|---|
@@ -26,7 +26,9 @@ Au premier lancement (ou à tout moment : **Réglages → Connexion → Ouvrir l
 1. Ouvrez Nour → **Cloud open source**. Groq est présélectionné.
 2. **Ouvrir la page des clés** (console.groq.com/keys) → *Create API Key* → copiez la clé (elle ne s'affiche qu'une fois).
 3. Collez-la dans Nour → **Tester la connexion**.
-4. Nour charge la liste **en direct** des modèles, ne garde que les modèles ouverts et présélectionne un modèle conseillé (gpt-oss 120B, Llama 3.3 70B, Kimi K2, Qwen3…). Changez si vous voulez, puis **Utiliser Groq · …**. C'est prêt.
+4. Nour mesure le temps de réponse, charge la liste **en direct** des modèles, ne garde que les modèles à poids ouverts (les versions propriétaires vendues sous un nom de famille ouverte, comme Qwen Max ou Mistral Medium, sont écartées) et présélectionne un modèle conseillé (gpt-oss 120B, Llama 3.3 70B, Kimi K2, Qwen3…).
+5. Facultatif : **Essai en direct → Faire parler Nour**. Le modèle choisi se présente en une phrase, avec le délai avant le premier mot et sa vitesse (jetons par seconde). Rien n'est enregistré.
+6. **Utiliser Groq · …**. C'est prêt.
 
 Avec **OpenRouter** : même chemin ; la case « Modèles gratuits uniquement » (cochée d'office) ne montre que les modèles `:free`.
 
@@ -59,9 +61,9 @@ Pour distinguer CORS et réseau, Nour refait une requête « opaque » (`mode: '
 La clé reste dans les variables d'environnement Netlify ; vous vous connectez depuis n'importe quel appareil avec un mot de passe. Tout se prépare **dans l'application**, sans ligne de commande :
 
 1. Publiez le site sur Netlify (voir [Déploiement](#déploiement-sur-netlify)).
-2. Dans Nour → **Mon serveur Netlify** : choisissez le fournisseur du serveur (et éventuellement son modèle par défaut), tapez un mot de passe d'accès ou cliquez **Proposer**, puis **Générer les variables**. L'empreinte PBKDF2 (`ACCESS_PASSWORD_HASH`) et le secret de signature (`TOKEN_SECRET`) sont calculés dans le navigateur (Web Crypto) : rien n'est envoyé, le mot de passe n'est stocké nulle part.
-3. Copiez chaque variable (boutons *Nom* / *Valeur*) dans *Project configuration → Environment variables* — ou **Copier le bloc .env** pour *Import from a .env file* si l'option est proposée (les valeurs sont entre apostrophes ; la fonction les accepte avec ou sans). Ajoutez votre clé dans `PROVIDER_API_KEY` directement sur Netlify.
-4. Redéployez (*Deploys → Trigger deploy*). Nour interroge `/api/status` : dès que la fonction est complète, l'accueil affiche **« Votre serveur Nour est prêt sur ce site — Se connecter »**. S'il manque une variable, l'assistant la nomme.
+2. Dans Nour → **Mon serveur Netlify** : choisissez le fournisseur du serveur (et éventuellement son modèle par défaut), tapez un mot de passe d'accès ou cliquez **Proposer** (cinq mots tirés au hasard et un nombre, environ 50 bits d'entropie), puis **Générer les variables**. L'empreinte PBKDF2 (`ACCESS_PASSWORD_HASH`) et le secret de signature (`TOKEN_SECRET`) sont calculés dans le navigateur (Web Crypto) : rien n'est envoyé, le mot de passe n'est stocké nulle part. Si vous changez de mot de passe après la génération, Nour retire l'ancienne empreinte, bloque la copie et demande **Recalculer l'empreinte** : impossible de copier une empreinte qui ne correspond plus au mot de passe noté.
+3. Copiez chaque variable (boutons *Nom* / *Valeur*) dans *Project configuration → Environment variables* — ou **Copier le bloc .env** pour *Import from a .env file* si l'option est proposée (les valeurs sont entre apostrophes ; la fonction les accepte avec ou sans). Remplacez ensuite `collez-votre-cle-ici` par votre vraie clé dans `PROVIDER_API_KEY`, directement sur Netlify.
+4. Redéployez (*Deploys → Trigger deploy*). Nour interroge `/api/status` : dès que la fonction est complète, l'accueil affiche **« Votre serveur Nour est prêt sur ce site — Se connecter »** et met la carte du serveur en avant. S'il manque une variable, l'assistant la nomme ; une clé absente ou laissée sur le texte d'exemple compte comme manquante. Après connexion, si le fournisseur refuse la clé, l'état du serveur passe à « clé refusée » et « Utiliser mon serveur » reste bloqué avec la marche à suivre.
 
 Sur le téléphone : ouvrez le site, **Se connecter avec le mot de passe**, puis « Ajouter à l'écran d'accueil ».
 
@@ -74,10 +76,12 @@ window.NOUR_CONFIG = {
   provider: 'groq',               // fournisseur cloud présélectionné
   model: 'openai/gpt-oss-120b',   // choisi après le test s'il existe chez ce fournisseur
   serverModel: '',                // modèle demandé au serveur Netlify (vide = PROVIDER_DEFAULT_MODEL)
-  path: 'cloud',                  // 'cloud' ou 'server'
+  path: 'cloud',                  // chemin mis en avant à l'accueil : 'cloud' ou 'server'
   freeOnly: true,                 // OpenRouter : modèles gratuits d'abord
 };
 ```
+
+Avec `path: 'server'`, la carte « Mon serveur Netlify » passe en premier avec le badge « Recommandé ». Un serveur détecté et prêt sur le site prend de toute façon la vedette, quel que soit ce réglage.
 
 ### Avancé : héberger votre propre modèle ouvert sur un GPU cloud
 
@@ -176,7 +180,7 @@ La clé reste dans les variables d'environnement Netlify. Le navigateur appelle 
 | Variable | Rôle |
 |---|---|
 | `PROVIDER_BASE_URL` | URL compatible OpenAI, ex. `https://api.groq.com/openai/v1` |
-| `PROVIDER_API_KEY` | clé du fournisseur (facultative pour un serveur sans clé) |
+| `PROVIDER_API_KEY` | clé du fournisseur. Obligatoire vers une adresse publique (absente ou laissée sur `collez-votre-cle-ici`, le serveur n'est pas annoncé prêt) ; facultative vers une adresse locale ou privée ; `aucune` pour un serveur compatible OpenAI sans authentification |
 | `ACCESS_PASSWORD_HASH` | empreinte du mot de passe d'accès (voir ci-dessous) |
 | `TOKEN_SECRET` | secret aléatoire de 32 caractères minimum (signature des jetons) |
 | `PROVIDER_DEFAULT_MODEL` | *facultatif* — modèle utilisé si l'interface n'en choisit pas |
@@ -302,13 +306,13 @@ Les API d'IA ne sont jamais appelées : le script démarre lui-même le site, le
 
 ```bash
 npm install --no-save playwright && npx playwright install chromium
-node tests/e2e.cjs              # 38 scénarios, captures d'écran dans un dossier temporaire
+node tests/e2e.cjs              # 39 scénarios, captures d'écran dans un dossier temporaire
 node tests/e2e.cjs cerveau      # seulement l'assistant « Choisir le cerveau de Nour »
 node tests/e2e.cjs mémoire      # filtre sur le nom du scénario
 E2E_PORT=9400 E2E_SHOTS=./captures node tests/e2e.cjs   # autres ports / dossier de captures
 ```
 
-Scénarios couverts : assistant « Choisir le cerveau » (Groq simulé par interception réseau : clé d'un autre fournisseur, 401, 429, CORS réel, réseau coupé, modèle conseillé, discussion ; générateur du mode serveur dont l'empreinte est vérifiée par la vraie fonction puis utilisée par un serveur lancé avec ces valeurs ; `config.js` ; mobile 390 px), configuration du fournisseur, envoi et rendu progressif, arrêt, régénération et versions, modification d'un message, persistance après rechargement, recherche, épingles / renommage / suppression, Markdown + code + KaTeX, charge XSS neutralisée, raisonnement, mémoire et souvenirs proposés, pièces jointes (texte et image), export / import, messages d'erreur (clé refusée, quota, panne, modèle inconnu, flux coupé), coffre chiffré, voix (API simulées), modèles « / », réglages, hors ligne via le service worker (et copie hors ligne qui reste la page de l'application), KaTeX rechargé après un échec, mode serveur (mot de passe faux puis juste, flux relayé, session refusée, fonction non configurée), longue réponse (rendu incrémental, fil réactif), flux coupé sans fin, délai d'attente, clé sans préfixe masquée, plusieurs onglets, ancre malformée, double-clic, collage texte + image, notifications au-dessus des fenêtres et de la zone de saisie, mobile 390 px sans défilement horizontal, thème clair. Le script échoue aussi à la moindre erreur dans la console.
+Scénarios couverts : assistant « Choisir le cerveau » (Groq simulé par interception réseau : clé d'un autre fournisseur, 401, 429, CORS réel, réseau coupé, modèle conseillé, essai en direct, discussion ; générateur du mode serveur dont l'empreinte est vérifiée par la vraie fonction puis utilisée par un serveur lancé avec ces valeurs, empreinte périmée après un changement de mot de passe ; clé du serveur laissée sur le texte d'exemple puis refusée par le fournisseur ; serveur mis en avant ; `config.js` (`provider`, `model`, `path`) ; mobile 390 px, liste complète des modèles comprise), configuration du fournisseur, envoi et rendu progressif, arrêt, régénération et versions, modification d'un message, persistance après rechargement, recherche, épingles / renommage / suppression, Markdown + code + KaTeX, charge XSS neutralisée, raisonnement, mémoire et souvenirs proposés, pièces jointes (texte et image), export / import, messages d'erreur (clé refusée, quota, panne, modèle inconnu, flux coupé), coffre chiffré, voix (API simulées), modèles « / », réglages, hors ligne via le service worker (et copie hors ligne qui reste la page de l'application), KaTeX rechargé après un échec, mode serveur (mot de passe faux puis juste, flux relayé, session refusée, fonction non configurée), longue réponse (rendu incrémental, fil réactif), flux coupé sans fin, délai d'attente, clé sans préfixe masquée, plusieurs onglets, ancre malformée, double-clic, collage texte + image, notifications au-dessus des fenêtres et de la zone de saisie, mobile 390 px sans défilement horizontal, thème clair. Le script échoue aussi à la moindre erreur dans la console.
 
 ---
 

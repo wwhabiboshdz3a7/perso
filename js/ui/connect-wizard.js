@@ -11,7 +11,7 @@ import {
   CLOUD_PROVIDERS, LOCAL_PROVIDERS, providerById, recommendedModels, openModels, pickDefaultModel,
   cleanKey, keyOwner, suggestionLabels, localCorsHelp,
 } from '../providers.js';
-import { browserConnection, listModels, probeServer, probeReachable, serverLogin, session, authState, redact, ApiError } from '../client.js';
+import { browserConnection, connection, listModels, streamChat, probeServer, probeReachable, serverLogin, session, authState, redact, ApiError } from '../client.js';
 import {
   hashAccessPassword, randomTokenSecret, generatePassphrase, passwordStrength, serverVariables, envBlock,
   setupAvailable, MIN_PASSWORD,
@@ -47,33 +47,47 @@ function formatExpiry(ts) {
 /* =====================================================================
    Les trois choix (accueil et première étape de l'assistant)
    ===================================================================== */
+/**
+ * Chemin mis en avant : le serveur s'il est détecté et prêt sur ce site (clé cachée, un seul mot
+ * de passe), ou si le propriétaire l'a choisi dans config.js (`path: 'server'`) ; sinon le cloud.
+ */
+export function featuredPath(server) {
+  return (server && server.state === 'ready') || preset.path === 'server' ? 'server' : 'cloud';
+}
+
 export function brainChoicesHTML({ server = null } = {}) {
   const s = server ? server.state : 'checking';
-  const srvBadge = s === 'ready' ? '<span class="brain-badge ok">Détecté sur ce site</span>'
+  const featured = featuredPath(server);
+  const srvBadge = s === 'ready' ? '<span class="brain-badge reco">Détecté · recommandé</span>'
     : s === 'incomplete' ? '<span class="brain-badge warn">À terminer</span>'
-      : '<span class="brain-badge">Idéal sur téléphone</span>';
+      : featured === 'server' ? '<span class="brain-badge reco">Recommandé</span>'
+        : '<span class="brain-badge">Idéal sur téléphone</span>';
+  const cloudBadge = featured === 'cloud' ? '<span class="brain-badge reco">Recommandé</span>' : '<span class="brain-badge">Prêt en 3 minutes</span>';
   const srvCta = s === 'ready' ? 'Se connecter avec le mot de passe' : s === 'incomplete' ? 'Terminer la configuration' : 'Configurer pas à pas';
-  return `<div class="brain${s === 'ready' ? ' has-detected' : ''}">
+  const cloud = `<button type="button" class="brain-card${featured === 'cloud' ? ' reco' : ''}" data-connect="cloud">
+        <span class="brain-top"><span class="brain-ico">${icon('cloud')}</span>${cloudBadge}</span>
+        <span class="brain-title">Cloud open source</span>
+        <span class="brain-text">Llama, Qwen, gpt-oss, Kimi, Mistral… hébergés sur des serveurs ultra-rapides. Rien ne tourne sur votre ordinateur.</span>
+        <span class="brain-short">Llama, Qwen, gpt-oss… sans rien installer.</span>
+        <span class="brain-points"><span>Prêt en 3 minutes</span><span>Offres gratuites (limitées)</span><span>Clé gardée dans ce navigateur</span></span>
+        <span class="brain-cta">Choisir un fournisseur${icon('arrow-right')}</span>
+      </button>`;
+  const srv = `<button type="button" class="brain-card${featured === 'server' ? ' reco' : ''}" data-connect="serveur">
+        <span class="brain-top"><span class="brain-ico">${icon('server')}</span>${srvBadge}</span>
+        <span class="brain-title">Mon serveur Netlify</span>
+        <span class="brain-text">La clé reste cachée côté serveur, derrière un mot de passe. Le même Nour sur l’ordinateur et le téléphone.</span>
+        <span class="brain-short">Clé cachée sur Netlify, un seul mot de passe.</span>
+        <span class="brain-points"><span>Clé jamais dans le navigateur</span><span>Un mot de passe, tous vos appareils</span><span>Guide et générateur intégrés</span></span>
+        <span class="brain-cta">${srvCta}${icon('arrow-right')}</span>
+      </button>`;
+  return `<div class="brain${s === 'ready' ? ' has-detected' : ''}" data-featured="${featured}">
     ${s === 'ready' ? `<button type="button" class="brain-detected" data-connect="serveur">
       <span class="brain-detected-ico">${icon('shield')}</span>
       <span class="brain-detected-text"><b>Votre serveur Nour est prêt sur ce site</b><small>La clé reste cachée sur Netlify : connectez-vous simplement avec votre mot de passe.</small></span>
       <span class="brain-detected-go">Se connecter${icon('arrow-right')}</span>
     </button>` : ''}
     <div class="brain-grid">
-      <button type="button" class="brain-card reco" data-connect="cloud">
-        <span class="brain-top"><span class="brain-ico">${icon('cloud')}</span><span class="brain-badge reco">Recommandé</span></span>
-        <span class="brain-title">Cloud open source</span>
-        <span class="brain-text">Llama, Qwen, gpt-oss, Kimi, Mistral… hébergés sur des serveurs ultra-rapides. Rien ne tourne sur votre ordinateur.</span>
-        <span class="brain-points"><span>Prêt en 3 minutes</span><span>Offres gratuites (limitées)</span><span>Clé gardée dans ce navigateur</span></span>
-        <span class="brain-cta">Choisir un fournisseur${icon('arrow-right')}</span>
-      </button>
-      <button type="button" class="brain-card" data-connect="serveur">
-        <span class="brain-top"><span class="brain-ico">${icon('server')}</span>${srvBadge}</span>
-        <span class="brain-title">Mon serveur Netlify</span>
-        <span class="brain-text">La clé reste cachée côté serveur, derrière un mot de passe. Le même Nour sur l’ordinateur et le téléphone.</span>
-        <span class="brain-points"><span>Clé jamais dans le navigateur</span><span>Un mot de passe, tous vos appareils</span><span>Guide et générateur intégrés</span></span>
-        <span class="brain-cta">${srvCta}${icon('arrow-right')}</span>
-      </button>
+      ${featured === 'server' ? srv + cloud : cloud + srv}
     </div>
     <details class="brain-adv">
       <summary>${icon('chevron-down')}Avancé : faire tourner le modèle sur cet ordinateur</summary>
@@ -86,8 +100,40 @@ export function brainChoicesHTML({ server = null } = {}) {
   </div>`;
 }
 
-/** Comparatif des trois façons de brancher Nour. */
-function compareHTML() {
+/**
+ * Carte « où réfléchit le cerveau » : Vous → Nour → cloud, serveur Netlify ou cet ordinateur.
+ * Le chemin mis en avant est animé ; survoler ou parcourir au clavier un choix allume le sien.
+ * Purement illustrative (aria-hidden) : les cartes ci-dessous portent l'information.
+ */
+function mapHTML(featured = 'cloud') {
+  const dests = [
+    { id: 'cloud', ico: 'cloud', name: 'Cloud open source', sub: 'Groq, OpenRouter, Hugging Face…', d: 'M0 75 C 62 75, 46 25, 110 25' },
+    { id: 'serveur', ico: 'server', name: 'Votre serveur Netlify', sub: 'clé cachée, puis le fournisseur', d: 'M0 75 L 110 75' },
+    { id: 'local', ico: 'laptop', name: 'Cet ordinateur', sub: 'Ollama, LM Studio · avancé', d: 'M0 75 C 62 75, 46 125, 110 125' },
+  ];
+  const hl = featured === 'server' ? 'serveur' : 'cloud';
+  return `<div class="cw-map" data-hl="${hl}" data-featured="${hl}" aria-hidden="true">
+    <span class="cw-map-node is-you"><span class="cw-map-ico">${icon('user')}</span><small>Vous</small></span>
+    <span class="cw-map-wire"><i></i><i></i></span>
+    <span class="cw-map-node is-nour"><span class="cw-map-ico"><svg viewBox="0 0 32 32"><use href="#av-arche"/></svg></span><small>Nour</small></span>
+    <svg class="cw-map-fork" viewBox="0 0 110 150" preserveAspectRatio="none" fill="none" focusable="false">
+      ${dests.map((x) => `<path class="base" data-p="${x.id}" d="${x.d}"/>`).join('')}
+      ${dests.map((x) => `<path class="flow" data-p="${x.id}" d="${x.d}" pathLength="100"/>`).join('')}
+    </svg>
+    <span class="cw-map-dests">${dests.map((x) => `<span class="cw-map-dest" data-p="${x.id}">
+      <span class="cw-map-ico sm">${icon(x.ico)}</span>
+      <span class="cw-map-dest-text"><b>${esc(x.name)}</b><small>${esc(x.sub)}</small></span>
+    </span>`).join('')}</span>
+  </div>`;
+}
+
+/** Comparatif des trois façons de brancher Nour (tableau sur grand écran, cartes empilées sur téléphone). */
+function compareHTML(featured = 'cloud') {
+  const cols = [
+    { id: 'cloud', name: 'Cloud open source' },
+    { id: 'server', name: 'Serveur Netlify' },
+    { id: 'local', name: 'Local (avancé)' },
+  ];
   const rows = [
     ['Mise en route', '3 minutes : une clé', '10 minutes : variables Netlify', 'Installer, télécharger un modèle'],
     ['Coût', 'Gratuit (limité) ou quelques centimes', 'Celui du fournisseur choisi', 'Gratuit, mais votre matériel travaille'],
@@ -95,11 +141,19 @@ function compareHTML() {
     ['Votre ordinateur', 'Ne calcule rien', 'Ne calcule rien', 'Fait tout le calcul'],
     ['Sur le téléphone', 'Oui (clé à saisir)', 'Oui, avec le mot de passe', 'Non'],
   ];
+  const reco = (i) => (cols[i].id === featured ? ' class="is-reco"' : '');
   return `<div class="cw-compare-wrap"><table class="cw-compare">
     <caption>Comparer en un coup d’œil</caption>
-    <thead><tr><th scope="col"><span class="sr-only">Critère</span></th><th scope="col" class="is-reco">Cloud open source</th><th scope="col">Serveur Netlify</th><th scope="col">Local (avancé)</th></tr></thead>
-    <tbody>${rows.map(([k, ...v]) => `<tr><th scope="row">${esc(k)}</th>${v.map((x, i) => `<td${i === 0 ? ' class="is-reco"' : ''}>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody>
-  </table></div>`;
+    <thead><tr><th scope="col"><span class="sr-only">Critère</span></th>${cols.map((c, i) => `<th scope="col"${reco(i)}>${esc(c.name)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(([k, ...v]) => `<tr><th scope="row">${esc(k)}</th>${v.map((x, i) => `<td${reco(i)}>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table></div>
+  <div class="cw-compare-cards" role="list" aria-label="Comparer en un coup d’œil">
+    <p class="cw-compare-title" aria-hidden="true">Comparer en un coup d’œil</p>
+    ${cols.map((c, i) => `<section class="cw-cc${c.id === featured ? ' is-reco' : ''}" role="listitem" aria-label="${esc(c.name)}">
+      <h4>${esc(c.name)}</h4>
+      <dl>${rows.map(([k, ...v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v[i])}</dd></div>`).join('')}</dl>
+    </section>`).join('')}
+  </div>`;
 }
 
 /* =====================================================================
@@ -120,7 +174,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     cloudId: provider && providerById(provider).cloud ? provider
       : (cur.cloud && conn.mode === 'browser' ? cur.id : (preset.provider || 'groq')),
     localId: provider && !providerById(provider).cloud ? provider : (!cur.cloud ? cur.id : 'ollama'),
-    keys: {}, bases: {}, models: {}, chosen: {}, tested: {}, diag: {},
+    keys: {}, bases: {}, models: {}, chosen: {}, tested: {}, diag: {}, conns: {}, tries: {},
     // Choix « gratuits uniquement » déjà fait sur OpenRouter, sinon préréglage (config.js), sinon oui.
     freeOnly: conn.mode === 'browser' && conn.provider === 'openrouter' && settings.get().onboarded ? !!conn.freeOnly : (preset.freeOnly ?? true),
     server: serverState(),
@@ -163,7 +217,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
         ($('[data-cw-prov][aria-pressed="true"]', root) || $('[data-cw-srv-status]', root) || $('h2', d))?.focus?.({ preventScroll: true });
         return;
       }
-      const target = step === 'choix' ? $('[data-connect="cloud"]', root)
+      const target = step === 'choix' ? ($('.brain-detected', root) || $('.brain-card.reco', root) || $('[data-connect="cloud"]', root))
         : step === 'serveur' ? ($('#cw-pass', root) || $('[data-cw-srv-status] [data-cw-recheck]', root) || $('[data-cw-finish]:not(:disabled)', d))
           : ($('#cw-base:not([readonly])', root) || $('#cw-key', root));
       target?.focus({ preventScroll: true });
@@ -185,28 +239,38 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
   function updateFoot() {
     finishBtn.hidden = st.step === 'choix';
     note.textContent = '';
+    note.classList.remove('is-pending');
     if (st.step === 'choix') { note.textContent = 'Rien n’est enregistré tant que vous n’avez pas validé.'; return; }
     if (st.step === 'serveur') {
       const ready = st.server && st.server.state === 'ready';
-      const ok = ready && !!session.get();
-      finishBtn.hidden = !ready;
+      const logged = ready && !!session.get();
+      const refused = logged && st.serverModelsError === 'auth';
+      const ok = logged && !refused;
+      finishBtn.hidden = !logged;
       finishBtn.disabled = !ok;
-      finishBtn.innerHTML = ok ? `${icon('check')}Utiliser mon serveur` : 'Connexion requise';
-      note.textContent = ready ? (ok ? '' : 'La clé ne quitte jamais le serveur.') : 'Après le redéploiement, Nour détectera votre serveur ici.';
+      finishBtn.innerHTML = refused ? 'Clé du serveur à corriger' : `${icon('check')}Utiliser mon serveur`;
+      note.textContent = !ready ? 'Après le redéploiement, Nour détectera votre serveur ici.'
+        : refused ? 'Corrigez PROVIDER_API_KEY sur Netlify, puis réessayez.'
+          : logged ? '' : 'La clé ne quitte jamais le serveur.';
       return;
     }
     const p = current();
     const model = st.chosen[p.id];
     const ready = st.tested[p.id] && !!model;
+    // Tant que le test n'a pas réussi, pas de gros bouton inerte : une simple indication.
+    finishBtn.hidden = !ready;
     finishBtn.disabled = !ready;
-    finishBtn.innerHTML = ready ? `${icon('check')}Utiliser ${esc(p.name)} · ${esc(shortModel(model))}` : 'Testez la connexion';
-    note.textContent = ready && !p.local && !p.custom ? 'La clé reste dans ce navigateur.' : '';
+    // Sur téléphone, fournisseur et modèle passent sur deux lignes courtes (le modèle tronqué au besoin).
+    finishBtn.innerHTML = ready ? `${icon('check')}<span class="cw-finish-txt"><span class="l1">Utiliser ${esc(p.name)}</span><span class="sep"> · </span><small>${esc(shortModel(model))}</small></span>` : '';
+    note.textContent = ready ? (!p.local && !p.custom ? 'La clé reste dans ce navigateur.' : '')
+      : st.tested[p.id] ? 'Choisissez un modèle pour continuer.' : 'Testez la connexion pour continuer.';
+    note.classList.toggle('is-pending', !ready);
   }
 
   /* ---------- Étape 1 : les trois choix ---------- */
   function drawChoices() {
-    root.innerHTML = `<div class="cw-choices">${brainChoicesHTML({ server: st.server })}
-      ${compareHTML()}
+    root.innerHTML = `<div class="cw-choices">${mapHTML(featuredPath(st.server))}${brainChoicesHTML({ server: st.server })}
+      ${compareHTML(featuredPath(st.server))}
       <p class="cw-choices-foot">${icon('info')}<span>Vous pourrez changer de cerveau à tout moment : <b>Réglages → Connexion</b>. Vos conversations restent sur cet appareil quel que soit le choix.</span></p></div>`;
     if (!st.server) refreshServer().then(() => { if (d.open && st.step === 'choix') drawChoices(); });
   }
@@ -222,7 +286,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const list = local ? LOCAL_PROVIDERS : CLOUD_PROVIDERS;
     const sel = current();
     root.innerHTML = `
-      ${local ? `<div class="notice warn cw-local-warn">${icon('laptop')}<div><p><b>Le modèle tournera sur cet ordinateur.</b> Processeur ou carte graphique très sollicités, plusieurs Go à télécharger, et Nour ne répond que sur cet appareil, tant qu’il est allumé.</p><p>Pour éviter de faire travailler votre PC : <button type="button" class="link-btn" data-go="cloud">choisissez le cloud open source</button>.</p></div></div>` : ''}
+      ${local ? `<div class="notice warn cw-local-warn">${icon('laptop')}<div><p><b>Le modèle tournera sur cet ordinateur.</b> Processeur ou carte graphique très sollicités, plusieurs Go à télécharger, et Nour ne répond que sur cet appareil, tant qu’il est allumé.</p><p>Pour éviter de faire travailler votre PC, le cloud open source fait le même travail sans rien installer.</p><p><button type="button" class="btn btn-sm" data-go="cloud">${icon('cloud')}Choisir le cloud open source${icon('arrow-right')}</button></p></div></div>` : ''}
       <div class="cw-split">
         <div class="cw-side">
           <p class="cw-side-title">${local ? 'Sur cet ordinateur ou ailleurs' : 'Fournisseurs cloud · modèles ouverts'}</p>
@@ -246,24 +310,31 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const needsBase = !!(p.local || p.custom);
     const base = st.bases[p.id] ?? p.baseUrl;
     const tested = !!st.tested[p.id];
+    // Sur téléphone, la présentation se replie derrière un bouton : l'étape « Coller la clé »
+    // remonte dans le premier écran. Sur grand écran, tout reste déplié.
     box.innerHTML = `
       <header class="cw-head">
         <div class="cw-head-text">
           <h3>${esc(p.name)}</h3>
-          <p class="cw-what">${esc(p.what || p.blurb)}</p>
         </div>
         ${p.price ? `<span class="price big ${p.price.kind}">${icon(p.price.kind === 'paid' ? 'bolt' : 'gift')}${esc(p.price.label)}</span>` : ''}
       </header>
-      ${p.price ? `<p class="cw-price-note">${icon('info')}<span>${esc(p.price.note)}</span></p>` : ''}
-      ${p.local ? `<p class="cw-price-note">${icon('info')}<span>${localCorsHelp(p)}</span></p>` : ''}
-      <div class="cw-sugg" ${tested ? 'hidden' : ''}><span class="cw-label">Modèles ouverts conseillés</span>
-        <span class="cw-sugg-list">${suggestionLabels(p).map((l) => `<span class="chip static">${esc(l)}</span>`).join('')}</span>
-        <span class="hint">Identifiants confirmés par le test, dans la liste en direct du fournisseur.</span></div>
+      <div class="cw-about${st.aboutOpen ? ' is-open' : ''}" data-cw-about>
+        <button type="button" class="cw-about-toggle" data-cw-about-toggle aria-expanded="${st.aboutOpen ? 'true' : 'false'}" aria-controls="cw-about-body">${icon('info')}<span>${p.local || p.custom ? 'Ce qu’il faut savoir' : 'L’offre et les modèles conseillés'}</span>${icon('chevron-down')}</button>
+        <div class="cw-about-body" id="cw-about-body">
+          <p class="cw-what">${esc(p.what || p.blurb)}</p>
+          ${p.price ? `<p class="cw-price-note">${icon('info')}<span>${esc(p.price.note)}</span></p>` : ''}
+          ${p.local ? `<p class="cw-price-note">${icon('info')}<span>${localCorsHelp(p)}</span></p>` : ''}
+          <div class="cw-sugg" ${tested ? 'hidden' : ''}><span class="cw-label">Modèles ouverts conseillés</span>
+            <span class="cw-sugg-list">${suggestionLabels(p).map((l) => `<span class="chip static">${esc(l)}</span>`).join('')}</span>
+            <span class="hint">Identifiants confirmés par le test, dans la liste en direct du fournisseur.</span></div>
+        </div>
+      </div>
       <ol class="cw-steps">
         <li>
           <b class="cw-step-title">${p.local ? 'Installer et lancer' : p.custom ? 'Votre serveur' : p.price && p.price.kind !== 'paid' ? 'Créer une clé (sans frais)' : 'Créer une clé'}</b>
           <p class="hint">${esc(p.steps || '')}</p>
-          ${p.keyUrl ? `<p><a class="btn btn-sm" href="${esc(p.keyUrl)}" target="_blank" rel="noopener noreferrer">${p.local ? 'Télécharger' : 'Ouvrir la page des clés'}${icon('external')}</a></p>` : ''}
+          ${p.keyUrl ? `<p><a class="btn btn-sm" href="${esc(p.keyUrl)}" target="_blank" rel="noopener noreferrer">${esc(p.keyLabel || (p.local ? 'Télécharger' : 'Ouvrir la page des clés'))}${icon('external')}</a></p>` : ''}
         </li>
         ${needsBase ? `<li>
           <label class="cw-step-title" for="cw-base">Adresse de l’API</label>
@@ -289,6 +360,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
           ${p.freeFilter ? `<label class="check cw-free"><input type="checkbox" data-cw-free ${st.freeOnly ? 'checked' : ''}><span>Modèles gratuits uniquement</span></label>` : ''}
           <div class="cw-reco" role="radiogroup" aria-label="Modèles conseillés" data-cw-reco></div>
           <details class="cw-all"><summary>${icon('chevron-down')}<span>Tous les modèles ouverts disponibles (<span data-cw-count>0</span>)</span></summary><div data-cw-picker></div></details>
+          ${tryHTML()}
         </li>
       </ol>`;
     if (st.diag[p.id]) showDiag(st.diag[p.id]);
@@ -302,7 +374,8 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const el = $('[data-cw-diag]', root);
     if (!el) return;
     el.dataset.kind = info.kind;
-    el.innerHTML = `${info.kind === 'loading' ? '<span class="cw-spin" aria-hidden="true"></span>' : icon(info.kind === 'ok' ? 'check' : info.kind === 'warn' ? 'info' : 'alert')}
+    el.classList.toggle('has-link', !!info.link);
+    el.innerHTML = `${info.link ? linkHTML(info.link) : ''}${info.kind === 'loading' ? '<span class="cw-spin" aria-hidden="true"></span>' : icon(info.kind === 'ok' ? 'check' : info.kind === 'warn' ? 'info' : 'alert')}
       <div><b>${esc(info.title)}</b>${info.text ? `<p>${esc(info.text)}</p>` : ''}${info.detail ? `<p class="cw-diag-detail">${esc(info.detail)}</p>` : ''}
       ${info.actions?.length ? `<p class="cw-diag-actions">${info.actions.map((a) => (a.href
     ? `<a class="btn btn-sm" href="${esc(a.href)}" target="_blank" rel="noopener noreferrer">${esc(a.label)}${icon('external')}</a>`
@@ -394,6 +467,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const timer = setTimeout(() => ctl.abort(), 20000);
     try {
       let models;
+      const t0 = performance.now();
       try {
         models = await listModels(conn, { signal: ctl.signal });
       } catch (e) {
@@ -405,8 +479,11 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
         throw e;
       }
       if (current().id !== p.id) return;
+      const ms = Math.max(1, Math.round(performance.now() - t0));
       st.models[p.id] = models;
       st.tested[p.id] = true;
+      st.conns[p.id] = conn;
+      st.tries[p.id] = null;
       const prefer = st.chosen[p.id] || (p.id === settings.get().connection.provider ? settings.get().connection.model : '') || (p.cloud ? preset.model : '');
       st.chosen[p.id] = pickDefaultModel(p, models, { preferred: prefer, freeOnly: !!(p.freeFilter && st.freeOnly) });
       const open = openModels(models);
@@ -416,7 +493,8 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
         showDiag({ kind: 'warn', title: 'Connexion réussie, mais aucun modèle listé', text: `${p.name} ne propose aucun modèle de discussion pour cette clé. Saisissez l’identifiant exact du modèle ci-dessous, ou vérifiez les droits de la clé.` });
       } else showDiag({
         kind: 'ok',
-        title: 'Connexion réussie',
+        link: { ms, name: p.name },
+        title: `Connexion réussie · réponse en ${ms.toLocaleString('fr-FR')} ms`,
         text: `${n} modèle${n > 1 ? 's' : ''} ${open.length ? 'ouvert' : 'de discussion'}${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''} chez ${p.name}${free ? `, dont ${free} gratuit${free > 1 ? 's' : ''}` : ''}. ${st.chosen[p.id] ? 'Un modèle conseillé est déjà sélectionné.' : ''}`.trim(),
       });
       $('.cw-sugg', root)?.setAttribute('hidden', '');
@@ -433,6 +511,88 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       st.busy = false;
       const b = $('[data-cw-test]', root);
       if (b) b.disabled = false;
+    }
+  }
+
+  /* ---------- Essai en direct : Nour se présente avec le modèle choisi ---------- */
+  function tryHTML() {
+    return `<div class="cw-try" data-cw-try>
+      <div class="cw-try-head">
+        <span class="cw-try-ico">${icon('sparkle')}</span>
+        <div class="grow"><b>Essai en direct</b><span class="hint">Une courte réponse du modèle choisi, avec sa vitesse réelle. Rien n’est enregistré.</span></div>
+        <button type="button" class="btn btn-sm" data-cw-try-btn>${icon('bolt')}Faire parler Nour</button>
+      </div>
+      <div class="cw-try-out" data-cw-try-out hidden></div>
+      <p class="sr-only" role="status" data-cw-try-live></p>
+    </div>`;
+  }
+
+  const fmtSec = (ms) => `${(ms / 1000).toLocaleString('fr-FR', { minimumFractionDigits: ms < 10000 ? 2 : 0, maximumFractionDigits: ms < 10000 ? 2 : 0 })} s`;
+
+  async function runTry(box, conn, model, label) {
+    const out = $('[data-cw-try-out]', box);
+    const btn = $('[data-cw-try-btn]', box);
+    if (!out || !btn || btn.disabled) return;
+    btn.disabled = true;
+    out.hidden = false;
+    out.dataset.state = 'run';
+    out.innerHTML = `<p class="cw-try-text"><span class="cw-try-caret" aria-hidden="true"></span></p><p class="cw-try-stats"><span class="cw-spin" aria-hidden="true"></span>Connexion au modèle${model ? ` ${esc(shortModel(model))}` : ''}…</p>`;
+    const text = $('.cw-try-text', out);
+    const stats = $('.cw-try-stats', out);
+    // Le texte arrive mot à mot : on n'annonce que le résultat final (lecteurs d'écran).
+    const live = $('[data-cw-try-live]', box);
+    if (live) live.textContent = 'Essai en cours…';
+    const name = settings.get().profile.name || '';
+    const t0 = performance.now();
+    let first = 0;
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 45000);
+    try {
+      const res = await streamChat({
+        conn,
+        model,
+        maxTokens: 400,
+        temperature: 0.7,
+        signal: ctl.signal,
+        messages: [
+          { role: 'system', content: `Tu es ${settings.get().assistant.name || 'Nour'}, un assistant personnel chaleureux et concis. Réponds en français.` },
+          { role: 'user', content: `Présente-toi${name ? ` à ${name}` : ''} en une seule phrase (25 mots au plus), sans liste ni titre.` },
+        ],
+        onDelta: (o) => {
+          if (!first) first = performance.now();
+          if (o.content) {
+            text.innerHTML = `${esc(o.content.replace(/<think>[\s\S]*?(<\/think>|$)/g, '').trim())}<span class="cw-try-caret" aria-hidden="true"></span>`;
+            stats.innerHTML = `<span class="cw-spin" aria-hidden="true"></span>Réponse en cours… premier mot en ${fmtSec(first - t0)}`;
+          } else if (o.reasoning) stats.innerHTML = '<span class="cw-spin" aria-hidden="true"></span>Le modèle réfléchit avant de répondre…';
+        },
+      });
+      const end = performance.now();
+      const content = (res.content || '').replace(/<think>[\s\S]*?(<\/think>|$)/g, '').trim();
+      const tokens = res.usage?.completion_tokens || Math.max(1, Math.round(((res.content || '') + (res.reasoning || '')).length / 4));
+      // Réponse livrée d'un bloc (pas de flux) ou trop courte : la vitesse n'aurait pas de sens.
+      const gen = end - (first || t0);
+      const rate = gen >= 120 && tokens >= 8 ? Math.round(tokens / (gen / 1000)) : 0;
+      // Lecture humaine : environ 4 à 5 jetons par seconde (250 mots par minute).
+      const times = Math.round(rate / 4.5);
+      text.innerHTML = content ? esc(content) : '<i>Le modèle a réfléchi sans formuler de réponse dans la limite de l’essai : posez-lui une vraie question, il ira au bout.</i>';
+      out.dataset.state = 'ok';
+      stats.innerHTML = `<span class="cw-try-stat"><b>${fmtSec((first || end) - t0)}</b> avant le premier mot</span>
+        ${rate ? `<span class="cw-try-stat"><b>≈ ${rate.toLocaleString('fr-FR')}</b> jetons/s</span>` : ''}
+        ${times >= 2 ? `<span class="cw-try-stat"><b>${times > 100 ? 'plus de 100×' : `≈ ${times.toLocaleString('fr-FR')}×`}</b> plus vite qu’on ne lit</span>` : ''}
+        ${rate ? `<span class="cw-try-meter" aria-hidden="true"><i style="--w:${Math.min(100, Math.round(Math.log10(Math.max(rate, 1)) / 3 * 100))}%"></i></span>` : ''}`;
+      if (live) live.textContent = `${label} : ${content || 'pas de réponse formulée'}. Premier mot en ${fmtSec((first || end) - t0)}${rate ? `, environ ${rate} jetons par seconde` : ''}.`;
+    } catch (err) {
+      out.dataset.state = 'error';
+      const info = err && err.name === 'AbortError' ? { title: 'Pas de réponse', text: 'Le modèle n’a pas répondu à temps. Réessayez, ou choisissez un modèle plus léger.' }
+        : st.step === 'serveur' ? { title: 'Le serveur n’a pas pu répondre', text: err.kind === 'auth' ? 'Le fournisseur refuse la clé configurée sur Netlify (PROVIDER_API_KEY).' : (err.message || 'Erreur inconnue.') }
+          : diagnose(err, current(), st.bases[current().id] ?? current().baseUrl);
+      text.innerHTML = '';
+      stats.innerHTML = `${icon('alert')}<span><b>${esc(info.title)}</b> ${esc(info.text || '')}</span>`;
+      if (live) live.textContent = `${info.title}. ${info.text || ''}`;
+    } finally {
+      clearTimeout(timer);
+      btn.disabled = false;
+      btn.innerHTML = `${icon('refresh')}Recommencer`;
     }
   }
 
@@ -516,7 +676,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const logged = !!session.get();
     root.innerHTML = `
       <div class="cw-server">
-        <div class="cw-srv-status" data-state="${state}" data-cw-srv-status>${serverStatusHTML(s)}</div>
+        <div class="cw-srv-status" data-state="${srvState()}" data-cw-srv-status>${serverStatusHTML(s)}</div>
         ${state === 'ready' ? `<section class="cw-login" data-cw-login>${logged ? loggedHTML() : loginHTML()}</section>` : ''}
         ${state === 'ready'
     ? `<details class="cw-guide-wrap"><summary>${icon('chevron-down')}Revoir le guide de configuration <span class="hint-inline">(changer de mot de passe, de fournisseur…)</span></summary>${guideHTML()}</details>`
@@ -525,13 +685,22 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     if (!s) refreshServer().then(() => { if (d.open && st.step === 'serveur') { drawServer(); updateFoot(); $('#cw-pass', root)?.focus(); } });
     if (state === 'ready' && logged) mountServerModels();
     drawVars();
+    updateStrength();
   }
+
+  /** État affiché : « prêt » ne tient plus si le fournisseur a refusé la clé du serveur. */
+  const keyRefused = () => !!(st.server && st.server.state === 'ready' && session.get() && st.serverModelsError === 'auth');
+  const srvState = () => (keyRefused() ? 'key-refused' : (st.server ? st.server.state : 'checking'));
 
   function serverStatusHTML(s) {
     const recheck = `<button type="button" class="btn btn-sm" data-cw-recheck>${icon('refresh')}Vérifier à nouveau</button>`;
     if (!s) return `<span class="cw-spin" aria-hidden="true"></span><div><b>Recherche d’un serveur Nour sur ce site…</b></div>`;
+    if (keyRefused()) return `${icon('alert')}<div><b>Serveur déployé, mais sa clé est refusée</b><p>Le mot de passe fonctionne ; c’est la clé du fournisseur (<code>PROVIDER_API_KEY</code>) qui est invalide ou révoquée. Détail et marche à suivre ci-dessous.</p></div>`;
     if (s.state === 'ready') return `${icon('shield')}<div><b>Serveur Nour détecté et configuré sur ce site</b><p>La clé du fournisseur reste dans les variables d’environnement Netlify. Il ne vous faut que le mot de passe d’accès.</p></div>`;
-    if (s.state === 'incomplete') return `${icon('alert')}<div><b>La fonction est déployée, mais sa configuration est incomplète</b><p>Variable${s.missing.length > 1 ? 's' : ''} manquante${s.missing.length > 1 ? 's' : ''} ou invalide${s.missing.length > 1 ? 's' : ''} : ${s.missing.map((m) => `<code>${esc(m)}</code>`).join(', ') || 'inconnue'}. Suivez le guide ci-dessous, puis redéployez.</p><p>${recheck}</p></div>`;
+    if (s.state === 'incomplete') {
+      const keyHelp = s.missing.includes('PROVIDER_API_KEY') ? '<p><code>PROVIDER_API_KEY</code> : collez votre vraie clé du fournisseur (le bloc .env contient le texte d’exemple « collez-votre-cle-ici »). Pour un serveur sans authentification, écrivez <code>aucune</code>.</p>' : '';
+      return `${icon('alert')}<div><b>La fonction est déployée, mais sa configuration est incomplète</b><p>Variable${s.missing.length > 1 ? 's' : ''} manquante${s.missing.length > 1 ? 's' : ''} ou invalide${s.missing.length > 1 ? 's' : ''} : ${s.missing.map((m) => `<code>${esc(m)}</code>`).join(', ') || 'inconnue'}. Suivez le guide ci-dessous, puis redéployez.</p>${keyHelp}<p>${recheck}</p></div>`;
+    }
     if (s.state === 'unknown') return `${icon('wifi-off')}<div><b>Impossible de vérifier le serveur</b><p>Vérifiez votre connexion, puis réessayez.</p><p>${recheck}</p></div>`;
     return `${icon('info')}<div><b>Pas encore de serveur Nour sur ce site</b><p>C’est normal tant que le site n’est pas publié sur Netlify avec ses variables d’environnement. Le guide ci-dessous génère tout ce qu’il faut, sans ligne de commande.</p><p>${recheck}</p></div>`;
   }
@@ -557,6 +726,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       <p class="hint">Sans choix ici, le serveur utilise <code>PROVIDER_DEFAULT_MODEL</code>.</p>
       <div class="cw-diag" data-cw-models-status role="status" aria-live="polite"></div>
       <div data-cw-srv-picker></div>
+      ${tryHTML()}
     </div>`;
   }
 
@@ -564,28 +734,58 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     const box = $('[data-cw-srv-picker]', root);
     const status = $('[data-cw-models-status]', root);
     if (!box) return;
+    // La case « gratuits uniquement » n'apparaît que si le fournisseur du serveur renvoie des prix.
     const p = mountModelPicker(box, {
       models: st.serverModels || [], value: st.serverModel, freeFilter: true,
+      emptyText: st.serverModelsError ? 'Liste indisponible : voir le message ci-dessus.' : 'Chargement des modèles du serveur…',
       onChange: (id) => { st.serverModel = id; },
     });
-    if (st.serverModels) return;
+    const tryBox = box.parentElement.querySelector('[data-cw-try]');
+    box.hidden = false;
+    if (tryBox) tryBox.hidden = false;
+    if (st.serverModels) { status.dataset.kind = 'ok'; status.innerHTML = serverModelsOk(st.serverModels); return; }
     status.dataset.kind = 'loading';
     status.innerHTML = '<span class="cw-spin" aria-hidden="true"></span><div><b>Chargement des modèles du serveur…</b></div>';
     try {
       const models = await listModels();
       st.serverModels = models;
-      p.setModels(models);
-      status.dataset.kind = 'ok';
-      status.innerHTML = `${icon('check')}<div><b>${models.filter((m) => m.chat).length} modèles disponibles sur le serveur</b></div>`;
+      st.serverModelsError = null;
+      refreshSrvStatus();
+      p.setModels(models, { emptyText: 'Le serveur n’a renvoyé aucun modèle : vérifiez PROVIDER_BASE_URL et les droits de PROVIDER_API_KEY.' });
+      status.dataset.kind = models.length ? 'ok' : 'warn';
+      status.innerHTML = models.length ? serverModelsOk(models)
+        : `${icon('info')}<div><b>Aucun modèle listé par le serveur</b><p>Indiquez l’identifiant exact ci-dessous, ou définissez <code>PROVIDER_DEFAULT_MODEL</code> sur Netlify.</p></div>`;
       // Sans modèle par défaut côté serveur, on en choisit un pour que la première question aboutisse.
       if (!st.serverModel && st.server && st.server.hasDefault === false) {
         const pick = pickDefaultModel(providerById('custom'), models, {});
         if (pick) { st.serverModel = pick; p.setValue(pick); }
       }
     } catch (err) {
+      if (err.kind === 'session') { drawServer(); updateFoot(); return; }
+      st.serverModelsError = err.kind || 'error';
+      p.setEmptyText('Liste indisponible : voir le message ci-dessus.');
+      // Clé refusée : ni liste ni essai possibles tant qu'elle n'est pas corrigée.
+      if (err.kind === 'auth') { box.hidden = true; if (tryBox) tryBox.hidden = true; }
+      refreshSrvStatus();
+      const retry = `<p class="cw-diag-actions"><button type="button" class="btn btn-sm" data-cw-srv-retry>${icon('refresh')}Réessayer</button></p>`;
       status.dataset.kind = 'error';
-      status.innerHTML = `${icon('alert')}<div><b>Modèles indisponibles</b><p>${esc(err.kind === 'auth' ? 'Le fournisseur refuse la clé configurée sur le serveur (PROVIDER_API_KEY).' : (err.message || 'Erreur'))}</p></div>`;
+      status.innerHTML = err.kind === 'auth'
+        ? `${icon('alert')}<div><b>Le fournisseur refuse la clé du serveur</b><p>La variable <code>PROVIDER_API_KEY</code> configurée sur Netlify est invalide ou révoquée : Nour ne pourra pas répondre. Collez une clé valide dans <i>Project configuration → Environment variables</i>, redéployez, puis réessayez.</p>${retry}</div>`
+        : `${icon('alert')}<div><b>Modèles indisponibles</b><p>${esc(err.kind === 'network' || err.kind === 'offline' ? 'Serveur injoignable : vérifiez votre connexion Internet.' : (err.message || 'Erreur'))}</p>${retry}</div>`;
     }
+    updateFoot();
+  }
+
+  function refreshSrvStatus() {
+    const el = $('[data-cw-srv-status]', root);
+    if (!el || el.dataset.state === srvState()) return;
+    el.dataset.state = srvState();
+    el.innerHTML = serverStatusHTML(st.server);
+  }
+
+  function serverModelsOk(models) {
+    const n = models.filter((m) => m.chat).length;
+    return `${icon('check')}<div><b>${n} modèle${n > 1 ? 's' : ''} disponible${n > 1 ? 's' : ''} sur le serveur</b><p>La clé du fournisseur est acceptée : Nour est prêt à répondre.</p></div>`;
   }
 
   async function doLogin(form) {
@@ -645,9 +845,9 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
         <label class="cw-step-title" for="cw-srv-prov">Choisir le fournisseur cloud du serveur</label>
         <div class="cw-inline">
           <select id="cw-srv-prov" class="input">${CLOUD_PROVIDERS.map((p) => `<option value="${p.id}" ${p.id === sp.id ? 'selected' : ''}>${esc(p.name)} — ${esc(p.price.label)}</option>`).join('')}</select>
-          <a class="btn btn-sm" data-cw-srv-keylink href="${esc(sp.keyUrl)}" target="_blank" rel="noopener noreferrer">Créer une clé ${esc(sp.name)}${icon('external')}</a>
+          <a class="btn btn-sm" data-cw-srv-keylink href="${esc(sp.keyUrl)}" target="_blank" rel="noopener noreferrer">${esc(sp.keyLabel || `Créer une clé ${sp.name}`)}${icon('external')}</a>
         </div>
-        <p class="hint">La clé ira dans Netlify (variable <code>PROVIDER_API_KEY</code>), jamais dans ce navigateur.</p>
+        <p class="hint">La clé ira dans Netlify (variable <code>PROVIDER_API_KEY</code>), jamais dans ce navigateur. Tant qu’elle manque, Nour n’annonce pas le serveur comme prêt.</p>
         <label class="cw-sub-label" for="cw-srv-model">Modèle par défaut <span class="hint-inline">(facultatif)</span></label>
         <input type="text" id="cw-srv-model" class="input mono" placeholder="ex. ${esc(sp.id === 'mistral' ? 'mistral-small-latest' : sp.id === 'cerebras' ? 'gpt-oss-120b' : 'openai/gpt-oss-120b')}" value="${esc(st.srvModelDraft || '')}" autocomplete="off" spellcheck="false">
       </li>
@@ -666,7 +866,7 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
         <b class="cw-step-title">Ajouter les variables dans Netlify</b>
         <p class="hint">Projet → <i>Project configuration</i> → <i>Environment variables</i> → <i>Add a variable</i>. Pour la clé, l’empreinte et le secret, cochez « Contains secret values » si l’option est proposée.</p>
         <div class="cw-vars" data-cw-vars></div>
-        <p class="cw-vars-actions"><button type="button" class="btn btn-sm" data-cw-copyenv>${icon('copy')}Copier le bloc .env</button><span class="hint">à coller via <i>Import from a .env file</i>, puis remplacez la clé.</span></p>
+        <p class="cw-vars-actions"><button type="button" class="btn btn-sm" data-cw-copyenv>${icon('copy')}Copier le bloc .env</button><span class="hint" data-cw-envhint></span></p>
       </li>
       <li>
         <b class="cw-step-title">Redéployer, puis revenir ici</b>
@@ -676,15 +876,21 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     </ol>`;
   }
 
+  /** L'empreinte affichée correspond-elle encore au mot de passe saisi ? */
+  const hashStale = () => !!st.generated && st.generated.pass !== (st.newPass || '');
+
   function drawVars() {
     const box = $('[data-cw-vars]', root);
     if (!box) return;
-    const vars = serverVariables({ providerId: st.srvProvider, hash: st.generated?.hash || '', secret: st.generated?.secret || '', model: st.srvModelDraft || '' });
-    box.innerHTML = vars.map((v) => {
+    const stale = hashStale();
+    const vars = serverVariables({ providerId: st.srvProvider, hash: stale ? '' : (st.generated?.hash || ''), secret: st.generated?.secret || '', model: st.srvModelDraft || '' });
+    box.innerHTML = (stale ? `<p class="cw-stale" role="status">${icon('alert')}<span><b>Le mot de passe a changé :</b> l’empreinte précédente ne lui correspond plus. Cliquez sur « Recalculer l’empreinte » avant de copier quoi que ce soit.</span></p>` : '') + vars.map((v) => {
       const empty = !v.value;
+      const isStale = stale && v.name === 'ACCESS_PASSWORD_HASH';
       const shown = v.name === 'PROVIDER_API_KEY' ? `votre clé ${esc(providerById(st.srvProvider).name)}`
-        : empty ? (v.optional ? 'vide = choisi dans Nour' : 'générée à l’étape 3') : esc(v.value);
-      return `<div class="cw-var${empty ? ' is-empty' : ''}" data-var="${v.name}">
+        : isStale ? 'à recalculer : mot de passe modifié'
+          : empty ? (v.optional ? 'vide = choisi dans Nour' : 'générée à l’étape 3') : esc(v.value);
+      return `<div class="cw-var${empty ? ' is-empty' : ''}${isStale ? ' is-stale' : ''}" data-var="${v.name}">
         <div class="cw-var-name"><code>${v.name}</code>${v.secret ? '<span class="pill">secret</span>' : ''}${v.optional ? '<span class="pill">facultatif</span>' : ''}</div>
         <div class="cw-var-value mono" title="${empty ? '' : esc(v.value)}">${shown}</div>
         <div class="cw-var-acts">
@@ -695,6 +901,14 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       </div>`;
     }).join('');
     box._vars = vars;
+    // Bloc .env : seulement avec une empreinte à jour (sinon on copierait des valeurs vides ou périmées).
+    const ready = !!st.generated && !stale;
+    const envBtn = $('[data-cw-copyenv]', root);
+    if (envBtn) envBtn.disabled = !ready;
+    const envHint = $('[data-cw-envhint]', root);
+    if (envHint) envHint.innerHTML = ready ? 'à coller via <i>Import from a .env file</i>, puis remplacez la clé.' : 'disponible une fois les variables générées (étape 3).';
+    const gen = $('[data-cw-generate]', root);
+    if (gen && !gen.disabled) gen.innerHTML = `${icon('key')}${stale ? 'Recalculer l’empreinte' : st.generated ? 'Régénérer les variables' : 'Générer les variables'}`;
   }
 
   function updateStrength() {
@@ -712,21 +926,35 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
     if (!s.ok) { input.setAttribute('aria-invalid', 'true'); input.focus(); updateStrength(); return; }
     input.removeAttribute('aria-invalid');
     const btn = $('[data-cw-generate]', root);
+    const pass = input.value;
+    // Mot de passe modifié après une première génération : seule l'empreinte change, le secret
+    // déjà copié reste valable. Régénération volontaire (même mot de passe) : tout est renouvelé.
+    const keepSecret = hashStale() && st.generated?.secret;
     btn.disabled = true;
     btn.innerHTML = `<span class="cw-spin" aria-hidden="true"></span>Calcul de l’empreinte…`;
+    let done = false;
     try {
-      st.generated = { hash: await hashAccessPassword(input.value), secret: randomTokenSecret() };
-      drawVars();
-      const box = $('[data-cw-vars]', root);
-      box.classList.add('fresh');
-      box.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      toast('Variables générées : copiez-les dans Netlify.', { kind: 'ok' });
+      const hash = await hashAccessPassword(pass);
+      st.generated = { hash, secret: keepSecret || randomTokenSecret(), pass };
+      st.newPass = pass;
+      done = true;
     } catch (e) {
       toast(e.message || 'Génération impossible.', { kind: 'error' });
     } finally {
       btn.disabled = false;
-      btn.innerHTML = `${icon('key')}Régénérer les variables`;
+      drawVars();
     }
+    if (!done) { btn.innerHTML = `${icon('key')}Générer les variables`; return; }
+    // Saisi pendant le calcul ? L'empreinte vaut pour le mot de passe au moment du clic : drawVars()
+    // l'a déjà signalée périmée le cas échéant.
+    const box = $('[data-cw-vars]', root);
+    box.classList.remove('fresh');
+    void box.offsetWidth;
+    box.classList.add('fresh');
+    // Le bouton a été désactivé pendant le calcul : le focus revient dessus (clavier, lecteur d'écran).
+    btn.focus({ preventScroll: true });
+    box.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    toast(hashStale() ? 'Le mot de passe a changé pendant le calcul : recalculez l’empreinte.' : 'Variables prêtes : copiez-les dans Netlify (étape 4).', { kind: hashStale() ? 'error' : 'ok' });
   }
 
   /* ---------- Événements ---------- */
@@ -748,10 +976,28 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       $$('[data-cw-prov]', root).forEach((x) => x.setAttribute('aria-pressed', String(x === prov)));
       drawDetail();
       updateFoot();
-      if (matchMedia('(max-width: 640px)').matches) $('[data-cw-detail]', root)?.scrollIntoView({ block: 'start' });
+      if (matchMedia('(max-width: 900px)').matches) $('[data-cw-detail]', root)?.scrollIntoView({ block: 'start' });
+      else body.scrollTop = 0;
       return;
     }
     if (t.closest('[data-cw-test]')) { runTest(); return; }
+    const tryBtn = t.closest('[data-cw-try-btn]');
+    if (tryBtn) {
+      const box = tryBtn.closest('[data-cw-try]');
+      if (st.step === 'serveur') runTry(box, connection(), st.serverModel || '', 'Serveur Nour');
+      else {
+        const p = current();
+        if (st.conns[p.id] && st.chosen[p.id]) runTry(box, st.conns[p.id], st.chosen[p.id], p.name);
+      }
+      return;
+    }
+    const about = t.closest('[data-cw-about-toggle]');
+    if (about) {
+      st.aboutOpen = about.getAttribute('aria-expanded') !== 'true';
+      about.setAttribute('aria-expanded', String(st.aboutOpen));
+      about.closest('[data-cw-about]').classList.toggle('is-open', st.aboutOpen);
+      return;
+    }
     const sw = t.closest('[data-cw-switch]');
     if (sw) {
       const key = cleanKey($('#cw-key', root).value);
@@ -780,13 +1026,15 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       if (st.step === 'serveur') { drawServer(); updateFoot(); go('serveur'); }
       return;
     }
-    if (t.closest('[data-cw-logout]')) { session.clear(); st.serverModels = null; app.refreshStatus(); drawServer(); updateFoot(); $('#cw-pass', root)?.focus(); return; }
+    if (t.closest('[data-cw-logout]')) { session.clear(); st.serverModels = null; st.serverModelsError = null; app.refreshStatus(); drawServer(); updateFoot(); $('#cw-pass', root)?.focus(); return; }
+    if (t.closest('[data-cw-srv-retry]')) { st.serverModels = null; st.serverModelsError = null; updateFoot(); mountServerModels(); return; }
     if (t.closest('[data-cw-genpass]')) {
       const input = $('#cw-newpass', root);
       input.value = generatePassphrase();
       st.newPass = input.value;
       input.removeAttribute('aria-invalid');
       updateStrength();
+      drawVars();
       input.focus();
       input.select();
       return;
@@ -810,7 +1058,13 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
   d.addEventListener('input', (e) => {
     if (e.target.id === 'cw-key') { st.keys[current().id] = e.target.value; checkKey(); }
     else if (e.target.id === 'cw-base') { st.bases[current().id] = e.target.value.trim(); $('[data-cw-host]', root).textContent = host(e.target.value.trim()); }
-    else if (e.target.id === 'cw-newpass') { st.newPass = e.target.value; e.target.removeAttribute('aria-invalid'); updateStrength(); }
+    else if (e.target.id === 'cw-newpass') {
+      const wasStale = hashStale();
+      st.newPass = e.target.value;
+      e.target.removeAttribute('aria-invalid');
+      updateStrength();
+      if (hashStale() !== wasStale) drawVars();
+    }
     else if (e.target.id === 'cw-srv-model') { st.srvModelDraft = e.target.value.trim(); drawVars(); }
   });
   d.addEventListener('change', (e) => {
@@ -821,10 +1075,21 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
       const sp = providerById(st.srvProvider);
       const a = $('[data-cw-srv-keylink]', root);
       a.href = sp.keyUrl;
-      a.innerHTML = `Créer une clé ${esc(sp.name)}${icon('external')}`;
+      a.innerHTML = `${esc(sp.keyLabel || `Créer une clé ${sp.name}`)}${icon('external')}`;
       drawVars();
     }
   });
+  // Carte du choix : le chemin survolé (souris) ou atteint au clavier s'allume, sinon celui mis en avant.
+  const mapFollow = (e) => {
+    if (st.step !== 'choix') return;
+    const m = $('.cw-map', root);
+    if (!m) return;
+    const c = e.target.closest?.('[data-connect], .brain-adv');
+    const id = c ? (c.dataset.connect || 'local') : m.dataset.featured;
+    if (m.dataset.hl !== id) m.dataset.hl = id;
+  };
+  d.addEventListener('pointerover', mapFollow);
+  d.addEventListener('focusin', mapFollow);
   d.addEventListener('submit', (e) => {
     const f = e.target.closest('[data-cw-login-form]');
     if (f) { e.preventDefault(); doLogin(f); }
@@ -835,6 +1100,16 @@ export function openConnectWizard(app, { step = 'choix', provider = null } = {})
 
   go(st.step);
   return d;
+}
+
+/** Liaison animée Nour ⇄ fournisseur, affichée quand le test réussit (temps de réponse mesuré). */
+function linkHTML({ ms, name }) {
+  const initials = String(name || '?').replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+  return `<div class="cw-link" aria-hidden="true">
+    <span class="cw-link-node is-nour"><svg viewBox="0 0 32 32"><use href="#av-arche"/></svg></span>
+    <span class="cw-link-wire"><i></i><i></i><i></i><em>${esc(ms.toLocaleString('fr-FR'))} ms</em></span>
+    <span class="cw-link-node is-prov">${esc(initials)}</span>
+  </div>`;
 }
 
 function flash(btn, label = '') {

@@ -8,11 +8,14 @@ const MAX_SHOWN = 400;
 
 /**
  * Monte le sélecteur dans `root`.
- * opts : { models, value, freeFilter, freeOnly, showAll, onChange(id), onPrefs({ freeOnly, showAll }) }
+ * opts : { models, value, freeFilter, freeOnly, showAll, emptyText, onChange(id), onPrefs({ freeOnly, showAll }) }
+ * La case « Modèles gratuits uniquement » n'apparaît que si `freeFilter` et si la liste contient
+ * au moins un modèle gratuit (prix renvoyés par le fournisseur, ou suffixe « :free »).
  */
 export function mountModelPicker(root, opts) {
   const uidp = `mp${++counter}`;
-  const st = { q: '', family: '', freeOnly: !!opts.freeFilter && !!opts.freeOnly, showAll: !!opts.showAll, value: opts.value || '', models: opts.models || [] };
+  const st = { q: '', family: '', freeOnly: !!opts.freeFilter && !!opts.freeOnly, showAll: !!opts.showAll, value: opts.value || '', models: opts.models || [], empty: opts.emptyText || 'Testez la connexion pour charger la liste des modèles.' };
+  const freeAvailable = () => !!opts.freeFilter && st.models.some((m) => m.free);
 
   root.innerHTML = `
     <div class="field" style="margin-bottom:10px">
@@ -21,7 +24,7 @@ export function mountModelPicker(root, opts) {
     </div>
     <div class="chips" role="group" aria-label="Familles de modèles ouverts" data-fams></div>
     <div class="mp-toggles" style="display:flex;gap:16px;flex-wrap:wrap;margin:0 0 10px">
-      ${opts.freeFilter ? `<label class="check" style="margin:0"><input type="checkbox" data-free ${st.freeOnly ? 'checked' : ''}><span>Modèles gratuits uniquement</span></label>` : ''}
+      ${opts.freeFilter ? `<label class="check" style="margin:0" data-free-wrap hidden><input type="checkbox" data-free ${st.freeOnly ? 'checked' : ''}><span>Modèles gratuits uniquement</span></label>` : ''}
       <label class="check" style="margin:0"><input type="checkbox" data-all ${st.showAll ? 'checked' : ''}><span>Afficher aussi les modèles non conversationnels</span></label>
     </div>
     <div class="model-list" role="radiogroup" aria-label="Modèles disponibles" data-list></div>
@@ -47,16 +50,19 @@ export function mountModelPicker(root, opts) {
 
   function filtered() {
     const needle = st.q.toLowerCase();
+    const freeOnly = st.freeOnly && freeAvailable();
     return st.models.filter((m) => (st.showAll || m.chat)
-      && (!st.freeOnly || m.free)
+      && (!freeOnly || m.free)
       && (!st.family || m.family === st.family)
       && (!needle || m.id.toLowerCase().includes(needle) || (m.name || '').toLowerCase().includes(needle)));
   }
 
   function renderList() {
     count.textContent = '';
+    const freeWrap = root.querySelector('[data-free-wrap]');
+    if (freeWrap) freeWrap.hidden = !freeAvailable();
     if (!st.models.length) {
-      list.innerHTML = `<div class="empty-note" style="border:0">${icon('info')} Testez la connexion pour charger la liste des modèles.</div>`;
+      list.innerHTML = `<div class="empty-note" style="border:0">${icon('info')} ${esc(st.empty)}</div>`;
       return;
     }
     const items = filtered();
@@ -111,7 +117,8 @@ export function mountModelPicker(root, opts) {
   renderList();
 
   return {
-    setModels(models) { st.models = models || []; renderFamilies(); renderList(); },
+    setModels(models, { emptyText } = {}) { st.models = models || []; if (emptyText) st.empty = emptyText; renderFamilies(); renderList(); },
+    setEmptyText(text) { st.empty = text; renderList(); },
     setValue(id) { st.value = id || ''; manual.value = st.value; renderList(); },
     get value() { return st.value; },
     focusSearch() { q.focus(); },

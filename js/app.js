@@ -1449,7 +1449,12 @@ async function unlock() {
 /* ---------- Choix rapide du modèle ---------- */
 async function openModelQuick() {
   const conn = connection();
-  if (!conn.ready && !(conn.mode === 'browser' && keystore.isLocked())) { openSettings(app, { tab: 'connexion' }); return; }
+  if (!conn.ready && !(conn.mode === 'browser' && keystore.isLocked())) {
+    // Rien de branché encore : l'assistant « Choisir le cerveau », comme la pastille d'état.
+    if (!isConfigured() && !settings.get().onboarded) openConnect();
+    else openSettings(app, { tab: 'connexion' });
+    return;
+  }
   const d = openDialog({
     id: 'dlg-model', title: 'Modèle', size: 'sm',
     sub: esc(conn.mode === 'server' ? 'Serveur sécurisé' : `${conn.provider.name} · ${conn.base}`),
