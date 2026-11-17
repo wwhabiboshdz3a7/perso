@@ -14,3 +14,8 @@ Projets web personnels. Chaque branche est un site autonome, publiable tel quel 
 1. Nouveau site → « Import from Git » → ce dépôt.
 2. Choisir la branche voulue, dossier de publication : `/` (ou celui indiqué dans le `netlify.toml` de la branche).
 3. Aucune commande de build nécessaire.
+
+## Publier sur Quai (plateforme perso)
+
+Le dossier [`quai/`](quai/) contient une mini-plateforme de déploiement auto-hébergée : on y dépose
+un dossier ou un zip et on obtient un lien, sans passer par Netlify. Voir [`quai/README.md`](quai/README.md).

@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quai</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d5c63'/%3E%3Cpath d='M9 8h14v4H9zM12 12h8v7h-8zM6 23c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --surface: #fffdf8;
+    --ink: #17232b;
+    --muted: #5d6a72;
+    --line: #dcd6c8;
+    --accent: #0d5c63;
+    --accent-ink: #ffffff;
+    --accent-soft: #e2efee;
+    --signal: #d9480f;
+    --ok: #1f7a4d;
+    --radius: 14px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f171c;
+      --surface: #16212a;
+      --ink: #e9eef0;
+      --muted: #94a3ab;
+      --line: #2a3943;
+      --accent: #4fc1c4;
+      --accent-ink: #062427;
+      --accent-soft: #173238;
+      --signal: #ff8a5c;
+      --ok: #5fd39a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px 80px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
+  .brand svg { width: 30px; height: 30px; }
+  .brand small { font-weight: 500; color: var(--muted); font-size: 13px; letter-spacing: 0; }
+
+  button, .btn {
+    font: inherit; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    padding: 8px 14px; border-radius: 10px; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    min-height: 38px;
+  }
+  button:hover, .btn:hover { border-color: var(--accent); }
+  button:focus-visible, .btn:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.primary:hover { filter: brightness(1.08); }
+  button.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+  button.quiet:hover { color: var(--ink); border-color: var(--line); }
+  button.danger:hover { color: var(--signal); border-color: var(--signal); }
+  button:disabled { opacity: .55; cursor: default; }
+
+  input[type=text], input[type=password], input[type=url] {
+    font: inherit; width: 100%;
+    padding: 9px 12px; min-height: 40px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); color: var(--ink);
+  }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+  }
+
+  /* Connexion */
+  #login { max-width: 400px; margin: 12vh auto 0; }
+  #login h1 { font-size: 22px; margin: 0 0 6px; }
+  #login p { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  #login form { display: grid; gap: 12px; }
+
+  /* Zone de dépôt */
+  .drop {
+    border: 2px dashed var(--line); border-radius: var(--radius);
+    background: var(--surface);
+    padding: 34px 20px; text-align: center;
+    transition: border-color .15s, background .15s;
+  }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop h2 { margin: 10px 0 4px; font-size: 20px; letter-spacing: -0.01em; }
+  .drop p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+  .drop .icon { width: 44px; height: 44px; color: var(--accent); }
+  .drop .choices { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .target-note { font-size: 14px; margin-top: 14px; }
+
+  .pending { display: grid; gap: 14px; }
+  .pending .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .pending .row > div { flex: 1 1 220px; }
+  .hint { font-size: 13px; color: var(--muted); margin: 0; }
+  .hint.warn { color: var(--signal); }
+
+  .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+
+  .done { display: grid; gap: 10px; }
+  .done strong { color: var(--ok); }
+  .linkrow {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .link {
+    font-family: var(--mono); font-size: 14px; color: var(--accent);
+    overflow-wrap: anywhere; text-decoration: none; flex: 1 1 200px; min-width: 0;
+  }
+  .link:hover { text-decoration: underline; }
+
+  details.git { margin-top: 14px; }
+  details.git > summary, details.history > summary {
+    cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted);
+    list-style: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: "▸"; font-size: 11px; }
+  details[open] > summary::before { content: "▾"; }
+  details.git form { display: grid; gap: 12px; margin-top: 12px; }
+  .grid2 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+
+  h3.section {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin: 34px 0 12px; font-weight: 700;
+  }
+  .projects { display: grid; gap: 12px; }
+  .project .head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+  .project .name { font-weight: 700; font-size: 17px; margin: 0; overflow-wrap: anywhere; }
+  .project .meta { font-size: 13px; color: var(--muted); margin: 2px 0 10px; }
+  .project .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent);
+    text-transform: uppercase; vertical-align: 2px; margin-left: 6px;
+  }
+  details.history { margin-top: 14px; }
+  .history ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+  .history li {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    font-size: 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px;
+  }
+  .history li.current { border-color: var(--accent); }
+  .hook { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .hook code { font-family: var(--mono); overflow-wrap: anywhere; color: var(--ink); }
+  .empty { text-align: center; color: var(--muted); padding: 30px 20px; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--ink); color: var(--bg);
+    padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    max-width: calc(100vw - 32px); box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  }
+  #toast.error { background: var(--signal); color: #fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="login" class="card" hidden>
+    <h1>Quai</h1>
+    <p>Entre le jeton d'accès affiché au démarrage du serveur.</p>
+    <form id="login-form">
+      <div>
+        <label for="token">Jeton d'accès</label>
+        <input id="token" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="primary" type="submit">Se connecter</button>
+    </form>
+  </section>
+
+  <main id="app" hidden>
+    <header class="top">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 8h14v4H9zM12 12h8v7h-8zM6 23c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Quai <small>· tes projets en ligne</small></span>
+      </div>
+      <button class="quiet" id="logout">Déconnexion</button>
+    </header>
+
+    <!-- Étape 1 : déposer -->
+    <section id="drop" class="drop">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      <h2 id="drop-title">Dépose un projet ici</h2>
+      <p>Un dossier ou un fichier .zip contenant ton site. Tu obtiens un lien tout de suite.</p>
+      <div class="choices">
+        <button class="primary" id="pick-folder">Choisir un dossier</button>
+        <button id="pick-zip">Choisir un .zip</button>
+      </div>
+      <p class="target-note" id="target-note" hidden>
+        <span id="target-text"></span>
+        <button class="quiet" id="target-cancel">Annuler</button>
+      </p>
+      <input id="input-folder" type="file" webkitdirectory multiple hidden>
+      <input id="input-zip" type="file" accept=".zip,application/zip" hidden>
+    </section>
+
+    <!-- Étape 2 : nommer -->
+    <section id="pending" class="card pending" hidden>
+      <div class="row">
+        <div>
+          <label for="name">Nom du projet (il apparaît dans le lien)</label>
+          <input id="name" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="63">
+        </div>
+        <button class="primary" id="deploy">Mettre en ligne</button>
+        <button class="quiet" id="cancel">Annuler</button>
+      </div>
+      <p class="hint" id="summary"></p>
+      <p class="hint" id="name-hint"></p>
+    </section>
+
+    <!-- Étape 3 : envoi -->
+    <section id="busy" class="card" hidden>
+      <p style="margin:0 0 10px;font-weight:600" id="busy-text">Envoi en cours…</p>
+      <div class="bar" role="progressbar" aria-label="Progression de l'envoi"><i id="bar"></i></div>
+    </section>
+
+    <!-- Étape 4 : lien -->
+    <section id="done" class="card done" hidden>
+      <div><strong>En ligne.</strong> <span id="done-text"></span></div>
+      <div class="linkrow">
+        <a class="link" id="done-link" target="_blank" rel="noopener"></a>
+        <button id="done-copy">Copier le lien</button>
+        <button class="quiet" id="done-close">Fermer</button>
+      </div>
+      <p class="hint warn" id="done-warning" hidden></p>
+    </section>
+
+    <details class="git">
+      <summary>Importer depuis un dépôt Git</summary>
+      <form id="git-form" class="card">
+        <div class="grid2">
+          <div>
+            <label for="git-name">Nom du projet</label>
+            <input id="git-name" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="63" required>
+          </div>
+          <div>
+            <label for="git-url">URL du dépôt (https)</label>
+            <input id="git-url" type="url" placeholder="https://github.com/toi/depot" required>
+          </div>
+          <div>
+            <label for="git-branch">Branche (optionnel)</label>
+            <input id="git-branch" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="main">
+          </div>
+          <div>
+            <label for="git-dir">Dossier à publier (optionnel)</label>
+            <input id="git-dir" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="racine du dépôt">
+          </div>
+        </div>
+        <p class="hint">Dépôt privé : mets un jeton d'accès dans l'URL (https://JETON@github.com/toi/depot).</p>
+        <div><button class="primary" type="submit" id="git-submit">Importer et mettre en ligne</button></div>
+      </form>
+    </details>
+
+    <h3 class="section">Mes projets</h3>
+    <div id="projects" class="projects"></div>
+  </main>
+</div>
+<div id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const IGNORED = new Set(['.git', 'node_modules', '__MACOSX', '.DS_Store', 'Thumbs.db']);
+  const NAME_RE = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+
+  let projects = [];
+  let maxUploadMb = 200;
+  let pending = null;   // { kind: 'zip', file } ou { kind: 'files', files: [{ path, file }] }
+  let target = null;    // nom du projet à mettre à jour
+
+  // ---------- petits utilitaires ----------
+
+  function h(tag, attrs, ...children) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs || {})) {
+      if (key === 'class') el.className = value;
+      else if (key.startsWith('on')) el.addEventListener(key.slice(2), value);
+      else if (value !== null && value !== undefined && value !== false) el.setAttribute(key, value);
+    }
+    for (const child of children.flat()) {
+      if (child === null || child === undefined || child === false) continue;
+      el.append(child.nodeType ? child : document.createTextNode(String(child)));
+    }
+    return el;
+  }
+
+  let toastTimer;
+  function toast(message, isError) {
+    const el = $('toast');
+    el.textContent = message;
+    el.className = isError ? 'error' : '';
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, isError ? 6000 : 2500);
+  }
+
+  function formatBytes(n) {
+    const fmt = (v) => v.toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    if (n < 1024) return n + ' o';
+    if (n < 1024 * 1024) return fmt(n / 1024) + ' Ko';
+    return fmt(n / 1024 / 1024) + ' Mo';
+  }
+  const formatDate = (ms) =>
+    new Date(ms).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+  const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
+
+  function slugify(text) {
+    return String(text)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 63)
+      .replace(/-+$/, '');
+  }
+
+  function randomName() {
+    const a = ['joli', 'vif', 'calme', 'brave', 'doux', 'grand', 'petit', 'rapide', 'clair', 'fier'];
+    const b = ['renard', 'hibou', 'phare', 'nuage', 'galet', 'lynx', 'canal', 'voilier', 'heron', 'cedre'];
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    return `${pick(a)}-${pick(b)}-${Math.floor(100 + Math.random() * 900)}`;
+  }
+
+  async function copy(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Lien copié.');
+    } catch {
+      window.prompt('Copie ce lien :', text);
+    }
+  }
+
+  async function api(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (typeof options.body === 'string') headers['Content-Type'] = 'application/json';
+    const response = await fetch('/_quai/api/' + path, { ...options, headers, credentials: 'same-origin' });
+    const data = await response.json().catch(() => ({}));
+    if (response.status === 401 && path !== 'login') showLogin();
+    if (!response.ok) throw new Error(data.error || `Erreur ${response.status}`);
+    return data;
+  }
+
+  // ---------- connexion ----------
+
+  function showLogin() {
+    $('app').hidden = true;
+    $('login').hidden = false;
+    $('token').focus();
+  }
+
+  $('login-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await api('login', { method: 'POST', body: JSON.stringify({ token: $('token').value.trim() }) });
+      $('token').value = '';
+      $('toast').hidden = true;
+      await refresh();
+    } catch (err) {
+      toast(err.message, true);
+    }
+  });
+
+  $('logout').addEventListener('click', async () => {
+    await api('logout', { method: 'POST' }).catch(() => {});
+    showLogin();
+  });
+
+  // ---------- liste des projets ----------
+
+  async function refresh() {
+    const data = await api('projects');
+    projects = data.projects;
+    maxUploadMb = data.maxUploadMb;
+    $('login').hidden = true;
+    $('app').hidden = false;
+    renderProjects();
+  }
+
+  function renderProjects() {
+    const box = $('projects');
+    box.replaceChildren();
+    if (!projects.length) {
+      box.append(h('div', { class: 'card empty' }, "Aucun projet pour l'instant. Dépose ton premier site ci-dessus."));
+      return;
+    }
+    for (const project of projects) box.append(projectCard(project));
+  }
+
+  function projectCard(project) {
+    const current = project.deploys.find((d) => d.id === project.current);
+    const meta = current
+      ? `Mis à jour le ${formatDate(current.createdAt)} · ${plural(current.files, 'fichier')} · ${formatBytes(current.bytes)}`
+      : 'Aucune version en ligne';
+
+    const history = h('details', { class: 'history' },
+      h('summary', null, `Historique (${plural(project.deploys.length, 'version')})`),
+      h('ul', null, project.deploys.map((deploy) => {
+        const isCurrent = deploy.id === project.current;
+        return h('li', { class: isCurrent ? 'current' : '' },
+          h('span', null, `${formatDate(deploy.createdAt)} · ${plural(deploy.files, 'fichier')} · ${formatBytes(deploy.bytes)}`),
+          isCurrent
+            ? h('span', { class: 'tag' }, 'en ligne')
+            : h('button', { onclick: () => rollback(project.name, deploy.id) }, 'Restaurer')
+        );
+      }))
+    );
+
+    return h('article', { class: 'card project' },
+      h('div', { class: 'head' },
+        h('div', null,
+          h('p', { class: 'name' }, project.name, project.git ? h('span', { class: 'tag' }, 'git') : null),
+          h('p', { class: 'meta' }, meta)
+        )
+      ),
+      h('div', { class: 'linkrow' },
+        h('a', { class: 'link', href: project.url, target: '_blank', rel: 'noopener' }, project.url),
+        h('button', { onclick: () => copy(project.url) }, 'Copier le lien')
+      ),
+      project.warning ? h('p', { class: 'hint warn', style: 'margin-top:8px' }, project.warning) : null,
+      h('div', { class: 'actions' },
+        h('button', { onclick: () => setTarget(project.name) }, 'Nouvelle version'),
+        project.git ? h('button', { onclick: (e) => redeploy(project.name, e.currentTarget) }, 'Redéployer depuis Git') : null,
+        h('button', { class: 'quiet danger', onclick: () => removeProject(project.name) }, 'Supprimer')
+      ),
+      project.git
+        ? h('p', { class: 'hook' },
+            `${project.git.url}${project.git.branch ? ' · branche ' + project.git.branch : ''}${project.git.dir ? ' · dossier ' + project.git.dir : ''}`,
+            h('br'),
+            'Webhook (déploiement automatique à chaque push) : ',
+            h('code', null, project.hookUrl), ' ',
+            h('button', { class: 'quiet', onclick: () => copy(project.hookUrl) }, 'Copier')
+          )
+        : null,
+      history
+    );
+  }
+
+  async function rollback(name, deploy) {
+    try {
+      await api(`projects/${name}/rollback`, { method: 'POST', body: JSON.stringify({ deploy }) });
+      toast('Version restaurée.');
+      await refresh();
+    } catch (err) { toast(err.message, true); }
+  }
+
+  async function redeploy(name, button) {
+    button.disabled = true;
+    button.textContent = 'Déploiement…';
+    try {
+      await api(`projects/${name}/redeploy`, { method: 'POST' });
+      toast('Projet redéployé.');
+    } catch (err) { toast(err.message, true); }
+    await refresh().catch(() => {});
+  }
+
+  async function removeProject(name) {
+    if (!window.confirm(`Supprimer « ${name} » et toutes ses versions ? Le lien ne fonctionnera plus.`)) return;
+    try {
+      await api(`projects/${name}`, { method: 'DELETE' });
+      if (target === name) setTarget(null);
+      toast('Projet supprimé.');
+      await refresh();
+    } catch (err) { toast(err.message, true); }
+  }
+
+  // ---------- étapes du déploiement ----------
+
+  function show(step) {
+    for (const id of ['drop', 'pending', 'busy', 'done']) $(id).hidden = id !== step;
+  }
+
+  function setTarget(name) {
+    target = name;
+    $('drop-title').textContent = name ? `Dépose la nouvelle version de « ${name} »` : 'Dépose un projet ici';
+    $('target-note').hidden = !name;
+    $('target-text').textContent = name ? 'Le lien reste le même.' : '';
+    if (name) {
+      show('drop');
+      $('drop').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  $('target-cancel').addEventListener('click', () => setTarget(null));
+
+  function keep(path) {
+    return !path.split('/').some((segment) => IGNORED.has(segment));
+  }
+
+  function commonRoot(files) {
+    const first = files[0].path.split('/');
+    if (first.length < 2) return '';
+    return files.every((f) => f.path.startsWith(first[0] + '/')) ? first[0] : '';
+  }
+
+  function stage(next, suggestion) {
+    if (next.kind === 'files') {
+      next.files = next.files.filter((f) => keep(f.path));
+      if (!next.files.length) return toast('Ce dossier ne contient aucun fichier à publier.', true);
+    }
+    const bytes = next.kind === 'zip' ? next.file.size : next.files.reduce((sum, f) => sum + f.file.size, 0);
+    if (bytes > maxUploadMb * 1024 * 1024) {
+      return toast(`Projet trop volumineux (${formatBytes(bytes)}). Limite : ${maxUploadMb} Mo.`, true);
+    }
+    pending = next;
+    $('name').value = target || slugify(suggestion) || randomName();
+    $('name').disabled = Boolean(target);
+    $('summary').textContent = next.kind === 'zip'
+      ? `Archive ${next.file.name} · ${formatBytes(bytes)}`
+      : `${plural(next.files.length, 'fichier')} · ${formatBytes(bytes)}`;
+    updateNameHint();
+    show('pending');
+    if (!target) $('name').select();
+  }
+
+  function updateNameHint() {
+    const name = $('name').value;
+    const hint = $('name-hint');
+    hint.className = 'hint';
+    if (!NAME_RE.test(name)) {
+      hint.className = 'hint warn';
+      hint.textContent = 'Lettres minuscules, chiffres et tirets uniquement.';
+      $('deploy').disabled = true;
+      return;
+    }
+    $('deploy').disabled = false;
+    const exists = projects.some((p) => p.name === name);
+    hint.textContent = exists
+      ? `« ${name} » existe déjà : une nouvelle version sera publiée, le lien ne change pas.`
+      : '';
+    $('deploy').textContent = exists ? 'Publier la nouvelle version' : 'Mettre en ligne';
+  }
+  $('name').addEventListener('input', () => {
+    const el = $('name');
+    const cleaned = el.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    if (cleaned !== el.value) el.value = cleaned;
+    updateNameHint();
+  });
+  $('name').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !$('deploy').disabled) $('deploy').click();
+  });
+
+  $('cancel').addEventListener('click', () => { pending = null; show('drop'); });
+  $('done-close').addEventListener('click', () => show('drop'));
+
+  function setProgress(ratio, text) {
+    $('bar').style.width = Math.round(Math.min(1, ratio) * 100) + '%';
+    if (text) $('busy-text').textContent = text;
+  }
+
+  function uploadZip(name, file) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `/_quai/api/projects/${name}/zip`);
+      xhr.setRequestHeader('Content-Type', 'application/zip');
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) setProgress(e.loaded / e.total * 0.95);
+      };
+      xhr.onload = () => {
+        let data = {};
+        try { data = JSON.parse(xhr.responseText); } catch { /* réponse vide */ }
+        if (xhr.status === 401) showLogin();
+        if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+        else reject(new Error(data.error || `Erreur ${xhr.status}`));
+      };
+      xhr.onerror = () => reject(new Error("L'envoi a été interrompu."));
+      xhr.send(file);
+    });
+  }
+
+  async function uploadFiles(name, files) {
+    const { id } = await api(`projects/${name}/deploys`, { method: 'POST' });
+    const total = files.reduce((sum, f) => sum + f.file.size, 0) || 1;
+    const queue = files.slice();
+    let sent = 0;
+    let failure = null;
+    async function worker() {
+      while (queue.length && !failure) {
+        const item = queue.shift();
+        try {
+          await api(`deploys/${id}/files?path=${encodeURIComponent(item.path)}`, {
+            method: 'PUT',
+            body: item.file,
+            headers: { 'Content-Type': 'application/octet-stream' },
+          });
+        } catch (err) {
+          failure = err;
+          return;
+        }
+        sent += item.file.size;
+        setProgress(sent / total * 0.95, `Envoi… ${files.length - queue.length} / ${files.length} fichiers`);
+      }
+    }
+    await Promise.all(Array.from({ length: 4 }, worker));
+    if (failure) {
+      api(`deploys/${id}`, { method: 'DELETE' }).catch(() => {});
+      throw failure;
+    }
+    return api(`deploys/${id}/publish`, { method: 'POST' });
+  }
+
+  $('deploy').addEventListener('click', async () => {
+    const name = $('name').value;
+    if (!pending || !NAME_RE.test(name)) return;
+    const job = pending;
+    pending = null;
+    show('busy');
+    setProgress(0, 'Envoi en cours…');
+    try {
+      const result = job.kind === 'zip' ? await uploadZip(name, job.file) : await uploadFiles(name, job.files);
+      setProgress(1);
+      showDone(result);
+    } catch (err) {
+      toast(err.message, true);
+      show('drop');
+    }
+    setTarget(null);
+    refresh().catch(() => {});
+  });
+
+  function showDone(result) {
+    const { project, deploy } = result;
+    $('done-text').textContent = `${project.name} · ${plural(deploy.files, 'fichier')} · ${formatBytes(deploy.bytes)}`;
+    $('done-link').textContent = project.url;
+    $('done-link').href = project.url;
+    $('done-copy').onclick = () => copy(project.url);
+    $('done-warning').hidden = !project.warning;
+    $('done-warning').textContent = project.warning || '';
+    show('done');
+  }
+
+  // ---------- sélection et glisser-déposer ----------
+
+  const isZip = (file) => /\.zip$/i.test(file.name);
+
+  $('pick-folder').addEventListener('click', () => $('input-folder').click());
+  $('pick-zip').addEventListener('click', () => $('input-zip').click());
+
+  $('input-folder').addEventListener('change', (event) => {
+    const files = [...event.target.files].map((file) => ({ path: file.webkitRelativePath || file.name, file }));
+    event.target.value = '';
+    if (files.length) stage({ kind: 'files', files }, commonRoot(files));
+  });
+  $('input-zip').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (file) stage({ kind: 'zip', file }, file.name.replace(/\.zip$/i, ''));
+  });
+
+  function readEntry(entry, prefix, out) {
+    if (entry.isFile) {
+      return new Promise((resolve, reject) => entry.file((file) => {
+        out.push({ path: prefix + entry.name, file });
+        resolve();
+      }, reject));
+    }
+    if (!entry.isDirectory || IGNORED.has(entry.name)) return Promise.resolve();
+    const reader = entry.createReader();
+    const readBatch = () => new Promise((resolve, reject) => reader.readEntries(resolve, reject));
+    return (async () => {
+      for (;;) {
+        const batch = await readBatch();
+        if (!batch.length) break;
+        for (const child of batch) await readEntry(child, prefix + entry.name + '/', out);
+      }
+    })();
+  }
+
+  async function handleDrop(dataTransfer) {
+    // Les entrées doivent être lues tout de suite : elles ne survivent pas à un await.
+    const entries = [...(dataTransfer.items || [])]
+      .map((item) => (item.webkitGetAsEntry ? item.webkitGetAsEntry() : null))
+      .filter(Boolean);
+    const plain = [...(dataTransfer.files || [])];
+
+    if (plain.length === 1 && isZip(plain[0]) && !(entries[0] && entries[0].isDirectory)) {
+      return stage({ kind: 'zip', file: plain[0] }, plain[0].name.replace(/\.zip$/i, ''));
+    }
+    let files = [];
+    if (entries.length) {
+      for (const entry of entries) await readEntry(entry, '', files);
+    } else {
+      files = plain.map((file) => ({ path: file.name, file }));
+    }
+    if (!files.length) return toast('Rien à publier dans ce que tu as déposé.', true);
+    stage({ kind: 'files', files }, commonRoot(files));
+  }
+
+  let depth = 0;
+  const hasFiles = (event) => [...(event.dataTransfer?.types || [])].includes('Files');
+  window.addEventListener('dragenter', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth += 1;
+    $('drop').classList.add('over');
+  });
+  window.addEventListener('dragover', (event) => { if (hasFiles(event)) event.preventDefault(); });
+  window.addEventListener('dragleave', () => {
+    depth = Math.max(0, depth - 1);
+    if (!depth) $('drop').classList.remove('over');
+  });
+  window.addEventListener('drop', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth = 0;
+    $('drop').classList.remove('over');
+    if ($('app').hidden || !$('busy').hidden) return;
+    handleDrop(event.dataTransfer).catch((err) => toast(err.message || 'Lecture du dossier impossible.', true));
+  });
+
+  // ---------- import Git ----------
+
+  $('git-name').addEventListener('input', (event) => {
+    const cleaned = event.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    if (cleaned !== event.target.value) event.target.value = cleaned;
+  });
+
+  $('git-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const name = $('git-name').value;
+    if (!NAME_RE.test(name)) return toast('Nom de projet invalide.', true);
+    const button = $('git-submit');
+    button.disabled = true;
+    button.textContent = 'Import en cours…';
+    try {
+      const result = await api(`projects/${name}/git`, {
+        method: 'POST',
+        body: JSON.stringify({ url: $('git-url').value, branch: $('git-branch').value, dir: $('git-dir').value }),
+      });
+      event.target.reset();
+      showDone(result);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      await refresh();
+    } catch (err) {
+      toast(err.message, true);
+    }
+    button.disabled = false;
+    button.textContent = 'Importer et mettre en ligne';
+  });
+
+  refresh().catch(() => {});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+services:
+  quai:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - quai-data:/data
+    environment:
+      # Décommente pour donner un sous-domaine à chaque projet (voir README) :
+      # BASE_DOMAIN: "203.0.113.10.sslip.io"
+      MAX_UPLOAD_MB: "200"
+
+volumes:
+  quai-data:

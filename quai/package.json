@@ -1,0 +1,13 @@
+{
+  "name": "quai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mini-plateforme de déploiement de sites statiques : dépose un projet, récupère un lien.",
+  "main": "server.js",
+  "bin": { "quai-deploy": "cli.js" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18.17" }
+}
