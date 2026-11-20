@@ -29,7 +29,9 @@ jobs:
     permissions:
       actions: write
     steps:
-      - run: gh workflow run quai-pages.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH"
+      - run: |
+          gh workflow run quai-pages.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH" \
+            || echo "::warning::Publication non relancée : la branche $DEFAULT_BRANCH n'a pas (encore) le workflow Quai."
         env:
           GH_TOKEN: ${{ github.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
