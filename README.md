@@ -15,7 +15,28 @@ Projets web personnels. Chaque branche est un site autonome, publiable tel quel 
 2. Choisir la branche voulue, dossier de publication : `/` (ou celui indiqué dans le `netlify.toml` de la branche).
 3. Aucune commande de build nécessaire.
 
-## Publier sur Quai (plateforme perso)
+## Liens publics automatiques (Quai sur GitHub Pages)
 
-Le dossier [`quai/`](quai/) contient une mini-plateforme de déploiement auto-hébergée : on y dépose
-un dossier ou un zip et on obtient un lien, sans passer par Netlify. Voir [`quai/README.md`](quai/README.md).
+Chaque projet du dépôt reçoit un lien public gratuit, accessible depuis n'importe quel appareil :
+
+    https://wwhabiboshdz3a7.github.io/perso/<projet>/
+
+La liste de tous les liens est sur https://wwhabiboshdz3a7.github.io/perso/
+
+Deux façons d'ajouter un projet :
+
+1. **Déposer un dossier ou un `.zip`** dans [`sites/`](sites/) sur la branche `main`
+   ([page de dépôt](https://github.com/wwhabiboshdz3a7/perso/upload/main/sites)), puis valider avec
+   « Commit changes ». Le lien est en ligne une à deux minutes plus tard.
+2. **Créer une branche** qui contient le site : elle est publiée sous son nom
+   (`motion-lab` → `…/perso/motion-lab/`). Une branche modifiée est republiée dans les dix minutes.
+
+Le projet doit avoir un `index.html` à sa racine (ou dans le dossier `publish` de son `netlify.toml`).
+
+**Activation, une seule fois :** dans [Settings → Pages](https://github.com/wwhabiboshdz3a7/perso/settings/pages),
+choisir **GitHub Actions** dans le menu **Source**.
+
+Limites : GitHub Pages ne sert que des fichiers. Les fonctions serveur et les formulaires Netlify
+ne fonctionnent pas sur ces liens ; les projets concernés sont signalés sur la page d'accueil.
+
+Le fonctionnement est décrit dans [`quai/README.md`](quai/README.md).

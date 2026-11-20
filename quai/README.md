@@ -1,6 +1,48 @@
 # Quai
 
-Ta mini-plateforme de déploiement : tu déposes un projet (dossier ou `.zip`), tu récupères un lien.
+Ta plateforme de déploiement : tu déposes un projet, tu récupères un lien. Deux modes.
+
+| Mode | Liens | Ce qu'il faut |
+|---|---|---|
+| **GitHub Pages** (recommandé) | Publics, `https://compte.github.io/depot/projet/` | Rien à faire tourner : GitHub héberge |
+| **Serveur perso** | `http://projet.localhost:8080/` ou ton adresse | Une machine allumée avec Node |
+
+## Mode GitHub Pages
+
+Le fichier `.github/workflows/quai-pages.yml` lance `quai/pages/build.js`, qui assemble en un seul
+site :
+
+- chaque **branche** du dépôt contenant un `index.html` (à la racine, ou dans le dossier `publish`
+  de son `netlify.toml`), publiée sous le nom de la branche ;
+- chaque **dossier ou `.zip`** déposé dans `sites/` sur la branche principale.
+
+Il génère aussi la page d'accueil qui liste les liens. La publication se déclenche :
+
+| Événement | Délai |
+|---|---|
+| Dépôt dans `sites/` (push sur la branche principale) | 1 à 2 minutes |
+| Création ou suppression d'une branche | 1 à 2 minutes |
+| Modification d'une branche existante | 10 minutes au plus (vérification périodique) |
+| Bouton « Run workflow » dans l'onglet Actions | immédiat |
+
+Ce que fait l'assemblage pour qu'un site prévu pour Netlify marche sous `/depot/projet/` :
+
+- les chemins absolus (`href="/style.css"`, `url(/img.png)`) sont préfixés dans le HTML et le CSS.
+  Le JavaScript n'est jamais modifié : un chemin absolu construit en JS restera cassé ;
+- les chemins masqués dans `netlify.toml` (redirection `404` forcée) ne sont pas publiés, ni le
+  dossier `netlify/`, ni les fichiers cachés ;
+- les fonctions serveur et formulaires Netlify ne peuvent pas tourner sur GitHub Pages : les projets
+  concernés sont signalés sur la page d'accueil.
+
+Activation, une seule fois : Settings → Pages → Source → **GitHub Actions**. Le dépôt doit être
+public (ou le compte payant). Pour tester l'assemblage en local :
+
+```bash
+node quai/pages/build.js --out _site
+```
+
+## Mode serveur perso
+
 Un seul serveur Node, aucune dépendance, aucune base de données.
 
 - **Dépôt direct** : glisser-déposer d'un dossier ou d'un zip dans l'interface.
@@ -153,3 +195,5 @@ npm test
 | `lib/git.js` | Import depuis Git |
 | `public/index.html` | Interface |
 | `cli.js` | Déploiement depuis le terminal |
+| `pages/build.js` | Assemblage du site pour GitHub Pages |
+| `pages/template.js` | Page d'accueil et page 404 générées |

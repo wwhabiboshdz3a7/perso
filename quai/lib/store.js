@@ -358,4 +358,4 @@ class Store {
   }
 }
 
-module.exports = { Store, HttpError, NAME_RE, IGNORED, assertName, byteLimiter };
+module.exports = { Store, HttpError, NAME_RE, IGNORED, assertName, byteLimiter, cleanRelPath };
