@@ -27,10 +27,10 @@ const CASES = {
   dlc: { metal: '#222327', polished: 0.2, satin: 0.46, lugs: 0.32 },
 };
 const DIALS = {
-  bleu: { base: '#1b3566', light: '150, 185, 255', dark: '0, 4, 14', edge: '2, 5, 14', vignette: 1, ink: '#efe6d2', hands: '#e6c787' },
-  argent: { base: '#b4b8be', light: '255, 255, 255', dark: '70, 76, 90', edge: '60, 66, 78', vignette: 0.5, ink: '#17191d', hands: '#24272d', shine: 0.42 },
-  vert: { base: '#17452f', light: '165, 235, 195', dark: '0, 10, 5', edge: '0, 8, 4', vignette: 1, ink: '#efe6d2', hands: '#e6c787' },
-  noir: { base: '#131417', light: '175, 182, 198', dark: '0, 0, 0', edge: '0, 0, 0', vignette: 0.9, ink: '#efe6d2', hands: '#dfe1e5' },
+  bleu: { base: '#1b3566', light: '150, 185, 255', dark: '0, 4, 14', edge: '2, 5, 14', vignette: 1, ink: '#efe6d2', hands: '#e6c787', shine: 0.5 },
+  argent: { base: '#b4b8be', light: '255, 255, 255', dark: '70, 76, 90', edge: '60, 66, 78', vignette: 0.5, ink: '#17191d', hands: '#24272d', shine: 0.36 },
+  vert: { base: '#17452f', light: '165, 235, 195', dark: '0, 10, 5', edge: '0, 8, 4', vignette: 1, ink: '#efe6d2', hands: '#e6c787', shine: 0.5 },
+  noir: { base: '#131417', light: '175, 182, 198', dark: '0, 0, 0', edge: '0, 0, 0', vignette: 0.9, ink: '#efe6d2', hands: '#dfe1e5', shine: 0.5 },
 };
 const LEATHERS = {
   noir: { base: '#17171a', light: '120, 120, 130', dark: '0, 0, 0', stitch: '#d8ccb2' },
@@ -44,7 +44,7 @@ const PARTS = [
   ['Aiguilles', 0.18, 0.32],
   ['Cadran', 0.1, 0.845],
   ['Ponts', 0.05, 0.79],
-  ['Rouage et balancier', 0, 0.6],
+  ['Rouage, balancier', 0, 0.6],
   ['Platine perlée', -0.045, 0.83],
   ['Masse oscillante', -0.11, 0.795],
   ['Carrure', -0.03, 1],
@@ -145,7 +145,7 @@ async function start() {
   }
   // reflets seuls, ajoutés à l'image sans toucher à sa transparence : la glace ne voile pas le cadran
   const sapphire = materials.thinGlass({
-    color: '#000000', opacity: 1, specularColor: new THREE.Color('#eef3ff'), specularIntensity: 0.55, ior: 1.77, roughness: 0.03, clearcoat: 0,
+    color: '#000000', opacity: 1, specularColor: new THREE.Color('#eef3ff'), specularIntensity: 0.3, ior: 1.77, roughness: 0.03, clearcoat: 0,
     blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
   });
   const crystal = new THREE.Mesh(revolve(dome, 96), sapphire);
@@ -231,7 +231,7 @@ async function start() {
   };
   const dialFace = new THREE.Mesh(
     new THREE.CircleGeometry(DIAL_R, 128).rotateX(-Math.PI / 2),
-    new THREE.MeshPhysicalMaterial({ map: dialMap('bleu'), metalness: 0.92, roughness: 0.4, anisotropy: 0.85, anisotropyMap: sunburstMap(), clearcoat: 0.7, clearcoatRoughness: 0.08 })
+    new THREE.MeshPhysicalMaterial({ map: dialMap('bleu'), metalness: 0.92, roughness: 0.4, anisotropy: 0.85, anisotropyMap: sunburstMap(), clearcoat: 0.3, clearcoatRoughness: 0.12, envMapIntensity: 0.5 })
   );
   dialFace.position.y = 0.1004;
   const print = new THREE.Mesh(
@@ -483,8 +483,7 @@ async function start() {
     // aiguilles et index : dorés sur les cadrans sombres, noircis sur l'argent, assortis à l'or rose
     handTarget.set(body === CASES.rose && dialName !== 'argent' ? '#efbd9b' : dial.hands);
     dialFace.material.map = dialMap(dialName);
-    dialFace.material.envMapIntensity = dial.shine || 1; // l'argent renvoie déjà beaucoup de lumière
-    dialFace.material.clearcoat = dial.shine ? 0.3 : 0.7;
+    dialFace.material.envMapIntensity = dial.shine; // dans un studio clair, un cadran métallisé sature vite
     dialFace.material.needsUpdate = true;
     print.material.map = printMap(dial.ink);
     print.material.needsUpdate = true;
@@ -639,7 +638,7 @@ async function start() {
     shadowMaterial.opacity = 0.26 * (1 - clamp(open * 6));
     crystalVeil.material.opacity = open * 0.14;
     crystalVeil.visible = open > 0.01;
-    sapphire.specularIntensity = lerp(0.55, 0.1, open); // sortie de la lunette, la glace reste transparente
+    sapphire.specularIntensity = lerp(0.3, 0.08, open); // sortie de la lunette, la glace reste transparente
     lamp.intensity = open * 10;
 
     // ----- orientation -----
@@ -653,7 +652,7 @@ async function start() {
     const portrait = camera.aspect < 0.95;
     const sway = Math.sin(time * 0.5) * 0.16 * auto * (1 - open);
     pose.rotation.set(lerp(tiltClosed, tiltOpen, open), (yaw + sway) * (1 - open), lerp(-0.07, -0.12, open) * (portrait ? 0.5 : 1));
-    pose.position.x = -open * (portrait ? 0.78 : 0.95);
+    pose.position.x = -open * (portrait ? 1.05 : 0.95);
     watch.rotation.y = spin * open;
 
     // ----- heure réelle, trotteuse continue -----

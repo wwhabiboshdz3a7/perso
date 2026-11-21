@@ -331,7 +331,7 @@ function render() {
     else if (status.why === 'cap') dispo.innerHTML = `<b>Trop petite</b> Prévue pour ${r.cap} voyageurs ; vous êtes ${state.guests}.`;
     else if (status.why === 'taken') {
       next = nextFree(r.id, state.arrive, n);
-      dispo.innerHTML = `<b>Complète</b> du ${fmtShort.format(state.arrive)} au ${fmtShort.format(state.depart)}.` + (next ? ` Libre pour ${plural(n, 'nuit', 'nuits')} à partir du ${fmtDay.format(next)}.` : '');
+      dispo.innerHTML = `<b>Complète</b> du ${fmtShort.format(state.arrive)} au ${fmtShort.format(state.depart)}` + (next ? ` — libre pour ${plural(n, 'nuit', 'nuits')} dès le ${fmtDay.format(next)}` : '');
     } else dispo.innerHTML = `<b>Libre</b> du ${fmtDay.format(state.arrive)} au ${fmtDay.format(state.depart)} — ${plural(n, 'nuit', 'nuits')}, ${euros(q.stay)}.`;
     if (nextButton) nextButton.hidden = !next;
     if (cta) cta.textContent = status.free ? 'Réserver cette chambre' : 'Changer mes dates';

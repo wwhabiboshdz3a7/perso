@@ -93,7 +93,7 @@ h3 { font: 700 18px/1.2 var(--text); }
 .hero__meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--ink); }
 .hero__meta span { padding: 9px 12px 9px 0; }
 .hero__meta span + span { padding-left: 12px; border-left: 1px solid var(--rule); }
-.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 18vw, 380px); line-height: 0.8; margin: clamp(18px, 2.6vw, 44px) 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
+.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 18vw, 380px); line-height: 0.8; margin: 0.23em 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
 .hero__title i { width: 0.17em; height: 0.17em; margin-left: 0.05em; border-radius: 50%; background: var(--signal); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px); padding-top: clamp(18px, 2vw, 28px); border-top: 1px solid var(--ink); background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 12px) 0 0 / 100% 7px no-repeat; }
 .hero__text { display: flex; flex-direction: column; gap: clamp(18px, 2.2vw, 28px); }

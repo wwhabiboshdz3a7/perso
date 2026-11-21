@@ -121,7 +121,7 @@ function booking() {
       const rnd = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
       for (let n = 0; n < 4; n++) rnd();
       busy.fill(1, barber.lunch, barber.lunch + 3);
-      const load = (day.today ? 0.42 : 0.28) + (day.date.getDay() === 6 ? 0.05 : 0);
+      const load = (day.today ? 0.36 : 0.27) + (day.date.getDay() === 6 ? 0.05 : 0);
       for (let t = 0; t < UNITS; ) {
         if (rnd() < load) {
           const length = 2 + Math.floor(rnd() * 3);
