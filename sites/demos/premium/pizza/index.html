@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno Nero — Pizza napolitaine au feu de bois, Toulouse</title>
+<meta name="description" content="Forno Nero : pâte maturée 72 heures, four à bois à 485 °C. Démonstration de site Premium — maison fictive.">
+<meta name="theme-color" content="#0c0a09">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23e8412c'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23f3e9d8' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="pizza.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="top">
+  <a class="top__brand" href="#accueil">Forno&nbsp;Nero</a>
+  <nav class="top__nav" aria-label="Sections">
+    <a href="#film">Le geste</a>
+    <a href="#composer">Composer</a>
+    <a href="#carte">La carte</a>
+    <a href="#venir">Venir</a>
+  </nav>
+  <a class="btn btn--fire" href="#reserver">Réserver</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : la vidéo du four, le nom en très grand -->
+  <section class="hero">
+    <video class="hero__video" data-loop muted loop playsinline preload="metadata" poster="media/cuire.webp">
+      <source src="media/cuire.mp4" type="video/mp4">
+    </video>
+    <div class="hero__meta mono">
+      <span>14, rue des Braises · Toulouse</span>
+      <span>Ouvert ce soir · 19 h — 22 h 30</span>
+    </div>
+    <h1 class="hero__title"><span>Forno</span> <span class="fire">Nero</span></h1>
+    <div class="hero__foot">
+      <p class="hero__lede">Une pâte, un feu, quatre-vingt-dix secondes. Regarde-la se faire, puis compose la tienne.</p>
+      <div class="hero__cta">
+        <a class="btn btn--fire" href="#reserver">Réserver une table</a>
+        <a class="btn btn--line" href="#film">Voir le geste ↓</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="band marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Pâte 72 h</span><span>✺</span><span>Feu de bois 485°</span><span>✺</span><span>90 secondes</span><span>✺</span><span>San Marzano DOP</span><span>✺</span><span>Mozzarella di bufala</span><span>✺</span>
+      <span>Pâte 72 h</span><span>✺</span><span>Feu de bois 485°</span><span>✺</span><span>90 secondes</span><span>✺</span><span>San Marzano DOP</span><span>✺</span><span>Mozzarella di bufala</span><span>✺</span>
+    </div>
+  </div>
+
+  <!-- le film : quatre plans que l'on fait avancer en défilant -->
+  <section class="film" id="film" data-film data-length="1.6" aria-label="La fabrication d'une pizza, en quatre gestes">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/petrir" data-frames="41" data-label="Pétrir">
+        <p class="step"><b>01</b> Pétrir</p>
+        <h2 class="shot__title">Trois jours<br>de patience</h2>
+        <p class="shot__text">Farine 00, eau, sel, une pincée de levure. Puis soixante-douze heures au frais : c'est le repos qui fait le bord soufflé.</p>
+      </article>
+      <article class="film__shot" data-src="media/etirer" data-frames="41" data-label="Étirer">
+        <p class="step"><b>02</b> Étirer</p>
+        <h2 class="shot__title">Jamais<br>de rouleau</h2>
+        <p class="shot__text">La pâte s'ouvre à la main, du centre vers le bord, pour pousser l'air là où il doit gonfler.</p>
+      </article>
+      <article class="film__shot" data-src="media/garnir" data-frames="41" data-label="Garnir">
+        <p class="step"><b>03</b> Garnir</p>
+        <h2 class="shot__title">Trois<br>ingrédients</h2>
+        <p class="shot__text">San Marzano écrasée à la main, bufflonne livrée deux fois par semaine, basilic. Rien pour se cacher.</p>
+      </article>
+      <article class="film__shot" data-src="media/cuire" data-frames="41" data-label="Cuire">
+        <p class="step"><b>04</b> Cuire</p>
+        <h2 class="shot__title">485 degrés,<br>90 secondes</h2>
+        <p class="shot__text">Chêne et hêtre, une flamme vive. Un quart de tour à mi-cuisson, et c'est prêt.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- la pizza en 3D, à composer -->
+  <section class="builder" id="composer">
+    <div class="builder__stage">
+      <canvas class="builder__canvas" data-builder tabindex="0" aria-label="Pizza en trois dimensions. Faites-la tourner avec les flèches gauche et droite."></canvas>
+      <p class="builder__hint mono" aria-hidden="true">↻ fais-la tourner</p>
+      <img class="builder__fallback" src="media/garnir.webp" alt="" loading="lazy">
+    </div>
+    <div class="builder__panel">
+      <p class="step rv"><b>05</b> Composer</p>
+      <h2 class="h2 rv" style="--i:1">Compose<br><span class="fire">la tienne</span></h2>
+      <p class="text rv" style="--i:2">On part d'une margherita. Ajoute ce que tu veux : tout tombe sur la pizza, et le prix suit.</p>
+      <fieldset class="toppings rv" style="--i:3">
+        <legend class="sr-only">Garnitures</legend>
+        <label class="topping"><input type="checkbox" data-topping="basilic" data-label="basilic" data-price="0" checked><span>Basilic frais</span><em>offert</em></label>
+        <label class="topping"><input type="checkbox" data-topping="tomates" data-label="tomates cerises" data-price="1.5"><span>Tomates cerises</span><em>+ 1,50 €</em></label>
+        <label class="topping"><input type="checkbox" data-topping="olives" data-label="olives" data-price="1"><span>Olives de Gaeta</span><em>+ 1,00 €</em></label>
+        <label class="topping"><input type="checkbox" data-topping="champignons" data-label="champignons" data-price="1.5"><span>Champignons</span><em>+ 1,50 €</em></label>
+        <label class="topping"><input type="checkbox" data-topping="nduja" data-label="nduja" data-price="2.5"><span>Nduja piquante</span><em>+ 2,50 €</em></label>
+        <label class="topping"><input type="checkbox" data-topping="roquette" data-label="roquette" data-price="1"><span>Roquette</span><em>+ 1,00 €</em></label>
+      </fieldset>
+      <div class="order rv" style="--i:4">
+        <div>
+          <p class="mono" data-summary>Margherita, telle quelle</p>
+          <p class="order__total" data-total aria-live="polite">13,00 €</p>
+        </div>
+        <a class="btn btn--fire" href="#reserver">Commander</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- la carte -->
+  <section class="menu" id="carte">
+    <header class="menu__head">
+      <p class="step rv"><b>06</b> La carte</p>
+      <h2 class="h2 rv" style="--i:1">Huit pizzas.<br>Pas une de plus.</h2>
+    </header>
+    <ol class="menu__list">
+      <li class="rv"><span class="mono">01</span><h3>Margherita</h3><p>San Marzano, fior di latte, basilic, huile d'olive</p><b>13 €</b></li>
+      <li class="rv"><span class="mono">02</span><h3>Marinara</h3><p>San Marzano, ail de Lautrec, origan de Sicile</p><b>11 €</b></li>
+      <li class="rv"><span class="mono">03</span><h3>Bufala</h3><p>Tomates jaunes du Vésuve, bufflonne crue à la sortie du four</p><b>16 €</b></li>
+      <li class="rv"><span class="mono">04</span><h3>Diavola</h3><p>Spianata piquante de Calabre, fior di latte, piment frais</p><b>15 €</b></li>
+      <li class="rv"><span class="mono">05</span><h3>Nduja e miele</h3><p>Nduja, stracciatella, miel de châtaignier, zeste de citron</p><b>17 €</b></li>
+      <li class="rv"><span class="mono">06</span><h3>Ortolana</h3><p>Courge rôtie, scamorza fumée, sauge, noisettes du Piémont</p><b>15 €</b></li>
+      <li class="rv"><span class="mono">07</span><h3>Quattro latti</h3><p>Fior di latte, ricotta, gorgonzola doux, parmesan 30 mois</p><b>16 €</b></li>
+      <li class="rv"><span class="mono">08</span><h3>Tartufo nero</h3><p>Crème de truffe noire, champignons de saison, jaune d'œuf confit</p><b>22 €</b></li>
+    </ol>
+  </section>
+
+  <!-- le lieu -->
+  <section class="place" id="venir">
+    <figure class="place__media" data-in>
+      <video data-loop muted loop playsinline preload="none" poster="media/part.webp"><source src="media/part.mp4" type="video/mp4"></video>
+    </figure>
+    <div class="place__text">
+      <p class="step rv"><b>07</b> Venir</p>
+      <h2 class="h2 rv" style="--i:1">Quarante couverts,<br>un seul four</h2>
+      <p class="text rv" style="--i:2">Le comptoir fait face au feu : tu vois ta pizza de la première pincée de farine à la pelle. Nous gardons toujours quelques places pour celles et ceux qui passent.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>485°</dt><dd>au cœur du four</dd></div>
+        <div><dt>72 h</dt><dd>de maturation</dd></div>
+        <div><dt>11</dt><dd>producteurs nommés</dd></div>
+      </dl>
+      <dl class="infos mono rv" style="--i:4">
+        <div><dt>Adresse</dt><dd>14, rue des Braises, 31000 Toulouse</dd></div>
+        <div><dt>Horaires</dt><dd>Mardi au samedi · 12 h–14 h · 19 h–22 h 30</dd></div>
+        <div><dt>Téléphone</dt><dd>05 00 00 00 00</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <figure class="wide" data-in>
+    <img src="media/salle.webp" alt="La salle de Forno Nero : comptoir en marbre noir face au four à bois" loading="lazy" width="1600" height="900">
+    <figcaption class="mono">La salle, un mardi soir</figcaption>
+  </figure>
+
+  <!-- réserver -->
+  <section class="book" id="reserver">
+    <div>
+      <p class="step rv"><b>08</b> Réserver</p>
+      <h2 class="h2 rv" style="--i:1">Une table<br><span class="fire">ce soir ?</span></h2>
+      <p class="text rv" style="--i:2">Réponse immédiate jusqu'à six couverts. Au-delà, écris à Gino, notre assistant : il s'occupe des grandes tablées.</p>
+      <button class="btn btn--line rv" style="--i:3" type="button" data-chat-open>Demander à Gino</button>
+    </div>
+    <form class="form rv" style="--i:2" data-demo="Merci ! Ceci est une démonstration : aucune réservation n’a été envoyée.">
+      <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+      <label>Téléphone<input type="tel" name="tel" autocomplete="tel" required></label>
+      <label>Date<input type="date" name="date" required></label>
+      <label>Couverts<select name="couverts"><option>2 personnes</option><option>3 personnes</option><option>4 personnes</option><option>5 personnes</option><option>6 personnes</option></select></label>
+      <button class="btn btn--fire" type="submit">Demander la table</button>
+      <p class="form__done mono" data-done role="status"></p>
+    </form>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">Forno Nero</p>
+  <div class="foot__row mono">
+    <span>© <span data-year>2026</span> Forno Nero — maison fictive</span>
+    <span>Site de démonstration, formule Premium. Adresse, prix et horaires sont inventés ; photos et vidéos générées par IA.</span>
+    <a href="../../">Toutes les démos</a>
+  </div>
+</footer>
+
+<a class="tag" href="../../" title="Retour au catalogue des démos">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Gino",
+  "role": "Assistant de Forno Nero",
+  "launch": "Demander à Gino",
+  "greeting": "Buonasera ! Je suis Gino. Une table, la carte, une allergie ? Dis-moi.",
+  "chips": ["Réserver une table", "Les horaires", "Sans gluten ?", "À emporter"],
+  "fallback": "Bonne question — celle-ci, je la laisse à l'équipe en salle : 05 00 00 00 00. Je peux t'aider pour une réservation, la carte, les allergènes ou les horaires.",
+  "intents": [
+    { "keys": ["reserv", "table", "ce soir", "couvert", "dispo"], "answer": "Ce soir il reste des tables à 19 h et à 21 h 15. Jusqu'à six couverts, la réservation est immédiate.", "link": { "label": "Réserver maintenant", "href": "#reserver" }, "chips": ["Nous sommes huit", "Les horaires"] },
+    { "keys": ["huit", "groupe", "anniversaire", "privatis", "dix", "douze"], "answer": "Pour une grande tablée, on vous installe le long du comptoir, face au four : menu unique à partager, à partir de 8 personnes. Laisse ton numéro dans le formulaire, on rappelle dans l'heure.", "link": { "label": "Laisser mon numéro", "href": "#reserver" } },
+    { "keys": ["horaire", "ouvert", "heure", "dimanche", "lundi", "midi"], "answer": "Du mardi au samedi : 12 h – 14 h et 19 h – 22 h 30. Fermé dimanche et lundi — le four se repose aussi.", "chips": ["Réserver une table", "Où êtes-vous ?"] },
+    { "keys": ["adresse", "ou etes", "trouver", "metro", "parking", "venir"], "answer": "14, rue des Braises, à Toulouse. Métro Carmes à quatre minutes, parking des Carmes juste à côté.", "link": { "label": "Voir les infos", "href": "#venir" } },
+    { "keys": ["gluten", "allerg", "lactose", "vegan", "vegetar", "intoler"], "answer": "Pas de pâte sans gluten chez nous : la farine vole partout, on ne peut pas garantir l'absence de traces. Côté végétarien : Margherita, Marinara (sans fromage), Ortolana et Quattro latti.", "chips": ["Voir la carte", "Réserver une table"] },
+    { "keys": ["emporter", "livraison", "livrer", "uber", "commande"], "answer": "À emporter oui, sur place uniquement et jusqu'à 21 h. Pas de livraison : une napolitaine ne survit pas à vingt minutes de scooter.", "link": { "label": "Composer ma pizza", "href": "#composer" } },
+    { "keys": ["carte", "menu", "prix", "pizza", "margherita", "combien"], "answer": "Huit pizzas, de 11 € (Marinara) à 22 € (Tartufo nero). La Margherita est à 13 €.", "link": { "label": "Voir la carte", "href": "#carte" } },
+    { "keys": ["bonjour", "salut", "bonsoir", "ciao", "hello"], "answer": "Ciao ! Qu'est-ce que je peux faire pour toi ?", "chips": ["Réserver une table", "Les horaires", "Sans gluten ?"] },
+    { "keys": ["merci", "super", "parfait", "top"], "answer": "Avec plaisir. À ce soir, peut-être !" }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="builder.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>

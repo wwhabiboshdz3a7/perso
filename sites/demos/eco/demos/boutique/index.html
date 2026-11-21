@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Ortie — Boutique de vêtements à Toulouse Carmes, e-shop & click & collect</title>
+<meta name="description" content="Boutique de prêt-à-porter éthique aux Carmes, Toulouse. Marques européennes, matières naturelles. Commandez en ligne, retirez en boutique ou faites-vous livrer.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ece7df'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='%232d2a26' font-family='serif'%3EO%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ClothingStore","name":"Maison Ortie","telephone":"+33561533902","priceRange":"€€","address":{"@type":"PostalAddress","streetAddress":"31 rue des Filatiers","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.5985,"longitude":1.4440},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"10:30","closes":"19:30"}],"url":"https://example.com/demos/boutique/"}
+</script>
+<style>
+:root{--linen:#ece7df;--linen-l:#f7f4ee;--ink:#2d2a26;--clay:#b56b48;--sage:#8a9a85;--muted:#7a746b;--accent:var(--ink);--focus:var(--clay);--border:#dcd6cb;--radius:2px;--ph:linear-gradient(160deg,#ece7df,#b8ae9e);--mb-bg:#2d2a26;--mb-bg2:#b56b48}
+body{font-family:Mulish,system-ui,sans-serif;background:#fff;color:var(--ink);font-weight:300}
+h1,h2,h3{font-family:"Tenor Sans",Georgia,serif;font-weight:400;line-height:1.1;letter-spacing:.01em}
+strong,b{font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;font-weight:600;font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:all .3s;border:1px solid var(--ink)}
+.btn-ink{background:var(--ink);color:#fff}.btn-ink:hover{background:var(--clay);border-color:var(--clay)}
+.btn-line{color:var(--ink)}.btn-line:hover{background:var(--ink);color:#fff}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.promo-bar{background:var(--ink);color:#fff;text-align:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{font-family:"Tenor Sans";font-size:24px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none}
+.nav{display:flex;gap:28px;align-items:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+.nav a{text-decoration:none}.nav a:hover{color:var(--clay)}
+.cart-btn{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+.cart-btn b{width:20px;height:20px;border-radius:50%;background:var(--clay);color:#fff;display:grid;place-items:center;font-size:11px}
+@media (max-width:899px){.nav{position:fixed;inset:74px 0 0;background:#fff;flex-direction:column;padding:40px;gap:28px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:16px}.nav.open{transform:none;visibility:visible}}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:82vh}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero .ph{min-height:420px}
+.hero .txt{background:var(--linen);display:flex;flex-direction:column;justify-content:center;padding:64px 7vw}
+.hero h1{font-size:clamp(40px,5vw,68px)}
+.hero p{font-size:17px;color:var(--muted);max-width:40ch;margin:22px 0 30px}
+.eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--clay);font-weight:700}
+section{padding:96px 0}
+@media (max-width:700px){section{padding:64px 0}}
+.section-head{margin-bottom:40px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.section-head h2{font-size:clamp(30px,4vw,46px);margin-top:10px}
+.cats{display:flex;gap:20px;flex-wrap:wrap}
+.cats button{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--muted);padding:6px 0;border-bottom:1px solid transparent}
+.cats button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px 20px}
+.prod{cursor:pointer}
+.prod.hidden{display:none}
+.prod .ph{aspect-ratio:3/4;margin-bottom:14px;position:relative}
+.prod:hover .ph img{transform:scale(1.04)}
+.prod .ph .tag{position:absolute;top:12px;left:12px;background:#fff;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:5px 8px;font-weight:700;z-index:2}
+.prod .ph .quick{position:absolute;left:12px;right:12px;bottom:12px;background:var(--ink);color:#fff;padding:12px;text-align:center;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;z-index:2}
+.prod:hover .quick{opacity:1;transform:none}
+.prod h3{font-size:17px}
+.prod .meta{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-top:4px}
+.prod .meta b{color:var(--ink)}
+.prod .sw{display:flex;gap:6px;margin-top:8px}
+.prod .sw i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+/* Fiche produit */
+.modal-box.pm{max-width:900px;padding:0;overflow:hidden}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:700px){.pm-grid{grid-template-columns:1fr}}
+.pm-grid .ph{aspect-ratio:3/4;min-height:300px}
+.pm-grid .info{padding:32px}
+.pm-grid h3{font-size:26px;margin:6px 0 8px}
+.pm-grid .pr{font-size:20px;margin-bottom:14px}
+.pm-grid p{font-size:14px;color:var(--muted);margin-bottom:16px}
+.lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;margin:14px 0 8px;display:block}
+.sizes{display:flex;gap:6px;flex-wrap:wrap}
+.sizes button{min-width:44px;height:40px;padding:0 10px;border:1px solid var(--border);font-weight:600;font-size:13px}
+.sizes button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sizes button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.colors{display:flex;gap:8px}
+.colors button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border)}
+.colors button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.stock{font-size:12px;color:var(--sage);font-weight:600;margin-top:12px}
+.stock.low{color:var(--clay)}
+.pm-grid .btn{width:100%;margin-top:18px}
+/* Panier (tiroir) */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(100%,440px);background:#fff;z-index:85;transform:translateX(100%);visibility:hidden;transition:transform .4s cubic-bezier(.2,.7,.2,1),visibility .4s;display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.15)}
+.drawer.open{transform:none;visibility:visible}
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:84;display:none}
+.drawer-bg.open{display:block}
+.drawer header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border)}
+.drawer header h3{font-size:20px}
+.drawer .items{flex:1;overflow:auto;padding:16px 24px;display:grid;gap:16px;align-content:start}
+.ci{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center}
+.ci .ph{aspect-ratio:3/4}
+.ci b{display:block;font-size:14px}.ci small{color:var(--muted);font-size:12px;display:block}
+.ci .q{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px}
+.ci .q button{width:24px;height:24px;border:1px solid var(--border);font-weight:600}
+.ci .pr{font-size:14px;font-weight:600;text-align:right}
+.ci .rm{font-size:11px;color:var(--muted);text-decoration:underline;display:block;margin-top:4px}
+.drawer .foot{padding:18px 24px;border-top:1px solid var(--border);background:var(--linen-l)}
+.promo{display:flex;gap:6px;margin-bottom:12px}
+.promo input{flex:1;padding:10px;border:1px solid var(--border);text-transform:uppercase;font-size:13px}
+.promo button{padding:10px 14px;background:var(--ink);color:#fff;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.promo-msg{font-size:12px;min-height:16px;margin-bottom:8px}
+.promo-msg.ok{color:var(--sage)}.promo-msg.err{color:#b91c1c}
+.tot{display:grid;gap:6px;font-size:14px;margin-bottom:12px}
+.tot div{display:flex;justify-content:space-between}
+.tot .g{font-size:18px;font-weight:600;border-top:1px solid var(--border);padding-top:8px}
+.drawer .btn{width:100%}
+.empty{text-align:center;color:var(--muted);padding:40px 0;font-size:14px}
+/* Checkout modal */
+.co .mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.co .mode label{border:1px solid var(--border);padding:12px;text-align:center;font-size:13px;font-weight:600;cursor:pointer}
+.co .mode label small{display:block;font-weight:300;color:var(--muted);font-size:12px}
+.co .mode label:has(input:checked){border-color:var(--ink);background:var(--linen-l)}
+.co .mode input{position:absolute;opacity:0}
+.co .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.co .row{grid-template-columns:1fr}}
+.co form{display:grid;gap:10px}
+.co .done{text-align:center;padding:12px 0}
+.co .done h3{font-size:26px;margin-bottom:8px}
+.co .done .num{font-family:ui-monospace,monospace;letter-spacing:.15em;margin:10px 0;font-size:18px}
+/* Reste */
+.values{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
+.val{background:#fff;padding:32px 24px;text-align:center}
+.val .ic{font-size:28px}
+.val h3{font-size:18px;margin:12px 0 8px}
+.val p{font-size:14px;color:var(--muted)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.review{background:var(--linen-l);padding:28px}
+.review .stars{color:var(--clay);letter-spacing:3px;font-size:12px}
+.review p{font-family:"Tenor Sans";font-size:18px;margin:12px 0;line-height:1.4}
+.review footer{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-family:"Tenor Sans";font-size:18px;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--clay)}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:18px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:14px}
+.hours .row.today{font-weight:600;color:var(--clay)}
+.map{min-height:320px;background:var(--linen)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0;filter:grayscale(.6)}
+address{font-style:normal;line-height:1.8;margin:14px 0;font-size:15px}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:44px 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<div class="promo-bar">Livraison offerte dès 120 € · Retrait en boutique en 2 h · Code BIENVENUE : −10 %</div>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand">Ortie</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#collection">Collection</a><a href="#valeurs">Valeurs</a><a href="#avis">Avis</a><a href="#boutique">Boutique</a></nav>
+  <div style="display:flex;gap:16px;align-items:center"><button class="cart-btn" id="cartBtn" aria-label="Ouvrir le panier">Panier <b id="cartCount">0</b></button><button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button></div>
+</div></header>
+
+<section class="hero" id="top" style="padding:0">
+  <div class="ph"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=70" alt="Silhouette en lin devant la vitrine de la boutique" fetchpriority="high"></div>
+  <div class="txt">
+    <p class="eyebrow" data-reveal>Automne · hiver 2026</p>
+    <h1 data-reveal>Des pièces qui durent, choisies aux Carmes</h1>
+    <p data-reveal>Lin, laine mérinos, coton bio : une sélection de marques européennes, essayable en boutique rue des Filatiers ou livrée chez vous à Toulouse.</p>
+    <div data-reveal><a href="#collection" class="btn btn-ink">Voir la collection</a></div>
+  </div>
+</section>
+
+<section id="collection"><div class="container">
+  <div class="section-head" data-reveal><div><p class="eyebrow">La collection</p><h2>Nouveautés de saison</h2></div><div class="cats" id="cats"><button aria-pressed="true" data-c="all">Tout</button><button aria-pressed="false" data-c="hauts">Hauts</button><button aria-pressed="false" data-c="bas">Bas</button><button aria-pressed="false" data-c="manteaux">Manteaux</button><button aria-pressed="false" data-c="accessoires">Accessoires</button></div></div>
+  <div class="grid" id="grid"></div>
+</div></section>
+
+<section id="valeurs" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><div><p class="eyebrow">Nos valeurs</p><h2>Acheter moins, acheter mieux</h2></div></div>
+  <div class="values" data-reveal>
+    <div class="val"><div class="ic">🌿</div><h3>Matières naturelles</h3><p>Lin européen, laine certifiée RWS, coton GOTS. Rien de synthétique sauf sur les coutures.</p></div>
+    <div class="val"><div class="ic">🇪🇺</div><h3>Fabriqué en Europe</h3><p>Portugal, Italie, France : ateliers visités, salaires décents, distances courtes.</p></div>
+    <div class="val"><div class="ic">🧵</div><h3>Réparation offerte</h3><p>Bouton, ourlet, accroc : notre atelier répare à vie ce que vous achetez chez nous.</p></div>
+    <div class="val"><div class="ic">♻️</div><h3>Seconde vie</h3><p>Rapportez une pièce Ortie usée : −15 % sur la suivante, et elle rejoint notre corner vintage.</p></div>
+  </div>
+</div></section>
+
+<section id="avis" style="background:var(--linen-l)"><div class="container">
+  <div class="section-head" data-reveal><div><p class="eyebrow">Avis</p><h2>Elles et ils portent Ortie</h2></div></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Commandé en ligne à midi, essayé en boutique à 18 h, échangé la taille sur place. Le meilleur des deux mondes.</p><footer>Julie · Carmes</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le manteau en laine est parfait, et ils ont recousu une boutonnière gratuitement un an après.</p><footer>Antoine · Saint-Étienne</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Enfin une boutique qui dit d'où viennent les vêtements. Conseils sincères sur les tailles.</p><footer>Nora · Busca</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0;padding-bottom:0"><div class="container" style="max-width:760px;padding:64px 0">
+  <div class="section-head" data-reveal><div><p class="eyebrow">Questions</p><h2>Livraison, retours, tailles</h2></div></div>
+  <div data-faq data-reveal>
+    <details><summary>Comment fonctionne le retrait en boutique ?</summary><p>Commandez en ligne, nous préparons votre commande en 2 h pendant les horaires d'ouverture. Vous essayez sur place et nous échangeons immédiatement si besoin.</p></details>
+    <details><summary>Quels sont les délais et frais de livraison ?</summary><p>À Toulouse, livraison à vélo le lendemain (4,90 €, offerte dès 120 €). En France, 48-72 h en point relais (5,90 €).</p></details>
+    <details><summary>Puis-je retourner un article ?</summary><p>Oui, sous 30 jours, en boutique ou par colis (étiquette prépayée). Remboursement ou avoir, au choix.</p></details>
+    <details><summary>Comment choisir ma taille ?</summary><p>Chaque fiche indique la coupe et les mensurations du modèle. En cas de doute, écrivez-nous : nous mesurons la pièce pour vous.</p></details>
+  </div>
+</div></section>
+
+<section id="boutique"><div class="container access">
+  <div data-reveal><p class="eyebrow">La boutique</p><h2 style="font-size:clamp(28px,4vw,40px);margin:10px 0 14px">Rue des Filatiers, aux Carmes</h2><div class="hours" id="hours"></div><address><strong>Maison Ortie</strong><br>31 rue des Filatiers, 31000 Toulouse<br>Métro B · Carmes<br><a href="tel:+33561533902">05 61 53 39 02</a> · <a href="mailto:bonjour@maisonortie.fr">bonjour@maisonortie.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=31+rue+des+Filatiers+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4360%2C43.5945%2C1.4520%2C43.6025&layer=mapnik&marker=43.5985%2C1.4440"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Maison Ortie — SAS Ortie</span><button data-open-modal="#mentions">Mentions légales & CGV</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SAS Ortie, 31 rue des Filatiers, 31000 Toulouse. SIRET 956 789 012 00025. Directrice de publication : Clémence Ortie. Hébergement : Netlify, Inc. Droit de rétractation 14 jours, étendu à 30 jours. Données de commande conservées 5 ans (obligations comptables). Site de démonstration : boutique fictive, aucun paiement réel.</p></div></div>
+<div class="modal" id="pm" aria-hidden="true" role="dialog"><div class="modal-box pm"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><div id="pmBody"></div></div></div>
+<div class="modal" id="coModal" aria-hidden="true" role="dialog"><div class="modal-box co"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><div id="coBody"></div></div></div>
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer" aria-label="Panier"><header><h3>Votre panier</h3><button id="drawerClose" aria-label="Fermer le panier" style="font-size:24px">×</button></header><div class="items" id="items"></div><div class="foot"><div class="promo"><input id="promo" placeholder="Code promo" aria-label="Code promo"><button id="promoBtn">OK</button></div><p class="promo-msg" id="promoMsg"></p><div class="tot" id="tot"></div><button class="btn btn-ink" id="checkout" disabled>Commander</button></div></aside>
+<div class="mobile-bar"><a href="tel:+33561533902">📞 Boutique</a><a href="#collection">Collection</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, uid, store, toast, openModal, closeModal, validate, sendNetlify } = Demo;
+  const KEY = 'ortie:cart';
+  const P = [
+    { id: 'chemise-lin', c: 'hauts', n: 'Chemise en lin Lauragais', p: 89, img: 'photo-1596755094514-f87e34085b2c', col: [['Écru', '#efe9dc'], ['Olive', '#6b7a5a']], sz: ['XS', 'S', 'M', 'L', 'XL'], out: ['XS'], d: 'Lin européen 100 %, col mao, coupe droite légèrement oversize. Tissée au Portugal. Le modèle mesure 1,78 m et porte du M.', tag: 'Nouveau' },
+    { id: 'pull-merinos', c: 'hauts', n: 'Pull col rond mérinos', p: 129, img: 'photo-1576871337622-98d48d1cf531', col: [['Camel', '#b56b48'], ['Marine', '#2b3550'], ['Gris chiné', '#9a9a9a']], sz: ['S', 'M', 'L', 'XL'], out: [], d: 'Laine mérinos extra-fine certifiée RWS, tricotée en Italie. Ne pique pas, régule la température. Lavage à 30 °C.' },
+    { id: 'tshirt-bio', c: 'hauts', n: 'T-shirt coton bio', p: 39, img: 'photo-1521572163474-6864f9cf17ab', col: [['Blanc', '#fff'], ['Noir', '#222'], ['Sauge', '#8a9a85']], sz: ['XS', 'S', 'M', 'L', 'XL'], out: [], d: 'Jersey 180 g coton GOTS, col rond côtelé, coupe droite. Fabriqué au Portugal.' },
+    { id: 'pantalon-velours', c: 'bas', n: 'Pantalon velours côtelé', p: 119, img: 'photo-1542272604-787c3835535d', col: [['Terracotta', '#b56b48'], ['Forêt', '#2f5d46']], sz: ['36', '38', '40', '42', '44'], out: ['44'], d: 'Velours de coton bio 1000 raies, taille haute, jambe droite. Fabriqué en France (Marseille).' },
+    { id: 'jean-selvedge', c: 'bas', n: 'Jean selvedge brut', p: 149, img: 'photo-1541099649105-f69ad21f3246', col: [['Brut', '#2b3550']], sz: ['28', '30', '32', '34', '36'], out: [], d: 'Denim japonais 14 oz, coupe tapered, boutons gravés. À porter brut pendant six mois pour une patine unique.' },
+    { id: 'jupe-laine', c: 'bas', n: 'Jupe midi en laine', p: 109, img: 'photo-1594633312681-425c7b97ccd1', col: [['Caramel', '#c48a4a'], ['Anthracite', '#444']], sz: ['34', '36', '38', '40', '42'], out: [], d: 'Flanelle de laine italienne, taille élastiquée au dos, doublure viscose. Longueur 78 cm.' },
+    { id: 'manteau-laine', c: 'manteaux', n: 'Manteau long en laine', p: 329, img: 'photo-1539533018447-63fcce2678e3', col: [['Camel', '#b56b48'], ['Noir', '#222']], sz: ['S', 'M', 'L'], out: ['L'], d: 'Drap de laine 80 % / cachemire 20 %, coupe droite, boutonnage caché. Confectionné en Italie. Réparation à vie.', tag: 'Best-seller' },
+    { id: 'veste-ouatinee', c: 'manteaux', n: 'Veste ouatinée recyclée', p: 189, img: 'photo-1591047139829-d91aecb6caea', col: [['Olive', '#6b7a5a'], ['Sable', '#d8c8a8']], sz: ['XS', 'S', 'M', 'L', 'XL'], out: [], d: 'Extérieur coton ciré, ouate 100 % polyester recyclé, poches plaquées. Déperlante.' },
+    { id: 'echarpe', c: 'accessoires', n: 'Écharpe mohair', p: 69, img: 'photo-1520903920243-00d872a2d1c9', col: [['Rouille', '#b56b48'], ['Crème', '#efe9dc'], ['Bleu nuit', '#2b3550']], sz: ['TU'], out: [], d: 'Mohair et soie tissés en France, 180 × 40 cm. Douce, chaude, légère.' },
+    { id: 'sac-cuir', c: 'accessoires', n: 'Cabas cuir tannage végétal', p: 219, img: 'photo-1548036328-c9fa89d128fa', col: [['Naturel', '#c9a67a'], ['Noir', '#222']], sz: ['TU'], out: [], d: 'Cuir pleine fleur tannage végétal (Toscane), coutures sellier, doublure coton. Se patine avec le temps.' }
+  ];
+  const PROMOS = { BIENVENUE: { pct: 10, label: '−10 % de bienvenue' }, ORTIE20: { pct: 20, min: 200, label: '−20 % dès 200 €' } };
+  let cart = store.get(KEY, { items: [], promo: null });
+  const img = (p, w) => `https://images.unsplash.com/${p.img}?auto=format&fit=crop&w=${w}&q=70`;
+  $('#grid').innerHTML = P.map((p) => `<article class="prod" data-c="${p.c}" data-id="${p.id}"><div class="ph">${p.tag ? `<span class="tag">${p.tag}</span>` : ''}<img src="${img(p, 600)}" alt="${p.n}" loading="lazy"><span class="quick">Aperçu rapide</span></div><h3>${p.n}</h3><div class="meta"><span>${p.col.length} coloris</span><b>${euro(p.p)}</b></div><div class="sw">${p.col.map((c) => `<i style="background:${c[1]}" title="${c[0]}"></i>`).join('')}</div></article>`).join('');
+  $$('.prod').forEach((el) => el.addEventListener('click', () => openProduct(el.dataset.id)));
+  $$('#cats button').forEach((b) => b.addEventListener('click', () => { $$('#cats button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); $$('.prod').forEach((p) => p.classList.toggle('hidden', b.dataset.c !== 'all' && p.dataset.c !== b.dataset.c)); }));
+
+  function openProduct(id) {
+    const p = P.find((x) => x.id === id); let size = p.sz.find((s) => !p.out.includes(s)), color = p.col[0][0];
+    const render = () => { $('#pmBody').innerHTML = `<div class="pm-grid"><div class="ph"><img src="${img(p, 800)}" alt="${p.n}" loading="lazy"></div><div class="info"><p class="eyebrow">${p.c}</p><h3>${p.n}</h3><div class="pr">${euro(p.p)}</div><p>${p.d}</p><span class="lbl">Coloris · ${color}</span><div class="colors">${p.col.map((c) => `<button data-col="${c[0]}" aria-pressed="${c[0] === color}" style="background:${c[1]}" aria-label="${c[0]}"></button>`).join('')}</div><span class="lbl">Taille</span><div class="sizes">${p.sz.map((s) => `<button data-size="${s}" aria-pressed="${s === size}" ${p.out.includes(s) ? 'disabled' : ''}>${s}</button>`).join('')}</div><p class="stock ${p.out.length ? 'low' : ''}">${p.out.length ? 'Certaines tailles sont épuisées en ligne — disponibles en boutique.' : 'En stock en boutique et en ligne.'}</p><button class="btn btn-ink" id="pmAdd">Ajouter au panier · ${euro(p.p)}</button></div></div>`;
+      $$('[data-col]').forEach((b) => b.addEventListener('click', () => { color = b.dataset.col; render(); })); $$('[data-size]').forEach((b) => b.addEventListener('click', () => { size = b.dataset.size; render(); }));
+      $('#pmAdd').addEventListener('click', () => { const sig = `${p.id}|${color}|${size}`; const ex = cart.items.find((i) => i.sig === sig); if (ex) ex.qty++; else cart.items.push({ sig, id: p.id, n: p.n, color, size, p: p.p, qty: 1 }); save(); closeModal($('#pm')); openDrawer(); toast(`${p.n} (${size}, ${color}) ajouté`, 'ok'); }); };
+    render(); openModal('#pm');
+  }
+  function totals() { const sub = cart.items.reduce((s, i) => s + i.p * i.qty, 0); const pr = cart.promo && PROMOS[cart.promo]; const disc = pr && (!pr.min || sub >= pr.min) ? sub * pr.pct / 100 : 0; return { sub, disc, total: sub - disc }; }
+  function save() { store.set(KEY, cart); renderCart(); }
+  function renderCart() {
+    const n = cart.items.reduce((s, i) => s + i.qty, 0); $('#cartCount').textContent = n;
+    $('#items').innerHTML = cart.items.length ? cart.items.map((i, k) => { const p = P.find((x) => x.id === i.id); return `<div class="ci"><div class="ph"><img src="${img(p, 200)}" alt="" loading="lazy"></div><div><b>${i.n}</b><small>${i.color} · ${i.size}</small><div class="q"><button data-q="${k}:-1" aria-label="Moins">−</button>${i.qty}<button data-q="${k}:1" aria-label="Plus">+</button></div></div><div><div class="pr">${euro(i.p * i.qty)}</div><button class="rm" data-rm="${k}">Retirer</button></div></div>`; }).join('') : '<p class="empty">Votre panier est vide.</p>';
+    $$('[data-q]').forEach((b) => b.addEventListener('click', () => { const [k, d] = b.dataset.q.split(':').map(Number); cart.items[k].qty += d; if (cart.items[k].qty <= 0) cart.items.splice(k, 1); save(); }));
+    $$('[data-rm]').forEach((b) => b.addEventListener('click', () => { cart.items.splice(Number(b.dataset.rm), 1); save(); }));
+    const t = totals(); const ship = t.total >= 120 || !cart.items.length ? 0 : 4.9;
+    $('#tot').innerHTML = `<div><span>Sous-total</span><span>${euro(t.sub)}</span></div>${t.disc ? `<div style="color:var(--sage)"><span>${PROMOS[cart.promo].label}</span><span>−${euro(t.disc)}</span></div>` : ''}<div><span>Livraison</span><span>${ship ? euro(ship) : 'Offerte'}</span></div><div class="g"><span>Total</span><span>${euro(t.total + ship)}</span></div>`;
+    $('#checkout').disabled = !cart.items.length;
+    if (cart.promo) { $('#promo').value = cart.promo; const m = $('#promoMsg'); m.className = 'promo-msg ok'; m.textContent = PROMOS[cart.promo].label + (t.disc ? ' appliqué' : ` (dès ${PROMOS[cart.promo].min} €)`); }
+  }
+  $('#promoBtn').addEventListener('click', () => { const c = $('#promo').value.trim().toUpperCase(); const m = $('#promoMsg'); if (!PROMOS[c]) { cart.promo = null; m.className = 'promo-msg err'; m.textContent = c ? 'Code invalide.' : ''; save(); return; } cart.promo = c; save(); });
+  const openDrawer = () => { $('#drawer').classList.add('open'); $('#drawerBg').classList.add('open'); };
+  const closeDrawer = () => { $('#drawer').classList.remove('open'); $('#drawerBg').classList.remove('open'); };
+  $('#cartBtn').addEventListener('click', openDrawer); $('#drawerClose').addEventListener('click', closeDrawer); $('#drawerBg').addEventListener('click', closeDrawer);
+
+  /* Validation de commande */
+  $('#checkout').addEventListener('click', () => {
+    closeDrawer(); const t = totals();
+    $('#coBody').innerHTML = `<p class="eyebrow">Commande</p><h3 style="margin:6px 0 14px">Finaliser · ${euro(t.total)}</h3><form name="commande-boutique" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="coForm" novalidate><input type="hidden" name="form-name" value="commande-boutique"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p><input type="hidden" name="panier" value="${cart.items.map((i) => `${i.qty}x ${i.n} ${i.color} ${i.size}`).join(', ')}"><input type="hidden" name="total" value="${euro(t.total)}"><div class="mode"><label><input type="radio" name="mode" value="Retrait boutique" checked>Retrait boutique<small>Prêt en 2 h · gratuit</small></label><label><input type="radio" name="mode" value="Livraison Toulouse">Livraison Toulouse<small>Demain à vélo · ${t.total >= 120 ? 'offerte' : '4,90 €'}</small></label></div><div class="row"><div class="field"><label for="coNom">Nom</label><input id="coNom" name="nom" required></div><div class="field"><label for="coTel">Téléphone</label><input id="coTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div><div class="field"><label for="coEmail">E-mail</label><input id="coEmail" name="email" type="email" required></div><div class="field" id="addrField" style="display:none"><label for="coAddr">Adresse de livraison</label><input id="coAddr" name="adresse"></div><button type="submit" class="btn btn-ink" id="coSubmit">Payer ${euro(t.total)} (simulé)</button><p style="font-size:12px;color:var(--muted);text-align:center">Paiement sécurisé CB, Apple Pay, 3× sans frais dès 150 €.</p></form>`;
+    $$('#coForm input[name=mode]').forEach((r) => r.addEventListener('change', () => { const liv = r.value.startsWith('Livraison'); $('#addrField').style.display = liv ? 'flex' : 'none'; $('#coAddr').required = liv; }));
+    $('#coForm').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } const btn = $('#coSubmit'); btn.disabled = true; btn.textContent = 'Paiement…'; const num = uid('ORT-'); await sendNetlify(f, { numero: num }); store.set('ortie:commandes', [...store.get('ortie:commandes', []), { num, items: cart.items, total: t.total, mode: f.mode.value, at: Date.now() }]); $('#coBody').innerHTML = `<div class="done"><p class="eyebrow">Merci</p><h3>Commande confirmée</h3><div class="num">${num}</div><p style="font-size:14px;color:var(--muted)">${f.mode.value === 'Retrait boutique' ? 'Votre commande sera prête en boutique dans 2 h (pendant nos horaires d\'ouverture). Vous recevrez un SMS.' : 'Livraison à vélo demain entre 12 h et 19 h à ' + f.adresse.value + '.'} Récapitulatif envoyé à ${f.email.value}.</p><button class="btn btn-ink" style="margin-top:18px" data-close-modal>Continuer</button></div>`; cart = { items: [], promo: null }; $('#promo').value = ''; $('#promoMsg').textContent = ''; save(); toast('Commande ' + num + ' confirmée', 'ok'); });
+    openModal('#coModal');
+  });
+  renderCart();
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 1 ? 'Fermé' : '10:30 – 19:30'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optique Saint-Georges — Opticien à Toulouse Saint-Georges</title>
+<meta name="description" content="Opticien indépendant à Toulouse Saint-Georges : montures de créateurs, verres sur mesure, examen de vue. Simulez votre reste à charge et prenez rendez-vous en ligne.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23fff'/%3E%3Ccircle cx='10' cy='17' r='6' fill='none' stroke='%231d4ed8' stroke-width='3'/%3E%3Ccircle cx='22' cy='17' r='6' fill='none' stroke='%231d4ed8' stroke-width='3'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Optician","name":"Optique Saint-Georges","telephone":"+33561230518","address":{"@type":"PostalAddress","streetAddress":"12 rue Boulbonne","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6020,"longitude":1.4465},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"10:00","closes":"19:00"}],"url":"https://example.com/demos/opticien/"}
+</script>
+<style>
+:root{--cobalt:#1d4ed8;--cobalt-d:#1e3a8a;--sky:#eef3ff;--ink:#0f172a;--muted:#64748b;--bg:#ffffff;--accent:var(--cobalt);--focus:var(--cobalt-d);--border:#e2e8f0;--radius:18px;--ph:linear-gradient(135deg,#eef3ff,#93c5fd);--mb-bg:#1d4ed8;--mb-bg2:#0f172a}
+body{font-family:Urbanist,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-weight:800;line-height:1.05;letter-spacing:-.03em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-cobalt{background:var(--cobalt);color:#fff}.btn-cobalt:hover{background:var(--cobalt-d);transform:translateY(-2px)}
+.btn-soft{background:var(--sky);color:var(--cobalt-d)}.btn-soft:hover{background:#dbe6ff}
+.btn-line{border:2px solid var(--ink)}.btn-line:hover{background:var(--ink);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-weight:800;font-size:21px;text-decoration:none;display:flex;align-items:center;gap:10px;letter-spacing:-.02em}
+.brand svg{width:40px}
+.nav{display:flex;gap:24px;align-items:center;font-weight:600;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--cobalt)}
+.nav .btn{padding:10px 18px}
+@media (max-width:899px){.nav{position:fixed;inset:72px 0 0;background:#fff;flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--sky);overflow:hidden}
+.hero .container{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:72px 0}
+@media (max-width:880px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(42px,6.5vw,84px)}
+.hero h1 span{color:var(--cobalt)}
+.hero p{font-size:18px;color:var(--muted);max-width:46ch;margin:20px 0 28px}
+.hero .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.hero .pills span{background:#fff;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.hero-img .ph{aspect-ratio:1;border-radius:50%;box-shadow:0 40px 80px rgba(29,78,216,.2)}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cobalt);font-weight:800}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,52px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+.filters select{padding:10px 14px;border:2px solid var(--border);border-radius:999px;font-weight:600;background:#fff}
+.frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.frame{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .25s;position:relative}
+.frame:hover{border-color:var(--cobalt);transform:translateY(-4px)}
+.frame.hidden{display:none}
+.frame svg{width:100%;height:90px;display:block;margin:10px 0 14px}
+.frame h3{font-size:18px}
+.frame p{font-size:13px;color:var(--muted);margin-top:3px}
+.frame .pr{font-weight:800;margin-top:10px;font-size:18px}
+.frame .tag{position:absolute;top:12px;right:12px;font-size:11px;font-weight:800;background:#dcfce7;color:#166534;padding:4px 8px;border-radius:999px}
+.frame .try{margin-top:12px;width:100%;padding:10px;border-radius:999px;background:var(--sky);color:var(--cobalt-d);font-weight:700}
+.frame .try.on{background:var(--cobalt);color:#fff}
+.empty{grid-column:1/-1;text-align:center;padding:36px;color:var(--muted);background:var(--sky);border-radius:var(--radius)}
+/* Simulateur */
+.simu{background:var(--ink);color:#fff}
+.simu .eyebrow{color:#93c5fd}.simu .section-head p{color:rgba(255,255,255,.75)}
+.simu-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+@media (max-width:900px){.simu-grid{grid-template-columns:1fr}}
+.panel{background:#fff;color:var(--ink);border-radius:24px;padding:28px}
+.panel h3{font-size:20px;margin-bottom:14px}
+.lbl{display:block;font-weight:700;font-size:14px;margin:16px 0 8px}
+.lbl:first-of-type{margin-top:0}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.seg label{border:2px solid var(--border);border-radius:14px;padding:12px;text-align:center;font-weight:700;font-size:14px;cursor:pointer}
+.seg label small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.seg label:has(input:checked){border-color:var(--cobalt);background:var(--sky)}
+.seg input{position:absolute;opacity:0}
+.res{background:var(--sky);color:var(--ink);border-radius:24px;padding:28px;position:sticky;top:90px}
+.res .big{font-size:56px;font-weight:800;color:var(--cobalt);line-height:1;margin:8px 0}
+.res .lines{display:grid;gap:8px;font-size:14px;margin:16px 0}
+.res .lines div{display:flex;justify-content:space-between;border-bottom:1px dashed #c7d2fe;padding-bottom:6px}
+.res .note{font-size:12px;color:var(--muted)}
+.res .ok{background:#dcfce7;color:#166534;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:700;margin-top:12px}
+/* RDV */
+.rdv-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.rdv-grid{grid-template-columns:1fr}}
+.card{background:var(--sky);border-radius:24px;padding:28px}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.days button{flex:none;width:64px;padding:8px 0;border:2px solid #fff;background:#fff;border-radius:14px;font-size:11px;color:var(--muted);font-weight:700}
+.days button b{display:block;font-size:20px;color:var(--ink)}
+.days button[aria-pressed="true"]{border-color:var(--cobalt)}
+.days button[disabled]{opacity:.35;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-top:8px}
+.slots button{padding:10px 4px;border:2px solid #fff;background:#fff;border-radius:12px;font-weight:700;font-size:14px}
+.slots button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.slots button.on{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.form-grid{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.done{text-align:center;padding:16px}
+.done h3{font-size:24px;color:var(--cobalt)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{border:2px solid var(--border);border-radius:var(--radius);padding:22px}
+.review .stars{color:#f59e0b;letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:700}
+.faq details{border:2px solid var(--border);border-radius:14px;padding:0 16px;margin-bottom:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:700;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--cobalt);font-size:20px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:14px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:800;color:var(--cobalt)}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--sky)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><svg viewBox="0 0 40 24" aria-hidden="true"><circle cx="10" cy="13" r="8" fill="none" stroke="#1d4ed8" stroke-width="3"/><circle cx="30" cy="13" r="8" fill="none" stroke="#1d4ed8" stroke-width="3"/><path d="M18 13h4M2 11l-2-4M38 11l2-4" stroke="#1d4ed8" stroke-width="3"/></svg>Optique Saint-Georges</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#montures">Montures</a><a href="#simulateur">Reste à charge</a><a href="#rdv">Examen de vue</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#rdv" class="btn btn-cobalt">Prendre RDV</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal>Opticien indépendant · Saint-Georges · Toulouse</p>
+    <h1 data-reveal>Voir mieux, <span>sans se ruiner</span></h1>
+    <p data-reveal>Montures de créateurs européens, verres fabriqués en France, examen de vue sur place. Et un simulateur qui vous dit avant d'entrer combien il vous restera à payer après la Sécu et votre mutuelle.</p>
+    <div data-reveal><a href="#simulateur" class="btn btn-cobalt">Simuler mon reste à charge</a> <a href="#montures" class="btn btn-line">Voir les montures</a></div>
+    <div class="pills" data-reveal><span>👓 100 % Santé disponible</span><span>🔍 Examen de vue offert</span><span>🔧 Ajustage à vie</span><span>↩️ Satisfait ou échangé 30 j</span></div>
+  </div>
+  <div class="hero-img" data-reveal="scale"><div class="ph"><img src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&w=900&q=70" alt="Monture en acétate sur fond clair" fetchpriority="high"></div></div>
+</div></section>
+
+<section id="montures"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les montures</p><h2>Trouvez la forme qui vous va</h2><p>Filtrez selon la forme de votre visage, le style et votre budget. Sélectionnez une monture pour l'ajouter au simulateur.</p></div>
+  <div class="filters" data-reveal>
+    <select id="fFace" aria-label="Forme du visage"><option value="">Tout visage</option><option value="rond">Visage rond</option><option value="ovale">Visage ovale</option><option value="carre">Visage carré</option><option value="coeur">Visage en cœur</option></select>
+    <select id="fStyle" aria-label="Style"><option value="">Tous styles</option><option value="rect">Rectangulaire</option><option value="round">Ronde</option><option value="cat">Papillon</option><option value="aviator">Aviateur</option></select>
+    <select id="fBudget" aria-label="Budget"><option value="">Tous prix</option><option value="100">Jusqu'à 100 €</option><option value="200">Jusqu'à 200 €</option><option value="sante">100 % Santé</option></select>
+    <span id="fCount" style="font-size:14px;color:var(--muted);font-weight:600"></span>
+  </div>
+  <div class="frames" id="frames"></div>
+</div></section>
+
+<section class="simu" id="simulateur"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Simulateur</p><h2>Votre reste à charge en 20 secondes</h2><p>Basé sur les remboursements de l'Assurance Maladie et les forfaits courants des mutuelles. Devis définitif en magasin.</p></div>
+  <div class="simu-grid">
+    <div class="panel" data-reveal>
+      <h3>Votre équipement</h3>
+      <span class="lbl">Monture</span>
+      <div class="seg" id="segFrame"><label><input type="radio" name="frm" value="30" checked>100 % Santé<small>30 €</small></label><label><input type="radio" name="frm" value="120">Classique<small>120 €</small></label><label><input type="radio" name="frm" value="220">Créateur<small>220 €</small></label><label><input type="radio" name="frm" value="custom">Sélection<small id="selFrameLbl">aucune</small></label></div>
+      <span class="lbl">Verres</span>
+      <div class="seg"><label><input type="radio" name="lens" value="simple" checked>Unifocaux<small>myopie, hypermétropie</small></label><label><input type="radio" name="lens" value="astig">Unifocaux astigmates<small>avec cylindre</small></label><label><input type="radio" name="lens" value="progr">Progressifs<small>presbytie</small></label></div>
+      <span class="lbl">Traitements</span>
+      <div class="seg"><label><input type="checkbox" name="opt" value="ar" data-p="40" checked>Antireflet<small>+40 €</small></label><label><input type="checkbox" name="opt" value="blue" data-p="35">Lumière bleue<small>+35 €</small></label><label><input type="checkbox" name="opt" value="thin" data-p="90">Amincis<small>+90 €</small></label><label><input type="checkbox" name="opt" value="photo" data-p="120">Photochromiques<small>+120 €</small></label></div>
+      <span class="lbl">Votre mutuelle</span>
+      <div class="seg"><label><input type="radio" name="mut" value="0">Aucune<small>Sécu seule</small></label><label><input type="radio" name="mut" value="150" checked>Basique<small>forfait 150 €</small></label><label><input type="radio" name="mut" value="300">Confort<small>forfait 300 €</small></label><label><input type="radio" name="mut" value="450">Premium<small>forfait 450 €</small></label></div>
+    </div>
+    <aside class="res" data-reveal="right"><p class="eyebrow">Reste à charge estimé</p><div class="big" id="rac"></div><div class="lines" id="racLines"></div><div id="racMsg"></div><p class="note" style="margin-top:12px">Remboursement Sécu : 0,09 € (hors 100 % Santé). Les forfaits mutuelle s'entendent par période de 2 ans. Tiers payant appliqué en magasin.</p><a href="#rdv" class="btn btn-cobalt" style="width:100%;margin-top:16px">Prendre rendez-vous avec ce devis</a></aside>
+  </div>
+</div></section>
+
+<section id="rdv"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Examen de vue & conseil</p><h2>Réservez votre créneau</h2><p>L'examen de vue (20 min) est offert et permet de renouveler vos lunettes sans ordonnance récente, selon votre âge.</p></div>
+  <div class="rdv-grid">
+    <div class="card" data-reveal>
+      <span class="lbl">Motif</span>
+      <div class="seg" id="motif"><label><input type="radio" name="motif" value="Examen de vue" checked>Examen de vue<small>20 min · offert</small></label><label><input type="radio" name="motif" value="Choix de monture">Choix de monture<small>30 min</small></label><label><input type="radio" name="motif" value="Lentilles">Adaptation lentilles<small>30 min</small></label><label><input type="radio" name="motif" value="Ajustage / SAV">Ajustage / SAV<small>10 min</small></label></div>
+      <span class="lbl">Jour</span><div class="days" id="days"></div>
+      <span class="lbl">Heure</span><div class="slots" id="slots"></div>
+    </div>
+    <div class="card" data-reveal="right">
+      <form name="rdv-opticien" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate>
+        <input type="hidden" name="form-name" value="rdv-opticien"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="motif_rdv" id="fMotif"><input type="hidden" name="creneau" id="fSlot"><input type="hidden" name="devis" id="fDevis">
+        <div class="form-grid">
+          <div class="field"><label for="nom">Nom</label><input id="nom" name="nom" required></div>
+          <div class="field"><label for="tel">Mobile</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+          <div class="field full"><label for="email">E-mail</label><input id="email" name="email" type="email" required></div>
+          <div class="field full"><label for="note">Précisions (ordonnance, gêne, mutuelle…)</label><textarea id="note" name="message" rows="2"></textarea></div>
+        </div>
+        <button type="submit" class="btn btn-cobalt" style="width:100%;margin-top:14px" id="submit" disabled>Confirmer le rendez-vous</button>
+      </form>
+      <div class="done hidden" id="done"><h3>Rendez-vous confirmé</h3><p id="doneText" style="color:var(--muted);font-size:15px;margin-top:8px"></p></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Vu par nos clients</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le simulateur annonçait 48 € de reste à charge, j'ai payé 48 €. Et la monture est magnifique.</p><footer>Léa · Saint-Georges</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Examen de vue sérieux, conseils honnêtes sur les traitements vraiment utiles. Pas de vente forcée.</p><footer>Marc · Capitole</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Mes progressifs ont été adaptés deux fois sans frais jusqu'à ce que ce soit parfait.</p><footer>Françoise · Carmes</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Puis-je renouveler mes lunettes sans ordonnance ?</summary><p>Oui, si votre ordonnance a moins de 5 ans (3 ans après 42 ans, 1 an avant 16 ans), l'opticien peut adapter la correction après un examen de vue.</p></details>
+    <details><summary>Qu'est-ce que le 100 % Santé ?</summary><p>Une sélection de montures (≤ 30 €) et de verres intégralement remboursés par la Sécu et les mutuelles responsables. Nous en proposons 35 modèles.</p></details>
+    <details><summary>Quel délai pour recevoir mes lunettes ?</summary><p>3 à 5 jours ouvrés pour des unifocaux, 7 à 10 jours pour des progressifs ou des verres spéciaux.</p></details>
+    <details><summary>Faites-vous le tiers payant ?</summary><p>Oui, avec la plupart des mutuelles : vous ne payez que votre reste à charge.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Rue Boulbonne, Saint-Georges</h2><div class="hours" id="hours"></div><address><strong>Optique Saint-Georges</strong><br>12 rue Boulbonne, 31000 Toulouse<br>Métro A · Esquirol · Parking Saint-Georges<br><a href="tel:+33561230518">05 61 23 05 18</a> · <a href="mailto:bonjour@optique-saintgeorges.fr">bonjour@optique-saintgeorges.fr</a></address><a class="btn btn-soft" href="https://www.google.com/maps/dir/?api=1&destination=12+rue+Boulbonne+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4385%2C43.5980%2C1.4545%2C43.6060&layer=mapnik&marker=43.6020%2C1.4465"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Optique Saint-Georges — SARL OSG</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SARL OSG, 12 rue Boulbonne, 31000 Toulouse. SIRET 945 678 901 00024. Opticien diplômé inscrit à l'ARS. Hébergement : Netlify, Inc. Les simulations sont indicatives ; les données de rendez-vous servent à organiser votre venue. Site de démonstration : magasin fictif.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561230518">📞 Appeler</a><a href="#rdv">Prendre RDV</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, isoDate, fmtDate, uid, store, toast, validate, sendNetlify } = Demo;
+  /* Montures (dessinées en SVG) */
+  const SHAPES = { rect: '<rect x="4" y="14" width="34" height="24" rx="6"/><rect x="62" y="14" width="34" height="24" rx="6"/><path d="M38 24h24"/>', round: '<circle cx="22" cy="26" r="17"/><circle cx="78" cy="26" r="17"/><path d="M39 24h22"/>', cat: '<path d="M4 20l36-6 0 20c0 6-8 10-18 10S4 38 4 30z"/><path d="M96 20l-36-6 0 20c0 6 8 10 18 10s18-6 18-10z"/><path d="M40 24h20"/>', aviator: '<path d="M4 14h36v12c0 10-8 18-18 18S4 36 4 26z"/><path d="M60 14h36v12c0 10-8 18-18 18s-18-8-18-18z"/><path d="M40 18h20"/>' };
+  const FRAMES = [['Lascrosses', 'rect', ['ovale', 'rond'], 'acétate écaille', 149, '#6b4423', false], ['Esquirol', 'round', ['carre', 'coeur'], 'métal doré', 189, '#b8963e', false], ['Garonne', 'cat', ['carre', 'ovale'], 'acétate noir', 165, '#111', false], ['Pont-Neuf', 'aviator', ['rond', 'coeur'], 'titane brossé', 240, '#64748b', false], ['Capitole', 'rect', ['rond', 'ovale'], 'acétate bleu nuit', 30, '#1e3a8a', true], ['Daurade', 'round', ['carre', 'ovale'], 'acétate cristal', 30, '#93c5fd', true], ['Carmes', 'cat', ['ovale', 'rond'], 'acétate bordeaux', 95, '#7f1d1d', false], ['Saint-Sernin', 'aviator', ['ovale', 'carre'], 'acier noir mat', 79, '#334155', false], ['Minimes', 'rect', ['coeur', 'rond'], 'titane vert', 210, '#2f5d46', false], ['Busca', 'round', ['carre', 'coeur'], 'acétate miel', 30, '#d97706', true]];
+  let selFrame = store.get('osg:frame', null);
+  function renderFrames() {
+    const face = $('#fFace').value, style = $('#fStyle').value, b = $('#fBudget').value;
+    const list = FRAMES.filter((f) => (!face || f[2].includes(face)) && (!style || f[1] === style) && (!b || (b === 'sante' ? f[6] : f[4] <= Number(b))));
+    $('#fCount').textContent = `${list.length} monture${list.length > 1 ? 's' : ''}`;
+    $('#frames').innerHTML = list.length ? list.map((f) => `<article class="frame">${f[6] ? '<span class="tag">100 % Santé</span>' : ''}<svg viewBox="0 0 100 52" fill="none" stroke="${f[5]}" stroke-width="4" stroke-linejoin="round">${SHAPES[f[1]]}</svg><h3>${f[0]}</h3><p>${f[3]} · visages ${f[2].join(', ')}</p><p class="pr">${euro(f[4])}</p><button class="try${selFrame === f[0] ? ' on' : ''}" data-sel="${f[0]}">${selFrame === f[0] ? '✓ Dans le simulateur' : 'Ajouter au simulateur'}</button></article>`).join('') : '<div class="empty">Aucune monture ne correspond à ces critères.</div>';
+    $$('[data-sel]').forEach((btn) => btn.addEventListener('click', () => { selFrame = btn.dataset.sel; store.set('osg:frame', selFrame); renderFrames(); $('input[name=frm][value=custom]').checked = true; calc(); toast(`Monture ${selFrame} ajoutée au simulateur`, 'ok'); }));
+    const f = FRAMES.find((x) => x[0] === selFrame); $('#selFrameLbl').textContent = f ? `${f[0]} · ${euro(f[4])}` : 'aucune';
+  }
+  ['#fFace', '#fStyle', '#fBudget'].forEach((s) => $(s).addEventListener('change', renderFrames)); renderFrames();
+
+  /* Simulateur */
+  const LENS = { simple: [90, 'Unifocaux'], astig: [140, 'Unifocaux astigmates'], progr: [320, 'Progressifs'] };
+  function calc() {
+    const frmV = $('input[name=frm]:checked').value; const f = FRAMES.find((x) => x[0] === selFrame);
+    const frame = frmV === 'custom' ? (f ? f[4] : 0) : Number(frmV); const sante = frmV === '30' || (frmV === 'custom' && f && f[6]);
+    const lens = LENS[$('input[name=lens]:checked').value]; const opts = $$('input[name=opt]:checked'); const optsTotal = opts.reduce((s, o) => s + Number(o.dataset.p), 0);
+    const total = frame + lens[0] * 2 + optsTotal; const mut = Number($('input[name=mut]:checked').value);
+    let secu = 0.09, mutRemb = Math.min(mut, total - secu); let rac = Math.max(0, total - secu - mutRemb);
+    if (sante && opts.length <= 1) { secu = total * 0.6; mutRemb = total - secu; rac = 0; }
+    $('#rac').textContent = euro(rac); $('#racLines').innerHTML = `<div><span>Monture${frmV === 'custom' && f ? ' ' + f[0] : ''}</span><span>${euro(frame)}</span></div><div><span>${lens[1]} (2 verres)</span><span>${euro(lens[0] * 2)}</span></div>${opts.map((o) => `<div><span>${o.parentElement.textContent.trim().split('+')[0]}</span><span>${euro(Number(o.dataset.p))}</span></div>`).join('')}<div><strong>Total équipement</strong><strong>${euro(total)}</strong></div><div><span>Assurance Maladie</span><span>−${euro(secu)}</span></div><div><span>Mutuelle</span><span>−${euro(mutRemb)}</span></div>`;
+    $('#racMsg').innerHTML = rac === 0 ? '<div class="ok">✓ Équipement intégralement pris en charge (100 % Santé)</div>' : mut === 0 ? '<div class="ok" style="background:#fef3c7;color:#92400e">Sans mutuelle, pensez au 100 % Santé : 0 € à payer.</div>' : '';
+    $('#fDevis').value = `Total ${euro(total)}, reste à charge ${euro(rac)}`; store.set('osg:simu', { frmV, lens: lens[1], rac });
+    if (frmV === 'custom' && !f) toast('Choisissez d\'abord une monture dans le catalogue.');
+  }
+  $$('.simu input').forEach((i) => i.addEventListener('change', calc)); calc();
+
+  /* RDV */
+  const st = { date: null, time: null }; const today = new Date(); today.setHours(0, 0, 0, 0);
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  const box = $('#days');
+  for (let i = 0; i < 14; i++) { const d = new Date(today); d.setDate(d.getDate() + i); const closed = d.getDay() === 0 || d.getDay() === 1; const b = document.createElement('button'); b.type = 'button'; b.disabled = closed; b.dataset.date = isoDate(d); b.innerHTML = `${fmtDate(d, { weekday: 'short' })}<b>${d.getDate()}</b>`; if (!closed && !st.date) st.date = isoDate(d); b.setAttribute('aria-pressed', String(st.date === isoDate(d))); b.addEventListener('click', () => { st.date = b.dataset.date; st.time = null; $$('#days button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); renderSlots(); }); box.appendChild(b); }
+  function renderSlots() { const s = $('#slots'); s.innerHTML = ''; const now = new Date(); ['10:00', '10:30', '11:00', '11:30', '12:00', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].forEach((t) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.disabled = seeded(st.date + t) < 0.35 || store.get('osg:rdv', []).some((r) => r.date === st.date && r.time === t) || (st.date === isoDate(now) && t <= `${now.getHours()}:${now.getMinutes()}`); if (st.time === t) b.classList.add('on'); b.addEventListener('click', () => { st.time = t; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#submit').disabled = false; }); s.appendChild(b); }); $('#submit').disabled = !st.time; }
+  renderSlots();
+  $('#form').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } const motif = $('input[name=motif]:checked').value; $('#fMotif').value = motif; $('#fSlot').value = st.date + ' ' + st.time; const btn = $('#submit'); btn.disabled = true; const r = { id: uid('OSG-'), date: st.date, time: st.time, motif }; await sendNetlify(f, { reference: r.id }); store.set('osg:rdv', [...store.get('osg:rdv', []), r]); $('#doneText').textContent = `${motif} le ${fmtDate(new Date(st.date + 'T12:00:00'))} à ${st.time}. Référence ${r.id}. ${$('#fDevis').value ? 'Votre simulation (' + $('#fDevis').value.toLowerCase() + ') est jointe.' : ''} Pensez à votre carte Vitale et votre carte de mutuelle.`; f.classList.add('hidden'); $('#done').classList.remove('hidden'); toast('Rendez-vous confirmé', 'ok'); });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 1 ? 'Fermé' : '10:00 – 19:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>

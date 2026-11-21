@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encre Noire — Salon de tatouage à Toulouse Arnaud-Bernard</title>
+<meta name="description" content="Studio de tatouage à Arnaud-Bernard, Toulouse : trois artistes (fine line, old school, blackwork), flashs disponibles, estimation de projet en ligne et prise de rendez-vous.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f2eee6'/%3E%3Cpath d='M8 24L24 8M10 8l14 16' stroke='%23111' stroke-width='3'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TattooParlor","name":"Encre Noire","telephone":"+33561214590","address":{"@type":"PostalAddress","streetAddress":"16 rue Arnaud-Bernard","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6095,"longitude":1.4395},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"19:00"}],"url":"https://example.com/demos/tatoueur/"}
+</script>
+<style>
+:root{--paper:#f2eee6;--ink:#111;--red:#b3261e;--grey:#6b6761;--accent:#111;--focus:#b3261e;--border:#cfc9bd;--radius:0;--ph:linear-gradient(135deg,#3a3732,#111);--mb-bg:#111;--mb-bg2:#b3261e}
+body{font-family:Oswald,system-ui,sans-serif;background:var(--paper);color:var(--ink);font-weight:300;background-image:radial-gradient(rgba(0,0,0,.06) 1px,transparent 1px);background-size:6px 6px}
+h1,h2,h3{font-family:"Special Elite",Courier,monospace;font-weight:400;line-height:1.1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;transition:all .2s;border:2px solid var(--ink)}
+.btn-ink{background:var(--ink);color:var(--paper)}.btn-ink:hover{background:var(--red);border-color:var(--red)}
+.btn-line{color:var(--ink)}.btn-line:hover{background:var(--ink);color:var(--paper)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.header{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:2px solid var(--ink)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{font-family:"Special Elite";font-size:24px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{width:26px;height:26px;background:var(--ink);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.nav{display:flex;gap:26px;align-items:center;font-size:14px;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--red)}
+.nav .btn{padding:9px 16px}
+@media (max-width:899px){.nav{position:fixed;inset:70px 0 0;background:var(--paper);flex-direction:column;padding:40px;gap:28px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{border-bottom:2px solid var(--ink)}
+.hero .container{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:64px 0}
+@media (max-width:860px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(40px,6vw,76px)}
+.hero h1 span{color:var(--red)}
+.hero p{font-size:18px;color:var(--grey);max-width:46ch;margin:20px 0 28px}
+.hero .stamp{display:inline-block;border:3px double var(--red);color:var(--red);padding:8px 14px;font-family:"Special Elite";transform:rotate(-4deg);margin-top:24px;letter-spacing:.1em}
+.hero-img .ph{aspect-ratio:4/5;border:3px solid var(--ink);box-shadow:12px 12px 0 var(--ink)}
+.hero-img .ph img{filter:grayscale(1) contrast(1.2)}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);font-weight:600}
+.section-head{max-width:640px;margin-bottom:40px}
+.section-head h2{font-size:clamp(30px,4.5vw,50px);margin-top:8px}
+.section-head p{color:var(--grey);margin-top:12px;font-size:17px}
+.artists{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:800px){.artists{grid-template-columns:1fr}}
+.artist{border:2px solid var(--ink);background:#fff;padding:0}
+.artist .ph{aspect-ratio:1;border-bottom:2px solid var(--ink)}
+.artist .ph img{filter:grayscale(1)}
+.artist:nth-child(2) .ph{--ph:linear-gradient(135deg,#b3261e,#3a0d0a)}.artist:nth-child(3) .ph{--ph:linear-gradient(135deg,#cfc9bd,#6b6761)}
+.artist .b{padding:20px}
+.artist h3{font-size:24px}
+.artist .st{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:4px 0 10px}
+.artist p{font-size:14px;color:var(--grey)}
+.artist .btn{margin-top:14px;width:100%;padding:10px}
+/* Flashs */
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.flash{border:2px solid var(--ink);background:#fff;padding:14px;text-align:center;position:relative;transition:transform .2s}
+.flash:hover{transform:translate(-3px,-3px);box-shadow:4px 4px 0 var(--ink)}
+.flash svg{width:100%;height:110px}
+.flash h3{font-size:16px;margin-top:8px;font-family:Oswald;font-weight:600}
+.flash p{font-size:12px;color:var(--grey)}
+.flash .pr{font-family:"Special Elite";font-size:20px;margin:6px 0}
+.flash button{width:100%;padding:9px;border:2px solid var(--ink);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-top:6px;background:#fff}
+.flash button:hover{background:var(--ink);color:var(--paper)}
+.flash.taken{opacity:.5}
+.flash.taken::after{content:"RÉSERVÉ";position:absolute;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);font-family:"Special Elite";font-size:26px;color:var(--red);border:3px solid var(--red);padding:4px 10px;background:rgba(255,255,255,.8)}
+.flash.taken button{display:none}
+/* Projet */
+.project{background:var(--ink);color:var(--paper)}
+.project .eyebrow{color:var(--red)}.project .section-head p{color:#aaa}
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+@media (max-width:900px){.proj-grid{grid-template-columns:1fr}}
+.lbl{display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin:18px 0 8px;color:#aaa}
+.lbl:first-child{margin-top:0}
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.choices label{border:2px solid #444;padding:12px 8px;text-align:center;font-size:14px;cursor:pointer;transition:all .15s}
+.choices label:has(input:checked){border-color:var(--paper);background:var(--paper);color:var(--ink)}
+.choices input{position:absolute;opacity:0}
+.proj-grid .field label{color:#aaa}.proj-grid input,.proj-grid textarea{background:#1c1c1c;border-color:#444;color:var(--paper)}
+.est{border:2px solid var(--paper);padding:28px;position:sticky;top:90px}
+.est h3{font-size:22px;margin-bottom:12px}
+.est .big{font-family:"Special Elite";font-size:44px;color:var(--red);line-height:1}
+.est .big small{font:300 14px Oswald;color:#aaa}
+.est .lines{display:grid;gap:6px;margin:14px 0;font-size:14px;color:#ccc}
+.est .lines div{display:flex;justify-content:space-between;border-bottom:1px dashed #444;padding-bottom:4px}
+.est .note{font-size:12px;color:#888}
+.upload{border:2px dashed #444;padding:18px;text-align:center;font-size:13px;color:#aaa;cursor:pointer;margin-top:8px}
+.upload.has{border-color:var(--paper);color:var(--paper)}
+.upload input{display:none}
+.done{border:2px solid var(--paper);padding:24px;text-align:center}
+.done h3{font-size:26px;margin-bottom:8px}
+.done .ref{font-family:"Special Elite";letter-spacing:.1em;color:var(--red);margin:8px 0;font-size:18px}
+.care{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.care div{border:2px solid var(--ink);padding:20px;background:#fff}
+.care b{display:block;font-family:"Special Elite";font-size:18px;margin-bottom:6px}
+.care p{font-size:14px;color:var(--grey)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{border:2px solid var(--ink);padding:22px;background:#fff}
+.review .stars{color:var(--red);letter-spacing:3px}
+.review p{margin:10px 0;font-size:16px}
+.review footer{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.faq details{border-bottom:2px solid var(--ink)}
+.faq summary{list-style:none;cursor:pointer;padding:16px 0;font-family:"Special Elite";font-size:19px;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--red)}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--grey);padding-bottom:16px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:600;color:var(--red)}
+.map{min-height:320px;background:#e4ded2;border:2px solid var(--ink)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0;filter:grayscale(1) contrast(1.1)}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--ink);color:#aaa;padding:40px 0;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline;letter-spacing:.1em;text-transform:uppercase;font-size:13px}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i></i>Encre Noire</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#artistes">Artistes</a><a href="#flashs">Flashs</a><a href="#projet">Mon projet</a><a href="#soins">Soins</a><a href="#acces">Studio</a><a href="#projet" class="btn btn-ink">Estimer mon tatouage</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top" style="padding:0"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal>Studio de tatouage · Arnaud-Bernard · Toulouse</p>
+    <h1 data-reveal>Des lignes qui <span>racontent</span> quelque chose</h1>
+    <p data-reveal>Trois artistes, trois univers, un studio lumineux rue Arnaud-Bernard. Projets sur mesure, flashs uniques, hygiène irréprochable. Dites-nous ce que vous avez en tête : on vous répond avec un prix et une date.</p>
+    <div data-reveal><a href="#projet" class="btn btn-ink">Décrire mon projet</a> <a href="#flashs" class="btn btn-line">Voir les flashs</a></div>
+    <div data-reveal><span class="stamp">Hygiène ARS · encres vegan · 18 ans et +</span></div>
+  </div>
+  <div class="hero-img" data-reveal="scale"><div class="ph"><img src="https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?auto=format&fit=crop&w=900&q=70" alt="Tatoueur au travail, machine en main" fetchpriority="high"></div></div>
+</div></section>
+
+<section id="artistes"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les artistes</p><h2>Trois styles, zéro compromis</h2></div>
+  <div class="artists" id="artists"></div>
+</div></section>
+
+<section id="flashs" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Flashs disponibles</p><h2>Pièces uniques, premier arrivé, premier tatoué</h2><p>Chaque flash n'est tatoué qu'une seule fois. Réservez-le : il disparaît de la liste.</p></div>
+  <div class="flash-grid" id="flashGrid"></div>
+</div></section>
+
+<section class="project" id="projet"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Mon projet</p><h2>Estimation en direct</h2><p>Style, zone, taille : on calcule une fourchette et une durée. L'artiste confirme après avoir vu vos références.</p></div>
+  <div class="proj-grid">
+    <form name="projet-tatouage" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate data-reveal>
+      <input type="hidden" name="form-name" value="projet-tatouage"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+      <input type="hidden" name="estimation" id="fEst">
+      <span class="lbl">Style</span><div class="choices" id="styles"><label><input type="radio" name="style" value="Fine line" checked>Fine line</label><label><input type="radio" name="style" value="Old school">Old school</label><label><input type="radio" name="style" value="Blackwork">Blackwork</label><label><input type="radio" name="style" value="Réalisme">Réalisme</label><label><input type="radio" name="style" value="Lettrage">Lettrage</label><label><input type="radio" name="style" value="Je ne sais pas">Je ne sais pas</label></div>
+      <span class="lbl">Zone du corps</span><div class="choices"><label><input type="radio" name="zone" value="Avant-bras" data-k="1" checked>Avant-bras</label><label><input type="radio" name="zone" value="Bras" data-k="1.1">Bras</label><label><input type="radio" name="zone" value="Épaule" data-k="1.1">Épaule</label><label><input type="radio" name="zone" value="Mollet" data-k="1">Mollet</label><label><input type="radio" name="zone" value="Cuisse" data-k="1.05">Cuisse</label><label><input type="radio" name="zone" value="Dos" data-k="1.2">Dos</label><label><input type="radio" name="zone" value="Côtes" data-k="1.35">Côtes</label><label><input type="radio" name="zone" value="Main / cou" data-k="1.5">Main / cou</label></div>
+      <span class="lbl">Taille approximative</span><div class="choices"><label><input type="radio" name="taille" value="Mini (< 5 cm)" data-h="1" checked>Mini<br>&lt; 5 cm</label><label><input type="radio" name="taille" value="Petit (5-10 cm)" data-h="1.5">Petit<br>5–10 cm</label><label><input type="radio" name="taille" value="Moyen (10-20 cm)" data-h="3">Moyen<br>10–20 cm</label><label><input type="radio" name="taille" value="Grand (20-30 cm)" data-h="5">Grand<br>20–30 cm</label><label><input type="radio" name="taille" value="Pièce entière" data-h="10">Pièce<br>entière</label></div>
+      <span class="lbl">Couleur</span><div class="choices"><label><input type="radio" name="couleur" value="Noir et gris" data-k="1" checked>Noir & gris</label><label><input type="radio" name="couleur" value="Couleur" data-k="1.25">Couleur</label></div>
+      <span class="lbl">Références</span><label class="upload" id="upload"><input type="file" id="fileIn" accept="image/*" multiple><span id="uploadTxt">📎 Ajouter des images d'inspiration (facultatif)</span></label>
+      <div class="field" style="margin-top:14px"><label for="desc">Décrivez l'idée</label><textarea id="desc" name="description" rows="3" required minlength="15" placeholder="Un héron en fine line, orienté vers le poignet, avec quelques roseaux…"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><div class="field"><label for="nom">Prénom</label><input id="nom" name="prenom" required></div><div class="field"><label for="tel">Mobile</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div></div>
+      <div class="field" style="margin-top:10px"><label for="email">E-mail</label><input id="email" name="email" type="email" required></div>
+      <label style="display:flex;gap:10px;font-size:13px;color:#aaa;margin-top:12px"><input type="checkbox" required name="majeur"> Je certifie avoir 18 ans ou plus.</label>
+      <button type="submit" class="btn btn-ink" style="width:100%;margin-top:16px;border-color:var(--paper)" id="submit">Envoyer mon projet</button>
+    </form>
+    <div data-reveal="right"><aside class="est"><h3>Estimation</h3><div class="big" id="estPrice"></div><div class="lines" id="estLines"></div><p class="note">Fourchette indicative. Tarif minimum du studio : 80 €. Acompte de 30 % à la prise de rendez-vous, déduit du total. Retouche offerte sous 3 mois.</p></aside><div class="done hidden" id="done" style="margin-top:20px"><h3>Projet reçu</h3><div class="ref" id="doneRef"></div><p id="doneText" style="font-size:14px;color:#ccc"></p></div></div>
+  </div>
+</div></section>
+
+<section id="soins"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Après la séance</p><h2>Soins & cicatrisation</h2></div>
+  <div class="care" data-reveal>
+    <div><b>Jour 0 – 3</b><p>Garder le film 4 h, laver à l'eau tiède et savon neutre, sécher en tamponnant, crème cicatrisante en couche fine.</p></div>
+    <div><b>Jour 4 – 14</b><p>Crème 2 à 3 fois par jour. Pas de bain, piscine, sauna, ni soleil. Ne pas gratter les croûtes.</p></div>
+    <div><b>Après 1 mois</b><p>Cicatrisation terminée en surface. Crème solaire indice 50 à vie pour garder les noirs profonds.</p></div>
+    <div><b>Retouche</b><p>Offerte dans les 3 mois si nécessaire, sur rendez-vous.</p></div>
+  </div>
+</div></section>
+
+<section id="avis" style="padding-top:0"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Marqués à vie, ravis</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>J'ai décrit mon projet en ligne un dimanche, Maya m'a envoyé un croquis le mardi. Le résultat dépasse l'idée.</p><footer>Sarah · Arnaud-Bernard</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Flash réservé en deux clics, tatoué le samedi. Studio nickel, musique parfaite, aucun stress.</p><footer>Lucas · Compans</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Dos complet en blackwork sur 4 séances avec Elio. Le devis initial a été respecté au centime.</p><footer>Mathieu · Minimes</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:760px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Avant de franchir la porte</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Est-ce que ça fait mal ?</summary><p>Oui, un peu : une sensation de griffure chaude. Les côtes, le sternum et les pieds sont plus sensibles. Venez reposé, nourri, hydraté.</p></details>
+    <details><summary>Comment se passe le premier rendez-vous ?</summary><p>Une consultation gratuite de 20 minutes : on affine l'idée, l'emplacement, la taille, et on fixe le devis et la date de séance. L'artiste dessine ensuite votre projet.</p></details>
+    <details><summary>Acceptez-vous les mineurs ?</summary><p>Non, même avec autorisation parentale. Une pièce d'identité est demandée.</p></details>
+    <details><summary>Puis-je annuler ma séance ?</summary><p>Jusqu'à 72 h avant, l'acompte est reporté. Au-delà, il est conservé pour compenser le temps de dessin.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Le studio</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Rue Arnaud-Bernard</h2><div class="hours" id="hours"></div><address><strong>Encre Noire</strong><br>16 rue Arnaud-Bernard, 31000 Toulouse<br>Métro B · Compans-Caffarelli · Métro A · Capitole<br><a href="tel:+33561214590">05 61 21 45 90</a> · <a href="mailto:studio@encrenoire.fr">studio@encrenoire.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=16+rue+Arnaud-Bernard+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4315%2C43.6055%2C1.4475%2C43.6135&layer=mapnik&marker=43.6095%2C1.4395"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Encre Noire — SAS Encre Noire Toulouse</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--grey);margin-top:10px">SAS Encre Noire Toulouse, 16 rue Arnaud-Bernard, 31000 Toulouse. SIRET 978 901 234 00027. Déclaration d'activité de tatouage auprès de l'ARS Occitanie. Hébergement : Netlify, Inc. Les références envoyées via le formulaire servent uniquement à préparer votre projet. Site de démonstration : studio fictif.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561214590">📞 Studio</a><a href="#projet">Mon projet</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, uid, store, toast, validate, sendNetlify } = Demo;
+  const ARTISTS = [{ n: 'Maya', s: 'Fine line · botanique', img: 'photo-1494790108377-be9c29b29330', d: 'Lignes fines, fleurs, animaux, tatouages discrets et précis. Aiguille simple, encre noire.', rate: 120 }, { n: 'Elio', s: 'Blackwork · géométrique', img: 'photo-1506794778202-cad84cf45f1d', d: 'Grands aplats noirs, ornements, pièces de dos et manches. Projets au long cours.', rate: 140 }, { n: 'Jo', s: 'Old school · couleur', img: 'photo-1539571696357-5a69c17a67c6', d: 'Traditionnel américain, couleurs franches, roses, hirondelles, panthères. Des flashs chaque mois.', rate: 130 }];
+  $('#artists').innerHTML = ARTISTS.map((a) => `<article class="artist" data-reveal><div class="ph"><img src="https://images.unsplash.com/${a.img}?auto=format&fit=crop&w=600&q=70" alt="Portrait de ${a.n}" loading="lazy"></div><div class="b"><h3>${a.n}</h3><p class="st">${a.s}</p><p>${a.d}</p><p style="margin-top:8px;font-weight:600">${a.rate} € / heure</p><a href="#projet" class="btn btn-line">Proposer un projet à ${a.n}</a></div></article>`).join('');
+  /* Flashs dessinés en SVG */
+  const FLASH = [['Héron', 'Maya', 140, '<path d="M30 80c10-30 25-45 40-45s10 20 0 25-10 10 5 20" fill="none" stroke="#111" stroke-width="3"/><circle cx="70" cy="33" r="3"/>'], ['Hirondelle', 'Jo', 120, '<path d="M20 50c15-20 30-15 35 0 5-15 20-20 35 0-15 0-25 10-35 30-10-20-20-30-35-30z" fill="#111"/>'], ['Serpent', 'Elio', 160, '<path d="M15 70c20-30 40 10 60-20s20 10 10 30" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round"/>'], ['Lune & pavot', 'Maya', 110, '<circle cx="50" cy="40" r="22" fill="none" stroke="#111" stroke-width="3"/><circle cx="58" cy="36" r="18" fill="#f2eee6"/><path d="M50 60v30M44 75c3-6 9-6 12 0" fill="none" stroke="#111" stroke-width="3"/>'], ['Dague', 'Jo', 130, '<path d="M50 10l6 50-6 30-6-30z" fill="#111"/><path d="M35 60h30" stroke="#b3261e" stroke-width="6"/>'], ['Œil', 'Elio', 150, '<path d="M15 50c20-25 50-25 70 0-20 25-50 25-70 0z" fill="none" stroke="#111" stroke-width="4"/><circle cx="50" cy="50" r="10" fill="#111"/>'], ['Rose', 'Jo', 125, '<circle cx="50" cy="40" r="18" fill="none" stroke="#b3261e" stroke-width="4"/><circle cx="50" cy="40" r="9" fill="none" stroke="#b3261e" stroke-width="3"/><path d="M50 58v30M50 70l-14-6M50 78l14-6" stroke="#111" stroke-width="3" fill="none"/>'], ['Montagnes', 'Maya', 100, '<path d="M10 80l25-40 15 20 15-30 25 50z" fill="none" stroke="#111" stroke-width="3" stroke-linejoin="round"/>']];
+  function renderFlash() { const taken = store.get('encre:flash', []); $('#flashGrid').innerHTML = FLASH.map((f, i) => `<div class="flash${taken.includes(i) ? ' taken' : ''}"><svg viewBox="0 0 100 100" aria-hidden="true">${f[3]}</svg><h3>${f[0]}</h3><p>par ${f[1]} · env. 8 cm</p><div class="pr">${f[2]} €</div><button data-flash="${i}">Réserver ce flash</button></div>`).join(''); $$('[data-flash]').forEach((b) => b.addEventListener('click', () => { const i = Number(b.dataset.flash); store.set('encre:flash', [...store.get('encre:flash', []), i]); renderFlash(); toast(`Flash « ${FLASH[i][0]} » réservé — ${FLASH[i][1]} vous contacte pour fixer la date.`, 'ok'); })); }
+  renderFlash();
+  /* Estimation */
+  function est() {
+    const h = Number($('input[name=taille]:checked').dataset.h); const kz = Number($('input[name=zone]:checked').dataset.k); const kc = Number($('input[name=couleur]:checked').dataset.k); const style = $('input[name=style]:checked').value;
+    const ks = { 'Réalisme': 1.3, 'Fine line': 1, 'Blackwork': 1.1, 'Old school': 1, 'Lettrage': .9, 'Je ne sais pas': 1 }[style]; const hours = Math.round(h * kz * ks * kc * 10) / 10; const lo = Math.max(80, Math.round(hours * 110 / 10) * 10), hi = Math.max(100, Math.round(hours * 150 / 10) * 10);
+    $('#estPrice').innerHTML = `${lo} – ${hi} €<small> · ${hours < 1 ? '< 1 h' : hours + ' h'}${hours > 4 ? ' · ' + Math.ceil(hours / 4) + ' séances' : ''}</small>`;
+    $('#estLines').innerHTML = `<div><span>Style</span><span>${style}</span></div><div><span>Zone</span><span>${$('input[name=zone]:checked').value}</span></div><div><span>Taille</span><span>${$('input[name=taille]:checked').value}</span></div><div><span>Couleur</span><span>${$('input[name=couleur]:checked').value}</span></div>`;
+    $('#fEst').value = `${lo}-${hi} € · ${hours} h`;
+  }
+  $$('#form input[type=radio]').forEach((r) => r.addEventListener('change', est)); est();
+  $('#fileIn').addEventListener('change', (e) => { const n = e.target.files.length; $('#uploadTxt').textContent = n ? `${n} image${n > 1 ? 's' : ''} jointe${n > 1 ? 's' : ''}` : '📎 Ajouter des images d\'inspiration (facultatif)'; $('#upload').classList.toggle('has', n > 0); });
+  $('#form').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f) || !f.majeur.checked) { if (!f.majeur.checked) toast('Vous devez certifier être majeur·e.', 'err'); else toast('Vérifiez les champs en rouge.', 'err'); return; } const btn = $('#submit'); btn.disabled = true; btn.textContent = 'Envoi…'; const ref = uid('EN-'); await sendNetlify(f, { reference: ref }); store.set('encre:projets', [...store.get('encre:projets', []), { ref, est: $('#fEst').value, style: f.style.value }]); $('#doneRef').textContent = 'Réf. ' + ref; $('#doneText').textContent = `${f.prenom.value}, votre projet ${f.style.value.toLowerCase()} (${f.zone.value.toLowerCase()}, ${f.taille.value.toLowerCase()}) est transmis. Estimation ${$('#fEst').value}. L'artiste vous propose une consultation gratuite sous 48 h.`; $('#done').classList.remove('hidden'); btn.textContent = 'Projet envoyé ✓'; toast('Projet envoyé', 'ok'); $('#done').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 1 ? 'Fermé' : '11:00 – 19:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>

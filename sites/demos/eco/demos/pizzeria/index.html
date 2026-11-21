@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno Rosso — Pizzeria au feu de bois à Toulouse Jean-Jaurès</title>
+<meta name="description" content="Pizzas napolitaines au feu de bois à Toulouse, quartier Jean-Jaurès. Commandez en ligne et récupérez votre commande en 20 minutes (click & collect).">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d62828'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23ffd166'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Restaurant","name":"Forno Rosso","servesCuisine":"Pizza napolitaine","priceRange":"€","telephone":"+33561452211","address":{"@type":"PostalAddress","streetAddress":"27 boulevard de Strasbourg","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6075,"longitude":1.4478},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"11:30","closes":"14:30"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"18:00","closes":"23:00"}],"url":"https://example.com/demos/pizzeria/"}
+</script>
+<style>
+:root{--red:#d62828;--red-d:#9f1a1a;--yellow:#ffd166;--black:#15110f;--paper:#fff8ee;--ink:#1f1b18;--muted:#6f655c;--accent:var(--red);--focus:#15110f;--border:#e6d9c6;--radius:14px;--ph:linear-gradient(135deg,#d62828,#6b1313);--mb-bg:#d62828;--mb-bg2:#15110f}
+body{font-family:Rubik,system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+h1,h2,h3,.display{font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.01em;line-height:1;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s;font-size:15px}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 6px 0 var(--red-d)}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 0 var(--red-d)}
+.btn-red:active{transform:translateY(3px);box-shadow:0 3px 0 var(--red-d)}
+.btn-black{background:var(--black);color:#fff;box-shadow:0 6px 0 #000}
+.btn-black:hover{transform:translateY(-2px)}
+.btn-outline{border:2px solid var(--black)}
+.btn-outline:hover{background:var(--black);color:#fff}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:var(--black);color:#fff}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.brand{font-family:Anton;font-size:28px;text-decoration:none;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.03em}
+.brand i{width:30px;height:30px;border-radius:50%;background:var(--red);box-shadow:inset 0 0 0 7px var(--yellow)}
+.nav{display:flex;gap:26px;align-items:center;font-weight:500}
+.nav a{text-decoration:none;opacity:.85}.nav a:hover{opacity:1;color:var(--yellow)}
+@media (max-width:899px){.nav{position:fixed;inset:68px 0 0;background:var(--black);flex-direction:column;padding:32px;gap:22px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:22px;font-family:Anton;text-transform:uppercase}.nav.open{transform:none;visibility:visible}}
+.cart-btn{display:inline-flex;align-items:center;gap:8px;background:var(--red);padding:10px 16px;border-radius:999px;font-weight:700;color:#fff;position:relative}
+.cart-btn b{background:var(--yellow);color:var(--black);border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:12px;padding:0 6px}
+.cart-btn.bump{animation:bump .4s}
+@keyframes bump{30%{transform:scale(1.15)}}
+/* Hero */
+.hero{background:var(--red);color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-20% -10%;background:repeating-linear-gradient(-45deg,transparent 0 28px,rgba(0,0,0,.06) 28px 56px);pointer-events:none}
+.hero .container{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:72px 0 80px}
+@media (max-width:860px){.hero .container{grid-template-columns:1fr;padding:48px 0 56px}}
+.hero h1{font-size:clamp(56px,10vw,128px);line-height:.92}
+.hero h1 span{color:var(--yellow);display:block}
+.hero p{font-size:18px;max-width:46ch;margin:22px 0 30px;opacity:.95}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+.hero-badges span{background:rgba(0,0,0,.25);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.hero-art{position:relative;aspect-ratio:1}
+.hero-art .ph{position:absolute;inset:0;border-radius:50%;box-shadow:0 40px 80px rgba(0,0,0,.35);--ph:radial-gradient(circle at 40% 35%,#ffd166,#e0802a 55%,#8c3a10)}
+.hero-art .ph img{animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sticker{position:absolute;top:-10px;right:0;width:120px;height:120px;border-radius:50%;background:var(--yellow);color:var(--black);display:grid;place-items:center;text-align:center;font-family:Anton;font-size:20px;line-height:1;transform:rotate(12deg);box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:2;padding:10px}
+.sticker small{font:700 11px Rubik;display:block;margin-top:4px}
+.marquee{background:var(--yellow);color:var(--black);overflow:hidden;font-family:Anton;font-size:20px;text-transform:uppercase;letter-spacing:.05em;padding:12px 0;white-space:nowrap}
+.marquee div{display:inline-block;animation:marquee 28s linear infinite}
+.marquee span{margin:0 28px}
+@keyframes marquee{to{transform:translateX(-50%)}}
+/* Layout commande */
+section{padding:72px 0}
+.section-head{margin-bottom:28px}
+.section-head h2{font-size:clamp(40px,6vw,72px)}
+.section-head p{color:var(--muted);margin-top:8px;font-size:17px}
+.order-layout{display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start}
+@media (max-width:1000px){.order-layout{grid-template-columns:1fr}}
+.cats{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:68px;background:var(--paper);padding:12px 0;z-index:5}
+.cats button{padding:9px 16px;border-radius:999px;border:2px solid var(--black);font-weight:700;font-size:14px;transition:all .15s;background:#fff}
+.cats button[aria-pressed="true"]{background:var(--black);color:#fff}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:16px}
+.product{background:#fff;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column}
+.product:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.1);border-color:var(--black)}
+.product .ph{aspect-ratio:4/3}
+.product .body{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.product h3{font-size:22px}
+.product p{font-size:13px;color:var(--muted);flex:1}
+.product .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{font-family:Anton;font-size:22px}
+.add{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;font-size:22px;display:grid;place-items:center;box-shadow:0 4px 0 var(--red-d);transition:transform .15s}
+.add:hover{transform:scale(1.08)}
+.product.hidden{display:none}
+.tagv{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#2d7d46}
+.tagsp{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+/* Panier */
+.cart{background:var(--black);color:#fff;border-radius:20px;padding:24px;position:sticky;top:90px}
+.cart h3{font-size:28px;display:flex;justify-content:space-between;align-items:baseline}
+.cart h3 small{font:500 13px Rubik;opacity:.7}
+.cart-items{margin:18px 0;display:grid;gap:12px;max-height:38vh;overflow:auto}
+.cart-empty{opacity:.6;font-size:14px;text-align:center;padding:24px 0}
+.ci{display:grid;grid-template-columns:1fr auto;gap:8px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.12);font-size:14px}
+.ci strong{display:block}.ci small{opacity:.65;display:block}
+.ci .qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+.ci .qty button{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.12);font-weight:700}
+.ci .qty button:hover{background:var(--red)}
+.ci .lp{font-family:Anton;font-size:18px;text-align:right}
+.promo{display:flex;gap:8px;margin:12px 0}
+.promo input{flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 12px;color:#fff;text-transform:uppercase}
+.promo input::placeholder{text-transform:none;color:rgba(255,255,255,.5)}
+.promo button{background:var(--yellow);color:var(--black);font-weight:700;padding:10px 14px;border-radius:10px}
+.promo-msg{font-size:13px;min-height:18px;margin-bottom:8px}
+.promo-msg.ok{color:#9be29b}.promo-msg.err{color:#ffb4b4}
+.totals{display:grid;gap:6px;font-size:14px;margin:12px 0}
+.totals div{display:flex;justify-content:space-between}
+.totals .grand{font-family:Anton;font-size:26px;border-top:1px solid rgba(255,255,255,.15);padding-top:10px;margin-top:4px}
+.totals .disc{color:#9be29b}
+.pickup{margin:14px 0}
+.pickup label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.7;display:block;margin-bottom:6px}
+.pickup select{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 12px;color:#fff}
+.pickup select option{color:#111}
+.cart .btn{width:100%}
+/* Modale options */
+.opt-group{margin:16px 0}
+.opt-group h4{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.opt-list{display:grid;gap:8px}
+.opt-list label{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-weight:500;transition:all .15s}
+.opt-list label:has(input:checked){border-color:var(--red);background:#fff1f1}
+.opt-list input{accent-color:var(--red);margin-right:10px}
+.opt-list label span:first-child{display:flex;align-items:center}
+.modal-foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px}
+.modal-box h3{font-size:30px}
+/* Checkout */
+#checkoutModal .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+@media (max-width:560px){#checkoutModal .form-grid{grid-template-columns:1fr}}
+#checkoutModal .full{grid-column:1/-1}
+.recap-box{background:var(--paper);border-radius:10px;padding:14px;font-size:14px;margin-top:12px}
+.recap-box div{display:flex;justify-content:space-between;padding:2px 0}
+.confirm{text-align:center;padding:12px 0}
+.confirm .num{font-family:Anton;font-size:64px;color:var(--red);line-height:1}
+.confirm .timer{font-size:15px;color:var(--muted);margin:10px 0 18px}
+.track{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
+.track div{padding:10px;border-radius:10px;background:var(--paper);font-size:13px;font-weight:700;opacity:.4}
+.track div.on{opacity:1;background:var(--yellow)}
+/* Infos */
+.info{background:var(--black);color:#fff}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px}
+.info h2{font-size:clamp(40px,6vw,72px);margin-bottom:24px}
+.info h3{font-size:22px;color:var(--yellow);margin-bottom:12px}
+.hours div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.15);font-size:14px}
+.hours div.today{color:var(--yellow);font-weight:700}
+.map{border-radius:16px;overflow:hidden;min-height:260px;background:#2a2320}
+.map iframe{width:100%;height:100%;min-height:260px;border:0}
+address{font-style:normal;line-height:1.8;font-size:15px}
+address a{color:var(--yellow)}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.review{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:22px}
+.review .stars{color:#f4a261;letter-spacing:2px}
+.review p{margin:10px 0 14px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:500}
+.faq details{background:#fff;border:2px solid var(--border);border-radius:12px;padding:0 18px;margin-bottom:10px}
+.faq summary{cursor:pointer;list-style:none;padding:16px 0;font-weight:700;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";font-family:Anton;font-size:22px;color:var(--red)}
+.faq details[open] summary::after{content:"–"}
+.faq details p{padding-bottom:16px;color:var(--muted);font-size:15px}
+footer.site{background:#0d0a09;color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;align-items:center}
+footer.site button{text-decoration:underline}
+</style>
+</head>
+<body>
+<header class="header" data-header>
+  <div class="container">
+    <a href="#" class="brand"><i></i>Forno Rosso</a>
+    <nav class="nav" data-nav aria-label="Navigation principale"><a href="#carte">La carte</a><a href="#avis">Avis</a><a href="#faq">FAQ</a><a href="#infos">Infos & accès</a></nav>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="cart-btn" id="cartBtn" aria-label="Voir le panier">🛒 Panier <b id="cartCount">0</b></button>
+      <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu" style="color:#fff"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="container">
+    <div>
+      <h1 data-reveal>Pizza au feu<span>de bois.</span>Prête en 20 min.</h1>
+      <p data-reveal>Pâte maturée 48 h, tomates San Marzano, fior di latte des Pouilles. Commandez en ligne, on enfourne, vous passez prendre. Boulevard de Strasbourg, à deux pas de Jean-Jaurès.</p>
+      <div data-reveal><a href="#carte" class="btn btn-black">Commander maintenant</a> <a href="tel:+33561452211" class="btn btn-outline" style="border-color:#fff;color:#fff">05 61 45 22 11</a></div>
+      <div class="hero-badges" data-reveal><span>🔥 Four à 450 °C</span><span>⏱ Retrait en 20 min</span><span>🌱 Options véganes</span><span>💳 Paiement sur place</span></div>
+    </div>
+    <div class="hero-art" data-reveal="scale">
+      <div class="sticker">-10 %<small>code BIENVENUE10</small></div>
+      <div class="ph"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=900&q=70" alt="Pizza margherita sortie du four à bois" fetchpriority="high"></div>
+    </div>
+  </div>
+</section>
+<div class="marquee" aria-hidden="true"><div><span>Click & collect</span>•<span>Pâte 48 h</span>•<span>Four à bois</span>•<span>Jean-Jaurès · Toulouse</span>•<span>7j/7</span>•<span>Click & collect</span>•<span>Pâte 48 h</span>•<span>Four à bois</span>•<span>Jean-Jaurès · Toulouse</span>•<span>7j/7</span>•</div></div>
+
+<section id="carte">
+  <div class="container">
+    <div class="section-head" data-reveal><h2>La carte</h2><p>Ajoutez au panier, choisissez la taille et vos suppléments, puis l'heure de retrait.</p></div>
+    <div class="order-layout">
+      <div>
+        <div class="cats" role="group" aria-label="Catégories" id="cats">
+          <button aria-pressed="true" data-cat="all">Tout</button><button aria-pressed="false" data-cat="pizza">Pizzas</button><button aria-pressed="false" data-cat="calzone">Calzones</button><button aria-pressed="false" data-cat="side">À côté</button><button aria-pressed="false" data-cat="dessert">Desserts</button><button aria-pressed="false" data-cat="drink">Boissons</button>
+        </div>
+        <div class="products" id="products"></div>
+      </div>
+      <aside class="cart" id="cart" aria-label="Panier">
+        <h3>Votre panier <small id="cartSub"></small></h3>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="promo"><input id="promoInput" placeholder="Code promo" aria-label="Code promo"><button id="promoBtn">OK</button></div>
+        <p class="promo-msg" id="promoMsg"></p>
+        <div class="pickup"><label for="pickupTime">Heure de retrait</label><select id="pickupTime"></select></div>
+        <div class="totals" id="totals"></div>
+        <button class="btn btn-red" id="checkoutBtn" disabled>Valider la commande</button>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="avis" style="padding-top:0">
+  <div class="container">
+    <div class="section-head" data-reveal><h2>Ils en redemandent</h2><p>4,7 / 5 · 1 240 avis Google</p></div>
+    <div class="reviews">
+      <article class="review" data-reveal><div class="stars">★★★★★</div><p>La meilleure pâte de Toulouse, point. Commandée depuis le bureau, prête pile à l'heure indiquée.</p><footer>Karim B. · Jean-Jaurès</footer></article>
+      <article class="review" data-reveal><div class="stars">★★★★★</div><p>La Diavola est une tuerie, la burrata fondante. Le code promo marche vraiment, c'est appréciable.</p><footer>Lucie T. · Saint-Aubin</footer></article>
+      <article class="review" data-reveal><div class="stars">★★★★☆</div><p>Super rapport qualité-prix. Dommage qu'il n'y ait que 4 tables sur place, mais le click & collect compense.</p><footer>Thomas G. · Marengo</footer></article>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="container faq" style="max-width:800px">
+    <div class="section-head" data-reveal><h2>Questions fréquentes</h2></div>
+    <div data-faq data-reveal>
+      <details><summary>Comment fonctionne le click & collect ?</summary><p>Vous composez votre commande, choisissez une heure de retrait et validez. Vous réglez sur place (CB, espèces, tickets resto) au moment de récupérer vos pizzas.</p></details>
+      <details><summary>Livrez-vous ?</summary><p>Pas encore ! Uniquement le retrait sur place boulevard de Strasbourg. Les commandes de plus de 10 pizzas se font par téléphone la veille.</p></details>
+      <details><summary>Avez-vous des pizzas sans gluten ou véganes ?</summary><p>Oui : pâte sans gluten (+2 €) sur toutes les pizzas, et plusieurs recettes véganes avec fromage végétal.</p></details>
+      <details><summary>Puis-je annuler ma commande ?</summary><p>Jusqu'à 10 minutes après validation, par téléphone au 05 61 45 22 11.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="info" id="infos">
+  <div class="container">
+    <h2 data-reveal>Infos & accès</h2>
+    <div class="info-grid">
+      <div data-reveal><h3>Horaires</h3><div class="hours" id="hours"></div></div>
+      <div data-reveal><h3>Adresse</h3><address>Forno Rosso<br>27 boulevard de Strasbourg<br>31000 Toulouse<br>Métro A/B · Jean-Jaurès<br><a href="tel:+33561452211">05 61 45 22 11</a><br><a href="mailto:ciao@fornorosso.fr">ciao@fornorosso.fr</a></address><p style="margin-top:14px"><a class="btn btn-outline" style="border-color:#fff;color:#fff" href="https://www.google.com/maps/dir/?api=1&destination=27+boulevard+de+Strasbourg+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></p></div>
+      <div class="map" data-reveal><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4400%2C43.6040%2C1.4560%2C43.6110&layer=mapnik&marker=43.6075%2C1.4478"></iframe></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Forno Rosso — SAS Rosso Toulouse</span><button data-open-modal="#mentions">Mentions légales & confidentialité</button></div></footer>
+
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SAS Rosso Toulouse, 27 boulevard de Strasbourg, 31000 Toulouse. SIRET 901 234 567 00012. Directeur de publication : Marco Ferrante. Hébergement : Netlify, Inc. Les données du formulaire de commande servent uniquement à préparer votre commande et sont supprimées sous 30 jours. Site de démonstration : entreprise fictive, aucune commande réelle n'est traitée.</p></div></div>
+
+<!-- Modale d'options produit -->
+<div class="modal" id="optModal" aria-hidden="true" role="dialog" aria-labelledby="optTitle"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3 id="optTitle"></h3><p id="optDesc" style="color:var(--muted);font-size:14px;margin-top:6px"></p><div id="optBody"></div><div class="modal-foot"><span class="price" id="optPrice"></span><button class="btn btn-red" id="optAdd">Ajouter au panier</button></div></div></div>
+
+<!-- Modale de validation -->
+<div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-labelledby="coTitle"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button>
+  <div id="coForm">
+    <h3 id="coTitle">Vos coordonnées</h3>
+    <div class="recap-box" id="coRecap"></div>
+    <form name="commande-pizzeria" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="orderForm" novalidate>
+      <input type="hidden" name="form-name" value="commande-pizzeria"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+      <input type="hidden" name="panier" id="fCart"><input type="hidden" name="retrait" id="fPickup"><input type="hidden" name="total" id="fTotal">
+      <div class="form-grid">
+        <div class="field"><label for="coNom">Nom</label><input id="coNom" name="nom" required placeholder="Martin"></div>
+        <div class="field"><label for="coTel">Téléphone</label><input id="coTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+        <div class="field full"><label for="coEmail">E-mail</label><input id="coEmail" name="email" type="email" required placeholder="vous@exemple.fr"></div>
+        <div class="field full"><label for="coNote">Note pour la cuisine</label><input id="coNote" name="note" placeholder="Bien cuite, sans oignons…"></div>
+      </div>
+      <button type="submit" class="btn btn-red" style="width:100%;margin-top:16px" id="orderSubmit">Confirmer — paiement sur place</button>
+    </form>
+  </div>
+  <div id="coDone" class="confirm hidden">
+    <p style="font-weight:700;color:var(--muted)">Commande n°</p><div class="num" id="orderNum"></div>
+    <p class="timer" id="orderTimer"></p>
+    <div class="track" id="track"><div class="on">Reçue</div><div>Au four</div><div>Prête</div></div>
+    <p style="font-size:14px;color:var(--muted)">Présentez ce numéro au comptoir. Un SMS vous préviendra quand la commande sera prête.</p>
+    <button class="btn btn-black" style="margin-top:18px" data-close-modal>Fermer</button>
+  </div>
+</div></div>
+
+<div class="mobile-bar"><a href="tel:+33561452211">📞 Appeler</a><a href="#carte">Commander</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, pad, uid, store, toast, openModal, closeModal, validate, sendNetlify } = Demo;
+  const KEY = 'forno-rosso:cart';
+  const IMG = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=600&q=70`;
+  const SIZES = [{ id: 'M', label: 'Classique 30 cm', delta: 0 }, { id: 'L', label: 'Grande 36 cm', delta: 4 }];
+  const EXTRAS = [{ id: 'burrata', label: 'Burrata', price: 3.5 }, { id: 'spianata', label: 'Spianata piccante', price: 2.5 }, { id: 'truffe', label: 'Crème de truffe', price: 4 }, { id: 'sansgluten', label: 'Pâte sans gluten', price: 2 }, { id: 'vegan', label: 'Fromage végétal', price: 1.5 }];
+  const PRODUCTS = [
+    { id: 'margherita', cat: 'pizza', name: 'Margherita', desc: 'San Marzano, fior di latte, basilic, huile d\'olive', price: 10.5, img: 'photo-1574071318508-1cdbab80d002', tag: 'Végétarien', opts: true },
+    { id: 'diavola', cat: 'pizza', name: 'Diavola', desc: 'Spianata piccante, fior di latte, piment de Calabre', price: 13.5, img: 'photo-1628840042765-356cda07504e', tag: 'Best-seller', opts: true, hot: true },
+    { id: 'quattro', cat: 'pizza', name: 'Quattro formaggi', desc: 'Gorgonzola, taleggio, parmesan, fior di latte', price: 14, img: 'photo-1513104890138-7c749659a591', tag: 'Végétarien', opts: true },
+    { id: 'capricciosa', cat: 'pizza', name: 'Capricciosa', desc: 'Jambon, champignons, artichauts, olives', price: 14.5, img: 'photo-1595295333158-4742f28fbd85', opts: true },
+    { id: 'tartufo', cat: 'pizza', name: 'Tartufo', desc: 'Crème de truffe, mozzarella, champignons, roquette', price: 16.5, img: 'photo-1571407970349-bc81e7e96d47', tag: 'Signature', opts: true },
+    { id: 'verdura', cat: 'pizza', name: 'Verdura vegana', desc: 'Légumes grillés, fromage végétal, pesto de basilic', price: 13, img: 'photo-1604382354936-07c5d9983bd3', tag: 'Vegan', opts: true },
+    { id: 'calz-classico', cat: 'calzone', name: 'Calzone classico', desc: 'Ricotta, jambon, mozzarella, tomate', price: 13.5, img: 'photo-1590947132387-155cc02f3212', opts: true },
+    { id: 'calz-verde', cat: 'calzone', name: 'Calzone verde', desc: 'Épinards, ricotta, parmesan', price: 13, img: 'photo-1588315029754-2dd089d39a1a', tag: 'Végétarien', opts: true },
+    { id: 'focaccia', cat: 'side', name: 'Focaccia romarin', desc: 'Pour partager, fleur de sel', price: 5.5, img: 'photo-1509440159596-0249088772ff', tag: 'Vegan' },
+    { id: 'burrata', cat: 'side', name: 'Burrata & tomates', desc: 'Burrata des Pouilles, tomates datterini', price: 8.5, img: 'photo-1546069901-ba9599a7e63c', tag: 'Végétarien' },
+    { id: 'tiramisu', cat: 'dessert', name: 'Tiramisù maison', desc: 'La recette de nonna Rosa', price: 6, img: 'photo-1571115177098-24ec42ed204d' },
+    { id: 'panna', cat: 'dessert', name: 'Panna cotta', desc: 'Fruits rouges', price: 5.5, img: 'photo-1488477181946-6428a0291777' },
+    { id: 'coke', cat: 'drink', name: 'Soda 33 cl', desc: 'Cola, limonade ou thé glacé', price: 2.5, img: 'photo-1513558161293-cdaf765ed2fd' },
+    { id: 'birra', cat: 'drink', name: 'Birra Moretti 33 cl', desc: 'Blonde italienne', price: 4, img: 'photo-1535958636904-5a5e1d4b4c17' },
+    { id: 'eau', cat: 'drink', name: 'San Pellegrino 50 cl', desc: 'Eau pétillante', price: 2.5, img: 'photo-1548839140-29a749e1cf4d' }
+  ];
+  const PROMOS = { BIENVENUE10: { type: 'pct', value: 10, label: '-10 % sur la commande' }, PIZZA2: { type: 'second', label: '2e pizza à -50 %' }, ROSSO5: { type: 'fixed', value: 5, min: 25, label: '-5 € dès 25 €' } };
+  let cart = store.get(KEY, { items: [], promo: null });
+
+  /* --- Catalogue --- */
+  function renderProducts() {
+    $('#products').innerHTML = PRODUCTS.map((p) => `<article class="product" data-cat="${p.cat}"><div class="ph"><img src="${IMG(p.img)}" alt="${p.name}" loading="lazy"></div><div class="body">${p.tag ? `<span class="${p.tag === 'Vegan' || p.tag === 'Végétarien' ? 'tagv' : 'tagsp'}">${p.tag}</span>` : ''}<h3>${p.name}</h3><p>${p.desc}</p><div class="row"><span class="price">${euro(p.price)}</span><button class="add" data-add="${p.id}" aria-label="Ajouter ${p.name}">+</button></div></div></article>`).join('');
+    $$('[data-add]').forEach((b) => b.addEventListener('click', () => { const p = PRODUCTS.find((x) => x.id === b.dataset.add); p.opts ? openOptions(p) : addToCart(p, {}, p.price); }));
+  }
+  $$('#cats button').forEach((b) => b.addEventListener('click', () => {
+    $$('#cats button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true');
+    $$('.product').forEach((p) => p.classList.toggle('hidden', b.dataset.cat !== 'all' && p.dataset.cat !== b.dataset.cat));
+  }));
+
+  /* --- Options (taille, suppléments) --- */
+  let current = null;
+  function openOptions(p) {
+    current = p;
+    $('#optTitle').textContent = p.name; $('#optDesc').textContent = p.desc;
+    $('#optBody').innerHTML = `<div class="opt-group"><h4>Taille</h4><div class="opt-list">${SIZES.map((s, i) => `<label><span><input type="radio" name="size" value="${s.id}" ${i === 0 ? 'checked' : ''}>${s.label}</span><span>${s.delta ? '+' + euro(s.delta) : ''}</span></label>`).join('')}</div></div><div class="opt-group"><h4>Suppléments</h4><div class="opt-list">${EXTRAS.map((e) => `<label><span><input type="checkbox" name="extra" value="${e.id}">${e.label}</span><span>+${euro(e.price)}</span></label>`).join('')}</div></div>`;
+    $$('#optBody input').forEach((i) => i.addEventListener('change', updateOptPrice));
+    updateOptPrice(); openModal('#optModal');
+  }
+  function optSelection() {
+    const size = SIZES.find((s) => s.id === $('#optBody input[name=size]:checked').value);
+    const extras = $$('#optBody input[name=extra]:checked').map((i) => EXTRAS.find((e) => e.id === i.value));
+    return { size, extras, price: current.price + size.delta + extras.reduce((s, e) => s + e.price, 0) };
+  }
+  function updateOptPrice() { $('#optPrice').textContent = euro(optSelection().price); }
+  $('#optAdd').addEventListener('click', () => { const sel = optSelection(); addToCart(current, { size: sel.size.label, extras: sel.extras.map((e) => e.label) }, sel.price); closeModal($('#optModal')); });
+
+  /* --- Panier --- */
+  function addToCart(p, opts, unit) {
+    const sig = p.id + '|' + (opts.size || '') + '|' + (opts.extras || []).join(',');
+    const ex = cart.items.find((i) => i.sig === sig);
+    if (ex) ex.qty++; else cart.items.push({ sig, id: p.id, name: p.name, cat: p.cat, opts, unit, qty: 1 });
+    save(); toast(p.name + ' ajouté au panier', 'ok');
+    $('#cartBtn').classList.remove('bump'); void $('#cartBtn').offsetWidth; $('#cartBtn').classList.add('bump');
+  }
+  function save() { store.set(KEY, cart); renderCart(); }
+  function totals() {
+    const sub = cart.items.reduce((s, i) => s + i.unit * i.qty, 0);
+    let disc = 0; const promo = cart.promo && PROMOS[cart.promo];
+    if (promo) {
+      if (promo.type === 'pct') disc = sub * promo.value / 100;
+      else if (promo.type === 'fixed' && sub >= promo.min) disc = promo.value;
+      else if (promo.type === 'second') { const pz = cart.items.filter((i) => i.cat === 'pizza').flatMap((i) => Array(i.qty).fill(i.unit)).sort((a, b) => b - a); if (pz.length >= 2) disc = pz[1] / 2; }
+    }
+    return { sub, disc: Math.round(disc * 100) / 100, total: Math.max(0, sub - disc) };
+  }
+  function renderCart() {
+    const n = cart.items.reduce((s, i) => s + i.qty, 0);
+    $('#cartCount').textContent = n; $('#cartSub').textContent = n ? `${n} article${n > 1 ? 's' : ''}` : '';
+    const box = $('#cartItems');
+    box.innerHTML = cart.items.length ? cart.items.map((i, idx) => `<div class="ci"><div><strong>${i.name}</strong><small>${[i.opts.size, ...(i.opts.extras || [])].filter(Boolean).join(' · ') || 'Standard'}</small><div class="qty"><button data-q="${idx}:-1" aria-label="Retirer un">−</button><span>${i.qty}</span><button data-q="${idx}:1" aria-label="Ajouter un">+</button></div></div><div class="lp">${euro(i.unit * i.qty)}</div></div>`).join('') : '<p class="cart-empty">Votre panier est vide.<br>Ajoutez une pizza pour commencer !</p>';
+    $$('[data-q]', box).forEach((b) => b.addEventListener('click', () => { const [idx, d] = b.dataset.q.split(':').map(Number); cart.items[idx].qty += d; if (cart.items[idx].qty <= 0) cart.items.splice(idx, 1); save(); }));
+    const t = totals();
+    $('#totals').innerHTML = `<div><span>Sous-total</span><span>${euro(t.sub)}</span></div>${t.disc ? `<div class="disc"><span>Promo ${cart.promo}</span><span>−${euro(t.disc)}</span></div>` : ''}<div class="grand"><span>Total</span><span>${euro(t.total)}</span></div>`;
+    $('#checkoutBtn').disabled = !cart.items.length;
+    if (cart.promo) { $('#promoInput').value = cart.promo; const m = $('#promoMsg'); m.className = 'promo-msg ok'; m.textContent = PROMOS[cart.promo].label + (t.disc ? ' appliqué' : ' (conditions non remplies)'); }
+  }
+  $('#promoBtn').addEventListener('click', () => {
+    const code = $('#promoInput').value.trim().toUpperCase(); const m = $('#promoMsg');
+    if (!code) { cart.promo = null; m.className = 'promo-msg'; m.textContent = ''; save(); return; }
+    if (!PROMOS[code]) { m.className = 'promo-msg err'; m.textContent = 'Code inconnu ou expiré.'; cart.promo = null; save(); return; }
+    cart.promo = code; save(); toast('Code promo appliqué', 'ok');
+  });
+  $('#cartBtn').addEventListener('click', () => $('#cart').scrollIntoView({ behavior: 'smooth', block: 'center' }));
+
+  /* --- Créneaux de retrait : toutes les 15 min, à partir de maintenant + 25 min, pendant les heures d'ouverture --- */
+  const HOURS = [[11.5, 14.5], [18, 23]];
+  function renderPickup() {
+    const sel = $('#pickupTime'); sel.innerHTML = '';
+    const now = new Date(); const from = new Date(now.getTime() + 25 * 60000);
+    from.setMinutes(Math.ceil(from.getMinutes() / 15) * 15, 0, 0);
+    const slots = [];
+    for (let d = 0; d < 2 && slots.length < 24; d++) {
+      HOURS.forEach(([a, b]) => {
+        for (let h = a; h < b; h += 0.25) {
+          const t = new Date(now); t.setDate(t.getDate() + d); t.setHours(Math.floor(h), (h % 1) * 60, 0, 0);
+          if (t >= from && slots.length < 24) slots.push(t);
+        }
+      });
+    }
+    slots.forEach((t, i) => { const o = document.createElement('option'); o.value = t.toISOString(); o.textContent = (t.getDate() !== now.getDate() ? 'Demain ' : (i === 0 ? 'Au plus tôt · ' : 'Aujourd\'hui ')) + pad(t.getHours()) + ':' + pad(t.getMinutes()); sel.appendChild(o); });
+  }
+
+  /* --- Validation --- */
+  $('#checkoutBtn').addEventListener('click', () => {
+    const t = totals(); const sel = $('#pickupTime');
+    $('#coRecap').innerHTML = cart.items.map((i) => `<div><span>${i.qty} × ${i.name}</span><span>${euro(i.unit * i.qty)}</span></div>`).join('') + (t.disc ? `<div><span>Promo</span><span>−${euro(t.disc)}</span></div>` : '') + `<div><strong>Total</strong><strong>${euro(t.total)}</strong></div><div><span>Retrait</span><span>${sel.options[sel.selectedIndex].textContent}</span></div>`;
+    $('#fCart').value = JSON.stringify(cart.items.map((i) => `${i.qty}x ${i.name} ${[i.opts.size, ...(i.opts.extras || [])].filter(Boolean).join(', ')}`)); $('#fPickup').value = sel.options[sel.selectedIndex].textContent; $('#fTotal').value = euro(t.total);
+    $('#coForm').classList.remove('hidden'); $('#coDone').classList.add('hidden'); openModal('#checkoutModal');
+  });
+  $('#orderForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const form = e.target;
+    if (!validate(form)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const btn = $('#orderSubmit'); btn.disabled = true; btn.textContent = 'Envoi…';
+    const num = String(Math.floor(100 + Math.random() * 900));
+    await sendNetlify(form, { numero: num });
+    const orders = store.get('forno-rosso:orders', []); orders.push({ num, total: totals().total, at: Date.now(), pickup: $('#fPickup').value }); store.set('forno-rosso:orders', orders);
+    $('#orderNum').textContent = num; $('#orderTimer').textContent = 'Retrait ' + $('#fPickup').value.toLowerCase() + ' · 27 boulevard de Strasbourg';
+    $('#coForm').classList.add('hidden'); $('#coDone').classList.remove('hidden');
+    cart = { items: [], promo: null }; $('#promoInput').value = ''; $('#promoMsg').textContent = ''; save();
+    btn.disabled = false; btn.textContent = 'Confirmer — paiement sur place';
+    /* Suivi simulé de la préparation */
+    const steps = $$('#track div'); setTimeout(() => steps[1].classList.add('on'), 4000); setTimeout(() => steps[2].classList.add('on'), 9000);
+    toast('Commande n°' + num + ' enregistrée !', 'ok');
+  });
+
+  /* --- Horaires --- */
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="${i === dow ? 'today' : ''}"><span>${names[i]}</span><span>11:30 – 14:30 · 18:00 – 23:00</span></div>`).join('');
+
+  renderProducts(); renderCart(); renderPickup();
+})();
+</script>
+</body>
+</html>

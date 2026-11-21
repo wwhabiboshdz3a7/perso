@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pétale & Co — Fleuriste à Toulouse Saint-Aubin, livraison le jour même</title>
+<meta name="description" content="Fleuriste artisan à Saint-Aubin, Toulouse. Bouquets de saison, livraison à Toulouse le jour même avec créneau et carte-message, abonnement hebdomadaire de fleurs.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23f7e1e8'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23d9486f'/%3E%3Ccircle cx='16' cy='8' r='4' fill='%23f29bb4'/%3E%3Ccircle cx='23' cy='13' r='4' fill='%23f29bb4'/%3E%3Ccircle cx='21' cy='22' r='4' fill='%23f29bb4'/%3E%3Ccircle cx='11' cy='22' r='4' fill='%23f29bb4'/%3E%3Ccircle cx='9' cy='13' r='4' fill='%23f29bb4'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Florist","name":"Pétale & Co","telephone":"+33561991230","priceRange":"€€","address":{"@type":"PostalAddress","streetAddress":"22 rue de la Colombette","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6050,"longitude":1.4530},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"19:30"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"09:00","closes":"13:00"}],"url":"https://example.com/demos/fleuriste/"}
+</script>
+<style>
+:root{--green:#2f5d46;--green-l:#e7efe9;--pink:#d9486f;--pink-l:#f7e1e8;--cream:#fffcf7;--ink:#243027;--muted:#6d7a70;--accent:var(--green);--focus:var(--pink);--border:#e3e8e3;--radius:16px;--ph:linear-gradient(135deg,#f29bb4,#2f5d46);--mb-bg:#2f5d46;--mb-bg2:#d9486f}
+body{font-family:Karla,system-ui,sans-serif;background:var(--cream);color:var(--ink)}
+h1,h2,h3{font-family:Lora,Georgia,serif;font-weight:600;line-height:1.1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:999px;font-weight:700;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#244a37;transform:translateY(-2px)}
+.btn-pink{background:var(--pink);color:#fff}.btn-pink:hover{background:#c03a5e}
+.btn-line{border:1.5px solid var(--green);color:var(--green)}.btn-line:hover{background:var(--green-l)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,252,247,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-family:Lora;font-size:24px;text-decoration:none;color:var(--green);display:flex;align-items:center;gap:8px}
+.brand i{font-style:normal}
+.nav{display:flex;gap:24px;align-items:center;font-weight:500;font-size:15px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--pink)}
+.nav .btn{padding:10px 18px}
+.cart-btn{position:relative;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.cart-btn b{background:var(--pink);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:grid;place-items:center;padding:0 5px}
+@media (max-width:899px){.nav{position:fixed;inset:72px 0 0;background:var(--cream);flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{position:relative;overflow:hidden;background:var(--pink-l)}
+.hero .container{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:64px 0}
+@media (max-width:880px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(40px,6vw,76px)}
+.hero h1 em{font-style:italic;color:var(--pink)}
+.hero p{font-size:18px;color:var(--muted);max-width:46ch;margin:20px 0 28px}
+.hero .promise{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px;font-size:14px;font-weight:700}
+.hero .promise span{background:#fff;padding:8px 14px;border-radius:999px}
+.hero-img{position:relative}
+.hero-img .ph{aspect-ratio:4/5;border-radius:200px 200px 24px 24px}
+.hero-img .badge{position:absolute;top:24px;right:-8px;background:var(--green);color:#fff;border-radius:50%;width:110px;height:110px;display:grid;place-items:center;text-align:center;font-family:Lora;font-size:15px;line-height:1.1;transform:rotate(8deg);padding:10px}
+@media (max-width:880px){.hero-img .badge{right:8px}}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pink);font-weight:700}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,48px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.filters button{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);font-weight:500;font-size:14px;background:#fff}
+.filters button[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+.catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.bq{background:#fff;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:all .25s;display:flex;flex-direction:column}
+.bq:hover{transform:translateY(-4px);box-shadow:0 20px 44px rgba(47,93,70,.12)}
+.bq .ph{aspect-ratio:1}
+.bq .ph:hover img{transform:scale(1.05)}
+.bq:nth-child(2n) .ph{--ph:linear-gradient(135deg,#f7e1e8,#d9486f)}.bq:nth-child(3n) .ph{--ph:linear-gradient(135deg,#e7efe9,#2f5d46)}.bq:nth-child(5n) .ph{--ph:linear-gradient(135deg,#fde68a,#f29bb4)}
+.bq .b{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.bq h3{font-size:19px}.bq p{font-size:13px;color:var(--muted);flex:1}
+.bq .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.bq .pr{font-family:Lora;font-size:20px;color:var(--green)}
+.bq .sz{display:flex;gap:4px}
+.bq .sz button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);font-size:12px;font-weight:700}
+.bq .sz button[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+.bq .add{width:100%;margin-top:10px;padding:11px;border-radius:999px;background:var(--pink-l);color:var(--pink);font-weight:700;transition:all .2s}
+.bq .add:hover{background:var(--pink);color:#fff}
+.bq.hidden{display:none}
+/* Livraison / panier */
+.order{background:var(--green);color:#fff}
+.order .eyebrow{color:#f29bb4}.order .section-head p{color:rgba(255,255,255,.8)}
+.order-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.order-grid{grid-template-columns:1fr}}
+.panel{background:#fff;color:var(--ink);border-radius:20px;padding:28px}
+@media (max-width:600px){.panel{padding:20px}}
+.panel h3{font-size:22px;margin-bottom:16px}
+.cart-list{display:grid;gap:10px;margin-bottom:16px}
+.ci{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--border);font-size:14px}
+.ci .nm{flex:1}.ci .nm small{display:block;color:var(--muted)}
+.ci .q{display:flex;align-items:center;gap:8px}
+.ci .q button{width:26px;height:26px;border-radius:50%;background:var(--green-l);font-weight:700}
+.ci .pr{font-family:Lora;min-width:60px;text-align:right}
+.empty{color:var(--muted);font-size:14px;padding:12px 0}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.mode label{border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;font-weight:700;font-size:14px}
+.mode label small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:3px}
+.mode label:has(input:checked){border-color:var(--green);background:var(--green-l)}
+.mode input{position:absolute;opacity:0}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+.slots button{padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:500;background:#fff}
+.slots button[disabled]{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.slots button.on{background:var(--green);color:#fff;border-color:var(--green)}
+.card-msg{position:relative}
+.card-msg textarea{width:100%;padding:14px;border:1.5px solid var(--border);border-radius:12px;font-family:Lora;font-style:italic;min-height:90px;background:#fffdf5}
+.card-msg .count{position:absolute;right:10px;bottom:10px;font-size:11px;color:var(--muted)}
+.card-prev{background:#fffdf5;border:1px solid #efe4c8;border-radius:10px;padding:16px;font-family:Lora;font-style:italic;font-size:15px;margin-top:10px;position:relative;box-shadow:0 6px 16px rgba(0,0,0,.06);transform:rotate(-1deg)}
+.card-prev::before{content:"Carte-message";position:absolute;top:-10px;left:12px;font:700 10px Karla;letter-spacing:.1em;text-transform:uppercase;background:#fff;padding:2px 6px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:560px){.form-grid{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.totals{display:grid;gap:6px;font-size:14px;margin:16px 0}
+.totals div{display:flex;justify-content:space-between}
+.totals .tot{border-top:2px solid var(--green);padding-top:10px;font-weight:700;font-size:17px}
+.totals .tot b{font-family:Lora;font-size:24px;color:var(--green)}
+.zone-ok{font-size:13px;margin-top:6px;min-height:18px}
+.zone-ok.ok{color:#166534}.zone-ok.ko{color:#b91c1c}
+.done{text-align:center;padding:16px 0}
+.done .ic{font-size:48px}
+.done h3{font-size:24px;margin:10px 0 6px}
+.done .ref{font-family:ui-monospace,monospace;letter-spacing:.1em;margin:8px 0}
+/* Abonnement */
+.abo{background:var(--green-l)}
+.abo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.abo-card{background:#fff;border-radius:var(--radius);padding:28px;border:1px solid var(--border);display:flex;flex-direction:column;position:relative}
+.abo-card.best{border-color:var(--pink);box-shadow:0 20px 50px rgba(217,72,111,.12)}
+.abo-card .badge{position:absolute;top:-12px;left:24px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.abo-card h3{font-size:22px}
+.abo-card .pr{font-family:Lora;font-size:40px;color:var(--green);margin:10px 0 4px}
+.abo-card .pr small{font:500 14px Karla;color:var(--muted)}
+.abo-card ul{display:grid;gap:8px;margin:16px 0 20px;font-size:14px;color:var(--muted);flex:1}
+.abo-card li::before{content:"🌿 "}
+.abo-form{background:#fff;border-radius:var(--radius);padding:28px;margin-top:24px;border:1px solid var(--border);max-width:640px}
+.abo-form h3{font-size:20px;margin-bottom:12px}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.review .stars{color:var(--pink);letter-spacing:2px}
+.review p{font-family:Lora;font-size:17px;margin:10px 0 12px;line-height:1.4}
+.review footer{font-size:13px;color:var(--muted)}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:700;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--pink);font-size:22px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:16px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:700;color:var(--green)}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--green-l)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i>❀</i>Pétale & Co</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#bouquets">Bouquets</a><a href="#livraison">Livraison</a><a href="#abonnement">Abonnement</a><a href="#avis">Avis</a><a href="#acces">Boutique</a><a href="#livraison" class="cart-btn">🧺 Panier <b id="cartCount">0</b></a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal>Fleuriste artisan · Saint-Aubin · Toulouse</p>
+    <h1 data-reveal>Des fleurs <em>de saison</em>, livrées le jour même</h1>
+    <p data-reveal>Bouquets composés le matin avec les fleurs des producteurs d'Occitanie. Commandez avant 14 h, nous livrons à vélo-cargo dans tout Toulouse, avec votre carte-message écrite à la main.</p>
+    <div data-reveal><a href="#bouquets" class="btn btn-green">Choisir un bouquet</a> <a href="#abonnement" class="btn btn-line">S'abonner</a></div>
+    <div class="promise" data-reveal><span>🚲 Livraison vélo-cargo</span><span>🌱 Fleurs françaises</span><span>✍️ Carte manuscrite</span></div>
+  </div>
+  <div class="hero-img" data-reveal="scale">
+    <div class="ph"><img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?auto=format&fit=crop&w=900&q=70" alt="Bouquet champêtre de saison" fetchpriority="high"></div>
+    <div class="badge">Commandé avant 14 h, livré aujourd'hui</div>
+  </div>
+</div></section>
+
+<section id="bouquets"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Les bouquets</p><h2>Composés ce matin, à Saint-Aubin</h2><p>Trois tailles pour chaque création. Les fleurs varient selon le marché : vous choisissez l'esprit, nous choisissons les plus belles tiges.</p></div>
+  <div class="filters" id="filters" data-reveal><button aria-pressed="true" data-f="all">Tous</button><button aria-pressed="false" data-f="champetre">Champêtre</button><button aria-pressed="false" data-f="romantique">Romantique</button><button aria-pressed="false" data-f="graphique">Graphique</button><button aria-pressed="false" data-f="plante">Plantes</button></div>
+  <div class="catalog" id="catalog"></div>
+</div></section>
+
+<section class="order" id="livraison"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Livraison à Toulouse</p><h2>Votre panier et votre créneau</h2><p>Livraison 6,90 € à Toulouse intra-périphérique (offerte dès 60 €), retrait gratuit en boutique rue de la Colombette.</p></div>
+  <div class="order-grid">
+    <div class="panel" data-reveal>
+      <h3>Panier</h3>
+      <div class="cart-list" id="cartList"></div>
+      <h3>Mode de réception</h3>
+      <div class="mode"><label><input type="radio" name="mode" value="livraison" checked>🚲 Livraison<small>Toulouse, 6,90 €</small></label><label><input type="radio" name="mode" value="retrait">🏪 Retrait boutique<small>Gratuit</small></label></div>
+      <div class="field"><label for="date">Date</label><input type="date" id="date"></div>
+      <div class="slots" id="slots"></div>
+      <h3 style="margin-top:20px">Carte-message</h3>
+      <div class="card-msg"><textarea id="msg" maxlength="160" placeholder="Pour toi, maman, avec tout mon amour…"></textarea><span class="count" id="msgCount">0 / 160</span></div>
+      <div class="card-prev" id="cardPrev">Votre message apparaîtra ici, écrit à la main sur une carte kraft.</div>
+    </div>
+    <div class="panel" data-reveal="right">
+      <h3>Coordonnées</h3>
+      <form name="commande-fleuriste" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate>
+        <input type="hidden" name="form-name" value="commande-fleuriste"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="panier" id="fCart"><input type="hidden" name="creneau" id="fSlot"><input type="hidden" name="mode" id="fMode"><input type="hidden" name="message_carte" id="fMsg"><input type="hidden" name="total" id="fTotal">
+        <div class="form-grid">
+          <div class="field"><label for="nom">Votre nom</label><input id="nom" name="nom" required></div>
+          <div class="field"><label for="tel">Votre téléphone</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+          <div class="field full"><label for="email">E-mail</label><input id="email" name="email" type="email" required></div>
+          <div id="addrFields" class="full form-grid" style="margin-top:0">
+            <div class="field"><label for="dest">Destinataire</label><input id="dest" name="destinataire" placeholder="Prénom Nom"></div>
+            <div class="field"><label for="destTel">Tél. du destinataire</label><input id="destTel" name="tel_destinataire" type="tel" placeholder="Pour le livreur"></div>
+            <div class="field full"><label for="adresse">Adresse de livraison</label><input id="adresse" name="adresse" placeholder="N°, rue, étage, code"></div>
+            <div class="field"><label for="cp">Code postal</label><input id="cp" name="code_postal" placeholder="31000" inputmode="numeric"></div>
+            <div class="field"><label>&nbsp;</label><p class="zone-ok" id="zoneOk"></p></div>
+          </div>
+        </div>
+        <div class="totals" id="totals"></div>
+        <button type="submit" class="btn btn-pink" style="width:100%" id="submit" disabled>Commander</button>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px">Paiement sécurisé à l'étape suivante (simulé en démo).</p>
+      </form>
+      <div class="done hidden" id="done"><div class="ic">💐</div><h3>Merci !</h3><p id="doneText" style="font-size:14px;color:var(--muted)"></p><div class="ref" id="doneRef"></div><button class="btn btn-line" id="again" style="margin-top:12px">Nouvelle commande</button></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="abo" id="abonnement"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Abonnement</p><h2>Des fleurs fraîches chaque semaine</h2><p>Un bouquet surprise de saison livré le jour de votre choix. Sans engagement, pause ou annulation en un clic.</p></div>
+  <div class="abo-grid">
+    <div class="abo-card" data-reveal><h3>Petit bonheur</h3><div class="pr">19 €<small> / semaine</small></div><ul role="list"><li>Bouquet 15 tiges</li><li>Livraison incluse</li><li>Fleurs de saison</li></ul><button class="btn btn-line" data-abo="Petit bonheur|19">Choisir</button></div>
+    <div class="abo-card best" data-reveal><span class="badge">Le préféré</span><h3>Grand air</h3><div class="pr">29 €<small> / semaine</small></div><ul role="list"><li>Bouquet 25 tiges</li><li>Livraison incluse</li><li>Vase offert au 1er envoi</li><li>Feuillages & fleurs rares</li></ul><button class="btn btn-pink" data-abo="Grand air|29">Choisir</button></div>
+    <div class="abo-card" data-reveal><h3>Entreprise</h3><div class="pr">49 €<small> / semaine</small></div><ul role="list"><li>Composition d'accueil XL</li><li>Livraison lundi matin</li><li>Facturation mensuelle</li><li>Entretien & remplacement</li></ul><button class="btn btn-line" data-abo="Entreprise|49">Choisir</button></div>
+  </div>
+  <div class="abo-form" data-reveal>
+    <form name="abonnement-fleuriste" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="aboForm" novalidate>
+      <input type="hidden" name="form-name" value="abonnement-fleuriste"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+      <h3>Mon abonnement : <span id="aboName">Grand air · 29 €/semaine</span></h3><input type="hidden" name="formule" id="fAbo" value="Grand air">
+      <div class="form-grid" style="margin-top:0"><div class="field"><label for="aboDay">Jour de livraison</label><select id="aboDay" name="jour"><option>Mardi</option><option>Jeudi</option><option selected>Vendredi</option><option>Samedi</option></select></div><div class="field"><label for="aboFreq">Fréquence</label><select id="aboFreq" name="frequence"><option>Chaque semaine</option><option>Une semaine sur deux</option><option>Une fois par mois</option></select></div><div class="field"><label for="aboNom">Nom</label><input id="aboNom" name="nom" required></div><div class="field"><label for="aboEmail">E-mail</label><input id="aboEmail" name="email" type="email" required></div><div class="field full"><label for="aboAdr">Adresse de livraison (Toulouse)</label><input id="aboAdr" name="adresse" required></div></div>
+      <button type="submit" class="btn btn-green" style="margin-top:14px" id="aboSubmit">Démarrer l'abonnement</button>
+    </form>
+    <div class="done hidden" id="aboDone"><div class="ic">🌷</div><h3>Abonnement activé</h3><p id="aboText" style="font-size:14px;color:var(--muted)"></p></div>
+  </div>
+</div></section>
+
+<section id="avis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Ils ont dit merci avec des fleurs</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Commandé à 11 h depuis Paris pour ma mère à Toulouse, livré à 16 h avec mon message écrit à la main. Elle a pleuré (de joie).</p><footer>Camille · livraison Côte Pavée</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>L'abonnement Grand air illumine notre salon chaque vendredi. Les compositions sont toujours différentes.</p><footer>Marion & Paul · Saint-Aubin</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Fleuriste de quartier adorable, bouquets qui tiennent dix jours. Et la livraison à vélo, c'est la classe.</p><footer>Théo · Jean-Jaurès</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:760px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Où livrez-vous ?</summary><p>Tout Toulouse intra-périphérique (codes postaux 31000, 31100, 31200, 31300, 31400, 31500) ainsi que Blagnac et Balma. Au-delà, contactez-nous.</p></details>
+    <details><summary>Puis-je choisir les fleurs exactes ?</summary><p>Les photos sont indicatives : nous composons avec les fleurs les plus fraîches du jour en respectant l'esprit et les couleurs du bouquet choisi. Précisez vos envies dans le message.</p></details>
+    <details><summary>Que se passe-t-il si le destinataire est absent ?</summary><p>Le livreur appelle le numéro indiqué, dépose chez un voisin ou le gardien, ou repasse dans le créneau suivant sans frais.</p></details>
+    <details><summary>Comment gérer mon abonnement ?</summary><p>Depuis le lien reçu par e-mail : pause, changement de jour ou d'adresse, annulation — sans frais, à tout moment.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">La boutique</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Rue de la Colombette</h2><div class="hours" id="hours"></div><address><strong>Pétale & Co</strong><br>22 rue de la Colombette, 31000 Toulouse<br>Métro A · Jean-Jaurès / Marengo<br><a href="tel:+33561991230">05 61 99 12 30</a> · <a href="mailto:coucou@petaleandco.fr">coucou@petaleandco.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=22+rue+de+la+Colombette+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4450%2C43.6010%2C1.4610%2C43.6090&layer=mapnik&marker=43.6050%2C1.4530"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Pétale & Co — EURL Pétale</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">EURL Pétale, 22 rue de la Colombette, 31000 Toulouse. SIRET 901 234 567 00020. Directrice de publication : Inès Cabanel. Hébergement : Netlify, Inc. Les données de commande et d'abonnement servent à préparer et livrer vos fleurs ; conservation 3 ans. Site de démonstration : entreprise fictive, aucun paiement réel.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561991230">📞 Appeler</a><a href="#bouquets">Commander</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, isoDate, fmtDate, cap, uid, store, toast, validate, sendNetlify } = Demo;
+  const KEY = 'petale:cart';
+  const SIZES = { S: [0, 'Petit'], M: [12, 'Moyen'], L: [26, 'Grand'] };
+  const BQ = [
+    { id: 'prairie', cat: 'champetre', n: 'Prairie', d: 'Fleurs des champs, graminées, tons pastel', p: 32, img: 'photo-1490750967868-88aa4486c946' },
+    { id: 'rosalie', cat: 'romantique', n: 'Rosalie', d: 'Roses de jardin, pivoines (en saison), eucalyptus', p: 45, img: 'photo-1457089328109-e5d9bd499191' },
+    { id: 'soleil', cat: 'champetre', n: 'Plein soleil', d: 'Tournesols, dahlias, feuillages dorés', p: 36, img: 'photo-1470509037663-253afd7f0f51' },
+    { id: 'nuit', cat: 'graphique', n: 'Nuit blanche', d: 'Monochrome blanc, anthurium, lisianthus', p: 48, img: 'photo-1508610048659-a06b669e3321' },
+    { id: 'terracotta', cat: 'graphique', n: 'Terracotta', d: 'Fleurs séchées et fraîches, tons brûlés', p: 42, img: 'photo-1526047932273-341f2a7631f9' },
+    { id: 'poesie', cat: 'romantique', n: 'Poésie', d: 'Renoncules, roses anciennes, menthe', p: 40, img: 'photo-1522673607200-164d1b6ce486' },
+    { id: 'monstera', cat: 'plante', n: 'Monstera', d: 'Plante d\'intérieur en pot céramique', p: 38, img: 'photo-1485955900006-10f4d324d411' },
+    { id: 'orchidee', cat: 'plante', n: 'Orchidée phalaenopsis', d: 'Deux hampes, cache-pot en grès', p: 34, img: 'photo-1524492412937-b28074a5d7da' }
+  ];
+  let cart = store.get(KEY, []); const chosen = {};
+  $('#catalog').innerHTML = BQ.map((b) => `<article class="bq" data-cat="${b.cat}"><div class="ph"><img src="https://images.unsplash.com/${b.img}?auto=format&fit=crop&w=600&q=70" alt="Bouquet ${b.n}" loading="lazy"></div><div class="b"><h3>${b.n}</h3><p>${b.d}</p><div class="row"><span class="pr" data-pr="${b.id}">${euro(b.p)}</span><div class="sz">${Object.keys(SIZES).map((s) => `<button data-sz="${b.id}:${s}" aria-pressed="${s === 'S'}" title="${SIZES[s][1]}">${s}</button>`).join('')}</div></div><button class="add" data-add="${b.id}">Ajouter au panier</button></div></article>`).join('');
+  $$('[data-sz]').forEach((b) => b.addEventListener('click', () => { const [id, s] = b.dataset.sz.split(':'); chosen[id] = s; $$(`[data-sz^="${id}:"]`).forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); $(`[data-pr="${id}"]`).textContent = euro(BQ.find((x) => x.id === id).p + SIZES[s][0]); }));
+  $$('[data-add]').forEach((b) => b.addEventListener('click', () => { const bq = BQ.find((x) => x.id === b.dataset.add); const s = chosen[bq.id] || 'S'; const sig = bq.id + s; const ex = cart.find((c) => c.sig === sig); if (ex) ex.qty++; else cart.push({ sig, id: bq.id, n: bq.n, size: SIZES[s][1], unit: bq.p + SIZES[s][0], qty: 1 }); save(); toast(`${bq.n} (${SIZES[s][1].toLowerCase()}) ajouté`, 'ok'); }));
+  $$('#filters button').forEach((b) => b.addEventListener('click', () => { $$('#filters button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); $$('.bq').forEach((c) => c.classList.toggle('hidden', b.dataset.f !== 'all' && c.dataset.cat !== b.dataset.f)); }));
+
+  /* Panier, créneaux, zone */
+  const ZONES = ['31000', '31100', '31200', '31300', '31400', '31500', '31700', '31130'];
+  const date = $('#date'); let slot = null;
+  const today = new Date(); date.min = isoDate(today); date.value = isoDate(today);
+  const mode = () => $('input[name=mode]:checked').value;
+  function renderSlots() {
+    const box = $('#slots'); box.innerHTML = ''; slot = null;
+    if (!date.value) return; const d = new Date(date.value + 'T12:00:00'); const dow = d.getDay(); const now = new Date(); const isToday = date.value === isoDate(now);
+    if (dow === 1) { box.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:#b91c1c">Fermé le lundi — choisissez un autre jour.</p>'; render(); return; }
+    const list = mode() === 'livraison' ? [['9h – 12h', 9], ['12h – 14h', 12], ['14h – 17h', 14], ['17h – 19h30', 17]] : [['9h – 11h', 9], ['11h – 13h', 11], ['14h – 16h', 14], ['16h – 19h30', 16]];
+    list.forEach(([label, h]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; const late = isToday && (now.getHours() >= h - 1 || (mode() === 'livraison' && now.getHours() >= 14 && h >= 14 && now.getHours() >= 14)); const sunday = dow === 0 && h >= 13; b.disabled = late || sunday; b.addEventListener('click', () => { slot = label; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); render(); }); box.appendChild(b); });
+    if (isToday && mode() === 'livraison' && now.getHours() >= 14) { const p = document.createElement('p'); p.style.cssText = 'grid-column:1/-1;font-size:13px;color:var(--muted)'; p.textContent = 'Il est plus de 14 h : la livraison le jour même n\'est plus possible, choisissez demain.'; box.appendChild(p); }
+    render();
+  }
+  date.addEventListener('change', renderSlots); $$('input[name=mode]').forEach((r) => r.addEventListener('change', () => { $('#addrFields').classList.toggle('hidden', mode() === 'retrait'); renderSlots(); }));
+  $('#cp').addEventListener('input', () => { const v = $('#cp').value.trim(); const el = $('#zoneOk'); if (v.length < 5) { el.textContent = ''; el.className = 'zone-ok'; } else if (ZONES.includes(v)) { el.textContent = '✓ Zone livrée'; el.className = 'zone-ok ok'; } else { el.textContent = '✕ Hors zone de livraison'; el.className = 'zone-ok ko'; } render(); });
+  $('#msg').addEventListener('input', () => { const v = $('#msg').value; $('#msgCount').textContent = v.length + ' / 160'; $('#cardPrev').textContent = v || 'Votre message apparaîtra ici, écrit à la main sur une carte kraft.'; $('#fMsg').value = v; });
+  function save() { store.set(KEY, cart); render(); }
+  function render() {
+    const n = cart.reduce((s, c) => s + c.qty, 0); $('#cartCount').textContent = n;
+    $('#cartList').innerHTML = cart.length ? cart.map((c, i) => `<div class="ci"><span class="nm">${c.n}<small>${c.size} · ${euro(c.unit)}</small></span><span class="q"><button data-q="${i}:-1" aria-label="Moins">−</button>${c.qty}<button data-q="${i}:1" aria-label="Plus">+</button></span><span class="pr">${euro(c.unit * c.qty)}</span></div>`).join('') : '<p class="empty">Votre panier est vide — choisissez un bouquet ci-dessus.</p>';
+    $$('[data-q]').forEach((b) => b.addEventListener('click', () => { const [i, d] = b.dataset.q.split(':').map(Number); cart[i].qty += d; if (cart[i].qty <= 0) cart.splice(i, 1); save(); }));
+    const sub = cart.reduce((s, c) => s + c.unit * c.qty, 0); const ship = mode() === 'livraison' ? (sub >= 60 ? 0 : 6.9) : 0; const tot = sub + ship;
+    $('#totals').innerHTML = `<div><span>Sous-total</span><span>${euro(sub)}</span></div><div><span>${mode() === 'livraison' ? 'Livraison' + (ship === 0 && sub > 0 ? ' (offerte dès 60 €)' : '') : 'Retrait boutique'}</span><span>${ship ? euro(ship) : 'Offert'}</span></div><div class="tot"><span>Total</span><b>${euro(tot)}</b></div>`;
+    const zoneOk = mode() !== 'livraison' || ZONES.includes($('#cp').value.trim());
+    $('#submit').disabled = !(cart.length && slot && zoneOk); $('#fCart').value = cart.map((c) => `${c.qty}× ${c.n} ${c.size}`).join(', '); $('#fSlot').value = date.value + ' ' + (slot || ''); $('#fMode').value = mode(); $('#fTotal').value = euro(tot);
+  }
+  $('#form').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    if (mode() === 'livraison') { ['dest', 'adresse', 'cp'].forEach((id) => $('#' + id).required = true); } else { ['dest', 'adresse', 'cp'].forEach((id) => $('#' + id).required = false); }
+    if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    if (!slot) { toast('Choisissez un créneau.', 'err'); return; }
+    const btn = $('#submit'); btn.disabled = true; btn.textContent = 'Envoi…'; const ref = uid('PC-');
+    await sendNetlify(f, { reference: ref }); store.set('petale:commandes', [...store.get('petale:commandes', []), { ref, cart, slot, date: date.value, mode: mode(), total: $('#fTotal').value }]);
+    $('#doneText').textContent = `${$('#fCart').value} · ${$('#fTotal').value}. ${mode() === 'livraison' ? 'Livraison' : 'Retrait'} ${fmtDate(new Date(date.value + 'T12:00:00'))}, créneau ${slot}.${$('#msg').value ? ' Carte-message incluse.' : ''}`; $('#doneRef').textContent = 'Réf. ' + ref;
+    f.classList.add('hidden'); $('#done').classList.remove('hidden'); cart = []; store.set(KEY, cart); btn.disabled = false; btn.textContent = 'Commander'; render(); toast('Commande enregistrée !', 'ok');
+  });
+  $('#again').addEventListener('click', () => { $('#form').reset(); date.value = isoDate(today); $('#form').classList.remove('hidden'); $('#done').classList.add('hidden'); renderSlots(); });
+  renderSlots();
+
+  /* Abonnement */
+  $$('[data-abo]').forEach((b) => b.addEventListener('click', () => { const [n, p] = b.dataset.abo.split('|'); $('#aboName').textContent = `${n} · ${p} €/semaine`; $('#fAbo').value = n; $('.abo-form').scrollIntoView({ behavior: 'smooth', block: 'center' }); }));
+  $('#aboForm').addEventListener('submit', async (e) => { e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; } $('#aboSubmit').disabled = true; await sendNetlify(f); store.set('petale:abonnement', { formule: f.formule.value, jour: f.jour.value, freq: f.frequence.value }); $('#aboText').textContent = `${f.formule.value}, ${f.frequence.value.toLowerCase()}, livré le ${f.jour.value.toLowerCase()} à ${f.adresse.value}. Premier bouquet ${f.jour.value.toLowerCase()} prochain — vous pouvez mettre en pause à tout moment.`; f.classList.add('hidden'); $('#aboDone').classList.remove('hidden'); toast('Abonnement activé', 'ok'); });
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 1 ? 'Fermé' : i === 0 ? '9:00 – 13:00' : '9:00 – 19:30'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Lys — Institut de beauté & onglerie à Toulouse Capitole</title>
+<meta name="description" content="Institut de beauté et onglerie près du Capitole à Toulouse : soins visage, épilation, manucure semi-permanente, massages. Réservez plusieurs prestations d'un coup et offrez une carte cadeau en ligne.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23fbf7f4'/%3E%3Cpath d='M16 6c3 6 8 8 8 13a8 8 0 0 1-16 0c0-5 5-7 8-13z' fill='%23b89a7a'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BeautySalon","name":"Maison Lys","telephone":"+33561218844","priceRange":"€€","address":{"@type":"PostalAddress","streetAddress":"9 rue Saint-Rome","addressLocality":"Toulouse","postalCode":"31000","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6025,"longitude":1.4425},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:30","closes":"19:00"}],"url":"https://example.com/demos/institut/"}
+</script>
+<style>
+:root{--white:#fbf7f4;--gold:#b89a7a;--gold-d:#8f7257;--lilac:#e8e0ec;--ink:#2b2622;--muted:#7d746c;--accent:var(--gold);--focus:var(--gold-d);--border:#e9e0d8;--radius:2px;--ph:linear-gradient(135deg,#e8e0ec,#b89a7a);--mb-bg:#2b2622;--mb-bg2:#b89a7a}
+body{font-family:"Nunito Sans",system-ui,sans-serif;background:var(--white);color:var(--ink);font-weight:300}
+h1,h2,h3{font-family:Marcellus,Georgia,serif;font-weight:400;line-height:1.1;letter-spacing:.02em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 30px;font-weight:600;font-size:13px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;transition:all .3s;border:1px solid var(--ink)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{background:var(--gold);border-color:var(--gold)}
+.btn-line{color:var(--ink)}.btn-line:hover{background:var(--ink);color:#fff}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.header{position:sticky;top:0;z-index:40;background:rgba(251,247,244,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:78px}
+.brand{font-family:Marcellus;font-size:26px;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
+.brand small{display:block;font:300 10px "Nunito Sans";letter-spacing:.3em;color:var(--gold);margin-top:2px}
+.nav{display:flex;gap:30px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+.nav a{text-decoration:none}.nav a:hover{color:var(--gold)}
+@media (max-width:899px){.nav{position:fixed;inset:78px 0 0;background:var(--white);flex-direction:column;padding:40px;gap:28px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:16px}.nav.open{transform:none;visibility:visible}}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:86vh;align-items:center;gap:48px;padding:48px 0}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+@media (min-width:861px){.hero-img .ph2{right:-6%}}
+.hero h1{font-size:clamp(42px,5.5vw,76px)}
+.hero h1 span{color:var(--gold);font-style:italic}
+.hero p{font-size:18px;color:var(--muted);max-width:44ch;margin:24px 0 32px}
+.hero-img{position:relative}
+.hero-img .ph{aspect-ratio:4/5;border-radius:300px 300px 0 0}
+.hero-img .ph2{position:absolute;right:0;bottom:-8%;width:46%;aspect-ratio:1;border-radius:0;--ph:linear-gradient(135deg,#b89a7a,#8f7257);box-shadow:0 30px 60px rgba(43,38,34,.2);border:8px solid var(--white)}
+.eyebrow{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700}
+section{padding:96px 0}
+@media (max-width:700px){section{padding:64px 0}}
+.section-head{text-align:center;max-width:640px;margin:0 auto 52px}
+.section-head h2{font-size:clamp(32px,4.5vw,52px);margin-top:12px}
+.section-head p{color:var(--muted);margin-top:14px;font-size:17px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.card{background:#fff;border:1px solid var(--border);padding:0 0 24px;transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(43,38,34,.08)}
+.card .ph{aspect-ratio:4/3}
+.card:nth-child(2) .ph{--ph:linear-gradient(135deg,#f3d9d2,#c48a78)}.card:nth-child(3) .ph{--ph:linear-gradient(135deg,#d9e6dc,#7f9b86)}.card:nth-child(4) .ph{--ph:linear-gradient(135deg,#efe1cf,#b89a7a)}
+.card h3{font-size:22px;margin:20px 24px 8px}
+.card p{margin:0 24px;color:var(--muted);font-size:14px}
+.card .pr{margin:14px 24px 0;font-weight:600;letter-spacing:.1em;font-size:12px;text-transform:uppercase}
+/* Réservation */
+.booking{background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.book-grid{display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start}
+@media (max-width:960px){.book-grid{grid-template-columns:1fr}}
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.cat-tabs button{padding:10px 18px;border:1px solid var(--border);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.cat-tabs button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.svc-list{display:grid;gap:8px}
+.svc{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);background:var(--white);transition:all .2s}
+.svc:hover{border-color:var(--gold)}
+.svc.on{border-color:var(--gold);background:#fff;box-shadow:inset 3px 0 0 var(--gold)}
+.svc .chk{width:22px;height:22px;border:1.5px solid var(--border);display:grid;place-items:center;font-size:13px;flex:none;transition:all .2s}
+.svc.on .chk{background:var(--gold);border-color:var(--gold);color:#fff}
+.svc .nm{flex:1;text-align:left}.svc .nm strong{display:block;font-weight:600}.svc .nm small{color:var(--muted);font-size:13px}
+.svc .pr{font-family:Marcellus;font-size:18px;white-space:nowrap}
+.svc.hidden{display:none}
+.summary{position:sticky;top:96px;background:var(--white);border:1px solid var(--border);padding:24px}
+.summary h3{font-size:22px;margin-bottom:14px}
+.summary ul{display:grid;gap:8px;font-size:14px;margin-bottom:14px}
+.summary li{display:flex;justify-content:space-between;gap:10px}
+.summary li button{color:var(--gold-d);text-decoration:underline;font-size:12px}
+.summary .tot{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:12px;font-weight:600}
+.summary .tot b{font-family:Marcellus;font-size:22px;font-weight:400}
+.summary .dur{font-size:13px;color:var(--muted);margin-top:4px}
+.summary .empty{color:var(--muted);font-size:14px;padding:12px 0}
+.summary .field{margin-top:12px}
+.summary .btn{width:100%;margin-top:14px}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.slots button{padding:9px 4px;border:1px solid var(--border);font-size:13px;background:#fff}
+.slots button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.slots button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* Carte cadeau */
+.gift{background:var(--lilac)}
+.gift-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+@media (max-width:900px){.gift-grid{grid-template-columns:1fr}}
+.gift-card{aspect-ratio:1.6;background:linear-gradient(135deg,#2b2622,#5a4a3e);color:#fff;padding:28px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 40px 80px rgba(43,38,34,.3);position:relative;overflow:hidden;transition:transform .5s}
+.gift-card::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(184,154,122,.5),transparent 70%);right:-80px;top:-80px}
+.gift-card .lg{font-family:Marcellus;letter-spacing:.2em;text-transform:uppercase;font-size:14px}
+.gift-card .amt{font-family:Marcellus;font-size:56px;line-height:1}
+.gift-card .to{font-size:13px;opacity:.85}
+.gift-card .to b{display:block;font-size:16px;font-family:Marcellus;font-weight:400;letter-spacing:.05em}
+.gift-card .code{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.2em;opacity:.7}
+.amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 16px}
+.amounts button{padding:12px 0;border:1px solid var(--border);background:#fff;font-weight:600;font-family:Marcellus;font-size:18px}
+.amounts button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.gift form{display:grid;gap:12px}
+.gift .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.gift .row{grid-template-columns:1fr}}
+.gift .done{background:#fff;padding:24px;text-align:center}
+.gift .done h3{font-size:26px;margin-bottom:8px}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.review{background:#fff;border:1px solid var(--border);padding:28px;text-align:center}
+.review .stars{color:var(--gold);letter-spacing:4px;font-size:12px}
+.review p{font-family:Marcellus;font-size:19px;margin:14px 0;line-height:1.4}
+.review footer{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.faq{max-width:760px;margin:0 auto}
+.faq details{border-bottom:1px solid var(--border)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-family:Marcellus;font-size:19px;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--gold)}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:18px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:15px}
+.hours div.today{color:var(--gold-d);font-weight:600}
+.map{min-height:340px;background:#eee6df}
+.map iframe{width:100%;height:100%;min-height:340px;border:0}
+address{font-style:normal;line-height:1.8;margin:20px 0}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:44px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:26px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand">Maison Lys<small>Institut · Capitole</small></a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#soins">Soins</a><a href="#reserver">Réserver</a><a href="#cadeau">Carte cadeau</a><a href="#avis">Avis</a><a href="#acces">Accès</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="container hero" id="top">
+  <div>
+    <p class="eyebrow" data-reveal>Rue Saint-Rome · Capitole</p>
+    <h1 data-reveal>Le temps d'une <span>parenthèse</span></h1>
+    <p data-reveal>Soins visage sur-mesure, onglerie, épilation douce et massages, à deux pas de la place du Capitole. Composez votre rendez-vous en combinant plusieurs prestations, ou offrez une carte cadeau en un clic.</p>
+    <div data-reveal><a href="#reserver" class="btn btn-dark">Réserver</a> <a href="#cadeau" class="btn btn-line">Offrir</a></div>
+  </div>
+  <div class="hero-img" data-reveal="scale">
+    <div class="ph"><img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=70" alt="Soin du visage à l'institut Maison Lys" fetchpriority="high"></div>
+    <div class="ph ph2"><img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=500&q=70" alt="Manucure semi-permanente" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="soins" style="padding-top:72px"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Nos univers</p><h2>Quatre univers de soin</h2><p>Des protocoles doux, des marques propres, un institut à taille humaine.</p></div>
+  <div class="cards">
+    <article class="card" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=600&q=70" alt="Soin du visage" loading="lazy"></div><h3>Visage</h3><p>Soins éclat, hydratation profonde, peeling doux. Diagnostic de peau offert.</p><p class="pr">dès 55 €</p></article>
+    <article class="card" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=600&q=70" alt="Pose de vernis semi-permanent" loading="lazy"></div><h3>Onglerie</h3><p>Manucure, semi-permanent, gel, nail art délicat. Beauté des pieds.</p><p class="pr">dès 28 €</p></article>
+    <article class="card" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=70" alt="Massage relaxant" loading="lazy"></div><h3>Corps</h3><p>Massages relaxants ou drainants, gommages, enveloppements.</p><p class="pr">dès 60 €</p></article>
+    <article class="card" data-reveal><div class="ph"><img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=600&q=70" alt="Épilation" loading="lazy"></div><h3>Épilation</h3><p>Cire tiède hypoallergénique, zones au choix, formules combinées.</p><p class="pr">dès 12 €</p></article>
+  </div>
+</div></section>
+
+<section class="booking" id="reserver"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Réservation multi-prestations</p><h2>Composez votre rendez-vous</h2><p>Cochez autant de soins que vous le souhaitez : la durée totale et le prix se calculent, puis choisissez votre créneau.</p></div>
+  <div class="book-grid">
+    <div data-reveal>
+      <div class="cat-tabs" id="tabs"></div>
+      <div class="svc-list" id="svcList"></div>
+    </div>
+    <aside class="summary" data-reveal>
+      <h3>Votre rendez-vous</h3>
+      <div id="sumBody"><p class="empty">Aucune prestation sélectionnée.</p></div>
+      <form name="rdv-institut" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="rdvForm" novalidate>
+        <input type="hidden" name="form-name" value="rdv-institut"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="prestations" id="fSvc"><input type="hidden" name="creneau" id="fSlot"><input type="hidden" name="total" id="fTotal">
+        <div class="field"><label for="date">Date</label><input type="date" id="date" name="date" required></div>
+        <div class="slots" id="slots"></div>
+        <div class="field"><label for="nom">Nom et prénom</label><input id="nom" name="nom" required placeholder="Élise Martin"></div>
+        <div class="field"><label for="tel">Mobile</label><input id="tel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+        <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" required placeholder="elise@exemple.fr"></div>
+        <button type="submit" class="btn btn-dark" id="rdvSubmit" disabled>Confirmer le rendez-vous</button>
+      </form>
+      <div id="rdvDone" class="hidden" style="text-align:center;padding:12px 0"><p class="eyebrow">Confirmé</p><h3 id="rdvDoneText" style="margin:10px 0"></h3><p style="font-size:14px;color:var(--muted)" id="rdvDoneSub"></p><button class="btn btn-line" style="margin-top:14px" id="rdvAgain">Nouveau rendez-vous</button></div>
+    </aside>
+  </div>
+</div></section>
+
+<section class="gift" id="cadeau"><div class="container gift-grid">
+  <div data-reveal>
+    <p class="eyebrow">Carte cadeau</p>
+    <h2 style="font-size:clamp(32px,4.5vw,52px);margin:12px 0 10px">Offrir une parenthèse</h2>
+    <p style="color:var(--muted);margin-bottom:20px">Montant libre, message personnalisé, envoi par e-mail immédiat ou à la date de votre choix. Valable un an sur tous les soins.</p>
+    <form name="carte-cadeau" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="giftForm" novalidate>
+      <input type="hidden" name="form-name" value="carte-cadeau"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+      <input type="hidden" name="montant" id="gAmount" value="80">
+      <div><label class="eyebrow" style="display:block;margin-bottom:6px">Montant</label><div class="amounts" id="amounts"><button type="button" data-amt="50" aria-pressed="false">50 €</button><button type="button" data-amt="80" aria-pressed="true">80 €</button><button type="button" data-amt="120" aria-pressed="false">120 €</button><button type="button" data-amt="150" aria-pressed="false">150 €</button></div><div class="field"><label for="gCustom">ou montant libre (20 à 500 €)</label><input type="number" id="gCustom" min="20" max="500" placeholder="ex. 95"></div></div>
+      <div class="row"><div class="field"><label for="gTo">Pour</label><input id="gTo" name="beneficiaire" required placeholder="Prénom du ou de la destinataire"></div><div class="field"><label for="gFrom">De la part de</label><input id="gFrom" name="offert_par" required placeholder="Votre prénom"></div></div>
+      <div class="field"><label for="gMsg">Message (facultatif)</label><input id="gMsg" name="message" maxlength="90" placeholder="Prends soin de toi…"></div>
+      <div class="row"><div class="field"><label for="gEmail">E-mail d'envoi</label><input id="gEmail" name="email" type="email" required placeholder="destinataire@exemple.fr"></div><div class="field"><label for="gDate">Date d'envoi</label><input id="gDate" name="date_envoi" type="date"></div></div>
+      <button type="submit" class="btn btn-dark" id="giftSubmit">Commander la carte — <span id="giftTotal">80 €</span></button>
+    </form>
+    <div class="done hidden" id="giftDone"><h3>Carte cadeau créée</h3><p id="giftDoneText" style="color:var(--muted);font-size:14px"></p><p style="margin-top:12px;font-family:ui-monospace,monospace;letter-spacing:.2em" id="giftCode"></p><button class="btn btn-line" style="margin-top:16px" id="giftAgain">Offrir une autre carte</button></div>
+  </div>
+  <div class="gift-card" data-reveal="scale" id="giftCard">
+    <div class="lg">Maison Lys · Carte cadeau</div>
+    <div class="amt" id="cardAmt">80 €</div>
+    <div class="to"><b id="cardTo">Pour vous</b><span id="cardMsg">Prends soin de toi…</span></div>
+    <div class="code" id="cardCode">LYS-XXXX-XXXX</div>
+  </div>
+</div></section>
+
+<section id="avis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Elles en parlent</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>J'ai réservé soin visage + manucure dans la même session, enchaînés sans attente. Un vrai moment pour moi.</p><footer>Charlotte · Capitole</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Carte cadeau offerte à ma mère pour ses 60 ans, reçue par mail le jour J avec notre message. Elle a adoré.</p><footer>Mélanie · Saint-Georges</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Semi-permanent impeccable qui tient trois semaines. L'équipe est douce et précise.</p><footer>Sarah · Carmes</footer></article>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="container faq">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Vos questions</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Puis-je enchaîner plusieurs soins ?</summary><p>Oui, c'est tout l'intérêt de notre réservation multi-prestations : la durée totale est calculée et une seule praticienne (ou deux en parallèle pour les ongles) vous accompagne.</p></details>
+    <details><summary>Comment utiliser une carte cadeau ?</summary><p>Indiquez son code lors de la réservation ou présentez-la à l'accueil. Elle est valable 12 mois, sur tous les soins et produits.</p></details>
+    <details><summary>Quelle politique d'annulation ?</summary><p>Annulation gratuite jusqu'à 24 h avant. Au-delà, 30 % du montant est dû.</p></details>
+    <details><summary>Acceptez-vous les hommes ?</summary><p>Bien sûr. Soins visage, massages et manucure sont ouverts à tous.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(30px,4vw,44px);margin:12px 0 20px">Rue Saint-Rome, Capitole</h2><div class="hours" id="hours"></div><address><strong>Maison Lys</strong><br>9 rue Saint-Rome, 31000 Toulouse<br>Métro A · Capitole — Parking Capitole<br><a href="tel:+33561218844">05 61 21 88 44</a> · <a href="mailto:bonjour@maisonlys.fr">bonjour@maisonlys.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=9+rue+Saint-Rome+31000+Toulouse" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.4350%2C43.5985%2C1.4500%2C43.6065&layer=mapnik&marker=43.6025%2C1.4425"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Maison Lys — SAS Lys Beauté</span><button data-open-modal="#mentions">Mentions légales & confidentialité</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SAS Lys Beauté, 9 rue Saint-Rome, 31000 Toulouse. SIRET 845 678 901 00014. Directrice de publication : Camille Roussel. Hébergement : Netlify, Inc. Données de réservation et de carte cadeau conservées 24 mois, jamais cédées. Site de démonstration : entreprise fictive, aucune carte cadeau réelle n'est émise.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561218844">📞 Appeler</a><a href="#reserver">Réserver</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, pad, isoDate, fmtDate, cap, uid, store, toast, validate, sendNetlify } = Demo;
+  const SERVICES = [
+    { cat: 'Visage', id: 'v1', name: 'Soin éclat', dur: 45, price: 55 }, { cat: 'Visage', id: 'v2', name: 'Soin hydratation profonde', dur: 60, price: 75 }, { cat: 'Visage', id: 'v3', name: 'Peeling doux', dur: 30, price: 48 },
+    { cat: 'Onglerie', id: 'o1', name: 'Manucure classique', dur: 30, price: 28 }, { cat: 'Onglerie', id: 'o2', name: 'Semi-permanent mains', dur: 45, price: 42 }, { cat: 'Onglerie', id: 'o3', name: 'Beauté des pieds + semi', dur: 60, price: 55 }, { cat: 'Onglerie', id: 'o4', name: 'Dépose', dur: 15, price: 12 },
+    { cat: 'Corps', id: 'c1', name: 'Massage relaxant 60 min', dur: 60, price: 75 }, { cat: 'Corps', id: 'c2', name: 'Massage dos 30 min', dur: 30, price: 45 }, { cat: 'Corps', id: 'c3', name: 'Gommage corps', dur: 30, price: 40 },
+    { cat: 'Épilation', id: 'e1', name: 'Sourcils', dur: 15, price: 12 }, { cat: 'Épilation', id: 'e2', name: 'Demi-jambes', dur: 20, price: 24 }, { cat: 'Épilation', id: 'e3', name: 'Maillot + aisselles', dur: 25, price: 30 }, { cat: 'Épilation', id: 'e4', name: 'Jambes entières', dur: 40, price: 38 }
+  ];
+  const cats = [...new Set(SERVICES.map((s) => s.cat))];
+  const sel = new Set(store.get('maison-lys:sel', []));
+  let slot = null;
+  $('#tabs').innerHTML = `<button aria-pressed="true" data-cat="all">Tout</button>` + cats.map((c) => `<button aria-pressed="false" data-cat="${c}">${c}</button>`).join('');
+  $('#svcList').innerHTML = SERVICES.map((s) => `<button class="svc" data-id="${s.id}" data-cat="${s.cat}" type="button"><span class="chk">✓</span><span class="nm"><strong>${s.name}</strong><small>${s.cat} · ${s.dur} min</small></span><span class="pr">${s.price} €</span></button>`).join('');
+  $$('#tabs button').forEach((b) => b.addEventListener('click', () => { $$('#tabs button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); $$('.svc').forEach((s) => s.classList.toggle('hidden', b.dataset.cat !== 'all' && s.dataset.cat !== b.dataset.cat)); }));
+  $$('.svc').forEach((b) => b.addEventListener('click', () => { sel.has(b.dataset.id) ? sel.delete(b.dataset.id) : sel.add(b.dataset.id); store.set('maison-lys:sel', [...sel]); render(); }));
+
+  const date = $('#date'); const today = new Date(); date.min = isoDate(today); const max = new Date(today); max.setDate(max.getDate() + 45); date.max = isoDate(max);
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  function totals() { const items = SERVICES.filter((s) => sel.has(s.id)); return { items, dur: items.reduce((a, s) => a + s.dur, 0), price: items.reduce((a, s) => a + s.price, 0) }; }
+  function render() {
+    $$('.svc').forEach((b) => b.classList.toggle('on', sel.has(b.dataset.id)));
+    const t = totals();
+    $('#sumBody').innerHTML = t.items.length ? `<ul role="list">${t.items.map((s) => `<li><span>${s.name} <small style="color:var(--muted)">${s.dur} min</small></span><span>${s.price} € <button type="button" data-rm="${s.id}" aria-label="Retirer ${s.name}">retirer</button></span></li>`).join('')}</ul><div class="tot"><span>Total</span><b>${euro(t.price)}</b></div><p class="dur">Durée totale : ${t.dur >= 60 ? Math.floor(t.dur / 60) + ' h ' + (t.dur % 60 ? pad(t.dur % 60) : '') : t.dur + ' min'}</p>` : '<p class="empty">Aucune prestation sélectionnée.</p>';
+    $$('[data-rm]').forEach((b) => b.addEventListener('click', () => { sel.delete(b.dataset.rm); store.set('maison-lys:sel', [...sel]); render(); }));
+    renderSlots(); $('#fSvc').value = t.items.map((s) => s.name).join(', '); $('#fTotal').value = euro(t.price);
+    $('#rdvSubmit').disabled = !(t.items.length && slot);
+  }
+  function renderSlots() {
+    const box = $('#slots'); box.innerHTML = ''; const t = totals();
+    if (!date.value || !t.items.length) { box.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:var(--muted)">Choisissez des prestations et une date pour voir les créneaux.</p>'; slot = null; return; }
+    const d = new Date(date.value + 'T12:00:00'); if (d.getDay() === 0) { box.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:#991b1b">Fermé le dimanche.</p>'; slot = null; return; }
+    const taken = store.get('maison-lys:rdv', []).filter((r) => r.date === date.value);
+    let any = false;
+    for (let m = 570; m + t.dur <= 1140; m += 30) {
+      let ok = seeded(date.value + m) > 0.35 && !taken.some((r) => m < r.start + r.dur && m + t.dur > r.start);
+      if (date.value === isoDate(today) && m <= today.getHours() * 60 + today.getMinutes()) ok = false;
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = `${pad(m / 60 | 0)}:${pad(m % 60)}`; b.disabled = !ok; if (slot === m) b.classList.add('on'); if (ok) any = true;
+      b.addEventListener('click', () => { slot = m; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#fSlot').value = date.value + ' ' + b.textContent; $('#rdvSubmit').disabled = false; });
+      box.appendChild(b);
+    }
+    if (!any) box.innerHTML = '<p style="grid-column:1/-1;font-size:13px;color:#991b1b">Complet pour cette durée. Essayez une autre date.</p>';
+  }
+  date.addEventListener('change', () => { slot = null; render(); });
+  $('#rdvForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; const t = totals();
+    if (!validate(f) || !slot) { toast('Vérifiez les champs et le créneau.', 'err'); return; }
+    const btn = $('#rdvSubmit'); btn.disabled = true; btn.textContent = 'Envoi…';
+    const rdv = { id: uid('LYS-'), date: date.value, start: slot, dur: t.dur, items: t.items.map((s) => s.name), price: t.price };
+    await sendNetlify(f, { reference: rdv.id });
+    store.set('maison-lys:rdv', [...store.get('maison-lys:rdv', []), rdv]);
+    $('#rdvDoneText').textContent = `${cap(fmtDate(new Date(rdv.date + 'T12:00:00')))} à ${pad(slot / 60 | 0)}h${pad(slot % 60)}`;
+    $('#rdvDoneSub').textContent = `${rdv.items.join(' + ')} · ${euro(rdv.price)} · réf. ${rdv.id}. Confirmation envoyée par e-mail et SMS.`;
+    f.classList.add('hidden'); $('#rdvDone').classList.remove('hidden'); $('#sumBody').innerHTML = '';
+    sel.clear(); store.set('maison-lys:sel', []); slot = null; $$('.svc').forEach((b) => b.classList.remove('on'));
+    btn.disabled = false; btn.textContent = 'Confirmer le rendez-vous'; toast('Rendez-vous confirmé', 'ok');
+  });
+  $('#rdvAgain').addEventListener('click', () => { $('#rdvForm').reset(); $('#rdvForm').classList.remove('hidden'); $('#rdvDone').classList.add('hidden'); render(); });
+  render();
+
+  /* Carte cadeau : aperçu en direct + commande */
+  let amount = 80;
+  const upd = () => { $('#cardAmt').textContent = amount + ' €'; $('#giftTotal').textContent = amount + ' €'; $('#gAmount').value = amount; $('#cardTo').textContent = $('#gTo').value ? 'Pour ' + $('#gTo').value : 'Pour vous'; $('#cardMsg').textContent = $('#gMsg').value || 'Prends soin de toi…'; };
+  $$('#amounts button').forEach((b) => b.addEventListener('click', () => { $$('#amounts button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); amount = Number(b.dataset.amt); $('#gCustom').value = ''; upd(); }));
+  $('#gCustom').addEventListener('input', () => { const v = Number($('#gCustom').value); if (v >= 20 && v <= 500) { amount = v; $$('#amounts button').forEach((x) => x.setAttribute('aria-pressed', 'false')); upd(); } });
+  ['#gTo', '#gMsg'].forEach((s) => $(s).addEventListener('input', upd));
+  $('#gDate').min = isoDate(today);
+  $('#giftForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target;
+    const c = Number($('#gCustom').value); if ($('#gCustom').value && (c < 20 || c > 500)) { Demo.setError($('#gCustom'), 'Montant entre 20 et 500 €.'); return; }
+    if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const btn = $('#giftSubmit'); btn.disabled = true;
+    const code = 'LYS-' + Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    await sendNetlify(f, { code });
+    store.set('maison-lys:cartes', [...store.get('maison-lys:cartes', []), { code, amount, to: f.beneficiaire.value, at: Date.now() }]);
+    $('#cardCode').textContent = code; $('#giftCard').style.transform = 'rotate(-3deg) scale(1.03)';
+    $('#giftDoneText').textContent = `Carte de ${amount} € pour ${f.beneficiaire.value}, envoyée à ${f.email.value} ${f.date_envoi.value ? 'le ' + fmtDate(new Date(f.date_envoi.value + 'T12:00:00')) : 'immédiatement'}. Paiement sécurisé à l'étape suivante (simulé).`;
+    $('#giftCode').textContent = code; f.classList.add('hidden'); $('#giftDone').classList.remove('hidden'); btn.disabled = false; toast('Carte cadeau créée', 'ok');
+  });
+  $('#giftAgain').addEventListener('click', () => { $('#giftForm').reset(); $('#giftForm').classList.remove('hidden'); $('#giftDone').classList.add('hidden'); amount = 80; $$('#amounts button').forEach((x) => x.setAttribute('aria-pressed', x.dataset.amt === '80')); $('#cardCode').textContent = 'LYS-XXXX-XXXX'; $('#giftCard').style.transform = ''; upd(); });
+  upd();
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="${i === dow ? 'today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Fermé' : '9:30 – 19:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>

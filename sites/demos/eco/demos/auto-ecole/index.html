@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auto-école Envol — Permis B et conduite accompagnée à Blagnac, Toulouse</title>
+<meta name="description" content="Auto-école à Blagnac (Toulouse) : permis B, conduite accompagnée, code en ligne. Calculez votre tarif, réservez vos leçons, suivez vos heures et entraînez-vous au code avec notre quiz.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/base.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232e4bff'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23ffd60a'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"DrivingSchool","name":"Auto-école Envol","telephone":"+33561713344","address":{"@type":"PostalAddress","streetAddress":"18 place des Marronniers","addressLocality":"Blagnac","postalCode":"31700","addressCountry":"FR"},"geo":{"@type":"GeoCoordinates","latitude":43.6350,"longitude":1.3900},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"19:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"09:00","closes":"13:00"}],"url":"https://example.com/demos/auto-ecole/"}
+</script>
+<style>
+:root{--blue:#2e4bff;--blue-d:#1d33c4;--yellow:#ffd60a;--ink:#0b1033;--bg:#f5f6fb;--muted:#5d6482;--accent:var(--blue);--focus:var(--blue-d);--border:#dfe2ef;--radius:14px;--ph:linear-gradient(135deg,#2e4bff,#0b1033);--mb-bg:#2e4bff;--mb-bg2:#0b1033}
+body{font-family:Figtree,system-ui,sans-serif;background:#fff;color:var(--ink)}
+h1,h2,h3{font-family:Outfit,sans-serif;font-weight:900;line-height:1.02;letter-spacing:-.02em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:12px;font-weight:600;text-decoration:none;transition:all .2s;font-size:15px}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(46,75,255,.3)}.btn-blue:hover{background:var(--blue-d);transform:translateY(-2px)}
+.btn-yellow{background:var(--yellow);color:var(--ink)}.btn-yellow:hover{background:#f5cd00}
+.btn-line{border:2px solid var(--ink)}.btn-line:hover{background:var(--ink);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{font-family:Outfit;font-weight:900;font-size:22px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand i{width:34px;height:34px;border-radius:10px;background:var(--blue);display:grid;place-items:center;color:var(--yellow);font-style:normal;font-size:18px}
+.nav{display:flex;gap:22px;align-items:center;font-weight:500;font-size:14px}
+.nav a{text-decoration:none}.nav a:not(.btn):hover{color:var(--blue)}
+.nav .btn{padding:10px 16px}
+@media (max-width:899px){.nav{position:fixed;inset:70px 0 0;background:#fff;flex-direction:column;padding:32px;gap:24px;transform:translateX(100%);visibility:hidden;transition:transform .35s,visibility .35s;font-size:20px}.nav.open{transform:none;visibility:visible}}
+.hero{background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(46,75,255,.5),transparent 50%),radial-gradient(circle at 10% 90%,rgba(255,214,10,.2),transparent 40%)}
+.hero .container{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:72px 0}
+@media (max-width:900px){.hero .container{grid-template-columns:1fr;padding:48px 0}}
+.hero h1{font-size:clamp(40px,6.5vw,84px)}
+.hero h1 span{color:var(--yellow)}
+.hero p{font-size:18px;opacity:.85;max-width:48ch;margin:20px 0 28px}
+.hero .rate{display:flex;gap:28px;margin-top:36px;flex-wrap:wrap}
+.hero .rate b{display:block;font-family:Outfit;font-size:36px;color:var(--yellow)}
+.hero .rate span{font-size:13px;opacity:.8}
+.hero-img .ph{aspect-ratio:4/3;border-radius:24px;transform:rotate(2deg);box-shadow:0 40px 80px rgba(0,0,0,.4)}
+section{padding:88px 0}
+@media (max-width:700px){section{padding:60px 0}}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.section-head{max-width:640px;margin-bottom:36px}
+.section-head h2{font-size:clamp(30px,4.5vw,52px);margin-top:8px}
+.section-head p{color:var(--muted);margin-top:12px;font-size:17px}
+/* Tarifs */
+.tarif-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:900px){.tarif-grid{grid-template-columns:1fr}}
+.card{background:var(--bg);border-radius:20px;padding:28px;border:1px solid var(--border)}
+@media (max-width:600px){.card{padding:20px}}
+.card h3{font-size:22px;margin-bottom:14px}
+.forfaits{display:grid;gap:10px}
+.forfait{display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.forfait[aria-pressed="true"]{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,75,255,.12)}
+.forfait .nm{flex:1}.forfait .nm b{display:block}.forfait .nm small{color:var(--muted);font-size:13px}
+.forfait .pr{font-family:Outfit;font-size:22px;color:var(--blue);white-space:nowrap}
+.lbl{display:block;font-weight:600;font-size:14px;margin:18px 0 8px}
+.range-row{display:flex;align-items:center;gap:14px}
+.range-row input{flex:1;accent-color:var(--blue)}
+.range-row output{font-family:Outfit;font-size:22px;min-width:50px;text-align:right}
+.opts{display:grid;gap:8px}
+.opts label{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;font-size:14px}
+.opts label:has(input:checked){border-color:var(--blue);background:#eef1ff}
+.opts input{accent-color:var(--blue);margin-right:10px}
+.total-box{background:var(--ink);color:#fff;border-radius:20px;padding:28px;position:sticky;top:90px}
+.total-box h3{font-size:18px;opacity:.8;margin-bottom:8px}
+.total-box .big{font-family:Outfit;font-size:56px;line-height:1;color:var(--yellow)}
+.total-box .lines{display:grid;gap:8px;margin:18px 0;font-size:14px}
+.total-box .lines div{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,.15);padding-bottom:6px}
+.total-box .mens{background:rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;font-size:14px}
+.total-box .mens b{font-family:Outfit;font-size:20px;color:var(--yellow)}
+/* Espace élève */
+.eleve{background:var(--bg)}
+.eleve-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+@media (max-width:900px){.eleve-grid{grid-template-columns:1fr}}
+.prog{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border)}
+.prog h3{font-size:22px;display:flex;justify-content:space-between;align-items:baseline}
+.prog h3 small{font:600 13px Figtree;color:var(--muted)}
+.ring{width:160px;height:160px;margin:18px auto;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:12}
+.ring .bg{stroke:var(--bg)}
+.ring .fg{stroke:var(--blue);stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.2,.7,.2,1)}
+.ring .txt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .txt b{font-family:Outfit;font-size:38px;line-height:1}
+.ring .txt span{font-size:12px;color:var(--muted)}
+.skills{display:grid;gap:10px}
+.skill{font-size:13px}
+.skill div{display:flex;justify-content:space-between;margin-bottom:4px}
+.skill i{display:block;height:8px;border-radius:999px;background:var(--bg);overflow:hidden}
+.skill i::after{content:"";display:block;height:100%;width:var(--w);background:var(--blue);border-radius:999px;transition:width .8s}
+.lessons{margin-top:18px;font-size:14px}
+.lessons h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.lessons article{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border)}
+.lessons article button{color:#b91c1c;text-decoration:underline;font-size:12px}
+.book{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border)}
+.book h3{font-size:22px;margin-bottom:14px}
+.monos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.monos button{border:2px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;background:#fff}
+.monos button[aria-pressed="true"]{border-color:var(--blue);background:#eef1ff}
+.monos i{display:block;width:44px;height:44px;border-radius:50%;margin:0 auto 6px;background:var(--ph)}
+.monos b{display:block;font-size:14px}.monos small{font-size:11px;color:var(--muted)}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-top:8px}
+.days button{flex:none;width:64px;padding:8px 0;border:2px solid var(--border);border-radius:12px;font-size:11px;color:var(--muted);background:#fff}
+.days button b{display:block;font-family:Outfit;font-size:20px;color:var(--ink)}
+.days button[aria-pressed="true"]{border-color:var(--blue);background:#eef1ff}
+.days button[disabled]{opacity:.35;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-top:8px}
+.slots button{padding:10px 4px;border:2px solid var(--border);border-radius:10px;font-weight:600;font-size:14px;background:#fff}
+.slots button[disabled]{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+.slots button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.book .btn{width:100%;margin-top:14px}
+/* Quiz */
+.quiz{background:var(--ink);color:#fff}
+.quiz .eyebrow{color:var(--yellow)}.quiz .section-head p{color:rgba(255,255,255,.75)}
+.quiz-box{background:#fff;color:var(--ink);border-radius:24px;padding:32px;max-width:760px;margin:0 auto}
+@media (max-width:600px){.quiz-box{padding:20px}}
+.quiz-bar{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600}
+.quiz-prog{height:6px;background:var(--bg);border-radius:999px;overflow:hidden;margin-bottom:22px}
+.quiz-prog i{display:block;height:100%;background:var(--blue);transition:width .3s}
+.quiz-q{font-family:Outfit;font-size:clamp(20px,3vw,26px);font-weight:700;line-height:1.2;margin-bottom:18px}
+.quiz-img{aspect-ratio:16/7;border-radius:14px;margin-bottom:18px;display:grid;place-items:center;font-size:60px;background:var(--bg)}
+.answers{display:grid;gap:10px}
+.answers button{text-align:left;padding:14px 16px;border:2px solid var(--border);border-radius:14px;font-weight:500;transition:all .15s;display:flex;gap:12px;align-items:center;background:#fff}
+.answers button:hover:not([disabled]){border-color:var(--blue)}
+.answers button i{width:28px;height:28px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:13px;flex:none}
+.answers button.ok{border-color:#16a34a;background:#dcfce7}.answers button.ko{border-color:#dc2626;background:#fee2e2}
+.answers button[disabled]{cursor:default}
+.explain{margin-top:14px;padding:14px;border-radius:12px;background:var(--bg);font-size:14px;color:var(--muted)}
+.quiz-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px;flex-wrap:wrap}
+.score{text-align:center;padding:20px 0}
+.score .big{font-family:Outfit;font-size:72px;line-height:1;color:var(--blue)}
+.score .big small{font-size:24px;color:var(--muted)}
+.score p{color:var(--muted);margin:10px 0 20px}
+.score .hist{font-size:13px;color:var(--muted);margin-top:14px}
+.reviews{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.review{background:var(--bg);border-radius:var(--radius);padding:22px;border:1px solid var(--border)}
+.review .stars{color:#f59e0b;letter-spacing:2px}
+.review p{margin:10px 0 12px;font-size:15px}
+.review footer{font-size:13px;color:var(--muted);font-weight:600}
+.faq details{border:1px solid var(--border);border-radius:12px;padding:0 16px;margin-bottom:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:600;display:flex;justify-content:space-between}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--blue);font-size:20px}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);padding-bottom:14px;font-size:15px}
+.access{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media (max-width:850px){.access{grid-template-columns:1fr}}
+.hours .row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:15px}
+.hours .row.today{font-weight:700;color:var(--blue)}
+.map{border-radius:var(--radius);overflow:hidden;min-height:320px;background:var(--bg);border:1px solid var(--border)}
+.map iframe{width:100%;height:100%;min-height:320px;border:0}
+address{font-style:normal;line-height:1.8;margin:14px 0}
+footer.site{background:var(--ink);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
+footer.site .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.site button{text-decoration:underline}
+.modal-box h3{font-size:22px}
+</style>
+</head>
+<body>
+<header class="header" data-header><div class="container">
+  <a href="#" class="brand"><i>🚗</i>Envol</a>
+  <nav class="nav" data-nav aria-label="Navigation principale"><a href="#tarifs">Tarifs</a><a href="#eleve">Espace élève</a><a href="#quiz">Quiz code</a><a href="#avis">Avis</a><a href="#acces">Accès</a><a href="#tarifs" class="btn btn-blue">Calculer mon tarif</a></nav>
+  <button class="burger" data-burger aria-expanded="false" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+</div></header>
+
+<section class="hero" id="top"><div class="container">
+  <div>
+    <p class="eyebrow" data-reveal style="color:var(--yellow)">Auto-école · Blagnac · agglomération toulousaine</p>
+    <h1 data-reveal>Le permis, <span>sans stress</span> et sans surprise</h1>
+    <p data-reveal>Moniteurs patients, voitures récentes (boîte manuelle et automatique), code en ligne illimité. Un prix clair calculé en 30 secondes, des leçons réservées depuis votre téléphone, et votre progression en temps réel.</p>
+    <div data-reveal><a href="#tarifs" class="btn btn-yellow">Calculer mon tarif</a> <a href="#quiz" class="btn btn-line" style="border-color:#fff;color:#fff">Tester le code</a></div>
+    <div class="rate" data-reveal><div><b>84 %</b><span>de réussite au permis B</span></div><div><b>4,8/5</b><span>sur 410 avis</span></div><div><b>6</b><span>moniteurs diplômés</span></div></div>
+  </div>
+  <div class="hero-img" data-reveal="scale"><div class="ph"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1000&q=70" alt="Leçon de conduite sur les routes de Blagnac" fetchpriority="high"></div></div>
+</div></section>
+
+<section id="tarifs"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Calculateur de tarif</p><h2>Combien va coûter mon permis ?</h2><p>Choisissez votre formule, ajustez le nombre d'heures, ajoutez les options : le total se met à jour en direct. Aucun frais caché.</p></div>
+  <div class="tarif-grid">
+    <div class="card" data-reveal>
+      <h3>1. Votre formule</h3>
+      <div class="forfaits" id="forfaits"></div>
+      <span class="lbl">2. Heures de conduite <span style="font-weight:400;color:var(--muted)">(20 h minimum légal, moyenne nationale 30 h)</span></span>
+      <div class="range-row"><input type="range" id="hours" min="20" max="45" value="25"><output id="hoursOut">25 h</output></div>
+      <span class="lbl">3. Options</span>
+      <div class="opts" id="opts">
+        <label><span><input type="checkbox" value="auto" data-p="150">Boîte automatique</span><b>+150 €</b></label>
+        <label><span><input type="checkbox" value="codeplus" data-p="60">Stage code intensif (3 jours)</span><b>+60 €</b></label>
+        <label><span><input type="checkbox" value="exam" data-p="55">Accompagnement examen (véhicule + moniteur)</span><b>+55 €</b></label>
+        <label><span><input type="checkbox" value="finance" data-p="0">Paiement en 10 fois sans frais</span><b>0 €</b></label>
+      </div>
+    </div>
+    <div class="total-box" data-reveal="right">
+      <h3>Votre tarif estimé</h3>
+      <div class="big" id="total"></div>
+      <div class="lines" id="lines"></div>
+      <div class="mens" id="mens"></div>
+      <a href="#eleve" class="btn btn-yellow" style="width:100%;margin-top:16px">S'inscrire et réserver une leçon</a>
+      <p style="font-size:12px;opacity:.6;margin-top:10px">Frais d'inscription et livret inclus. Présentation à l'examen du code : 30 € (frais ANTS).</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="eleve" id="eleve"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Espace élève</p><h2>Réservez vos leçons, suivez votre progression</h2><p>Chaque leçon réservée s'ajoute à votre compteur. Les compétences sont validées par votre moniteur après chaque séance.</p></div>
+  <div class="eleve-grid">
+    <div class="book" data-reveal>
+      <h3>Réserver une leçon</h3>
+      <span class="lbl">Moniteur</span>
+      <div class="monos" id="monos"></div>
+      <span class="lbl">Jour</span>
+      <div class="days" id="days"></div>
+      <span class="lbl">Créneau (leçon de 1 h)</span>
+      <div class="slots" id="slots"></div>
+      <form name="lecon-auto-ecole" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="form" novalidate>
+        <input type="hidden" name="form-name" value="lecon-auto-ecole"><p class="honey"><label>Ne pas remplir : <input name="bot-field"></label></p>
+        <input type="hidden" name="moniteur" id="fMono"><input type="hidden" name="creneau" id="fSlot">
+        <div class="field" style="margin-top:14px"><label for="eleveNom">Nom de l'élève</label><input id="eleveNom" name="eleve" required placeholder="Prénom Nom"></div>
+        <div class="field" style="margin-top:10px"><label for="eleveTel">Mobile (rappel SMS)</label><input id="eleveTel" name="telephone" type="tel" required placeholder="06 12 34 56 78"></div>
+        <button type="submit" class="btn btn-blue" id="submit" disabled>Réserver cette leçon</button>
+      </form>
+    </div>
+    <div class="prog" data-reveal="right">
+      <h3>Ma progression <small id="progName"></small></h3>
+      <div class="ring"><svg viewBox="0 0 120 120" width="160" height="160"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringFg" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg><div class="txt"><div><b id="ringH">0</b><span>h sur <span id="ringTot">25</span> prévues</span></div></div></div>
+      <div class="skills" id="skills"></div>
+      <div class="lessons" id="lessons"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="quiz" id="quiz"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Entraînement au code</p><h2>10 questions, comme à l'examen</h2><p>Une seule bonne réponse par question. À l'examen, il faut 35 bonnes réponses sur 40 : visez 9/10 ici.</p></div>
+  <div class="quiz-box" data-reveal id="quizBox"></div>
+</div></section>
+
+<section id="avis"><div class="container">
+  <div class="section-head" data-reveal><p class="eyebrow">Avis</p><h2>Ils ont eu le permis avec nous</h2></div>
+  <div class="reviews">
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Permis du premier coup en 27 h. Le suivi de progression m'a aidée à voir ce qu'il restait à travailler avant l'examen.</p><footer>Inès, 19 ans · Blagnac</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Réservation des leçons depuis le téléphone, à l'heure du déjeuner. Moniteurs calmes, voitures nickel.</p><footer>Mathis, 24 ans · Purpan</footer></article>
+    <article class="review" data-reveal><div class="stars">★★★★★</div><p>Le calculateur de tarif annonçait 1 290 €, j'ai payé 1 290 €. Rare dans ce milieu.</p><footer>Sandrine, reprise après 20 ans sans conduire</footer></article>
+  </div>
+</div></section>
+
+<section class="faq" style="padding-top:0"><div class="container" style="max-width:800px">
+  <div class="section-head" data-reveal><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></div>
+  <div data-faq data-reveal>
+    <details><summary>Combien d'heures faut-il en moyenne ?</summary><p>20 h minimum sont obligatoires ; nos élèves passent le permis après 28 h en moyenne. Le forfait peut être complété heure par heure au même tarif.</p></details>
+    <details><summary>Puis-je utiliser le permis à 1 € par jour ?</summary><p>Oui, nous sommes labellisés : prêt de 600 à 1 200 € à taux zéro pour les 15-25 ans. Nous préparons le dossier avec vous.</p></details>
+    <details><summary>Comment annuler une leçon ?</summary><p>Depuis votre espace élève jusqu'à 48 h avant, sans frais. Au-delà, la leçon est due sauf justificatif.</p></details>
+    <details><summary>Proposez-vous la conduite accompagnée ?</summary><p>Oui, dès 15 ans : 20 h de conduite puis 1 an minimum et 3 000 km avec vos accompagnateurs, deux rendez-vous pédagogiques inclus.</p></details>
+  </div>
+</div></section>
+
+<section id="acces" style="padding-top:0"><div class="container access">
+  <div data-reveal><p class="eyebrow">Accès</p><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 14px">Place des Marronniers, Blagnac</h2><div class="hours" id="horaires"></div><address><strong>Auto-école Envol</strong><br>18 place des Marronniers, 31700 Blagnac<br>Tram T1 · Place Georges Brassens<br><a href="tel:+33561713344">05 61 71 33 44</a> · <a href="mailto:contact@envol-permis.fr">contact@envol-permis.fr</a></address><a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=18+place+des+Marronniers+31700+Blagnac" target="_blank" rel="noopener">Itinéraire ↗</a></div>
+  <div class="map" data-reveal="right"><iframe title="Plan d'accès" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=1.3820%2C43.6310%2C1.3980%2C43.6390&layer=mapnik&marker=43.6350%2C1.3900"></iframe></div>
+</div></section>
+
+<footer class="site"><div class="container"><span>© <span data-year></span> Auto-école Envol — SARL Envol Formation · Agrément E 19 031 0012 0</span><button data-open-modal="#mentions">Mentions légales</button></div></footer>
+<div class="modal" id="mentions" aria-hidden="true" role="dialog"><div class="modal-box"><button class="modal-close" data-close-modal aria-label="Fermer">×</button><h3>Mentions légales</h3><p style="font-size:14px;color:var(--muted);margin-top:10px">SARL Envol Formation, 18 place des Marronniers, 31700 Blagnac. SIRET 912 345 678 00021. Agrément préfectoral E 19 031 0012 0. Directeur de publication : Olivier Castan. Hébergement : Netlify, Inc. Les données de réservation servent à organiser vos leçons ; la progression affichée est mémorisée sur votre appareil. Site de démonstration : établissement fictif, tarifs indicatifs.</p></div></div>
+<div class="mobile-bar"><a href="tel:+33561713344">📞 Appeler</a><a href="#tarifs">Mon tarif</a></div>
+
+<script src="../../assets/base.js"></script>
+<script>
+(function () {
+  const { $, $$, euro, pad, isoDate, fmtDate, cap, uid, store, toast, validate, sendNetlify } = Demo;
+  /* ---------- Tarifs ---------- */
+  const FORFAITS = [{ id: 'b', n: 'Permis B classique', s: 'Code en ligne + 20 h de conduite', base: 1190, h: 20, extra: 48 }, { id: 'aac', n: 'Conduite accompagnée (AAC)', s: 'Dès 15 ans, 20 h + 2 RDV pédagogiques', base: 1290, h: 20, extra: 46 }, { id: 'cs', n: 'Conduite supervisée', s: 'Dès 18 ans, après 20 h', base: 1240, h: 20, extra: 47 }, { id: 'auto', n: 'Permis boîte automatique', s: '13 h minimum, code inclus', base: 990, h: 13, extra: 52 }];
+  let forfait = FORFAITS[0];
+  $('#forfaits').innerHTML = FORFAITS.map((f, i) => `<button class="forfait" data-f="${f.id}" aria-pressed="${i === 0}"><span class="nm"><b>${f.n}</b><small>${f.s}</small></span><span class="pr">${f.base} €</span></button>`).join('');
+  $$('[data-f]').forEach((b) => b.addEventListener('click', () => { $$('[data-f]').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); forfait = FORFAITS.find((f) => f.id === b.dataset.f); const h = $('#hours'); h.min = forfait.h; if (Number(h.value) < forfait.h) h.value = forfait.h; if (forfait.id === 'auto') $('input[value=auto]').checked = false; calc(); }));
+  function calc() {
+    const h = Number($('#hours').value); $('#hoursOut').value = h + ' h';
+    const extraH = Math.max(0, h - forfait.h); const opts = $$('#opts input:checked').filter((o) => !(o.value === 'auto' && forfait.id === 'auto'));
+    const total = forfait.base + extraH * forfait.extra + opts.reduce((s, o) => s + Number(o.dataset.p), 0);
+    $('#total').textContent = euro(total); $('#ringTot').textContent = h;
+    $('#lines').innerHTML = `<div><span>${forfait.n} (${forfait.h} h)</span><span>${euro(forfait.base)}</span></div>${extraH ? `<div><span>${extraH} h supplémentaire${extraH > 1 ? 's' : ''} × ${forfait.extra} €</span><span>${euro(extraH * forfait.extra)}</span></div>` : ''}${opts.map((o) => `<div><span>${o.parentElement.textContent.trim()}</span><span>${euro(Number(o.dataset.p))}</span></div>`).join('')}`;
+    const fin = $('input[value=finance]').checked; $('#mens').innerHTML = fin ? `Soit <b>${euro(total / 10)}</b> / mois pendant 10 mois, sans frais.` : `Permis à 1 €/jour : jusqu'à <b>1 200 €</b> financés à taux zéro (15-25 ans).`;
+    store.set('envol:tarif', { forfait: forfait.id, h, total });
+  }
+  const savedT = store.get('envol:tarif'); if (savedT) { forfait = FORFAITS.find((f) => f.id === savedT.forfait) || forfait; $$('[data-f]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.f === forfait.id))); $('#hours').value = savedT.h; }
+  $('#hours').addEventListener('input', calc); $('#opts').addEventListener('change', calc); calc();
+
+  /* ---------- Réservation + progression ---------- */
+  const MONOS = [{ id: 'karim', n: 'Karim', s: 'Boîte manuelle', g: 'linear-gradient(135deg,#2e4bff,#9db0ff)' }, { id: 'lucie', n: 'Lucie', s: 'Auto & manuelle', g: 'linear-gradient(135deg,#ffd60a,#ff8a00)' }, { id: 'paul', n: 'Paul', s: 'Boîte automatique', g: 'linear-gradient(135deg,#0b1033,#5d6482)' }];
+  const KEY = 'envol:lecons'; let lessons = store.get(KEY, []); const st = { mono: MONOS[0], date: null, time: null };
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const seeded = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; };
+  $('#monos').innerHTML = MONOS.map((m, i) => `<button data-mono="${m.id}" aria-pressed="${i === 0}"><i style="background:${m.g}"></i><b>${m.n}</b><small>${m.s}</small></button>`).join('');
+  $$('[data-mono]').forEach((b) => b.addEventListener('click', () => { $$('[data-mono]').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); st.mono = MONOS.find((m) => m.id === b.dataset.mono); st.time = null; renderSlots(); }));
+  const box = $('#days');
+  for (let i = 0; i < 14; i++) { const d = new Date(today); d.setDate(d.getDate() + i); const b = document.createElement('button'); b.type = 'button'; b.disabled = d.getDay() === 0; b.dataset.date = isoDate(d); b.innerHTML = `${fmtDate(d, { weekday: 'short' })}<b>${d.getDate()}</b>`; if (!st.date && !b.disabled) { st.date = isoDate(d); b.setAttribute('aria-pressed', 'true'); } else b.setAttribute('aria-pressed', 'false'); b.addEventListener('click', () => { st.date = b.dataset.date; st.time = null; $$('#days button').forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); renderSlots(); }); box.appendChild(b); }
+  function renderSlots() {
+    const s = $('#slots'); s.innerHTML = ''; const now = new Date(); const sat = new Date(st.date + 'T12:00:00').getDay() === 6;
+    for (let h = 8; h < (sat ? 13 : 20); h++) { const t = pad(h) + ':00'; const busy = seeded(st.mono.id + st.date + t) < 0.4 || lessons.some((l) => l.mono === st.mono.id && l.date === st.date && l.time === t) || (st.date === isoDate(now) && h <= now.getHours()); const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.disabled = busy; if (st.time === t) b.classList.add('on'); b.addEventListener('click', () => { st.time = t; $$('#slots button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); $('#submit').disabled = false; $('#fMono').value = st.mono.n; $('#fSlot').value = st.date + ' ' + t; }); s.appendChild(b); }
+    $('#submit').disabled = !st.time;
+  }
+  renderSlots();
+  const SKILLS = [['Maîtriser le véhicule', 0], ['Circuler en ville', 0], ['Voie rapide & autoroute', 0], ['Manœuvres & stationnement', 0], ['Conduite autonome', 0]];
+  function renderProg() {
+    const n = lessons.length; const tot = Number($('#hours').value) || 25; $('#ringH').textContent = n; $('#ringFg').style.strokeDashoffset = 326.7 * (1 - Math.min(1, n / tot));
+    $('#progName').textContent = store.get('envol:eleve', '') ? store.get('envol:eleve') : 'Nouvel élève';
+    $('#skills').innerHTML = SKILLS.map((s, i) => { const p = Math.min(100, Math.max(0, Math.round((n - i * 4) / 6 * 100))); return `<div class="skill"><div><span>${s[0]}</span><span>${p >= 100 ? '✓ Validé' : p + ' %'}</span></div><i style="--w:${p}%"></i></div>`; }).join('');
+    const up = lessons.filter((l) => l.date >= isoDate(today)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    $('#lessons').innerHTML = `<h4>${up.length ? 'Prochaines leçons' : 'Aucune leçon à venir'}</h4>` + up.map((l) => `<article><span><strong>${cap(fmtDate(new Date(l.date + 'T12:00:00'), { weekday: 'short', day: 'numeric', month: 'short' }))} · ${l.time}</strong> avec ${MONOS.find((m) => m.id === l.mono).n}</span><button data-cancel="${l.id}">Annuler</button></article>`).join('');
+    $$('[data-cancel]').forEach((b) => b.addEventListener('click', () => { lessons = lessons.filter((l) => l.id !== b.dataset.cancel); store.set(KEY, lessons); renderProg(); renderSlots(); toast('Leçon annulée.'); }));
+  }
+  $('#hours').addEventListener('input', renderProg);
+  $('#form').addEventListener('submit', async (e) => {
+    e.preventDefault(); const f = e.target; if (!validate(f)) { toast('Vérifiez les champs en rouge.', 'err'); return; }
+    const btn = $('#submit'); btn.disabled = true; btn.textContent = 'Envoi…'; const l = { id: uid('L-'), mono: st.mono.id, date: st.date, time: st.time };
+    await sendNetlify(f, { reference: l.id }); lessons.push(l); store.set(KEY, lessons); store.set('envol:eleve', f.eleve.value);
+    st.time = null; btn.textContent = 'Réserver cette leçon'; renderSlots(); renderProg(); toast(`Leçon réservée le ${fmtDate(new Date(l.date + 'T12:00:00'))} à ${l.time} avec ${st.mono.n}. SMS de rappel la veille.`, 'ok');
+  });
+  renderProg();
+
+  /* ---------- Quiz code ---------- */
+  const QUESTIONS = [
+    { q: 'En agglomération, sauf indication contraire, la vitesse est limitée à :', ic: '🏙️', a: ['30 km/h', '50 km/h', '70 km/h'], ok: 1, e: 'La vitesse maximale en agglomération est de 50 km/h, sauf signalisation spécifique (zone 30, zone de rencontre 20).' },
+    { q: 'Le taux d\'alcoolémie maximal autorisé pour un conducteur en permis probatoire est de :', ic: '🍷', a: ['0,2 g/l de sang', '0,5 g/l de sang', '0,8 g/l de sang'], ok: 0, e: 'Pendant la période probatoire (3 ans, ou 2 ans après AAC), la limite est de 0,2 g/l, soit zéro verre.' },
+    { q: 'À une intersection sans signalisation, je dois céder le passage :', ic: '🔀', a: ['Aux véhicules venant de gauche', 'Aux véhicules venant de droite', 'À personne, je suis prioritaire'], ok: 1, e: 'C\'est la règle de la priorité à droite.' },
+    { q: 'Sur autoroute, la distance de sécurité minimale correspond à :', ic: '🛣️', a: ['1 seconde', '2 secondes', '5 secondes'], ok: 1, e: 'Deux secondes au minimum, soit deux bandes d\'arrêt d\'urgence à 130 km/h (environ 73 m).' },
+    { q: 'Un panneau triangulaire à bord rouge signale :', ic: '⚠️', a: ['Une interdiction', 'Un danger', 'Une obligation'], ok: 1, e: 'Les panneaux triangulaires indiquent un danger ; les ronds rouges une interdiction ; les ronds bleus une obligation.' },
+    { q: 'Par temps de pluie, la vitesse maximale sur autoroute est de :', ic: '🌧️', a: ['110 km/h', '120 km/h', '130 km/h'], ok: 0, e: 'Par temps de pluie : 110 km/h sur autoroute, 100 km/h sur route à chaussées séparées, 80 km/h sur route.' },
+    { q: 'Le nombre de points d\'un permis probatoire la première année est de :', ic: '🪪', a: ['6 points', '8 points', '12 points'], ok: 0, e: 'Le permis probatoire commence à 6 points et gagne 2 points par an (3 par an après AAC) jusqu\'à 12.' },
+    { q: 'Je peux téléphoner au volant :', ic: '📱', a: ['Avec un kit mains libres à oreillette', 'Uniquement avec le haut-parleur intégré au véhicule', 'Jamais, même à l\'arrêt moteur tournant'], ok: 1, e: 'Les oreillettes et casques sont interdits depuis 2015. Seul un dispositif intégré au véhicule (Bluetooth) est toléré.' },
+    { q: 'Un feu orange clignotant signifie :', ic: '🚦', a: ['Arrêt obligatoire', 'Passage autorisé avec prudence, priorité à droite s\'applique', 'Passage prioritaire'], ok: 1, e: 'Le feu orange clignotant signale un carrefour où l\'on passe avec prudence, en respectant la priorité à droite.' },
+    { q: 'Dans un rond-point (sens giratoire avec cédez-le-passage), la priorité est :', ic: '🔄', a: ['Aux véhicules déjà engagés dans l\'anneau', 'Aux véhicules qui entrent', 'À droite'], ok: 0, e: 'Dans un carrefour à sens giratoire, les véhicules déjà engagés ont la priorité. Attention : dans un rond-point sans panneau, c\'est la priorité à droite.' }
+  ];
+  let qi = 0, score = 0, answered = false;
+  function renderQ() {
+    const box = $('#quizBox'); const q = QUESTIONS[qi];
+    box.innerHTML = `<div class="quiz-bar"><span>Question ${qi + 1} / ${QUESTIONS.length}</span><span>Score : ${score}</span></div><div class="quiz-prog"><i style="width:${qi / QUESTIONS.length * 100}%"></i></div><div class="quiz-img" aria-hidden="true">${q.ic}</div><p class="quiz-q">${q.q}</p><div class="answers">${q.a.map((a, i) => `<button data-a="${i}"><i>${'ABC'[i]}</i>${a}</button>`).join('')}</div><div class="explain hidden" id="explain"></div><div class="quiz-foot"><span style="font-size:13px;color:var(--muted)">Une seule réponse possible</span><button class="btn btn-blue hidden" id="nextQ">${qi === QUESTIONS.length - 1 ? 'Voir mon score' : 'Question suivante'}</button></div>`;
+    answered = false;
+    $$('[data-a]').forEach((b) => b.addEventListener('click', () => { if (answered) return; answered = true; const i = Number(b.dataset.a); if (i === q.ok) { score++; b.classList.add('ok'); } else { b.classList.add('ko'); $(`[data-a="${q.ok}"]`).classList.add('ok'); } $$('[data-a]').forEach((x) => x.disabled = true); $('#explain').textContent = (i === q.ok ? '✓ Bonne réponse. ' : '✕ Mauvaise réponse. ') + q.e; $('#explain').classList.remove('hidden'); $('#nextQ').classList.remove('hidden'); $('#nextQ').focus(); }));
+    $('#nextQ').addEventListener('click', () => { qi++; qi < QUESTIONS.length ? renderQ() : renderScore(); });
+  }
+  function renderScore() {
+    const hist = store.get('envol:quiz', []); hist.push({ score, at: Date.now() }); store.set('envol:quiz', hist.slice(-10));
+    const best = Math.max(...hist.map((h) => h.score));
+    $('#quizBox').innerHTML = `<div class="score"><p class="eyebrow">Résultat</p><div class="big">${score}<small> / ${QUESTIONS.length}</small></div><p>${score >= 9 ? 'Excellent, vous êtes prêt·e pour l\'examen du code !' : score >= 7 ? 'Bien ! Encore quelques révisions sur les thèmes ratés.' : 'Continuez l\'entraînement : le code en ligne illimité est inclus dans tous nos forfaits.'}</p><button class="btn btn-blue" id="retry">Recommencer</button> <a href="#tarifs" class="btn btn-line">Voir les forfaits</a><p class="hist">${hist.length} test${hist.length > 1 ? 's' : ''} effectué${hist.length > 1 ? 's' : ''} sur cet appareil · meilleur score ${best}/10</p></div>`;
+    $('#retry').addEventListener('click', () => { qi = 0; score = 0; renderQ(); });
+  }
+  renderQ();
+
+  const names = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']; const dow = new Date().getDay();
+  $("#horaires").innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 ? 'Fermé' : i === 6 ? '9:00 – 13:00' : '9:00 – 12:30 · 14:00 – 19:00'}</span></div>`).join('');
+})();
+</script>
+</body>
+</html>
