@@ -116,7 +116,7 @@ body { background: var(--paper); color: var(--ink); font: 400 17px/1.55 var(--di
 .idx b { display: inline-grid; place-items: center; min-width: 30px; height: 22px; margin-right: 10px; padding: 0 6px; background: var(--ink); color: var(--paper); font-weight: 600; }
 .idx--film b { background: var(--accent); color: #fff; }
 .film__shot { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: clamp(24px, 4vw, 72px); }
-.shot__title { margin-top: 16px; font: 600 clamp(46px, 8.6vw, 152px) / 0.87 var(--display); letter-spacing: -0.06em; }
+.shot__title { margin-top: 16px; font: 600 clamp(44px, 6.5vw, 126px) / 0.88 var(--display); letter-spacing: -0.06em; }
 .shot__text { margin-top: 20px; max-width: 33em; font-size: clamp(16px, 1.35vw, 20px); line-height: 1.45; }
 .shot__data { display: grid; gap: 0; min-width: 200px; margin-right: clamp(0px, 14vw, 230px); border-top: 1px solid rgba(255, 255, 255, 0.55); }
 .shot__data div { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.55); }

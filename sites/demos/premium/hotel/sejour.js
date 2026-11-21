@@ -34,7 +34,7 @@ const fmtDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeri
 const fmtShort = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
 const fmtLong = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 const fmtMonth = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
-const euros = (v) => v.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }) + ' €';
+const euros = (v) => v.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }) + '\u00a0€';
 const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
 
 // ---------- calendrier fictif : nuits déjà prises, en jours à partir d'aujourd'hui ----------

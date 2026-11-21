@@ -461,7 +461,7 @@ function start() {
   B.finish(model);
 
   // lumières propres à la maquette : la chambre choisie, le bassin le soir
-  const roomLight = new THREE.PointLight('#ffd09a', 0, 7, 1.6);
+  const roomLight = new THREE.PointLight('#ffd09a', 0, 4.4, 1.6);
   const poolLight = new THREE.PointLight('#4fdccd', 0, 9, 1.4);
   poolLight.position.set((pool.x0 + pool.x1) / 2, 0.9, (pool.z0 + pool.z1) / 2);
   model.add(roomLight, poolLight);
@@ -580,7 +580,7 @@ function start() {
     if (!width || !height) return;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
-    const aspect = width / height, half = Math.max(7.5, 9.6 / aspect);
+    const aspect = width / height, half = Math.max(7.5, 10.1 / aspect);
     camera.left = -half * aspect; camera.right = half * aspect; camera.top = half; camera.bottom = -half;
     camera.updateProjectionMatrix();
     wake();
@@ -641,7 +641,7 @@ function start() {
       facing.copy(room.normal).applyAxisAngle(THREE.Object3D.DEFAULT_UP, turn.rotation.y);
       room.pin.classList.toggle('is-away', facing.dot(viewDir) < 0.05);
     }
-    roomLight.intensity = light * lerp(7, 20, mood);
+    roomLight.intensity = light * lerp(5, 11, mood);
     turn.updateMatrixWorld();
     renderer.render(scene, camera);
   }
