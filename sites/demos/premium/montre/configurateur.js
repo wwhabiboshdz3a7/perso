@@ -28,7 +28,7 @@ const CASES = {
 };
 const DIALS = {
   bleu: { base: '#1b3566', light: '150, 185, 255', dark: '0, 4, 14', edge: '2, 5, 14', vignette: 1, ink: '#efe6d2', hands: '#e6c787' },
-  argent: { base: '#c6c9ce', light: '255, 255, 255', dark: '70, 76, 90', edge: '60, 66, 78', vignette: 0.5, ink: '#17191d', hands: '#24272d' },
+  argent: { base: '#b4b8be', light: '255, 255, 255', dark: '70, 76, 90', edge: '60, 66, 78', vignette: 0.5, ink: '#17191d', hands: '#24272d', shine: 0.42 },
   vert: { base: '#17452f', light: '165, 235, 195', dark: '0, 10, 5', edge: '0, 8, 4', vignette: 1, ink: '#efe6d2', hands: '#e6c787' },
   noir: { base: '#131417', light: '175, 182, 198', dark: '0, 0, 0', edge: '0, 0, 0', vignette: 0.9, ink: '#efe6d2', hands: '#dfe1e5' },
 };
@@ -483,6 +483,8 @@ async function start() {
     // aiguilles et index : dorés sur les cadrans sombres, noircis sur l'argent, assortis à l'or rose
     handTarget.set(body === CASES.rose && dialName !== 'argent' ? '#efbd9b' : dial.hands);
     dialFace.material.map = dialMap(dialName);
+    dialFace.material.envMapIntensity = dial.shine || 1; // l'argent renvoie déjà beaucoup de lumière
+    dialFace.material.clearcoat = dial.shine ? 0.3 : 0.7;
     dialFace.material.needsUpdate = true;
     print.material.map = printMap(dial.ink);
     print.material.needsUpdate = true;
@@ -560,9 +562,11 @@ async function start() {
     lastTouch = performance.now();
     wake();
   };
+  let lastMove = 0;
   canvas.addEventListener('pointerdown', (event) => {
     dragging = true;
     velocity = 0;
+    lastMove = event.timeStamp;
     lastX = event.clientX;
     lastY = event.clientY;
     canvas.setPointerCapture(event.pointerId);
@@ -573,11 +577,16 @@ async function start() {
     if (!dragging) return;
     const dx = (event.clientX - lastX) * 0.01;
     turn(dx, (event.clientY - lastY) * 0.006);
-    velocity = dx * 40;
+    // élan à la libération : la vitesse du dernier geste, bornée
+    velocity = clamp(dx / Math.max((event.timeStamp - lastMove) / 1000, 0.008), -3.5, 3.5);
+    lastMove = event.timeStamp;
     lastX = event.clientX;
     lastY = event.clientY;
   });
-  const release = () => { dragging = false; };
+  const release = (event) => {
+    dragging = false;
+    if (event.timeStamp - lastMove > 120) velocity = 0; // geste arrêté avant de lâcher
+  };
   canvas.addEventListener('pointerup', release);
   canvas.addEventListener('pointercancel', release);
   canvas.addEventListener('keydown', (event) => {
@@ -630,6 +639,7 @@ async function start() {
     shadowMaterial.opacity = 0.26 * (1 - clamp(open * 6));
     crystalVeil.material.opacity = open * 0.14;
     crystalVeil.visible = open > 0.01;
+    sapphire.specularIntensity = lerp(0.55, 0.1, open); // sortie de la lunette, la glace reste transparente
     lamp.intensity = open * 10;
 
     // ----- orientation -----

@@ -3,18 +3,18 @@
 
 // x0 / x1 : emprise du lot sur la façade, en mètres (lue par la maquette).
 export const LOTS = [
-  { id: 'A001', rooms: 3, area: 66, ext: 38, kind: 'Jardin privatif', level: 0, x0: -15, x1: -4, aspect: 'Sud-ouest et nord-ouest', price: 389000, status: 'vendu' },
-  { id: 'A002', rooms: 4, area: 84, ext: 52, kind: 'Jardin privatif', level: 0, x0: 0, x1: 15, aspect: 'Sud-ouest et sud-est', price: 472000, status: 'dispo' },
-  { id: 'A101', rooms: 2, area: 44, ext: 9, kind: 'Loggia', level: 1, x0: -15, x1: -8, aspect: 'Sud-ouest et nord-ouest', price: 259000, status: 'dispo' },
+  { id: 'A001', rooms: 3, area: 66, ext: 38, kind: 'Jardin privatif', level: 0, x0: -15, x1: -4, aspect: 'Sud-ouest · nord-ouest', price: 389000, status: 'vendu' },
+  { id: 'A002', rooms: 4, area: 84, ext: 52, kind: 'Jardin privatif', level: 0, x0: 0, x1: 15, aspect: 'Sud-ouest · sud-est', price: 472000, status: 'dispo' },
+  { id: 'A101', rooms: 2, area: 44, ext: 9, kind: 'Loggia', level: 1, x0: -15, x1: -8, aspect: 'Sud-ouest · nord-ouest', price: 259000, status: 'dispo' },
   { id: 'A102', rooms: 3, area: 65, ext: 12, kind: 'Terrasse', level: 1, x0: -8, x1: 3, aspect: 'Traversant sud-ouest', price: 379000, status: 'dispo' },
-  { id: 'A103', rooms: 4, area: 86, ext: 14, kind: 'Terrasse', level: 1, x0: 3, x1: 15, aspect: 'Sud-ouest et sud-est', price: 489000, status: 'option' },
-  { id: 'A201', rooms: 3, area: 67, ext: 12, kind: 'Terrasse', level: 2, x0: -15, x1: -5, aspect: 'Sud-ouest et nord-ouest', price: 392000, status: 'dispo' },
+  { id: 'A103', rooms: 4, area: 86, ext: 14, kind: 'Terrasse', level: 1, x0: 3, x1: 15, aspect: 'Sud-ouest · sud-est', price: 489000, status: 'option' },
+  { id: 'A201', rooms: 3, area: 67, ext: 12, kind: 'Terrasse', level: 2, x0: -15, x1: -5, aspect: 'Sud-ouest · nord-ouest', price: 392000, status: 'dispo' },
   { id: 'A202', rooms: 2, area: 46, ext: 9, kind: 'Loggia', level: 2, x0: -5, x1: 2, aspect: 'Sud-ouest', price: 268000, status: 'vendu' },
-  { id: 'A203', rooms: 4, area: 88, ext: 14, kind: 'Terrasse', level: 2, x0: 2, x1: 15, aspect: 'Sud-ouest et sud-est', price: 505000, status: 'vendu' },
-  { id: 'A301', rooms: 4, area: 91, ext: 31, kind: 'Terrasse', level: 3, x0: -15, x1: 1, aspect: 'Sud-ouest et nord-ouest', price: 548000, status: 'dispo' },
-  { id: 'A302', rooms: 3, area: 69, ext: 26, kind: 'Terrasse', level: 3, x0: 1, x1: 15, aspect: 'Sud-ouest et sud-est', price: 428000, status: 'option' },
+  { id: 'A203', rooms: 4, area: 88, ext: 14, kind: 'Terrasse', level: 2, x0: 2, x1: 15, aspect: 'Sud-ouest · sud-est', price: 505000, status: 'vendu' },
+  { id: 'A301', rooms: 4, area: 91, ext: 31, kind: 'Terrasse', level: 3, x0: -15, x1: 1, aspect: 'Sud-ouest · nord-ouest', price: 548000, status: 'dispo' },
+  { id: 'A302', rooms: 3, area: 69, ext: 26, kind: 'Terrasse', level: 3, x0: 1, x1: 15, aspect: 'Sud-ouest · sud-est', price: 428000, status: 'option' },
   { id: 'A401', rooms: 5, area: 112, ext: 38, kind: 'Terrasse', level: 4, x0: -15, x1: 3, aspect: 'Triple orientation', price: 695000, status: 'dispo' },
-  { id: 'A402', rooms: 2, area: 48, ext: 22, kind: 'Terrasse', level: 4, x0: 3, x1: 13, aspect: 'Sud-ouest et sud-est', price: 298000, status: 'dispo' },
+  { id: 'A402', rooms: 2, area: 48, ext: 22, kind: 'Terrasse', level: 4, x0: 3, x1: 13, aspect: 'Sud-ouest · sud-est', price: 298000, status: 'dispo' },
   { id: 'A501', rooms: 5, area: 124, ext: 96, kind: 'Terrasse d’attique', level: 5, x0: -11, x1: 9, aspect: 'Quatre orientations', price: 865000, status: 'dispo' },
 ];
 

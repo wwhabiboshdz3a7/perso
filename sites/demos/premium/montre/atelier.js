@@ -76,7 +76,7 @@ const nextOpen = (date) => {
   while (!isOpen(day)) day.setDate(day.getDate() + 1);
   return day;
 };
-const longDate = (date) => date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+const longDate = (date) => date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/ 1 /, ' 1er ');
 const isoDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 for (const input of $$('[data-open-days]')) {

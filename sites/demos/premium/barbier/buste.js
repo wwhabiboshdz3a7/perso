@@ -19,6 +19,7 @@ const pause = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const CLAY = '#d9c6a8';
 const HAIR = '#1b1917';
+const BASE = -2.3; // hauteur de la coupe du buste
 
 // ---------- formes de base ----------
 function ell(x, y, z, cx, cy, cz, rx, ry, rz) {
@@ -45,21 +46,21 @@ function skull(ax, y, z) {
   d = smin(d, ell(ax, y, z, 0, -0.22, 0.2, 0.6, 0.86, 0.58), 0.22);
   d = smin(d, ell(ax, y, z, 0, -0.66, 0.06, 0.5, 0.36, 0.5), 0.2);
   d = smin(d, Math.hypot(ax, y + 0.88, z - 0.44) - 0.22, 0.2);
-  d = smin(d, cone(ax, y, z, 0, -0.5, -0.3, 0, -2.2, -0.52, 0.4, 0.45), 0.18);
+  d = smin(d, cone(ax, y, z, 0, -0.5, -0.3, 0, -1.95, -0.5, 0.4, 0.44), 0.18);
   return d;
 }
 function head(ax, y, z) {
   let d = skull(ax, y, z);
   if (y < -1.2) {
-    d = smin(d, ell(ax, y, z, 0, -2.52, -0.5, 1.28, 0.56, 0.68), 0.5); // épaules
-    d = Math.max(d, -2.62 - y); // coupe nette à la base
+    d = smin(d, ell(ax, y, z, 0, -2.2, -0.5, 1.22, 0.5, 0.66), 0.45); // épaules
+    d = Math.max(d, BASE - y); // coupe nette à la base
   } else if (d < 0.45) {
     d = smin(d, ell(ax, y, z, 0, 0.2, 0.62, 0.48, 0.1, 0.2), 0.12); // arcade
-    d = smax(d, 0.15 - Math.hypot(ax - 0.27, y - 0.04, z - 0.84), 0.1); // orbites
+    d = smax(d, 0.13 - Math.hypot(ax - 0.27, y - 0.05, z - 0.89), 0.13); // orbites
     d = smin(d, cone(ax, y, z, 0, 0.12, 0.72, 0, -0.3, 0.9, 0.062, 0.108), 0.07); // nez
-    d = smin(d, ell(ax, y, z, 0, -0.64, 0.66, 0.2, 0.075, 0.1), 0.1); // bouche, à peine
-    const ex = ax - (0.74 - 0.32 * (z + 0.1));
-    d = smin(d, ell(ex, y, z, 0, -0.1, -0.1, 0.05, 0.3, 0.17), 0.045); // oreille
+    d = smin(d, ell(ax, y, z, 0, -0.64, 0.66, 0.19, 0.06, 0.085), 0.1); // bouche, à peine
+    const ex = ax - (0.745 - 0.22 * (z + 0.1));
+    d = smin(d, ell(ex, y, z, 0, -0.1, -0.1, 0.045, 0.25, 0.135), 0.045); // oreille
   }
   return d;
 }
@@ -69,7 +70,7 @@ const ZC = -0.12; // axe vertical du crâne
 const azimuth = (x, z) => Math.abs(Math.atan2(x, z - ZC)); // 0 = face, π = nuque
 // hauteur de la ligne d'implantation selon l'azimut : front, tempe, patte, tour d'oreille, nuque
 const hairline = (a) => 0.8 - 0.95 * ss(0.6, 1.05, a) + 0.45 * ss(1.22, 1.45, a) - 0.85 * ss(1.72, 2.3, a);
-const sideOf = (a) => ss(0.55, 1.1, a);
+const sideOf = (a) => ss(0.45, 0.85, a);
 const levelOf = (a, h0, side, drop, min) => Math.max(h0 + min, side - drop * ss(1.6, 2.6, a));
 
 // Chaque coupe : la teinte peinte sur le crâne [densité, hauteur du fondu sur les côtés, chute vers
@@ -77,15 +78,15 @@ const levelOf = (a, h0, side, drop, min) => Math.max(h0 + min, side - drop * ss(
 // et le volume de cheveux (champ de distance), s'il y en a un.
 const CUTS = {
   degrade: {
-    tint: [1, 0.5, 0.55, 0.1, 0.55],
+    tint: [1, 0.62, 0.62, 0.1, 0.62],
     view: -0.95,
     field(x, y, z, s) {
       const a = azimuth(x, z), h0 = hairline(a), side = sideOf(a);
-      const level = levelOf(a, h0, 0.5, 0.55, 0.1);
-      const grow = lerp(1, ss(level - 0.1, level + 0.34, y), side);
-      const top = ss(0.5, 1.05, y);
+      const level = levelOf(a, h0, 0.62, 0.62, 0.1);
+      const grow = lerp(1, ss(level - 0.06, level + 0.42, y), side);
+      const top = ss(0.6, 1.1, y);
       const quiff = ss(0.15, 0.7, z) * ss(0.62, 1, y) * (1 - ss(0.3, 0.64, Math.abs(x)));
-      const t = 0.075 + 0.075 * top + 0.11 * quiff + 0.011 * Math.sin((x + 0.22 * z) * 46) * top;
+      const t = 0.058 + 0.07 * top + 0.085 * quiff + 0.006 * Math.sin((x + 0.22 * z) * 46) * top;
       return Math.max(s - (t * grow - 0.045 * (1 - grow)), (h0 - y) * 0.8);
     },
   },
@@ -111,19 +112,19 @@ const CUTS = {
       const grow = lerp(1, ss(level - 0.06, level + 0.26, y), side);
       const mid = 1 - ss(0.22, 0.8, ax);
       const front = Math.pow(ss(-0.6, 0.66, z), 1.6);
-      const t = 0.1 + 0.34 * front * mid * ss(0.55, 1, y);
+      const t = 0.085 + 0.25 * front * mid * ss(0.55, 1, y);
       let d = Math.max(s - (t * grow - 0.045 * (1 - grow)), (h0 - y) * 0.8);
-      d = smin(d, ell(ax, y, z, 0, 1.36, 0.5, 0.46, 0.27, 0.4), 0.22); // le rouleau au-dessus du front
-      return d - 0.012 * Math.sin(x * 44) * ss(0.7, 1, y); // sillons du peigne
+      d = smin(d, ell(ax, y, z, 0, 1.27, 0.5, 0.42, 0.21, 0.36), 0.22); // le rouleau au-dessus du front
+      return d - 0.008 * Math.sin(x * 44) * ss(0.7, 1, y); // sillons du peigne
     },
   },
-  tondu: { tint: [0.8, -9, 0, 0.09, 0.09], view: -0.7, field: null },
+  tondu: { tint: [0.9, -9, 0, 0.1, 0.1], view: -0.7, field: null },
 };
 
 // Barbes : [densité peinte, douceur du bord] et volume éventuel.
 const BEARDS = {
   rase: { tint: [0, 0.02], field: null },
-  trois: { tint: [0.6, 0.035], field: null },
+  trois: { tint: [0.74, 0.03], field: null },
   pleine: {
     tint: [1, 0.012],
     field(x, y, z, s) {
@@ -134,7 +135,7 @@ const BEARDS = {
       const am = 1.28 + 0.25 * ss(-0.35, -0.6, y);
       const chin = ss(-0.5, -1, y) * (1 - ss(0.3, 0.95, a));
       const grow = ss(yc + 0.02, yc - 0.2, y) * ss(am + 0.02, am - 0.3, a);
-      const t = 0.075 + 0.11 * chin + 0.01 * Math.sin(y * 40 + Math.abs(x) * 9);
+      const t = 0.06 + 0.085 * chin;
       const mouth = 1 - Math.hypot(x / 0.2, (y + 0.66) / 0.06);
       return Math.max(s - (t * grow - 0.045 * (1 - grow)), yn - y, mouth * 0.05);
     },
@@ -156,7 +157,7 @@ const GLSL_HEAD = /* glsl */ `
     float a = abs(atan(p.x, p.z + 0.12));
     float h0 = lameLine(a);
     float aa = clamp(fwidth(p.y) * 1.5, 0.004, 0.03);
-    float side = smoothstep(0.55, 1.1, a);
+    float side = smoothstep(0.45, 0.85, a);
     float level = max(h0 + uScalp.w, uScalp.y - uScalp.z * smoothstep(1.6, 2.6, a));
     float ramp = smoothstep(max(h0, level - uFade), level, p.y);
     float scalp = uScalp.x * smoothstep(h0 - aa, h0 + aa, p.y) * mix(1.0, ramp, side);
@@ -168,8 +169,8 @@ const GLSL_HEAD = /* glsl */ `
     float beard = uBeard.x * (1.0 - smoothstep(yc - e, yc + e, p.y)) * smoothstep(yn - e, yn + e, p.y)
       * (1.0 - smoothstep(am - e * 2.0, am + e * 2.0, a)) * smoothstep(1.0 - e * 4.0, 1.0 + e * 4.0, mouth);
     float m = max(scalp, beard);
-    float grain = lameNoise(p * 58.0);
-    return clamp(m + (grain - 0.5) * 1.5 * m * (1.0 - m), 0.0, 1.0);
+    float grain = lameNoise(p * 84.0);
+    return clamp(m + (grain - 0.5) * 1.1 * m * (1.0 - m), 0.0, 1.0);
   }`;
 
 // ---------- du champ au maillage : « surface nets » ----------
@@ -307,8 +308,8 @@ async function start() {
 
   // ----- grille commune : la tête y est échantillonnée une fois, les cheveux la réutilisent -----
   const CELL = 0.035;
-  const dims = [83, 136, 75];
-  const min = [-((dims[0] - 1) / 2) * CELL, -2.76, -1.32];
+  const dims = [79, 127, 75];
+  const min = [-((dims[0] - 1) / 2) * CELL, BASE - 0.14, -1.32];
   const [nx, ny, nz] = dims;
   const total = nx * ny * nz;
   const skullGrid = new Float32Array(total);
@@ -356,12 +357,12 @@ async function start() {
 
   // socle et ombre de contact
   const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.12, 64), new THREE.MeshStandardMaterial({ color: '#0f0e0d', roughness: 0.5 }));
-  plinth.scale.set(1.16, 1, 0.66);
-  plinth.position.set(0, -2.68, -0.5);
+  plinth.scale.set(1.1, 1, 0.64);
+  plinth.position.set(0, BASE - 0.06, -0.5);
   const ring = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.03, 64), new THREE.MeshStandardMaterial({ color: '#9b1c1c', roughness: 0.6 }));
-  ring.scale.set(1.2, 1, 0.7);
-  ring.position.set(0, -2.755, -0.5);
-  const shadow = softDisc({ radius: 2.4, color: '#000000', opacity: 0.5, y: -2.77 });
+  ring.scale.set(1.14, 1, 0.68);
+  ring.position.set(0, BASE - 0.135, -0.5);
+  const shadow = softDisc({ radius: 2.3, color: '#000000', opacity: 0.5, y: BASE - 0.152 });
   shadow.position.z = -0.5;
   bust.add(plinth, ring);
   scene.add(shadow);
@@ -380,7 +381,7 @@ async function start() {
         const z = min[2] + k * CELL;
         for (let j = 0; j < ny; j++) {
           const y = min[1] + j * CELL;
-          if (y < -1.6) continue;
+          if (y < -1.6) continue; // rien ne pousse sous le cou
           const row = nx * (j + ny * k);
           for (let i = 0; i < half; i++) {
             const s = skullGrid[row + i];
@@ -547,9 +548,9 @@ async function start() {
     // au repos, la tête se balance à peine : assez pour lire le volume, jamais un manège
     const sway = reduced ? 0 : Math.sin(time * 0.55) * 0.13 * ss(1.5, 4, idle);
     const fovY = THREE.MathUtils.degToRad(camera.fov) / 2;
-    const distance = Math.max(2.5 / Math.tan(fovY), 1.5 / (Math.tan(fovY) * camera.aspect));
-    camera.position.set(0, -0.42 + Math.sin(pitch) * distance, Math.cos(pitch) * distance - 0.3);
-    camera.lookAt(0, -0.42, -0.3);
+    const distance = Math.max(2.45 / Math.tan(fovY), 1.5 / (Math.tan(fovY) * camera.aspect));
+    camera.position.set(0, -0.58 + Math.sin(pitch) * distance, Math.cos(pitch) * distance - 0.3);
+    camera.lookAt(0, -0.58, -0.3);
     bust.rotation.y = yaw + sway;
     renderer.render(scene, camera);
   }
