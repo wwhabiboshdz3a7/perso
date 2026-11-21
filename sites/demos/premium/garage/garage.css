@@ -201,7 +201,7 @@ body { background: var(--ink); color: var(--paper); font: 400 17px/1.55 var(--di
 .fiche__foot .btn { min-height: 46px; padding: 0 18px; font-size: 12px; }
 @media (max-width: 1000px) {
   .xp__head, .xp__body { grid-template-columns: 1fr; }
-  .xp__view { min-height: min(96vw, 520px); }
+  .xp__view { min-height: min(78vw, 520px); }
 }
 @media (max-width: 640px) {
   .xp__ctrl { grid-template-columns: 1fr; }

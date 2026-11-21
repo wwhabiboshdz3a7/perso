@@ -51,7 +51,7 @@ body { background: var(--paper); color: var(--ink); font: 400 17px/1.55 var(--di
 .top__nav { display: flex; gap: clamp(14px, 2.2vw, 34px); }
 .top__nav a { display: inline-flex; align-items: center; min-height: 44px; font: 500 11.5px/1 var(--mono-font); letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
 .top__nav a:hover { color: var(--accent-deep); }
-.top__cta { min-height: 40px; padding: 0 16px; font-size: 15px; }
+.top__cta { min-height: 44px; padding: 0 16px; font-size: 15px; white-space: nowrap; }
 @media (max-width: 900px) { .top__nav { display: none; } }
 
 /* ---------- ouverture ---------- */
@@ -152,7 +152,7 @@ body { background: var(--paper); color: var(--ink); font: 400 17px/1.55 var(--di
 .chips input:focus-visible + span, .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
 .range { display: grid; gap: 2px; flex: 1 1 220px; max-width: 360px; }
 .range output { margin-left: 8px; font-weight: 700; color: var(--accent-deep); }
-input[type="range"] { width: 100%; height: 32px; margin: 0; accent-color: var(--accent-deep); cursor: pointer; }
+input[type="range"] { width: 100%; height: 44px; margin: 0; accent-color: var(--accent-deep); cursor: pointer; }
 .check { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; cursor: pointer; }
 .check input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); flex: none; }
 .maq__count { margin-left: auto; color: var(--muted); }
@@ -360,7 +360,7 @@ tr:is(:hover, .is-selected) .lot-btn::after { opacity: 1; }
 .sim input[type="range"] { accent-color: var(--accent-soft); height: 44px; }
 .seg__row { display: flex; }
 .seg legend { margin-bottom: 8px; }
-.seg label { flex: 1; }
+.seg .seg__row label { display: block; flex: 1; width: auto; }
 .seg span { display: grid; place-items: center; height: 52px; padding: 0 12px; border: 1px solid rgba(243, 239, 231, 0.5); margin-left: -1px; font: 500 16px/1 var(--display); white-space: nowrap; transition: background 0.2s, color 0.2s; }
 .seg label:first-of-type span { margin-left: 0; }
 .seg input:checked + span { background: var(--paper); color: var(--ink); border-color: var(--paper); }

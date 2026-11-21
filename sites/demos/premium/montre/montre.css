@@ -50,7 +50,8 @@ h3 { font: 700 18px/1.2 var(--text); }
 
 /* titres */
 .h2, .hero__title, .shot__title, .foot__big { font-family: var(--display); font-weight: 900; font-stretch: 151%; text-transform: uppercase; letter-spacing: -0.02em; }
-.h2 { font-size: clamp(27px, 6.3vw, 104px); line-height: 0.92; }
+.h2 { font-size: clamp(32px, 6.3vw, 104px); line-height: 0.92; }
+@media (max-width: 620px) { .h2, .shot__title { font-size: 9.6vw; } }
 
 /* figures : cadre, repères d'angle, légende */
 .fig { position: relative; border: 1px solid var(--ink); background: var(--sheet); }
@@ -92,7 +93,7 @@ h3 { font: 700 18px/1.2 var(--text); }
 .hero__meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--ink); }
 .hero__meta span { padding: 9px 12px 9px 0; }
 .hero__meta span + span { padding-left: 12px; border-left: 1px solid var(--rule); }
-.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 15.1vw, 330px); line-height: 0.8; margin: clamp(18px, 2.6vw, 44px) 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
+.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 18vw, 380px); line-height: 0.8; margin: clamp(18px, 2.6vw, 44px) 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
 .hero__title i { width: 0.17em; height: 0.17em; margin-left: 0.05em; border-radius: 50%; background: var(--signal); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px); padding-top: clamp(18px, 2vw, 28px); border-top: 1px solid var(--ink); background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 12px) 0 0 / 100% 7px no-repeat; }
 .hero__text { display: flex; flex-direction: column; gap: clamp(18px, 2.2vw, 28px); }
@@ -107,7 +108,7 @@ h3 { font: 700 18px/1.2 var(--text); }
 .nums dd { margin-top: 8px; font: 500 11px/1.35 var(--mono-font); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .hero__fig { display: grid; grid-template-rows: 1fr auto; min-height: 240px; background: #111 url("media/mouvement.webp") center / cover; }
 .hero__fig video { min-height: 0; aspect-ratio: 16 / 9; }
-@media (min-width: 901px) { .hero__fig video { aspect-ratio: auto; height: clamp(230px, calc(100svh - 486px), 600px); } }
+@media (min-width: 901px) { .hero__fig video { aspect-ratio: auto; height: clamp(230px, calc(100svh - 34vw - 250px), 600px); } }
 .pastille { position: absolute; top: 12px; left: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--ink); color: var(--paper); font: 600 11px/1 var(--mono-font); letter-spacing: 0.08em; text-transform: uppercase; }
 @media (prefers-reduced-motion: no-preference) {
   .hero__title span { animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
@@ -120,6 +121,7 @@ h3 { font: 700 18px/1.2 var(--text); }
   .hero__grid { grid-template-columns: 1fr; }
   .hero__meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero__meta span:nth-child(n + 3) { display: none; }
+  .hero__title { font-size: 21.4vw; }
   .nums { margin-top: 6px; }
 }
 
@@ -132,7 +134,7 @@ h3 { font: 700 18px/1.2 var(--text); }
 .film .step b { background: var(--paper); color: var(--ink); }
 .film__hud { top: calc(var(--bar) + 18px); }
 .film__shot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 23rem); align-items: end; gap: clamp(20px, 4vw, 64px); bottom: clamp(52px, 9vh, 96px); }
-.shot__title { margin-top: 16px; font-size: clamp(27px, 6.3vw, 104px); line-height: 0.92; }
+.shot__title { margin-top: 16px; font-size: clamp(32px, 6.3vw, 104px); line-height: 0.92; }
 .shot__title em { font-style: normal; color: var(--signal); }
 .notes { position: relative; min-height: 15.5rem; border-top: 1px solid rgba(255, 255, 255, 0.6); background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0 1px, transparent 1px 12px) 0 0 / 100% 7px no-repeat; }
 .notes li { position: absolute; inset: 20px 0 auto 0; display: grid; gap: 8px; opacity: 0; transform: translateY(14px); transition: opacity 0.45s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }

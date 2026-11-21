@@ -388,7 +388,7 @@ async function start() {
     }
     const sway = idle ? Math.sin(clock * 0.35) * 0.16 : 0;
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const distance = Math.max((camera.aspect > 1.15 ? 31 : 20) / (tanHalf * camera.aspect), 15 / tanHalf);
+    const distance = Math.max((camera.aspect > 1.15 ? 28 : 19.5) / (tanHalf * camera.aspect), 15 / tanHalf);
     const angle = yaw + sway;
     camera.position.set(target.x + Math.sin(angle) * Math.cos(pitch) * distance, target.y + Math.sin(pitch) * distance, target.z + Math.cos(angle) * Math.cos(pitch) * distance);
     camera.lookAt(target);

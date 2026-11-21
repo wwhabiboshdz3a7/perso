@@ -31,6 +31,7 @@ body { background: var(--plaster); color: var(--ink); font: 400 17px/1.55 var(--
 :focus-visible { outline: 2px solid var(--pool-deep); outline-offset: 3px; }
 ::selection { background: var(--pool); color: var(--ink); }
 em { font-style: italic; }
+[hidden] { display: none !important; }
 .mono { font: 500 11.5px/1.5 var(--mono-font); letter-spacing: 0.07em; text-transform: uppercase; }
 .d2 { font: 400 clamp(54px, 9.6vw, 176px) / 0.86 var(--serif); letter-spacing: -0.025em; text-transform: lowercase; }
 .d2 em { color: var(--pool-deep); }
@@ -57,10 +58,10 @@ em { font-style: italic; }
 .cover__media { clip-path: inset(var(--bar) 0 0 var(--split)); }
 .cover__video { position: absolute; top: 0; left: var(--split); width: calc(100% - var(--split)); height: 100%; object-fit: cover; }
 .cover__media::before { content: ""; position: absolute; z-index: 1; inset: 0 0 0 var(--split); background: linear-gradient(90deg, rgba(35, 28, 23, 0.6), rgba(35, 28, 23, 0.12) 62%), linear-gradient(to top, rgba(35, 28, 23, 0.55), transparent 30%); }
-.cover__title { position: absolute; z-index: 2; left: var(--pad); top: 47%; transform: translateY(-50%); margin-left: -0.035em; font: 400 clamp(70px, min(19vw, 30svh), 340px) / 0.82 var(--serif); letter-spacing: -0.03em; text-transform: lowercase; white-space: nowrap; pointer-events: none; }
+.cover__title { position: absolute; left: var(--pad); top: 47%; transform: translateY(-50%); margin-left: -0.035em; font: 400 clamp(70px, min(19vw, 30svh), 340px) / 0.82 var(--serif); letter-spacing: -0.03em; text-transform: lowercase; white-space: nowrap; pointer-events: none; }
 .cover__title span, .cover__title em { display: block; }
 .cover__title em { padding-right: 0.08em; }
-.cover__title--light { color: var(--plaster); }
+.cover__title--light { color: var(--plaster); z-index: 2; }
 .cover__meta { position: absolute; left: var(--pad); top: calc(var(--bar) + 22px); width: calc(var(--split) - var(--pad) - 28px); display: flex; flex-wrap: wrap; gap: 4px 22px; }
 .cover__meta span + span::before { content: "— "; }
 .cover__foot { position: absolute; left: var(--pad); bottom: clamp(70px, 9vh, 84px); width: calc(var(--split) - var(--pad) - 36px); }

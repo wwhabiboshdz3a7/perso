@@ -266,7 +266,7 @@ function start3d(canvas) {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    yawHome = camera.aspect < 1.05 ? -0.72 : -0.46;
+    yawHome = camera.aspect < 1.3 ? -0.5 : -0.46;
     if (!grabbed) yaw = yawHome;
     wake();
   }
@@ -298,8 +298,8 @@ function start3d(canvas) {
 
     t = reduced ? goal : Math.abs(goal - t) < 0.0005 ? goal : lerp(t, goal, 1 - Math.exp(-3.4 * dt));
     const s1 = step(0, 0.5, t), s2 = step(0.5, 1, t);
-    const k = camera.aspect < 1.05 ? 0.74 : 1; // écran étroit : pièces moins écartées, pour rester lisibles
-    const o = { nuts: (1.9 * s1 + 1.3 * s2) * k, wheel: (1.2 * s1 + 0.9 * s2) * k, disc: 0.85 * s2 * k, pads: 0.3 * s2, lift: 0.55 * s2, hub: -0.7 * s2 * k };
+    const k = camera.aspect < 1.3 ? 0.82 : 1; // écran étroit : pièces moins écartées, pour rester lisibles
+    const o = { nuts: (1.8 * s1 + 1.1 * s2) * k, wheel: (1.2 * s1 + 0.9 * s2) * k, disc: 0.85 * s2 * k, pads: 0.3 * s2, lift: 0.55 * s2, hub: -0.7 * s2 * k };
     parts.ecrous.group.position.y = o.nuts;
     for (const nut of parts.ecrous.nuts) nut.rotation.y = s1 * TAU * 3;
     parts.roue.group.position.y = o.wheel;

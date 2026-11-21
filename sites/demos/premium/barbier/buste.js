@@ -118,13 +118,13 @@ const CUTS = {
       return d - 0.008 * Math.sin(x * 44) * ss(0.7, 1, y); // sillons du peigne
     },
   },
-  tondu: { tint: [0.9, -9, 0, 0.1, 0.1], view: -0.7, field: null },
+  tondu: { tint: [0.96, -9, 0, 0.1, 0.1], view: -0.7, field: null },
 };
 
 // Barbes : [densité peinte, douceur du bord] et volume éventuel.
 const BEARDS = {
   rase: { tint: [0, 0.02], field: null },
-  trois: { tint: [0.74, 0.03], field: null },
+  trois: { tint: [0.82, 0.03], field: null },
   pleine: {
     tint: [1, 0.012],
     field(x, y, z, s) {

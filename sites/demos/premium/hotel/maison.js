@@ -580,7 +580,7 @@ function start() {
     if (!width || !height) return;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
-    const aspect = width / height, half = Math.max(7.1, 9.5 / aspect);
+    const aspect = width / height, half = Math.max(7.5, 9.6 / aspect);
     camera.left = -half * aspect; camera.right = half * aspect; camera.top = half; camera.bottom = -half;
     camera.updateProjectionMatrix();
     wake();
@@ -601,8 +601,9 @@ function start() {
     const sway = interacted || reduced ? 0 : Math.sin(time * 0.4) * 0.2;
     turn.rotation.y = yaw + sway;
     viewDir.set(0, Math.sin(pitch), Math.cos(pitch));
-    camera.position.copy(viewDir).multiplyScalar(60).add(new THREE.Vector3(0, 3.5, 0));
-    camera.lookAt(0, 3.5, 0);
+    camera.position.copy(viewDir).multiplyScalar(60);
+    camera.position.y += 2.9;
+    camera.lookAt(0, 2.9, 0);
 
     // ambiance
     key.intensity = lerp(2.2, 0.3, mood); key.color.copy(dayKey).lerp(nightKey, mood);
