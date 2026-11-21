@@ -6,7 +6,7 @@
 
 const fsp = require('node:fs/promises');
 const path = require('node:path');
-const { execFile } = require('node:child_process');
+const { execFile, spawn } = require('node:child_process');
 const { HttpError } = require('../lib/store');
 
 const SERVICE = 'fr.quai.mac';
@@ -21,6 +21,29 @@ function run(bin, args) {
       const code = !err ? 0 : typeof err.code === 'number' ? err.code : -1;
       resolve({ code, stdout: String(stdout || '') });
     });
+  });
+}
+
+// Même chose, en passant du texte sur l'entrée standard (rien de sensible dans les arguments).
+function runWithInput(bin, args, input) {
+  return new Promise((resolve) => {
+    let child;
+    try {
+      child = spawn(bin, args, { stdio: ['pipe', 'ignore', 'ignore'], windowsHide: true });
+    } catch {
+      return resolve({ code: -1 });
+    }
+    const timer = setTimeout(() => child.kill(), 15000);
+    child.on('error', () => {
+      clearTimeout(timer);
+      resolve({ code: -1 });
+    });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      resolve({ code: typeof code === 'number' ? code : -1 });
+    });
+    child.stdin.on('error', () => {});
+    child.stdin.end(input);
   });
 }
 
@@ -61,6 +84,13 @@ function createSecrets({ kind, configDir, securityBin = '/usr/bin/security' }) {
       return stdout.replace(/\r?\n$/, '') || null;
     },
     async set(token) {
+      // D'abord par l'entrée standard (mode interactif de security) : le jeton n'apparaît alors pas
+      // dans la liste des processus du Mac. On relit pour vérifier ; à défaut, on passe par un argument.
+      if (/^[A-Za-z0-9_.~+/=-]+$/.test(token)) {
+        await runWithInput(securityBin, ['-i'], `add-generic-password -U -s ${SERVICE} -a ${ACCOUNT} -l Quai-jeton-GitHub -w ${token}\n`);
+        const stored = await keychain.get().catch(() => null);
+        if (stored === token) return;
+      }
       const { code } = await run(securityBin, [
         'add-generic-password', '-U', '-s', SERVICE, '-a', ACCOUNT, '-l', 'Quai (jeton GitHub)', '-w', token,
       ]);
