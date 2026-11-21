@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cour Sainte-Anne — Maison d'hôtes, cinq chambres autour d'un bassin, Toulouse</title>
+<meta name="description" content="Cour Sainte-Anne : cinq chambres dans un hôtel particulier toulousain de 1748, une cour pavée et un bassin. Démonstration de site Premium — maison fictive.">
+<meta name="theme-color" content="#efe6da">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23efe6da'/%3E%3Crect x='5' y='5' width='22' height='22' fill='%23c9836b'/%3E%3Crect x='10' y='16' width='12' height='6' fill='%231f9d97'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="hotel.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="bar__brand" href="#accueil">cour <em>sainte-anne</em></a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#film">Le film</a>
+    <a href="#maison">La maison en coupe</a>
+    <a href="#chambres">Chambres &amp; tarifs</a>
+    <a href="#lieu">Le quartier</a>
+  </nav>
+  <a class="btn btn--pool bar__cta" href="#reserver">Réserver</a>
+</header>
+
+<main id="accueil">
+  <!-- couverture : le titre passe du plâtre à l'image, en deux tons -->
+  <section class="cover">
+    <div class="cover__page">
+      <p class="cover__meta mono"><span>Maison d'hôtes</span><span>Toulouse · Saint-Étienne</span><span>Cinq chambres, un bassin</span></p>
+      <h1 class="cover__title"><span>cour</span> <em>sainte-anne</em></h1>
+      <div class="cover__foot">
+        <p class="cover__lede">Un hôtel particulier de 1748, une cour pavée, un bassin de neuf mètres. Vous poussez la porte cochère&nbsp;: la ville reste dehors.</p>
+        <div class="cover__cta">
+          <a class="btn btn--ink" href="#reserver">Réserver un séjour</a>
+          <a class="btn btn--line" href="#maison">Visiter la maison ↓</a>
+        </div>
+      </div>
+    </div>
+    <div class="cover__media">
+      <video class="cover__video" data-loop muted loop playsinline preload="metadata" poster="media/cour.webp" aria-label="La cour à l'heure bleue : le bassin éclairé, les oliviers, les fenêtres en arc allumées">
+        <source src="media/cour.mp4" type="video/mp4">
+      </video>
+      <p class="cover__title cover__title--light" aria-hidden="true"><span>cour</span> <em>sainte-anne</em></p>
+      <p class="cover__caption mono">Fig. 0 — la cour, un soir de septembre, 21&nbsp;h&nbsp;40</p>
+      <a class="cover__sticker" href="#chambres"><span class="mono">La nuit, dès</span><b>165&nbsp;€</b><span class="mono">petit-déjeuner dans la cour</span></a>
+    </div>
+  </section>
+
+  <div class="band marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>cinq chambres</span><i>✳</i><span><em>un bassin de neuf mètres</em></span><i>✳</i><span>bâtie en 1748</span><i>✳</i><span><em>petit-déjeuner sous les oliviers</em></span><i>✳</i><span>à quatre minutes des Carmes</span><i>✳</i>
+      <span>cinq chambres</span><i>✳</i><span><em>un bassin de neuf mètres</em></span><i>✳</i><span>bâtie en 1748</span><i>✳</i><span><em>petit-déjeuner sous les oliviers</em></span><i>✳</i><span>à quatre minutes des Carmes</span><i>✳</i>
+    </div>
+  </div>
+
+  <!-- édito : la maison en quelques lignes et quatre chiffres -->
+  <section class="edito" id="edito">
+    <header class="folio mono"><span>01 — La maison</span><span>Cour Sainte-Anne · Toulouse</span></header>
+    <p class="edito__lead rv">Ici, on vous remet <em>une clé</em>, pas un badge. Cinq chambres seulement&nbsp;: nous connaissons votre prénom, l'heure de votre café et la table que vous préférez <em>dans la cour.</em></p>
+    <div class="edito__grid">
+      <figure class="edito__photo" data-in>
+        <img src="media/photo-1.webp" alt="Le petit-déjeuner servi dans la cour, sur la table en pierre : pain, confitures, café" loading="lazy" width="1600" height="1200">
+        <figcaption class="mono"><b>Fig. 1</b> Le petit-déjeuner, sur la table en pierre. De 8&nbsp;h à 10&nbsp;h&nbsp;30, dehors dès qu'il fait beau.</figcaption>
+      </figure>
+      <dl class="edito__nums">
+        <div class="rv"><dt>1748</dt><dd class="mono">l'année gravée sur la clé de voûte de la porte cochère</dd></div>
+        <div class="rv" style="--i:1"><dt>5</dt><dd class="mono">chambres, pas une de plus&nbsp;: la maison reste une maison</dd></div>
+        <div class="rv" style="--i:2"><dt>9&nbsp;<small>m</small></dt><dd class="mono">de bassin, chauffé à 27&nbsp;°C de mai à la mi-octobre</dd></div>
+        <div class="rv" style="--i:3"><dt>4&nbsp;<small>min</small></dt><dd class="mono">à pied du marché et du métro des Carmes</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- le film : deux plans que l'on fait avancer en défilant -->
+  <section class="film" id="film" data-film data-length="1.6" aria-label="Le film : le soir dans la cour, puis le matin dans la chambre">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/cour" data-frames="41" data-label="Le soir, la cour">
+        <p class="shot__when mono"><b>21&nbsp;h&nbsp;30</b> le bassin s'allume</p>
+        <h2 class="shot__title">le soir, <em>la cour</em></h2>
+        <p class="shot__text">Les fenêtres en arc s'éclairent une à une et l'eau vire au turquoise. Nous laissons des bougies, une carafe et deux verres sous les oliviers&nbsp;; le bassin est à vous jusqu'à 21&nbsp;h, la cour toute la nuit.</p>
+      </article>
+      <article class="film__shot film__shot--right" data-src="media/suite" data-frames="41" data-label="Le matin, la chambre">
+        <p class="shot__when mono"><b>8&nbsp;h&nbsp;10</b> les volets de la suite</p>
+        <h2 class="shot__title">le matin, <em>la chambre</em></h2>
+        <p class="shot__text">Vous ouvrez les volets sur les toits de tuile et le clocher. Le café monte à l'heure que vous avez cochée la veille&nbsp;; les croissants viennent du fournil au bout de la rue.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- la maison en coupe : maquette 3D, une chambre se choisit en la touchant -->
+  <section class="maison" id="maison">
+    <header class="folio mono"><span>02 — La maison en coupe</span><span>Tournez-la, touchez une chambre</span></header>
+    <div class="maison__head">
+      <h2 class="d2 rv">la maison <em>en coupe</em></h2>
+      <p class="maison__intro rv" style="--i:1">Nous avons ouvert la maison en deux, comme une maison de poupée. Choisissez vos dates, faites-la tourner&nbsp;: les chambres libres restent claires, les autres se hachurent.</p>
+    </div>
+    <div class="maison__grid">
+      <div class="maison__stage">
+        <canvas class="maison__canvas" data-maison tabindex="0" aria-label="Maquette en trois dimensions de la maison, ouverte en coupe : la cour, le bassin et les cinq chambres. Flèches gauche et droite pour la faire tourner, haut et bas pour l'incliner. Les chambres se choisissent avec les boutons numérotés."></canvas>
+        <div class="maison__pins" data-pins></div>
+        <div class="maison__mood" role="group" aria-label="Heure de la maquette">
+          <button type="button" class="mono is-on" data-mood="jour" aria-pressed="true">Le matin</button>
+          <button type="button" class="mono" data-mood="soir" aria-pressed="false">Le soir</button>
+        </div>
+        <p class="maison__hint mono" aria-hidden="true">↻ faites tourner la maquette · touchez une chambre</p>
+        <img class="maison__fallback" src="media/cour.webp" alt="La cour de la maison à l'heure bleue, le bassin éclairé" loading="lazy">
+      </div>
+
+      <aside class="fiche" aria-label="Fiche de la chambre choisie">
+        <div class="fiche__tabs" role="group" aria-label="Choisir une chambre" data-room-tabs></div>
+        <p class="fiche__where mono" data-f="where"></p>
+        <h3 class="fiche__name" data-f="name" aria-live="polite"></h3>
+        <p class="fiche__text" data-f="text"></p>
+        <dl class="fiche__facts">
+          <div><dt class="mono">Surface</dt><dd data-f="area"></dd></div>
+          <div><dt class="mono">Vue</dt><dd data-f="view"></dd></div>
+          <div><dt class="mono">Voyageurs</dt><dd data-f="cap"></dd></div>
+          <div><dt class="mono">La nuit</dt><dd data-f="price"></dd></div>
+        </dl>
+        <div class="fiche__dates">
+          <label class="mono">Arrivée<input type="date" data-field="arrive"></label>
+          <label class="mono">Départ<input type="date" data-field="depart"></label>
+        </div>
+        <p class="fiche__dispo" data-f="dispo" role="status"></p>
+        <div class="fiche__cta">
+          <a class="btn btn--pool" href="#reserver" data-f="cta">Réserver cette chambre</a>
+          <button class="btn btn--line" type="button" data-next-free hidden>Prendre ces dates</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- chambres et tarifs -->
+  <section class="rooms" id="chambres">
+    <header class="folio mono"><span>03 — Chambres &amp; tarifs</span><span>Prix par nuit, pour deux</span></header>
+    <h2 class="d2 rv">cinq chambres, <em>cinq prix</em></h2>
+    <ol class="rooms__list" data-room-list></ol>
+    <div class="rooms__extras">
+      <div class="rv">
+        <p class="mono">Toujours compris</p>
+        <p>Le linge et les draps de lin, le wifi par fibre, le thé et le café en chambre, l'accès au bassin, une carte du quartier annotée par Jeanne.</p>
+      </div>
+      <dl class="rv" style="--i:1">
+        <div><dt>Petit-déjeuner</dt><dd>16&nbsp;€ <span class="mono">par personne et par matin</span></dd></div>
+        <div><dt>Garage fermé à 150&nbsp;m</dt><dd>18&nbsp;€ <span class="mono">par nuit, trois places</span></dd></div>
+        <div><dt>Arrivée après 20&nbsp;h</dt><dd>20&nbsp;€ <span class="mono">boîte à clés, code par SMS</span></dd></div>
+        <div><dt>Nuits de vendredi et samedi</dt><dd>+&nbsp;20&nbsp;€ <span class="mono">par nuit</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- réserver : dates, voyageurs, chambre, options → nuits et total calculés -->
+  <section class="book" id="reserver">
+    <header class="folio mono"><span>04 — Réserver</span><span>Réponse de Jeanne dans la journée</span></header>
+    <h2 class="d2 rv">vos dates, <em>votre chambre</em></h2>
+    <form class="book__form" data-booking data-demo="Merci ! Ceci est une démonstration : aucune réservation n’a été envoyée." novalidate>
+      <div class="book__steps">
+        <fieldset class="step">
+          <legend><span class="mono">1</span> Les dates</legend>
+          <div class="step__row">
+            <label class="field">Arrivée<input type="date" name="arrivee" data-field="arrive" required></label>
+            <label class="field">Départ<input type="date" name="depart" data-field="depart" required></label>
+            <div class="field field--guests">
+              <span id="guests-label">Voyageurs</span>
+              <div class="stepper" role="group" aria-labelledby="guests-label">
+                <button type="button" data-guests="-1" aria-label="Un voyageur de moins">−</button>
+                <output data-guests-out aria-live="polite">2</output>
+                <button type="button" data-guests="1" aria-label="Un voyageur de plus">+</button>
+              </div>
+              <input type="hidden" name="voyageurs" value="2" data-guests-input>
+            </div>
+          </div>
+          <div class="cal" data-cal>
+            <div class="cal__nav">
+              <button type="button" class="cal__btn" data-cal-nav="-1" aria-label="Mois précédent">←</button>
+              <p class="cal__hint mono" data-cal-hint role="status"></p>
+              <button type="button" class="cal__btn" data-cal-nav="1" aria-label="Mois suivant">→</button>
+            </div>
+            <div class="cal__months" data-cal-months></div>
+            <p class="cal__legend mono"><span class="k k--sel"></span>votre séjour <span class="k k--off"></span>complet pour <b data-cal-room></b></p>
+          </div>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="mono">2</span> La chambre</legend>
+          <div class="opts" data-room-radios></div>
+          <p class="step__note mono">Les chambres hachurées sont prises ou trop petites pour ces dates. <a href="#maison">Les voir dans la maquette ↑</a></p>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="mono">3</span> Les options</legend>
+          <div class="extras">
+            <label class="extra"><input type="checkbox" name="petit-dejeuner" data-opt="breakfast"><span><b>Petit-déjeuner</b><small>Dans la cour ou au salon, de 8&nbsp;h à 10&nbsp;h&nbsp;30</small></span><em>16&nbsp;€ / pers. / matin</em></label>
+            <label class="extra"><input type="checkbox" name="arrivee-tardive" data-opt="late"><span><b>Arrivée tardive</b><small>Après 20&nbsp;h&nbsp;: boîte à clés, code envoyé par SMS</small></span><em>20&nbsp;€</em></label>
+            <label class="extra"><input type="checkbox" name="parking" data-opt="parking"><span><b>Parking</b><small>Garage fermé à 150&nbsp;m de la maison</small></span><em>18&nbsp;€ / nuit</em></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="mono">4</span> Vous</legend>
+          <div class="step__row step__row--you">
+            <label class="field">Nom<input type="text" name="nom" autocomplete="name" required></label>
+            <label class="field">E-mail<input type="email" name="email" autocomplete="email" required></label>
+            <label class="field">Téléphone<input type="tel" name="tel" autocomplete="tel"></label>
+            <label class="field field--wide">Un mot pour Jeanne <span class="mono">(facultatif)</span><textarea name="message" rows="2" placeholder="Heure d'arrivée, anniversaire, allergie, chien…"></textarea></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <aside class="ticket" aria-label="Récapitulatif du séjour">
+        <p class="ticket__label mono">Votre séjour</p>
+        <p class="ticket__room" data-t="room"></p>
+        <p class="ticket__dates mono" data-t="dates"></p>
+        <p class="ticket__nights"><b data-t="nights">2</b><span data-t="nights-label">nuits</span></p>
+        <ul class="ticket__lines" data-t="lines"></ul>
+        <p class="ticket__total"><span class="mono">Total</span><b data-t="total" aria-live="polite"></b></p>
+        <p class="ticket__note mono" data-t="note"></p>
+        <p class="ticket__problem" data-t="problem" role="alert"></p>
+        <button class="btn btn--pool ticket__send" type="submit">Demander cette réservation</button>
+        <p class="ticket__done" data-done role="status"></p>
+      </aside>
+    </form>
+  </section>
+
+  <!-- avis -->
+  <section class="proof" id="avis">
+    <header class="folio mono"><span>05 — Ils ont dormi ici</span><span>4,9 / 5 · 212 avis</span></header>
+    <blockquote class="proof__big rv">
+      <p>«&nbsp;On a ouvert les volets sur le clocher et on a décidé de rester <em>une nuit de plus.</em>&nbsp;»</p>
+      <footer class="mono">Claire &amp; Thomas, Nantes — la Sainte-Anne, mai 2026</footer>
+    </blockquote>
+    <div class="proof__row">
+      <p class="proof__score rv"><b>4,9</b><span class="mono">sur 5 — 212 avis<br>depuis l'ouverture en 2019</span></p>
+      <blockquote class="rv" style="--i:1">
+        <p>«&nbsp;Le bassin éclairé, à 20&nbsp;h&nbsp;30, pour nous seuls. Et un petit-déjeuner qui tient jusqu'au dîner.&nbsp;»</p>
+        <footer class="mono">Inès, Lyon — l'Olivier, juillet 2026</footer>
+      </blockquote>
+      <blockquote class="rv" style="--i:2">
+        <p>«&nbsp;Jeanne nous avait noté trois adresses sur un carton. On a fait les trois, on reviendra pour la quatrième.&nbsp;»</p>
+        <footer class="mono">Marc, Bruxelles — la Pastel, octobre 2026</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- le lieu, le quartier, les infos pratiques -->
+  <section class="place" id="lieu">
+    <header class="folio mono"><span>06 — Le quartier &amp; la pratique</span><span>6, rue du Bassin-Sainte-Anne</span></header>
+    <div class="place__top">
+      <h2 class="d2 rv">derrière <em>la porte cochère</em></h2>
+      <figure class="place__facade" data-in>
+        <img src="media/photo-2.webp" alt="La façade en brique rose de la maison, sur une rue calme, avec sa porte cochère" loading="lazy" width="1200" height="1500">
+        <figcaption class="mono"><b>Fig. 2</b> Côté rue, rien ne dit qu'il y a un bassin.</figcaption>
+      </figure>
+      <div class="place__text">
+        <p class="place__lead rv">Jeanne et Baptiste ont repris la maison en 2019, après deux ans de chantier&nbsp;: briques rejointoyées à la chaux, volets repeints, bassin creusé là où se trouvait l'ancien lavoir.</p>
+        <p class="rv" style="--i:1">La rue est à sens unique et presque sans voitures. Tout se fait à pied&nbsp;: le marché le matin, la Garonne en fin de journée, et le soir on rentre par la petite porte dans la grande.</p>
+        <ul class="walk mono rv" style="--i:2">
+          <li><span>Marché et métro des Carmes</span><b>4 min</b></li>
+          <li><span>Cathédrale Saint-Étienne</span><b>6 min</b></li>
+          <li><span>Quais de la Garonne</span><b>11 min</b></li>
+          <li><span>Gare Matabiau, en métro</span><b>12 min</b></li>
+          <li><span>Aéroport, en taxi</span><b>25 min</b></li>
+        </ul>
+        <button class="btn btn--line rv" style="--i:3" type="button" data-chat-open>Demander ses adresses à Jeanne</button>
+      </div>
+      <figure class="place__suite" data-in>
+        <video data-loop muted loop playsinline preload="none" poster="media/suite.webp" aria-label="La suite au matin, les volets ouverts sur les toits"><source src="media/suite.mp4" type="video/mp4"></video>
+        <figcaption class="mono"><b>Fig. 3</b> La Sainte-Anne, 8&nbsp;h&nbsp;10.</figcaption>
+      </figure>
+    </div>
+    <dl class="practical">
+      <div class="rv"><dt>Arrivée</dt><dd>De 16&nbsp;h à 20&nbsp;h, Jeanne vous ouvre. Après 20&nbsp;h, c'est l'option «&nbsp;arrivée tardive&nbsp;».</dd></div>
+      <div class="rv" style="--i:1"><dt>Départ</dt><dd>Avant 11&nbsp;h. Nous gardons vos bagages jusqu'au soir si votre train est tard.</dd></div>
+      <div class="rv" style="--i:2"><dt>Bassin</dt><dd>9&nbsp;×&nbsp;3&nbsp;m, 1,40&nbsp;m de fond. Ouvert de 9&nbsp;h à 21&nbsp;h, réservé aux voyageurs, non surveillé.</dd></div>
+      <div class="rv" style="--i:3"><dt>Animaux</dt><dd>Chiens et chats bienvenus dans la Pastel et l'Olivier, 15&nbsp;€ par séjour.</dd></div>
+      <div class="rv" style="--i:4"><dt>Annulation</dt><dd>Gratuite jusqu'à 7&nbsp;jours avant l'arrivée. Ensuite, l'acompte de 30&nbsp;% est conservé.</dd></div>
+      <div class="rv" style="--i:5"><dt>Escaliers</dt><dd>Pas d'ascenseur&nbsp;: 22 marches jusqu'au premier, 41 jusqu'au second. Nous montons les valises.</dd></div>
+    </dl>
+    <address class="contact mono">
+      <span>6, rue du Bassin-Sainte-Anne, 31000 Toulouse</span>
+      <a href="tel:+33500000000">05 00 00 00 00</a>
+      <a href="mailto:bonjour@cour-sainte-anne.example">bonjour@cour-sainte-anne.example</a>
+    </address>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">cour <em>sainte-anne</em></p>
+  <div class="foot__row mono">
+    <span>© <span data-year>2026</span> Cour Sainte-Anne — maison d'hôtes fictive</span>
+    <span>Site de démonstration, formule Premium — entreprise fictive&nbsp;; photos et vidéos générées par IA. Adresse, prix, avis et disponibilités sont inventés.</span>
+    <a href="../../eco/demos/hotel/">Voir la version Éco de ce métier</a>
+  </div>
+</footer>
+
+<a class="tag" href="../../">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Jeanne",
+  "role": "Votre hôtesse, Cour Sainte-Anne",
+  "launch": "Écrire à Jeanne",
+  "greeting": "Bonjour, je suis Jeanne. Je tiens la maison avec Baptiste. Une question sur l'arrivée, le petit-déjeuner, le bassin, le quartier ?",
+  "chips": ["Heures d'arrivée", "Le petit-déjeuner", "Où se garer ?", "Vos adresses du quartier"],
+  "fallback": "Pour cette question, le plus simple est de nous appeler au 05 00 00 00 00 ou de laisser un mot dans la demande de réservation. Je peux vous répondre sur l'arrivée, le petit-déjeuner, le parking, les animaux, l'annulation, le bassin et le quartier.",
+  "intents": [
+    { "keys": ["arrivee", "arriver", "check", "heure", "horaire", "tard", "cle", "depart", "bagage"], "answer": "Nous vous accueillons de 16 h à 20 h. Après 20 h, cochez « arrivée tardive » (20 €) : une boîte à clés vous attend sous le porche, le code arrive par SMS. Le départ se fait avant 11 h, et nous gardons vos bagages jusqu'au soir.", "link": { "label": "Choisir mes dates", "href": "#reserver" }, "chips": ["Où se garer ?", "Le petit-déjeuner"] },
+    { "keys": ["dejeuner", "cafe", "croissant", "matin", "manger", "gluten", "allerg", "vegetar"], "answer": "Le petit-déjeuner est servi de 8 h à 10 h 30, dans la cour dès qu'il fait beau, sinon au salon. Pain et croissants du fournil voisin, confitures de la maison, œufs, fruits, café ou thé : 16 € par personne. Dites-moi vos allergies dans la demande, je m'adapte.", "link": { "label": "L'ajouter à mon séjour", "href": "#reserver" }, "chips": ["Le bassin", "Vos adresses du quartier"] },
+    { "keys": ["parking", "garer", "voiture", "garage", "stationn", "velo", "moto"], "answer": "La rue est étroite : on dépose les valises devant la porte cochère, puis la voiture dort au garage fermé, à 150 m (18 € la nuit, trois places, à réserver avec la chambre). Sinon, le parking public des Carmes est à quatre minutes à pied. Les vélos entrent sous le porche.", "link": { "label": "Réserver une place", "href": "#reserver" }, "chips": ["Comment venir ?", "Heures d'arrivée"] },
+    { "keys": ["chien", "chat", "animal", "animaux"], "answer": "Les chiens et les chats sont les bienvenus dans deux chambres : la Pastel et l'Olivier, pour 15 € par séjour. Un panier et une gamelle les attendent. Seule consigne : pas dans le bassin.", "link": { "label": "Voir ces chambres", "href": "#maison" }, "chips": ["Le bassin", "Conditions d'annulation"] },
+    { "keys": ["annul", "rembours", "acompte", "modifier", "report", "paiement", "payer"], "answer": "Un acompte de 30 % confirme la réservation. L'annulation est gratuite jusqu'à 7 jours avant l'arrivée ; passé ce délai, l'acompte est conservé, mais nous reportons volontiers vos dates une fois. Le solde se règle sur place.", "chips": ["Réserver une chambre", "Heures d'arrivée"] },
+    { "keys": ["adresse", "quartier", "restaurant", "diner", "visiter", "marche", "bar", "sortir", "voir", "faire"], "answer": "Mes trois habitudes : le marché des Carmes le matin, pour le fromage et les fruits ; la cathédrale Saint-Étienne à six minutes, presque toujours vide ; puis les quais de la Garonne au coucher du soleil. Pour dîner, je vous laisse à l'arrivée un carton avec les tables du moment.", "link": { "label": "Le quartier à pied", "href": "#lieu" }, "chips": ["Comment venir ?", "Le petit-déjeuner"] },
+    { "keys": ["bassin", "piscine", "baign", "nager", "chauff", "eau", "serviette", "enfant"], "answer": "Le bassin mesure 9 × 3 m pour 1,40 m de fond. Il est chauffé à 27 °C de mai à la mi-octobre et ouvert de 9 h à 21 h, pour les voyageurs de la maison seulement. Il n'est pas surveillé : les enfants s'y baignent avec un adulte. Les serviettes sont dans le coffre en bois, près des transats.", "link": { "label": "Voir la cour", "href": "#maison" }, "chips": ["Les animaux", "Réserver une chambre"] },
+    { "keys": ["prix", "tarif", "combien", "cout", "chambre", "suite", "nuit"], "answer": "Cinq chambres, de 165 € (la Pastel) à 265 € la nuit (la Sainte-Anne, notre suite pour quatre). Comptez 20 € de plus les nuits de vendredi et de samedi. Le linge, le wifi et le bassin sont compris.", "link": { "label": "Chambres et tarifs", "href": "#chambres" }, "chips": ["Réserver une chambre", "Le petit-déjeuner"] },
+    { "keys": ["reserv", "dispo", "libre", "date", "week", "sejour", "complet"], "answer": "Les disponibilités sont à jour dans la page : choisissez vos dates, les chambres prises se hachurent dans la maquette comme dans le formulaire, et le total se calcule tout seul. Je confirme chaque demande dans la journée.", "link": { "label": "Voir les disponibilités", "href": "#reserver" }, "chips": ["Les prix", "Conditions d'annulation"] },
+    { "keys": ["venir", "acces", "metro", "gare", "aeroport", "train", "taxi", "trouver", "ou etes"], "answer": "Nous sommes au 6, rue du Bassin-Sainte-Anne, dans le quartier Saint-Étienne. Métro Carmes (ligne B) à quatre minutes à pied ; la gare Matabiau est à douze minutes en métro, l'aéroport à vingt-cinq minutes en taxi.", "link": { "label": "Infos pratiques", "href": "#lieu" }, "chips": ["Où se garer ?", "Heures d'arrivée"] },
+    { "keys": ["bonjour", "bonsoir", "salut", "hello", "coucou"], "answer": "Bonjour ! Dites-moi ce qui vous ferait plaisir de savoir.", "chips": ["Heures d'arrivée", "Le bassin", "Les prix"] },
+    { "keys": ["merci", "parfait", "super", "top", "genial"], "answer": "Avec plaisir. À bientôt dans la cour, j'espère." }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="sejour.js"></script>
+<script type="module" src="maison.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>

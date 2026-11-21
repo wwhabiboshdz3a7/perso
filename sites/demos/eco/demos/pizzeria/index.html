@@ -416,6 +416,7 @@ footer.site button{text-decoration:underline}
   renderProducts(); renderCart(); renderPickup();
 })();
 </script>
-<a data-premium-link href="../../../premium/pizza/" style="position:fixed;z-index:60;right:14px;bottom:calc(env(safe-area-inset-bottom) + 122px);display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:#c6f432;color:#0a0a0b;font:700 13px/1 system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,.28)">Ce métier en formule Premium&nbsp;→</a>
+<style>.premium-link{position:fixed;z-index:59;left:14px;bottom:14px;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:#c6f432;color:#0a0a0b;font:700 13px/1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.28)}@media(max-width:820px){.premium-link{left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 112px)}}</style>
+<a class="premium-link" data-premium-link href="../../../premium/pizza/">Ce métier en formule Premium&nbsp;→</a>
 </body>
 </html>

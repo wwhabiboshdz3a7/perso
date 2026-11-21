@@ -108,7 +108,8 @@
     const data = new FormData(form);
     Object.entries(extra || {}).forEach(([k, v]) => data.set(k, typeof v === 'string' ? v : JSON.stringify(v)));
     if (!data.get('form-name') && form.getAttribute('name')) data.set('form-name', form.getAttribute('name'));
-    // En local, le serveur statique n'accepte pas POST : on résout quoi qu'il arrive (le site publié sur Netlify reçoit bien l'envoi).
+    // Hors Netlify (GitHub Pages, serveur local), il n'y a personne pour recevoir l'envoi : la démo ne transmet rien.
+    if (!/\.netlify\.app$/.test(location.hostname)) return Promise.resolve(false);
     return fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
       .then((r) => r.ok).catch(() => false);
   }
