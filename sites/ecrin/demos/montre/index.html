@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison Aurèle — Manufacture horlogère du Jura</title>
+<meta name="description" content="Maison Aurèle, manufacture horlogère indépendante dans le Jura : une montre de 39 mm, un calibre maison AU-01, quarante pièces par an. Démonstration de site Écrin.">
+<meta name="theme-color" content="#07090d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2307090d'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23c9a45c' stroke-width='1.6'/%3E%3Cpath d='M16 16V9M16 16l5 3' stroke='%23c9a45c' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/ecrin.css">
+<link rel="stylesheet" href="montre.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<canvas class="stage" data-stage aria-hidden="true"></canvas>
+<div class="poster" style="background-image:url('../../assets/img/montre/etabli.webp')"></div>
+<div class="veil" aria-hidden="true"><div class="veil__mark">Maison Aurèle</div></div>
+
+<header class="bar">
+  <a class="bar__brand" href="#top">Maison Aurèle</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#mouvement">Le calibre</a>
+    <a href="#collection">La collection</a>
+    <a href="#atelier">L'atelier</a>
+    <a href="#venir">Venir</a>
+  </nav>
+  <a class="btn btn--small" href="#rendez-vous">Rendez-vous</a>
+</header>
+<nav class="rail" aria-label="Chapitres"></nav>
+
+<main id="top">
+  <section class="chapter chapter--hero chapter--low" data-chapter data-label="Maison Aurèle">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Manufacture horlogère · Jura</p>
+      <h1 class="display rv" style="--i:1">Maison <em>Aurèle</em></h1>
+      <p class="lede rv" style="--i:2">Une seule montre, dessinée, usinée et réglée sous le même toit. Quarante pièces par an, pas une de plus.</p>
+      <div class="rv" style="--i:3"><a class="btn" href="#rendez-vous">Prendre rendez-vous</a></div>
+    </div>
+    <div class="cue" aria-hidden="true">Défiler</div>
+  </section>
+
+  <section class="chapter chapter--right" id="boitier" data-chapter data-label="Le boîtier">
+    <div class="chapter__inner">
+      <p class="numeral rv">01 — Le boîtier</p>
+      <h2 class="title rv" style="--i:1">Trente-neuf millimètres, <em>acier ou or rose</em></h2>
+      <p class="lede rv" style="--i:2">La carrure est satinée au trait, la lunette et les cornes polies à la main sur un disque d'étain. Sous la manchette, elle ne dépasse pas : 10,4 mm, glace bombée comprise.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>39 mm</dt><dd>de diamètre</dd></div>
+        <div><dt>10,4 mm</dt><dd>d'épaisseur</dd></div>
+        <div><dt>50 m</dt><dd>d'étanchéité</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter" id="cadran" data-chapter data-label="Le cadran">
+    <div class="chapter__inner">
+      <p class="numeral rv">02 — Le cadran</p>
+      <h2 class="title rv" style="--i:1">Un bleu de nuit, <em>soleillé</em></h2>
+      <p class="lede rv" style="--i:2">Le laiton est brossé du centre vers le bord, puis verni en onze couches. Treize index en or sont rivés un à un ; la minuterie chemin de fer est décalquée à l'encre ivoire.</p>
+      <a class="more rv" style="--i:3" href="#collection">Voir la collection</a>
+    </div>
+  </section>
+
+  <section class="chapter chapter--right" id="mouvement" data-chapter data-label="Le mouvement">
+    <div class="chapter__inner">
+      <p class="numeral rv">03 — Le mouvement</p>
+      <h2 class="title rv" style="--i:1">Calibre <span class="nb">AU-01,</span> <em>fait ici</em></h2>
+      <p class="lede rv" style="--i:2">Platine perlée, ponts anglés à la lime, masse oscillante en or : 194 composants, dont les deux tiers sortent de nos établis. Chaque mouvement est réglé dans cinq positions avant l'emboîtage.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>72 h</dt><dd>de réserve de marche</dd></div>
+        <div><dt>28 800</dt><dd>alternances par heure</dd></div>
+        <div><dt>28</dt><dd>rubis</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter chapter--center chapter--top" id="essayage" data-chapter data-label="L'essayage">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Sur rendez-vous, à la manufacture ou à Paris</p>
+      <h2 class="title rv" style="--i:1">Une heure <em>pour la porter</em></h2>
+      <div class="rv" style="--i:2"><a class="btn" href="#rendez-vous">Demander un essayage</a></div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--first" id="collection">
+    <div class="sheet__head">
+      <p class="eyebrow rv">La collection</p>
+      <h2 class="title rv" style="--i:1">Une montre, <em>quatre visages</em></h2>
+      <p class="lede rv" style="--i:2">Même boîtier, même calibre. Seuls changent le métal et le cadran. Les délais tiennent à notre cadence : quarante montres par an.</p>
+    </div>
+    <ul class="carte rv" style="--i:3">
+      <li><h3>Aurèle 39 Nuit <span>14 800 €</span></h3><p>Acier, cadran bleu nuit soleillé, index et aiguilles dorés, bracelet en veau bleu marine.</p><span class="ref">Réf. AU39-AN · délai six mois</span></li>
+      <li><h3>Aurèle 39 Ivoire <span>14 800 €</span></h3><p>Acier, cadran ivoire grené, aiguilles bleuies à la flamme, bracelet en veau gris.</p><span class="ref">Réf. AU39-AI · délai six mois</span></li>
+      <li><h3>Aurèle 39 Or rose <span>31 500 €</span></h3><p>Or rose 18 carats, cadran bleu nuit soleillé, bracelet en alligator à écailles carrées.</p><span class="ref">Réf. AU39-RN · délai neuf mois</span></li>
+      <li><h3>Aurèle 39 Grand Feu <span>38 000 €</span></h3><p>Or rose 18 carats, cadran en émail grand feu cuit à 820 °C. Douze pièces numérotées par an.</p><span class="ref">Réf. AU39-RE · sur liste d'attente</span></li>
+    </ul>
+    <p class="note sheet__foot rv" style="--i:4">Prix TTC, bracelet et boucle ardillon compris. Garantie de cinq ans, première révision offerte à la manufacture.</p>
+  </section>
+
+  <figure class="wide" data-in>
+    <img src="../../assets/img/montre/etabli.webp" alt="Un mouvement de montre posé sur son porte-mouvement en laiton, sous la lampe d'un établi d'horloger" loading="lazy" width="1800" height="1018">
+    <figcaption class="subtitle rv">Trois semaines d'établi pour un seul mouvement.</figcaption>
+  </figure>
+
+  <section class="sheet" id="atelier">
+    <div class="split">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/montre/atelier.webp" alt="L'atelier à l'heure bleue : des établis en bois alignés sous de hautes fenêtres, la forêt enneigée derrière les vitres" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">L'atelier</p>
+        <h2 class="title rv" style="--i:1">Six établis <em>face à la forêt</em></h2>
+        <p class="lede rv" style="--i:2">La manufacture occupe une ancienne ferme horlogère, à 1 080 mètres d'altitude. Ses fenêtres donnent au nord, comme autrefois : une lumière égale, sans ombre portée, du matin au soir.</p>
+        <p class="lede rv" style="--i:3">Nous y sommes neuf. Chaque montre est assemblée par un seul horloger, qui signe le fond de son poinçon.</p>
+        <dl class="facts rv" style="--i:4">
+          <div><dt>9</dt><dd>artisans</dd></div>
+          <div><dt>40</dt><dd>montres par an</dd></div>
+          <div><dt>2011</dt><dd>année de fondation</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--alt" id="savoir-faire">
+    <div class="split split--flip">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/montre/mains.webp" alt="Les mains d'un horloger posent un balancier sur le mouvement à l'aide d'une brucelle" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">Le savoir-faire</p>
+        <h2 class="title rv" style="--i:1">Ce que la main <em>fait encore mieux</em></h2>
+        <p class="lede rv" style="--i:2">Les machines taillent au micron. La suite revient aux doigts : casser un angle à la lime, tirer un trait droit sur une pierre, poser un balancier sans le voiler.</p>
+        <p class="lede rv" style="--i:3">Rien de cela ne se voit montre fermée. C'est pourtant ce qui la fera tourner juste dans trente ans.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <div class="sheet__head">
+      <p class="eyebrow rv">Trois gestes</p>
+      <h2 class="title rv" style="--i:1">Du métal brut <em>au réglage</em></h2>
+    </div>
+    <div class="cards rv" style="--i:2">
+      <article class="card"><p class="numeral">01</p><h3>L'anglage</h3><p>Chaque arête des ponts est abattue à 45°, puis polie au bois de gentiane. Comptez une journée par pont.</p></article>
+      <article class="card"><p class="numeral">02</p><h3>Le perlage</h3><p>Près de neuf cents cercles se chevauchent sur la platine, posés un à un à la cheville abrasive.</p></article>
+      <article class="card"><p class="numeral">03</p><h3>Le réglage</h3><p>Dix jours d'observation dans cinq positions et à trois températures. Écart toléré : deux secondes par jour.</p></article>
+    </div>
+  </section>
+
+  <section class="sheet sheet--alt sheet--tight">
+    <figure class="quote">
+      <blockquote class="rv">« On ne voit pas tout de suite ce qu'elle a de plus. On le comprend au bout d'un mois, quand on n'a plus envie d'en porter une autre. »</blockquote>
+      <figcaption class="rv" style="--i:1"><cite>Les Cahiers du temps — hiver</cite></figcaption>
+    </figure>
+  </section>
+
+  <section class="sheet" id="rendez-vous">
+    <div class="sheet__head">
+      <p class="eyebrow rv">Rendez-vous</p>
+      <h2 class="title rv" style="--i:1">Venez <em>l'essayer</em></h2>
+      <p class="lede rv" style="--i:2">Une heure en tête-à-tête avec un horloger, les quatre modèles sur un plateau, sans obligation. Nous répondons sous deux jours ouvrés.</p>
+    </div>
+    <form class="form rv" style="--i:3" data-demo="Merci. Ceci est une démonstration : aucune demande n’a été envoyée.">
+      <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+      <label>Courriel<input type="email" name="courriel" autocomplete="email" required></label>
+      <label>Lieu
+        <select name="lieu"><option>La manufacture, Bois-d'Amont</option><option>Le salon parisien, sur invitation</option><option>En visioconférence</option></select>
+      </label>
+      <label>Date souhaitée<input type="date" name="date" required></label>
+      <label class="full">Modèle
+        <select name="modele"><option>Aurèle 39 Nuit — acier</option><option>Aurèle 39 Ivoire — acier</option><option>Aurèle 39 Or rose</option><option>Aurèle 39 Grand Feu</option><option>Je ne sais pas encore</option></select>
+      </label>
+      <label class="full">Un mot, si vous le souhaitez<textarea name="message" rows="3"></textarea></label>
+      <div class="full"><button class="btn" type="submit">Demander un rendez-vous</button></div>
+      <p class="form__done" role="status"></p>
+    </form>
+  </section>
+
+  <section class="sheet sheet--alt sheet--tight" id="venir">
+    <dl class="infos rv">
+      <div><dt>La manufacture</dt><dd>12, chemin de la Combe-Froide<br>39220 Bois-d'Amont</dd></div>
+      <div><dt>Visites</dt><dd>Du mardi au vendredi<br>sur rendez-vous, 10 h – 17 h</dd></div>
+      <div><dt>Contact</dt><dd>03 00 00 00 00<br>atelier@maison-aurele.example</dd></div>
+      <div><dt>Entretien</dt><dd>Révision tous les sept ans,<br>réalisée par l'horloger d'origine</dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <p class="foot__brand">Maison Aurèle</p>
+    <p class="foot__links"><a href="#collection">La collection</a><a href="#atelier">L'atelier</a><a href="#rendez-vous">Rendez-vous</a><a href="../../">Toutes les démos</a></p>
+  </div>
+  <p class="foot__legal">Site de démonstration réalisé pour Écrin. Maison Aurèle est une maison fictive : adresse, prix, calibre et citations sont inventés. © <span data-year>2026</span></p>
+</footer>
+
+<a class="tag" href="../../" title="Retour à la galerie des démos">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg>
+  Écrin <span>· démo</span>
+</a>
+
+<script type="module" src="scene.js"></script>
+<script type="module" src="../../assets/js/ui.js"></script>
+</body>
+</html>
