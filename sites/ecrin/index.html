@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Écrin — Démos de sites premium en 3D</title>
+<meta name="description" content="Écrin : une galerie de sites de démonstration haut de gamme, chacun construit autour d'un objet en 3D temps réel. Pizzeria, horlogerie, parfum, pâtisserie, champagne, café.">
+<meta name="theme-color" content="#08080a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2308080a'/%3E%3Cpath d='M16 5 26 13 16 27 6 13z M6 13h20 M11 13l5-8 5 8-5 14z' fill='none' stroke='%23c9a45c' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/ecrin.css">
+<link rel="stylesheet" href="assets/css/hub.css">
+<script type="importmap">{"imports":{"three":"./assets/vendor/three/build/three.module.min.js","three/addons/":"./assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<canvas class="stage" data-stage aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"><div class="veil__mark">Écrin</div></div>
+
+<header class="bar">
+  <a class="bar__brand" href="#top">Écrin</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#maisons">Les démos</a>
+    <a href="#methode">La méthode</a>
+  </nav>
+  <a class="btn btn--small btn--ghost" href="#maisons">Entrer</a>
+</header>
+
+<main id="top">
+  <section class="chapter chapter--hero" data-chapter data-label="Écrin">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Galerie de démonstration</p>
+      <h1 class="display rv" style="--i:1">Écrin</h1>
+      <p class="lede rv" style="--i:2">Des sites conçus comme des vitrines de joaillier : un objet en trois dimensions, une lumière juste, et une histoire qui se déroule au fil du doigt.</p>
+      <div class="rv" style="--i:3"><a class="btn" href="#maisons">Voir les six maisons</a></div>
+    </div>
+    <div class="cue" aria-hidden="true">Défiler</div>
+  </section>
+
+  <section class="chapter" data-chapter data-label="Six maisons">
+    <div class="chapter__inner">
+      <p class="numeral rv">Six maisons, six métiers</p>
+      <h2 class="title rv" style="--i:1">Chaque métier mérite <em>sa mise en scène</em></h2>
+      <p class="lede rv" style="--i:2">Une pizza qui se découpe, une montre qui s'ouvre sur son mouvement, un bouchon qui saute. Ici, le produit n'est pas une photo : on tourne autour, on s'approche, on le voit vivre.</p>
+      <dl class="facts hub-count rv" style="--i:3">
+        <div><dt>6</dt><dd>univers</dd></div>
+        <div><dt>3D</dt><dd>temps réel</dd></div>
+        <div><dt>0</dt><dd>vidéo à charger</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet sheet--first" id="maisons">
+    <div class="sheet__head">
+      <p class="eyebrow rv">Les démos</p>
+      <h2 class="title rv" style="--i:1">Poussez <em>la porte</em></h2>
+      <p class="lede rv" style="--i:2">Six maisons fictives, six sites complets. Chacun se parcourt de haut en bas, sur ordinateur, tablette ou téléphone.</p>
+    </div>
+
+    <div class="houses">
+      <a class="house" href="demos/pizza/" data-accent="#e9843b" style="--tint:#e9843b" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Pizzeria napolitaine</p>
+          <h3 class="house__name rv" style="--i:1">Forno Nero</h3>
+          <p class="house__pitch rv" style="--i:2">Une margherita en relief qui s'incline, passe au feu, reçoit son basilic, puis laisse partir une part.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">01</span><img src="assets/img/covers/pizza.webp" alt="Aperçu du site Forno Nero : une pizza en 3D sur fond sombre" loading="lazy" width="1600" height="1000"></div>
+      </a>
+
+      <a class="house" href="demos/montre/" data-accent="#c9a45c" style="--tint:#c9a45c" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Haute horlogerie</p>
+          <h3 class="house__name rv" style="--i:1">Maison Aurèle</h3>
+          <p class="house__pitch rv" style="--i:2">Une montre qui donne l'heure exacte, puis s'ouvre couche par couche jusqu'aux rouages de son mouvement.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">02</span><img src="assets/img/covers/montre.webp" alt="Aperçu du site Maison Aurèle : une montre en 3D" loading="lazy" width="1600" height="1000"></div>
+      </a>
+
+      <a class="house" href="demos/parfum/" data-accent="#d9a066" style="--tint:#d9a066" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Parfumerie de niche</p>
+          <h3 class="house__name rv" style="--i:1">Sévane</h3>
+          <p class="house__pitch rv" style="--i:2">Un flacon de verre épais, un capot qui se lève, et les notes du parfum qui gravitent autour de lui.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">03</span><img src="assets/img/covers/parfum.webp" alt="Aperçu du site Sévane : un flacon de parfum en 3D" loading="lazy" width="1600" height="1000"></div>
+      </a>
+
+      <a class="house" href="demos/macaron/" data-accent="#e58aa6" style="--tint:#e58aa6" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Pâtisserie</p>
+          <h3 class="house__name rv" style="--i:1">Maison Lune</h3>
+          <p class="house__pitch rv" style="--i:2">Des macarons en apesanteur, une coque qui se soulève sur son cœur, une pyramide qui se compose toute seule.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">04</span><img src="assets/img/covers/macaron.webp" alt="Aperçu du site Maison Lune : des macarons en 3D sur fond clair" loading="lazy" width="1600" height="1000"></div>
+      </a>
+
+      <a class="house" href="demos/champagne/" data-accent="#cfae6a" style="--tint:#cfae6a" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Maison de champagne</p>
+          <h3 class="house__name rv" style="--i:1">Clos Séraphin</h3>
+          <p class="house__pitch rv" style="--i:2">Une bouteille dans la pénombre de la cave, le bouchon qui saute, la flûte qui se remplit de bulles.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">05</span><img src="assets/img/covers/champagne.webp" alt="Aperçu du site Clos Séraphin : une bouteille de champagne en 3D" loading="lazy" width="1600" height="1000"></div>
+      </a>
+
+      <a class="house" href="demos/cafe/" data-accent="#c9783c" style="--tint:#c9783c" data-in>
+        <div class="house__text">
+          <p class="house__kind rv">Torréfacteur</p>
+          <h3 class="house__name rv" style="--i:1">Noir Velours</h3>
+          <p class="house__pitch rv" style="--i:2">Une tasse d'espresso, des grains qui s'enroulent en tourbillon, puis une plongée dans la crema.</p>
+          <span class="house__go rv" style="--i:3">Entrer</span>
+        </div>
+        <div class="house__cover"><span class="house__num">06</span><img src="assets/img/covers/cafe.webp" alt="Aperçu du site Noir Velours : une tasse d'espresso en 3D" loading="lazy" width="1600" height="1000"></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="sheet sheet--alt" id="methode">
+    <div class="sheet__head">
+      <p class="eyebrow rv">La méthode</p>
+      <h2 class="title rv" style="--i:1">Ce que ces sites <em>ont en commun</em></h2>
+    </div>
+    <div class="cards method rv" style="--i:2">
+      <article class="card"><p class="numeral">01</p><h3>Un objet, pas une photo</h3><p>Le produit est modélisé et affiché en temps réel dans le navigateur. On en fait le tour, on s'en approche, il réagit.</p></article>
+      <article class="card"><p class="numeral">02</p><h3>Un récit au défilement</h3><p>Chaque chapitre déplace la caméra et transforme l'objet. Le visiteur avance à son rythme, la mise en scène le suit.</p></article>
+      <article class="card"><p class="numeral">03</p><h3>Tout est embarqué</h3><p>Polices, images et moteur 3D sont servis avec le site : aucun service tiers à attendre, aucun traceur.</p></article>
+      <article class="card"><p class="numeral">04</p><h3>Pensé pour le tactile</h3><p>La mise en page se recompose sur tablette et téléphone, et la définition s'ajuste seule si l'appareil peine.</p></article>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <div class="closing">
+      <p class="eyebrow rv">Et la vôtre ?</p>
+      <h2 class="title rv" style="--i:1">Chaque démo est <em>un point de départ</em></h2>
+      <p class="lede rv" style="--i:2">Nom, couleurs, textes, photos, objet en 3D : tout se remplace. Ces six maisons n'existent pas ; la septième peut être la vôtre.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <p class="foot__brand">Écrin</p>
+    <p class="foot__links"><a href="demos/pizza/">Forno Nero</a><a href="demos/montre/">Maison Aurèle</a><a href="demos/parfum/">Sévane</a><a href="demos/macaron/">Maison Lune</a><a href="demos/champagne/">Clos Séraphin</a><a href="demos/cafe/">Noir Velours</a></p>
+  </div>
+  <p class="foot__legal">Galerie de démonstration. Les maisons présentées sont fictives : noms, adresses, prix et citations sont inventés. Les photographies ont été générées par intelligence artificielle. © <span data-year>2026</span></p>
+</footer>
+
+<script type="module" src="assets/js/hub.js"></script>
+<script type="module" src="assets/js/ui.js"></script>
+</body>
+</html>

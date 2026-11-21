@@ -1,0 +1,107 @@
+name: Quai · publication des projets
+
+# Publie sur GitHub Pages chaque branche qui contient un site, et chaque dossier ou .zip
+# déposé dans sites/. Liste des liens : https://<compte>.github.io/<depot>/
+
+on:
+  push:
+  create:
+  delete:
+  workflow_dispatch:
+  schedule:
+    # Toutes les 10 minutes : rattrape les branches modifiées qui n'ont pas ce fichier.
+    - cron: '4-59/10 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quai-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  relais:
+    name: Prévenir la branche principale
+    # Seule la branche principale a le droit de déployer sur GitHub Pages :
+    # quand une autre branche bouge, on y relance la publication.
+    if: github.event_name != 'schedule' && github.ref_name != github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - run: |
+          gh workflow run quai-pages.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH" \
+            || echo "::warning::Publication non relancée : la branche $DEFAULT_BRANCH n'a pas (encore) le workflow Quai."
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+
+  construction:
+    name: Assembler les projets
+    if: github.event_name == 'schedule' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    outputs:
+      publier: ${{ steps.bilan.outputs.publier }}
+    env:
+      QUAI_MAIN_BRANCH: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Récupérer toutes les branches
+        run: git fetch --no-tags --depth=1 origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - name: GitHub Pages est-il activé ?
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>/dev/null)" = "workflow" ]; then
+            echo "actif=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "actif=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=GitHub Pages n'est pas encore activé::Ouvre Settings → Pages, puis choisis « GitHub Actions » dans le menu Source."
+            echo "### GitHub Pages n'est pas encore activé" >> "$GITHUB_STEP_SUMMARY"
+            echo "Ouvre https://github.com/$GITHUB_REPOSITORY/settings/pages et choisis **GitHub Actions** dans le menu **Source**. Les projets seront publiés dans les minutes qui suivent." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Y a-t-il du nouveau ?
+        id: sources
+        if: steps.pages.outputs.actif == 'true'
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+            node quai/pages/build.js --changed
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Assembler le site
+        if: steps.sources.outputs.changed == 'true'
+        run: node quai/pages/build.js --out _site
+
+      - name: Préparer la mise en ligne
+        if: steps.sources.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Bilan
+        id: bilan
+        run: echo "publier=${{ steps.sources.outputs.changed == 'true' }}" >> "$GITHUB_OUTPUT"
+
+  mise-en-ligne:
+    name: Mettre en ligne
+    needs: construction
+    if: needs.construction.outputs.publier == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v5

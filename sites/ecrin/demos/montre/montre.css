@@ -1,0 +1,40 @@
+/* Maison Aurèle — nuit bleu-noir, encre ivoire, or champagne. Cormorant léger pour les titres. */
+:root {
+  --bg: #07090d;
+  --surface: #0c1017;
+  --ink: #f1ebdd;
+  --muted: #949baa;
+  --line: rgba(241, 235, 221, 0.14);
+  --accent: #c9a45c;
+  --accent-ink: #0b0d12;
+  --font-display: "Cormorant", "Iowan Old Style", Georgia, serif;
+  --display-weight: 300;
+  --display-tracking: -0.012em;
+}
+
+/* Cormorant a un œil plus petit que les autres polices de titres : on compense un peu. */
+.display { font-size: clamp(56px, 11vw, 176px); line-height: 0.9; }
+.title { font-size: clamp(38px, 5.5vw, 80px); }
+.display em, .title em, .subtitle em { font-weight: 300; }
+.facts dt { font-weight: 400; font-variant-numeric: lining-nums; }
+.bar__brand, .veil__mark, .foot__brand { font-weight: 400; }
+.quote blockquote { font-weight: 300; }
+
+/* la collection : nom du modèle, référence discrète, prix aligné à droite */
+.carte h3 { font-weight: 400; font-size: 28px; }
+.carte h3 span { font-weight: 500; }
+.carte p { max-width: 30em; }
+.carte .ref { display: block; margin-top: 10px; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: color-mix(in srgb, var(--muted) 80%, transparent); }
+
+.card h3 { font-weight: 400; }
+.nb { white-space: nowrap; }
+.sheet__foot { margin-top: clamp(28px, 4vw, 48px); max-width: 44rem; }
+
+.form textarea { resize: vertical; min-height: 96px; }
+
+@media (max-width: 820px), (orientation: portrait) {
+  /* sur téléphone la montre occupe le haut de l'écran : le texte se resserre en bas */
+  .chapter .facts { gap: 14px 28px; }
+  .chapter .facts dt { font-size: 28px; }
+  .chapter .lede { font-size: 15px; line-height: 1.6; }
+}

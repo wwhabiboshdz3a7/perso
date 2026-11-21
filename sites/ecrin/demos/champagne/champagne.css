@@ -1,0 +1,47 @@
+/* Clos Séraphin — vert-noir de cave, encre craie, or pâle ; Bodoni pour les titres. */
+:root {
+  --bg: #07100c;
+  --surface: #0b1711;
+  --ink: #f3efe4;
+  --muted: #9ba699;
+  --line: rgba(243, 239, 228, 0.15);
+  --accent: #cfae6a;
+  --accent-ink: #0b130e;
+  --font-display: "Bodoni", "Cormorant", "Didot", Georgia, serif;
+  --display-weight: 400;
+  --display-tracking: -0.012em;
+}
+
+/* Bodoni : grand corps optique pour les titres, pleins et déliés bien marqués. */
+.display, .title, .subtitle, .quote blockquote { font-variation-settings: "opsz" 72; }
+.display { line-height: 0.96; }
+.title { line-height: 1.06; }
+.display em, .title em, .subtitle em { font-weight: 400; }
+.bar__brand, .foot__brand, .veil__mark { letter-spacing: 0.22em; }
+.facts dt, .carte h3, .card h3 { font-variation-settings: "opsz" 28; }
+
+/* deux boutons côte à côte */
+.actions { display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: center; justify-content: inherit; }
+.chapter--center .actions { justify-content: center; }
+
+/* les cuvées : un peu plus d'air que la carte d'un restaurant */
+.carte li { padding: 26px 0; }
+.carte h3 small { display: block; margin-top: 8px; font: 600 10px/1 var(--font-text); letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+.carte__note { margin-top: clamp(24px, 3vw, 40px); font-size: 13px; color: var(--muted); max-width: 46rem; }
+
+/* mention légale sur l'alcool */
+.foot__health { font: 600 11px/1.6 var(--font-text); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); padding-top: 22px; border-top: 1px solid var(--line); }
+
+@media (max-width: 820px), (orientation: portrait) {
+  .display { font-size: clamp(46px, 13.5vw, 96px); }
+  .title { font-size: clamp(32px, 8.6vw, 60px); }
+}
+.carte h3 b { font-weight: inherit; }
+
+/* téléphone : le texte passe devant le bloc de craie, on l'adosse à un voile sombre sur toute la largeur */
+@media (max-width: 820px), (orientation: portrait) {
+  .chapter__inner::before {
+    inset: -13vh calc(-1 * var(--gutter)) -9vh;
+    background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--bg) 84%, transparent) 24%, color-mix(in srgb, var(--bg) 90%, transparent) 78%, transparent);
+  }
+}

@@ -1,0 +1,79 @@
+/* Maison Lune — thème clair : crème, encre brun profond, framboise, une pointe de pistache.
+   Cormorant pour les titres. */
+:root {
+  --bg: #f6efe6;
+  --surface: #fbf7f1;
+  --ink: #3a2a2a;
+  --muted: #75625f;
+  --line: rgba(58, 42, 42, 0.16);
+  --accent: #c2476b;
+  --accent-ink: #fffaf5;
+  --accent-deep: #a83458; /* framboise plus soutenue pour les petits textes sur fond crème */
+  --pistache: #6f8a3c;
+  --font-display: "Cormorant", "Iowan Old Style", Georgia, serif;
+  --display-weight: 400;
+  --display-tracking: -0.015em;
+  color-scheme: light;
+}
+
+/* Cormorant est fine : un peu plus de corps dans les petites tailles */
+.display { font-weight: 300; line-height: 0.9; }
+.display em, .title em, .subtitle em { font-weight: 400; }
+.title { line-height: 1; }
+.carte h3, .card h3, .facts dt { font-weight: 500; }
+.bar__brand, .foot__brand, .veil__mark { font-weight: 500; }
+.lede { color: color-mix(in srgb, var(--ink) 88%, transparent); }
+
+/* petits textes d'accent : contraste renforcé */
+.eyebrow, .more, .infos dt, .carte h3 span, .form__done, .card .numeral { color: var(--accent-deep); }
+.btn--ghost:hover { color: var(--accent-deep); border-color: var(--accent-deep); }
+.btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+/* barre du haut : un voile crème assez dense pour rester lisible devant les macarons */
+.bar { background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 94%, transparent) 30%, transparent); }
+.bar__nav a { color: color-mix(in srgb, var(--ink) 72%, transparent); }
+
+/* halo clair derrière le texte des chapitres */
+.chapter__inner::before { background: radial-gradient(closest-side, color-mix(in srgb, var(--bg) 78%, transparent), transparent); }
+.chapter .numeral { color: var(--accent-deep); }
+
+/* étiquette de retour vers la galerie, en version claire */
+.tag { color: var(--ink); background: rgba(255, 251, 246, 0.82); border-color: rgba(58, 42, 42, 0.18); box-shadow: 0 6px 24px rgba(58, 42, 42, 0.08); }
+.tag:hover { border-color: rgba(58, 42, 42, 0.45); }
+.tag span { color: var(--muted); }
+
+/* sections */
+.sheet--alt { border-block: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.split__media, .wide img { border-radius: 4px; }
+.wide { margin-inline: var(--gutter); border-radius: 4px; }
+.wide::after { content: ""; position: absolute; inset: 45% 0 0 0; background: linear-gradient(to top, rgba(251, 244, 236, 0.92), rgba(251, 244, 236, 0)); pointer-events: none; }
+.wide figcaption { z-index: 1; left: clamp(20px, 4vw, 56px); text-shadow: 0 1px 18px rgba(255, 250, 244, 0.9); }
+.sheet--join { padding-bottom: clamp(36px, 5vw, 64px); }
+.sheet--after { padding-top: clamp(36px, 5vw, 64px); }
+
+/* les parfums : une pastille de couleur devant chaque nom */
+.carte h3 { align-items: center; }
+.carte h3 i { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--dot, var(--accent)); box-shadow: inset 0 -2px 3px rgba(58, 42, 42, 0.14), 0 0 0 1px rgba(58, 42, 42, 0.06); margin-right: -4px; }
+.carte h3 b { font-weight: inherit; flex: 1; }
+.carte p { padding-left: 26px; }
+
+/* les coffrets */
+.coffrets { margin-top: clamp(40px, 6vw, 80px); }
+.coffrets .card { background: var(--surface); }
+.coffrets .card strong { font: 500 clamp(30px, 3vw, 40px) / 1 var(--font-display); color: var(--ink); }
+.coffrets .card strong small { font: 500 12px/1 var(--font-text); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-left: 6px; }
+.note { margin-top: 22px; max-width: 46rem; }
+.note b { color: var(--pistache); font-weight: 600; }
+
+/* formulaire */
+.form input, .form select, .form textarea { border-bottom-color: rgba(58, 42, 42, 0.34); }
+.form textarea { resize: vertical; min-height: 96px; }
+.form select option { color: var(--ink); background: #fff; }
+
+.foot { background: var(--surface); }
+
+@media (max-width: 820px), (orientation: portrait) {
+  .chapter__inner::before { background: radial-gradient(closest-side, color-mix(in srgb, var(--bg) 90%, transparent), transparent); }
+  .wide { margin-inline: 0; border-radius: 0; }
+  .wide img { border-radius: 0; }
+}

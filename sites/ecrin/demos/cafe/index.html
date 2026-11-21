@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noir Velours — Torréfacteur de cafés de spécialité</title>
+<meta name="description" content="Noir Velours, torréfacteur de cafés de spécialité à Nantes : lots de 12 kg, comptoir de dégustation, abonnement. Démonstration de site Écrin.">
+<meta name="theme-color" content="#0c0806">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230c0806'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23d6916c'/%3E%3Ccircle cx='16' cy='16' r='5.5' fill='%230c0806'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/ecrin.css">
+<link rel="stylesheet" href="cafe.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<canvas class="stage" data-stage aria-hidden="true"></canvas>
+<div class="poster" style="background-image:url('../../assets/img/cafe/extraction.webp')"></div>
+<div class="veil" aria-hidden="true"><div class="veil__mark">Noir Velours</div></div>
+
+<header class="bar">
+  <a class="bar__brand" href="#top">Noir Velours</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#cafes">Les cafés</a>
+    <a href="#atelier">L'atelier</a>
+    <a href="#origine">L'origine</a>
+    <a href="#venir">Venir</a>
+  </nav>
+  <a class="btn btn--small" href="#abonnement">S'abonner</a>
+</header>
+<nav class="rail" aria-label="Chapitres"></nav>
+
+<main id="top">
+  <section class="chapter chapter--hero" data-chapter data-label="Noir Velours">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Torréfacteur · Comptoir de dégustation · Nantes</p>
+      <h1 class="display rv" style="--i:1">Noir <em>Velours</em></h1>
+      <p class="lede rv" style="--i:2">Des cafés de spécialité torréfiés par petits lots, à quelques mètres du comptoir où nous les servons.</p>
+      <div class="actions rv" style="--i:3"><a class="btn" href="#abonnement">S'abonner</a><a class="btn btn--ghost" href="#cafes">Les cafés du moment</a></div>
+    </div>
+    <div class="cue" aria-hidden="true">Défiler</div>
+  </section>
+
+  <section class="chapter chapter--right" data-chapter data-label="L'origine">
+    <div class="chapter__inner">
+      <p class="numeral rv">01 — L'origine</p>
+      <h2 class="title rv" style="--i:1">Cueilli à la main, <em>cerise après cerise</em></h2>
+      <p class="lede rv" style="--i:2">Nos cafés viennent de fermes que nous connaissons par leur nom : les hauts plateaux de Guji, en Éthiopie, les pentes du Huila, en Colombie. Là-haut le fruit mûrit lentement, et se récolte en plusieurs passages.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>1 950 m</dt><dd>d'altitude moyenne</dd></div>
+        <div><dt>7</dt><dd>fermes partenaires</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter" data-chapter data-label="La torréfaction">
+    <div class="chapter__inner">
+      <p class="numeral rv">02 — La torréfaction</p>
+      <h2 class="title rv" style="--i:1">Douze kilos <em>à la fois</em></h2>
+      <p class="lede rv" style="--i:2">Chaque lot tourne une douzaine de minutes dans un tambour en fonte. Une courbe lente, suivie à l'oreille autant qu'à la sonde : on coupe la chauffe quelques instants après le premier crac.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>12 kg</dt><dd>par lot</dd></div>
+        <div><dt>205 °C</dt><dd>en fin de courbe</dd></div>
+        <div><dt>12 min</dt><dd>de tambour</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter chapter--right" data-chapter data-label="L'extraction">
+    <div class="chapter__inner">
+      <p class="numeral rv">03 — L'extraction</p>
+      <h2 class="title rv" style="--i:1">Neuf bars, <em>vingt-sept secondes</em></h2>
+      <p class="lede rv" style="--i:2">Dix-huit grammes de mouture, trente-six en tasse. La crema se referme, tigrée, couleur noisette : c'est elle qui dit si le geste était juste.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>18 g</dt><dd>de mouture</dd></div>
+        <div><dt>9 bars</dt><dd>de pression</dd></div>
+        <div><dt>27 s</dt><dd>d'écoulement</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter chapter--center chapter--top" data-chapter data-label="S'abonner">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Par la poste ou au comptoir</p>
+      <h2 class="title rv" style="--i:1">Torréfié le lundi, <em>chez vous le jeudi</em></h2>
+      <div class="actions rv" style="--i:2"><a class="btn" href="#abonnement">S'abonner</a><a class="btn btn--ghost" href="#venir">Venir au comptoir</a></div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--first" id="cafes">
+    <div class="sheet__head">
+      <p class="eyebrow rv">Les cafés du moment</p>
+      <h2 class="title rv" style="--i:1">Six cafés, <em>torréfiés cette semaine</em></h2>
+      <p class="lede rv" style="--i:2">Paquets de 250 g, en grains ou moulus à la demande. La date de torréfaction est écrite à la main sur chaque sachet.</p>
+    </div>
+    <ul class="carte rv" style="--i:3">
+      <li><h3>Guji Hambela <span>15,50 €</span></h3><p><span class="origine">Éthiopie · lavé · 2 050 m</span>Jasmin, bergamote, pêche blanche. Pour le filtre, ou un espresso très vif.</p></li>
+      <li><h3>Sidama Bensa <span>16 €</span></h3><p><span class="origine">Éthiopie · nature · 1 980 m</span>Myrtille, cacao, fruits rouges confits. Séché trois semaines sur lits africains.</p></li>
+      <li><h3>Huila La Esperanza <span>13,50 €</span></h3><p><span class="origine">Colombie · lavé · 1 750 m</span>Caramel, pomme rouge, noisette. Le café de tous les matins.</p></li>
+      <li><h3>Nariño El Tablón <span>14,50 €</span></h3><p><span class="origine">Colombie · honey · 2 100 m</span>Sucre de canne, mandarine, fleur d'oranger. Une tasse ronde et longue.</p></li>
+      <li><h3>Assemblage Velours <span>12 €</span></h3><p><span class="origine">Éthiopie et Colombie · espresso maison</span>Chocolat noir, noisette grillée, fruits secs. Celui que nous servons au comptoir.</p></li>
+      <li><h3>Décaféiné du Huila <span>13 €</span></h3><p><span class="origine">Colombie · décaféiné à la canne à sucre</span>Biscuit, miel, cacao doux. Un vrai café, pour le soir.</p></li>
+    </ul>
+  </section>
+
+  <figure class="wide" data-in>
+    <img src="../../assets/img/cafe/torrefacteur.webp" alt="Les grains tout juste torréfiés tombent du tambour en cuivre dans le bac de refroidissement" loading="lazy" width="1800" height="1018">
+    <figcaption class="subtitle rv">Un tambour de douze kilos, allumé du lundi au jeudi.</figcaption>
+  </figure>
+
+  <section class="sheet sheet--alt" id="atelier">
+    <div class="sheet__head">
+      <p class="eyebrow rv">L'atelier de torréfaction</p>
+      <h2 class="title rv" style="--i:1">Une courbe <em>par café</em></h2>
+      <p class="lede rv" style="--i:2">L'atelier est derrière la vitre du comptoir. On y torréfie le matin, on y goûte l'après-midi, et rien n'en sort sans être passé par la table de dégustation.</p>
+    </div>
+    <div class="cards rv" style="--i:3">
+      <article class="card"><p class="numeral">01</p><h3>Le café vert</h3><p>Les sacs arrivent par lots de trente kilos. Chaque lot est trié, pesé, et son taux d'humidité mesuré avant le premier essai.</p></article>
+      <article class="card"><p class="numeral">02</p><h3>La courbe</h3><p>Trois torréfactions d'essai de 200 g, goûtées à l'aveugle. La courbe retenue est notée, puis reproduite à la seconde près.</p></article>
+      <article class="card"><p class="numeral">03</p><h3>Le repos</h3><p>Le grain dégaze dix jours avant d'être servi en espresso. Vos paquets partent plus tôt : ils finissent de reposer chez vous.</p></article>
+      <article class="card"><p class="numeral">04</p><h3>La tasse</h3><p>Chaque lot est goûté le lendemain. S'il n'est pas au niveau, il ne part pas : il finit en café du personnel.</p></article>
+    </div>
+  </section>
+
+  <section class="sheet" id="origine">
+    <div class="split">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/cafe/cerises.webp" alt="Cerises de café rouges sur la branche, plantation d'altitude dans la brume" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">L'origine</p>
+        <h2 class="title rv" style="--i:1">Un fruit <em>avant d'être un grain</em></h2>
+        <p class="lede rv" style="--i:2">Le café est le noyau d'une cerise. Cueillie mûre, à la main, elle donne une tasse sucrée et nette ; cueillie trop tôt, aucune torréfaction ne la rattrape. C'est pourquoi nous payons la récolte au-dessus du cours, à des producteurs qui repassent quatre ou cinq fois sur le même arbre.</p>
+        <p class="lede rv" style="--i:3">Le nom de la ferme, l'altitude et le prix payé au producteur figurent sur chaque paquet.</p>
+        <dl class="facts rv" style="--i:4">
+          <div><dt>2</dt><dd>pays</dd></div>
+          <div><dt>7</dt><dd>fermes</dd></div>
+          <div><dt>100 %</dt><dd>arabica tracé</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--alt" id="comptoir">
+    <div class="split split--flip">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/cafe/extraction.webp" alt="Deux filets d'espresso coulent du porte-filtre dans une tasse noire" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">Le comptoir</p>
+        <h2 class="title rv" style="--i:1">Goûter <em>avant de choisir</em></h2>
+        <p class="lede rv" style="--i:2">Huit places, une machine à leviers, trois cafés ouverts chaque jour. Demandez le même grain en espresso puis en filtre : c'est la façon la plus simple de comprendre ce que vous aimez.</p>
+        <p class="lede rv" style="--i:3">Le samedi matin, dégustation commentée de quatre cafés. Douze personnes, une heure, 18 €.</p>
+        <a class="more rv" style="--i:4" href="#venir">Horaires et adresse</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--tight">
+    <figure class="quote">
+      <blockquote class="rv">« On croit venir chercher un paquet de café. On repart en sachant enfin pourquoi on l'aime. »</blockquote>
+      <figcaption class="rv" style="--i:1"><cite>Les Carnets de l'Ouest — octobre</cite></figcaption>
+    </figure>
+  </section>
+
+  <section class="sheet sheet--alt" id="abonnement">
+    <div class="sheet__head">
+      <p class="eyebrow rv">L'abonnement</p>
+      <h2 class="title rv" style="--i:1">Un café différent <em>à chaque envoi</em></h2>
+      <p class="lede rv" style="--i:2">Nous choisissons, vous goûtez. Torréfié le lundi, posté le mardi, dans votre boîte aux lettres le jeudi. Sans engagement : une pause ou un arrêt se règle en un message.</p>
+    </div>
+    <form class="form rv" style="--i:3" data-demo="Merci. Ceci est une démonstration : aucun abonnement n’a été enregistré.">
+      <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+      <label>Courriel<input type="email" name="courriel" autocomplete="email" required></label>
+      <label>Formule
+        <select name="formule">
+          <option>250 g toutes les deux semaines — 14 €</option>
+          <option>250 g chaque semaine — 13 €</option>
+          <option>2 × 250 g chaque mois — 27 €</option>
+        </select>
+      </label>
+      <label>Mouture
+        <select name="mouture"><option>En grains</option><option>Espresso</option><option>Filtre</option><option>Piston</option></select>
+      </label>
+      <div class="full"><button class="btn" type="submit">Commencer l'abonnement</button></div>
+      <p class="form__done" role="status"></p>
+    </form>
+  </section>
+
+  <section class="sheet sheet--tight" id="venir">
+    <dl class="infos rv">
+      <div><dt>Adresse</dt><dd>12, rue du Tambour<br>44000 Nantes</dd></div>
+      <div><dt>Comptoir</dt><dd>Mardi au samedi<br>8 h 30 – 18 h 30</dd></div>
+      <div><dt>Dégustation</dt><dd>Le samedi à 10 h<br>sur inscription, 18 €</dd></div>
+      <div><dt>Contact</dt><dd>02 00 00 00 00<br>bonjour@noirvelours.example</dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <p class="foot__brand">Noir Velours</p>
+    <p class="foot__links"><a href="#cafes">Les cafés</a><a href="#atelier">L'atelier</a><a href="#abonnement">S'abonner</a><a href="../../">Toutes les démos</a></p>
+  </div>
+  <p class="foot__legal">Site de démonstration réalisé pour Écrin. Noir Velours est une maison fictive : adresse, cafés, prix et citations sont inventés. © <span data-year>2026</span></p>
+</footer>
+
+<a class="tag" href="../../" title="Retour à la galerie des démos">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg>
+  Écrin <span>· démo</span>
+</a>
+
+<script type="module" src="scene.js"></script>
+<script type="module" src="../../assets/js/ui.js"></script>
+</body>
+</html>

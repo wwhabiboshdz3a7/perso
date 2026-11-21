@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno Nero — Pizzeria napolitaine au feu de bois</title>
+<meta name="description" content="Forno Nero, pizzeria napolitaine à Toulouse : pâte maturée 72 heures, four à bois à 485 °C. Démonstration de site Écrin.">
+<meta name="theme-color" content="#0a0706">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230a0706'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23e9843b' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/ecrin.css">
+<link rel="stylesheet" href="pizza.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<canvas class="stage" data-stage aria-hidden="true"></canvas>
+<div class="poster" style="background-image:url('../../assets/img/pizza/four.webp')"></div>
+<div class="veil" aria-hidden="true"><div class="veil__mark">Forno Nero</div></div>
+
+<header class="bar">
+  <a class="bar__brand" href="#top">Forno Nero</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#pate">La pâte</a>
+    <a href="#carte">La carte</a>
+    <a href="#maison">La maison</a>
+    <a href="#venir">Venir</a>
+  </nav>
+  <a class="btn btn--small" href="#reserver">Réserver</a>
+</header>
+<nav class="rail" aria-label="Chapitres"></nav>
+
+<main id="top">
+  <section class="chapter chapter--hero chapter--low" data-chapter data-label="Forno Nero">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Pizzeria napolitaine · Toulouse</p>
+      <h1 class="display rv" style="--i:1">Forno <em>Nero</em></h1>
+      <p class="lede rv" style="--i:2">Une pâte, un feu, quatre-vingt-dix secondes. Tout le reste est affaire de patience.</p>
+      <div class="rv" style="--i:3"><a class="btn" href="#reserver">Réserver une table</a></div>
+    </div>
+    <div class="cue" aria-hidden="true">Défiler</div>
+  </section>
+
+  <section class="chapter chapter--top" id="pate" data-chapter data-label="La pâte">
+    <div class="chapter__inner">
+      <p class="numeral rv">01 — La pâte</p>
+      <h2 class="title rv" style="--i:1">Soixante-douze heures <em>de repos</em></h2>
+      <p class="lede rv" style="--i:2">Farine de type 00, eau, sel, une pincée de levure. Puis trois jours au frais : le temps qu'il faut pour un bord soufflé, léger, qui craque puis fond.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>72 h</dt><dd>de maturation</dd></div>
+        <div><dt>68 %</dt><dd>d'hydratation</dd></div>
+        <div><dt>250 g</dt><dd>le pâton</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter chapter--right" data-chapter data-label="Le feu">
+    <div class="chapter__inner">
+      <p class="numeral rv">02 — Le feu</p>
+      <h2 class="title rv" style="--i:1">485 degrés, <em>pas un de moins</em></h2>
+      <p class="lede rv" style="--i:2">Notre four a été monté pierre à pierre par un artisan de Naples. Chêne et hêtre, une flamme vive : la pizza y passe quatre-vingt-dix secondes, puis le basilic arrive, cru.</p>
+      <dl class="facts rv" style="--i:3">
+        <div><dt>90 s</dt><dd>de cuisson</dd></div>
+        <div><dt>2,4 t</dt><dd>de pierre volcanique</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="chapter" data-chapter data-label="La part">
+    <div class="chapter__inner">
+      <p class="numeral rv">03 — La part</p>
+      <h2 class="title rv" style="--i:1">Tomate, lait, <em>basilic</em></h2>
+      <p class="lede rv" style="--i:2">San Marzano de l'Agro Sarnese, mozzarella de bufflonne livrée deux fois par semaine, huile d'olive pressée à froid. Trois ingrédients n'ont nulle part où se cacher.</p>
+      <a class="more rv" style="--i:3" href="#carte">Voir la carte</a>
+    </div>
+  </section>
+
+  <section class="chapter chapter--center chapter--top" id="reserver-appel" data-chapter data-label="À table">
+    <div class="chapter__inner">
+      <p class="eyebrow rv">Du mardi au samedi, midi et soir</p>
+      <h2 class="title rv" style="--i:1">Il reste une place <em>près du four</em></h2>
+      <div class="rv" style="--i:2"><a class="btn" href="#reserver">Réserver une table</a></div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--first" id="carte">
+    <div class="sheet__head">
+      <p class="eyebrow rv">La carte</p>
+      <h2 class="title rv" style="--i:1">Huit pizzas, <em>pas une de plus</em></h2>
+      <p class="lede rv" style="--i:2">La carte change avec les saisons. Celle-ci est celle de l'automne.</p>
+    </div>
+    <ul class="carte rv" style="--i:3">
+      <li><h3>Margherita <span>13 €</span></h3><p>San Marzano, mozzarella fior di latte, basilic, huile d'olive</p></li>
+      <li><h3>Marinara <span>11 €</span></h3><p>San Marzano, ail de Lautrec, origan de Sicile, huile d'olive</p></li>
+      <li><h3>Bufala <span>16 €</span></h3><p>Tomates jaunes du Vésuve, bufflonne crue ajoutée à la sortie du four</p></li>
+      <li><h3>Diavola <span>15 €</span></h3><p>Spianata piquante de Calabre, fior di latte, piment frais</p></li>
+      <li><h3>Nduja e miele <span>17 €</span></h3><p>Nduja, stracciatella, miel de châtaignier, zeste de citron</p></li>
+      <li><h3>Ortolana <span>15 €</span></h3><p>Courge rôtie, scamorza fumée, sauge, noisettes du Piémont</p></li>
+      <li><h3>Quattro latti <span>16 €</span></h3><p>Fior di latte, ricotta, gorgonzola doux, parmesan 30 mois</p></li>
+      <li><h3>Tartufo nero <span>22 €</span></h3><p>Crème de truffe noire, champignons de saison, jaune d'œuf confit</p></li>
+    </ul>
+  </section>
+
+  <figure class="wide" data-in>
+    <img src="../../assets/img/pizza/four.webp" alt="La bouche du four à bois, flammes vives sous la voûte" loading="lazy" width="1800" height="1018">
+    <figcaption class="subtitle rv">Un seul four, allumé chaque matin à neuf heures.</figcaption>
+  </figure>
+
+  <section class="sheet" id="maison">
+    <div class="split">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/pizza/mains.webp" alt="Les mains du pizzaiolo étirent un pâton dans un nuage de farine" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">La maison</p>
+        <h2 class="title rv" style="--i:1">Le geste <em>avant tout</em></h2>
+        <p class="lede rv" style="--i:2">La pâte ne connaît pas le rouleau. Elle s'étire à la main, du centre vers le bord, pour pousser l'air là où il doit gonfler. Il faut deux ans pour l'apprendre, et une vie pour ne plus y penser.</p>
+        <p class="lede rv" style="--i:3">Nous sommes quatre devant le four. Vous nous verrez depuis toutes les tables.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--alt">
+    <div class="split split--flip">
+      <div class="split__media ratio-tall" data-in><img src="../../assets/img/pizza/ingredients.webp" alt="Tomates San Marzano, mozzarella, basilic et huile d'olive sur une ardoise" loading="lazy" width="1300" height="1625"></div>
+      <div class="split__text">
+        <p class="eyebrow rv">Les produits</p>
+        <h2 class="title rv" style="--i:1">Peu de choses, <em>très bien choisies</em></h2>
+        <p class="lede rv" style="--i:2">Chaque producteur est nommé sur la carte. Nous allons les voir une fois l'an, en Campanie, quand les tomates sont mûres.</p>
+        <dl class="facts rv" style="--i:3">
+          <div><dt>11</dt><dd>producteurs</dd></div>
+          <div><dt>0</dt><dd>congélateur</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet sheet--tight">
+    <figure class="quote">
+      <blockquote class="rv">« La meilleure margherita que j'aie mangée de ce côté-ci des Alpes. »</blockquote>
+      <figcaption class="rv" style="--i:1"><cite>Le Carnet gourmand — novembre</cite></figcaption>
+    </figure>
+  </section>
+
+  <section class="sheet sheet--alt" id="reserver">
+    <div class="sheet__head">
+      <p class="eyebrow rv">Réserver</p>
+      <h2 class="title rv" style="--i:1">Une table <em>ce soir ?</em></h2>
+      <p class="lede rv" style="--i:2">Quarante couverts seulement. Nous gardons toujours quelques places au comptoir pour celles et ceux qui passent.</p>
+    </div>
+    <form class="form rv" style="--i:3" data-demo="Merci. Ceci est une démonstration : aucune réservation n’a été envoyée.">
+      <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+      <label>Téléphone<input type="tel" name="tel" autocomplete="tel" required></label>
+      <label>Date<input type="date" name="date" required></label>
+      <label>Couverts
+        <select name="couverts"><option>2 personnes</option><option>3 personnes</option><option>4 personnes</option><option>5 personnes</option><option>6 personnes</option></select>
+      </label>
+      <div class="full"><button class="btn" type="submit">Demander la table</button></div>
+      <p class="form__done" role="status"></p>
+    </form>
+  </section>
+
+  <section class="sheet sheet--tight" id="venir">
+    <dl class="infos rv">
+      <div><dt>Adresse</dt><dd>14, rue des Braises<br>31000 Toulouse</dd></div>
+      <div><dt>Horaires</dt><dd>Mardi au samedi<br>12 h – 14 h · 19 h – 22 h 30</dd></div>
+      <div><dt>Contact</dt><dd>05 00 00 00 00<br>bonjour@fornonero.example</dd></div>
+      <div><dt>À emporter</dt><dd>Sur place uniquement,<br>jusqu'à 21 h</dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <p class="foot__brand">Forno Nero</p>
+    <p class="foot__links"><a href="#carte">La carte</a><a href="#maison">La maison</a><a href="#reserver">Réserver</a><a href="../../">Toutes les démos</a></p>
+  </div>
+  <p class="foot__legal">Site de démonstration réalisé pour Écrin. Forno Nero est une maison fictive : adresse, prix et citations sont inventés. © <span data-year>2026</span></p>
+</footer>
+
+<a class="tag" href="../../" title="Retour à la galerie des démos">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg>
+  Écrin <span>· démo</span>
+</a>
+
+<script type="module" src="scene.js"></script>
+<script type="module" src="../../assets/js/ui.js"></script>
+</body>
+</html>
