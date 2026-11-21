@@ -238,7 +238,7 @@
           <p class="lbl ticket__ask">Demander ce rendez-vous</p>
           <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
           <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" required pattern="0[1-9]([ .]?[0-9]{2}){4}" title="Dix chiffres, par exemple 06 12 34 56 78"></label>
-          <label>Immatriculation<input type="text" name="immat" required pattern="[A-Za-z]{2}[- ]?[0-9]{3}[- ]?[A-Za-z]{2}" title="Format AB-123-CD" placeholder="AB-123-CD" autocapitalize="characters"></label>
+          <label>Immatriculation<input type="text" name="immat" required pattern="[A-Za-z]{2}[\- ]?[0-9]{3}[\- ]?[A-Za-z]{2}" title="Format AB-123-CD" placeholder="AB-123-CD" autocapitalize="characters"></label>
           <label>Date souhaitée<input type="date" name="date" required data-q-date></label>
           <button class="btn btn--ink" type="submit" data-q-submit>Demander le rendez-vous</button>
           <p class="ticket__done lbl" data-done role="status"></p>

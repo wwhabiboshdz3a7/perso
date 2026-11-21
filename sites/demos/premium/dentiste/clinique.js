@@ -160,6 +160,7 @@ if (booking) {
     set('slot', state.slot && `${slotText(state.slot.date, state.slot.time, true).replace(/^./, (c) => c.toUpperCase())}`, 'Créneau à choisir');
     fields.hidden = !state.slot || confirmed;
     wait.hidden = Boolean(state.slot) || confirmed;
+    wait.textContent = !state.motif ? 'Choisissez un motif, un praticien puis un créneau : la confirmation apparaît ici.' : !state.doctor ? 'Il reste à choisir un praticien, puis un créneau.' : 'Il reste à choisir un créneau.';
     ok.hidden = !confirmed;
     $('[data-crumb="1"]', booking).textContent = state.motif ? state.motif.label : '';
     $('[data-crumb="2"]', booking).textContent = state.doctor ? state.doctor.name : '';
@@ -337,8 +338,9 @@ if (est) {
     const result = estimate({ price: act.price, base: number(baseInput), rate, level, forfait: act.forfait ? number(forfaitInput) : 0, zero: act.zero });
     $('[data-est-rac]', est).textContent = euros(result.rac);
     $('[data-est-price]', est).textContent = euros(act.price);
-    $('[data-est-ss]', est).textContent = '− ' + euros(result.ss);
-    $('[data-est-mut]', est).textContent = '− ' + euros(result.mutuelle);
+    const minus = (value) => (value > 0 ? '− ' : '') + euros(value);
+    $('[data-est-ss]', est).textContent = minus(result.ss);
+    $('[data-est-mut]', est).textContent = minus(result.mutuelle);
     $('[data-est-you]', est).textContent = euros(result.rac);
     $('[data-est-rate]', est).textContent = `${Math.round(rate * 100)} % de ${euros(number(baseInput))}`;
     for (const [key, value] of [['ss', result.ss], ['mut', result.mutuelle], ['rac', result.rac]]) {

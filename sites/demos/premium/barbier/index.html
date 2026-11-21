@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAME — Barbier-coiffeur aux Carmes, Toulouse</title>
+<meta name="description" content="LAME, barbier-coiffeur pour hommes aux Carmes : dégradés, barbes à la lame, quatre fauteuils. Démonstration de site Premium — entreprise fictive.">
+<meta name="theme-color" content="#efe7d6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111010'/%3E%3Cpath d='M-4 20 20-4h8L4 20zM10 36 36 10v8L18 36z' fill='%239b1c1c'/%3E%3Cpath d='M4 28 28 4h6L10 28z' fill='%23efe7d6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="barbier.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="top">
+  <a class="top__brand" href="#accueil" aria-label="LAME, retour en haut de page"><i class="pole" aria-hidden="true"></i>LAME</a>
+  <nav class="top__nav" aria-label="Sections">
+    <a href="#film">Le geste</a>
+    <a href="#essayer">Essayer</a>
+    <a href="#carte">Tarifs</a>
+    <a href="#equipe">L'équipe</a>
+    <a href="#venir">Venir</a>
+  </nav>
+  <a class="btn btn--red top__cta" href="#reserver">Réserver</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : le nom, tranché net, et la tondeuse cadrée serré -->
+  <section class="hero">
+    <p class="hero__meta mono"><span>Barbier — coiffeur · Toulouse, les Carmes</span><span class="status" data-open-status>Lundi → samedi · 9 h 30 – 19 h 30</span></p>
+    <div class="hero__main">
+      <h1 class="hero__title" aria-label="Lame">
+        <span class="cut cut--a" aria-hidden="true">LAME</span>
+        <span class="cut cut--b" aria-hidden="true">LAME</span>
+      </h1>
+      <div class="hero__text">
+        <p class="hero__claim">Coupe nette.<br><em>Barbe droite.</em></p>
+        <div>
+          <p class="hero__lede">Quatre fauteuils rue des Rémouleurs, à deux pas du marché des Carmes. Tu choisis ta coupe, ton barbier, ton créneau — et tu ressors net en trente minutes.</p>
+          <div class="hero__cta">
+            <a class="btn btn--ink" href="#reserver">Prendre un créneau</a>
+            <a class="btn btn--line" href="#essayer">Essayer une coupe</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <figure class="hero__media">
+      <video data-loop muted loop playsinline preload="metadata" poster="media/tondeuse.webp" aria-label="Un barbier passe la tondeuse sur une nuque pour fondre un dégradé">
+        <source src="media/tondeuse.mp4" type="video/mp4">
+      </video>
+      <i class="stripes stripes--v" aria-hidden="true"></i>
+      <div class="stamp" aria-hidden="true">
+        <svg viewBox="0 0 200 200"><defs><path id="ring-a" d="M100 100m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/></defs><text><textPath href="#ring-a" textLength="496">SANS RENDEZ-VOUS LE MATIN · CARMES · TOULOUSE ·</textPath></text></svg>
+        <b>dès<br><span>14 €</span></b>
+      </div>
+      <figcaption class="mono">Fauteuil 01 · dégradé bas</figcaption>
+    </figure>
+    <dl class="hero__facts">
+      <div><dt>4</dt><dd>fauteuils,<br>quatre barbiers</dd></div>
+      <div><dt>30 min</dt><dd>pour un dégradé,<br>shampoing compris</dd></div>
+      <div><dt>4,9<small>/5</small></dt><dd>sur 640 avis<br>depuis 2019</dd></div>
+      <div><dt>9 h 30</dt><dd>sans rendez-vous<br>jusqu'à midi</dd></div>
+    </dl>
+  </section>
+
+  <div class="band" aria-hidden="true">
+    <i class="stripes"></i>
+    <div class="marquee band__words">
+      <div class="marquee__track">
+        <span>Dégradé</span><i class="pole"></i><span>Crop texturé</span><i class="pole"></i><span>Pompadour</span><i class="pole"></i><span>Tonte</span><i class="pole"></i><span>Barbe à la lame</span><i class="pole"></i><span>Rasage serviette chaude</span><i class="pole"></i>
+        <span>Dégradé</span><i class="pole"></i><span>Crop texturé</span><i class="pole"></i><span>Pompadour</span><i class="pole"></i><span>Tonte</span><i class="pole"></i><span>Barbe à la lame</span><i class="pole"></i><span>Rasage serviette chaude</span><i class="pole"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- le film : un seul plan, long, que l'on fait avancer en défilant -->
+  <section class="film" id="film" data-film data-length="2.4" aria-label="Le dégradé, en trois temps">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/tondeuse" data-frames="41" data-label="Le dégradé">
+        <div class="shot__head">
+          <p class="step"><b>01</b> Le geste</p>
+          <h2 class="shot__title">Le dégradé</h2>
+        </div>
+        <ol class="beats">
+          <li class="beat" style="--a:-1;--b:.3;--s:0"><b>1</b><h3>La ligne de départ</h3><p>Tondeuse sans sabot au ras de la nuque et des oreilles. C'est le trait le plus bas : tout le fondu part de là.</p></li>
+          <li class="beat" style="--a:.3;--b:.62;--s:.3"><b>2</b><h3>Les paliers</h3><p>Sabot 1, puis 2, puis 3, peigne en appui. À chaque passage, la tondeuse sort d'un coup de poignet pour effacer la marche.</p></li>
+          <li class="beat" style="--a:.62;--b:2;--s:.62"><b>3</b><h3>Le fondu</h3><p>Levier ouvert, on reprend entre deux hauteurs jusqu'à ce qu'on ne voie plus aucune ligne. Miroir derrière la tête : tu valides.</p></li>
+        </ol>
+      </article>
+    </div>
+  </section>
+
+  <!-- le buste en 3D : essayer une coupe et une barbe -->
+  <section class="essai" id="essayer" data-essai>
+    <header class="essai__head">
+      <div>
+        <p class="step rv"><b>02</b> Le salon d'essayage</p>
+        <h2 class="h2 rv" style="--i:1">Essaie <em>ta coupe</em></h2>
+      </div>
+      <p class="text rv" style="--i:2">Quatre coupes, trois barbes : douze têtes possibles. Fais tourner le buste, regarde la nuque, puis réserve exactement ce que tu vois — la durée et le prix suivent.</p>
+    </header>
+    <div class="essai__grid">
+      <fieldset class="opts opts--coupe">
+        <legend class="mono">A — La coupe</legend>
+        <label class="opt"><input type="radio" name="look-coupe" value="degrade" data-presta="degrade" data-name="Dégradé bas" data-min="30" data-price="26" checked><b>01</b><span class="opt__name">Dégradé bas</span><span class="opt__desc">Fondu à blanc sur la nuque, longueur gardée dessus.</span><em>30 min · 26 €</em></label>
+        <label class="opt"><input type="radio" name="look-coupe" value="crop" data-presta="crop" data-name="Crop texturé" data-min="35" data-price="28"><b>02</b><span class="opt__name">Crop texturé</span><span class="opt__desc">Frange courte, dessus travaillé aux ciseaux, côtés hauts.</span><em>35 min · 28 €</em></label>
+        <label class="opt"><input type="radio" name="look-coupe" value="pompadour" data-presta="pompadour" data-name="Pompadour" data-min="40" data-price="32"><b>03</b><span class="opt__name">Pompadour</span><span class="opt__desc">Volume coiffé vers l'arrière, côtés courts, brushing.</span><em>40 min · 32 €</em></label>
+        <label class="opt"><input type="radio" name="look-coupe" value="tondu" data-presta="tonte" data-name="Tondu" data-min="15" data-price="14"><b>04</b><span class="opt__name">Tondu</span><span class="opt__desc">Une seule hauteur à la tondeuse, contours nets.</span><em>15 min · 14 €</em></label>
+      </fieldset>
+
+      <div class="essai__stage">
+        <p class="essai__ghost" aria-hidden="true" data-look-ghost>Dégradé</p>
+        <canvas class="essai__canvas" data-buste tabindex="0" aria-label="Buste en trois dimensions portant la coupe et la barbe choisies. Fais-le tourner avec les flèches gauche et droite."></canvas>
+        <img class="essai__fallback" src="media/photo-1.webp" alt="Le salon LAME : quatre fauteuils en cuir devant un mur de carreaux vert bouteille" loading="lazy">
+        <p class="essai__hint mono" aria-hidden="true">↔ fais tourner la tête</p>
+        <div class="essai__views" role="group" aria-label="Angle de vue">
+          <button type="button" data-view="face">Face</button>
+          <button type="button" data-view="profil">Profil</button>
+          <button type="button" data-view="nuque">Nuque</button>
+        </div>
+      </div>
+
+      <div class="essai__side">
+        <fieldset class="opts opts--barbe">
+          <legend class="mono">B — La barbe</legend>
+          <label class="opt"><input type="radio" name="look-barbe" value="rase" data-presta="rasage" data-name="Rasé de près" data-min="25" data-price="22"><span class="opt__name">Rasé de près</span><span class="opt__desc">Serviette chaude, blaireau, coupe-chou.</span><em>25 min · 22 €</em></label>
+          <label class="opt"><input type="radio" name="look-barbe" value="trois" data-presta="trois" data-name="Barbe de trois jours" data-min="10" data-price="10" checked><span class="opt__name">Trois jours</span><span class="opt__desc">Tondeuse, joues et cou nettoyés.</span><em>10 min · 10 €</em></label>
+          <label class="opt"><input type="radio" name="look-barbe" value="pleine" data-presta="pleine" data-name="Barbe pleine" data-min="20" data-price="18"><span class="opt__name">Barbe pleine</span><span class="opt__desc">Ciseaux, contours à la lame, huile.</span><em>20 min · 18 €</em></label>
+        </fieldset>
+        <div class="ticket">
+          <p class="ticket__head mono"><span>Ton look</span><span data-look-code>N° 01 · B2</span></p>
+          <dl class="ticket__lines" aria-live="polite">
+            <div><dt data-look-coupe>Dégradé bas</dt><dd data-look-coupe-meta>30 min · 26 €</dd></div>
+            <div data-look-barbe-line><dt data-look-barbe>Barbe de trois jours</dt><dd data-look-barbe-meta>10 min · 10 €</dd></div>
+            <div class="ticket__duo" data-look-duo><dt>Duo coupe + barbe</dt><dd>− 4 €</dd></div>
+          </dl>
+          <label class="solo"><input type="checkbox" data-look-solo><span>Juste la coupe : je m'occupe de ma barbe</span></label>
+          <p class="ticket__total"><b data-look-total>32 €</b><span class="mono" data-look-time>40 min au fauteuil</span></p>
+          <a class="btn btn--red" href="#reserver" data-look-book>Réserver ce look →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- la carte des prestations -->
+  <section class="carte" id="carte">
+    <header class="carte__head">
+      <div>
+        <p class="step rv"><b>03</b> Les tarifs</p>
+        <h2 class="h2 rv" style="--i:1">Huit prestations,<br><em>prix affichés</em></h2>
+        <p class="text rv" style="--i:2">Le prix est le même quel que soit le barbier. Shampoing et coiffage compris, rien à payer en ligne. Coupe et barbe le même jour : 4 € de moins.</p>
+      </div>
+      <figure class="carte__photo rv" style="--i:2">
+        <img src="media/photo-2.webp" alt="Sur un plateau vert : coupe-chou, peigne en acier, ciseaux, blaireau, deux pots de cire et une serviette pliée" loading="lazy" width="1168" height="880">
+        <figcaption class="mono">Le plateau d'Inès, avant un rasage</figcaption>
+      </figure>
+    </header>
+    <ul class="prestas">
+      <li class="presta rv"><p class="mono">Coupe · 30 min</p><h3>Dégradé</h3><p class="presta__desc">Bas, moyen ou haut. Fondu à blanc, contours à la lame.</p><p class="presta__price">26<span>€</span></p><a class="presta__go" href="#reserver" data-pick-coupe="degrade">Réserver<span class="sr-only"> un dégradé</span></a><i class="presta__badge mono">La plus demandée</i></li>
+      <li class="presta rv" style="--i:1"><p class="mono">Coupe · 35 min</p><h3>Crop texturé</h3><p class="presta__desc">Frange courte, dessus piqué aux ciseaux, côtés hauts.</p><p class="presta__price">28<span>€</span></p><a class="presta__go" href="#reserver" data-pick-coupe="crop">Réserver<span class="sr-only"> un crop texturé</span></a></li>
+      <li class="presta rv" style="--i:2"><p class="mono">Coupe · 40 min</p><h3>Pompadour</h3><p class="presta__desc">Coupe longue aux ciseaux, brushing, cire en finition.</p><p class="presta__price">32<span>€</span></p><a class="presta__go" href="#reserver" data-pick-coupe="pompadour">Réserver<span class="sr-only"> une pompadour</span></a></li>
+      <li class="presta rv" style="--i:3"><p class="mono">Coupe · 15 min</p><h3>Tonte</h3><p class="presta__desc">Une hauteur partout, du sabot 1 au 4, contours nets.</p><p class="presta__price">14<span>€</span></p><a class="presta__go" href="#reserver" data-pick-coupe="tonte">Réserver<span class="sr-only"> une tonte</span></a></li>
+      <li class="presta presta--green rv"><p class="mono">Barbe · 10 min</p><h3>Trois jours</h3><p class="presta__desc">Entretien à la tondeuse, joues et cou nettoyés.</p><p class="presta__price">10<span>€</span></p><a class="presta__go" href="#reserver" data-pick-barbe="trois">Réserver<span class="sr-only"> une barbe de trois jours</span></a></li>
+      <li class="presta presta--green rv" style="--i:1"><p class="mono">Barbe · 20 min</p><h3>Barbe pleine</h3><p class="presta__desc">Taille aux ciseaux, contours à la lame, huile.</p><p class="presta__price">18<span>€</span></p><a class="presta__go" href="#reserver" data-pick-barbe="pleine">Réserver<span class="sr-only"> une taille de barbe</span></a></li>
+      <li class="presta presta--green rv" style="--i:2"><p class="mono">Barbe · 25 min</p><h3>Rasage à l'ancienne</h3><p class="presta__desc">Serviette chaude, savon au blaireau, coupe-chou.</p><p class="presta__price">22<span>€</span></p><a class="presta__go" href="#reserver" data-pick-barbe="rasage">Réserver<span class="sr-only"> un rasage à l'ancienne</span></a></li>
+      <li class="presta presta--red rv" style="--i:3"><p class="mono">Moins de 12 ans · 20 min</p><h3>Coupe gamin</h3><p class="presta__desc">Aux ciseaux si la tondeuse fait peur. Dès 4 ans.</p><p class="presta__price">16<span>€</span></p><a class="presta__go" href="#reserver" data-pick-coupe="gamin">Réserver<span class="sr-only"> une coupe gamin</span></a></li>
+    </ul>
+  </section>
+
+  <!-- preuves -->
+  <section class="preuves" aria-label="Chiffres et avis">
+    <dl class="chiffres">
+      <div class="rv"><dt>4,9<small>/5</small></dt><dd>Note moyenne sur 640 avis</dd></div>
+      <div class="rv" style="--i:1"><dt>38</dt><dd>Têtes par jour, en moyenne</dd></div>
+      <div class="rv" style="--i:2"><dt>12<small>min</small></dt><dd>D'attente sans rendez-vous, le matin</dd></div>
+      <div class="rv" style="--i:3"><dt>2019</dt><dd>Ouverture rue des Rémouleurs</dd></div>
+    </dl>
+    <ul class="avis">
+      <li class="rv"><blockquote>« Dégradé raté trois fois ailleurs. Malik a repris la nuque en dix minutes, sans faire de commentaire. J'y retourne toutes les trois semaines. »</blockquote><p class="mono">Bastien · client depuis 2022</p></li>
+      <li class="rv" style="--i:1"><blockquote>« Réservé à 8 h pour 12 h 15, sorti à 12 h 50, barbe comprise. Pour une pause déjeuner, c'est exactement ce qu'il faut. »</blockquote><p class="mono">Karim · coupe + barbe pleine</p></li>
+      <li class="rv" style="--i:2"><blockquote>« Mon fils de six ans a peur des tondeuses. Théo a tout fait aux ciseaux en lui expliquant chaque geste. Pas une larme. »</blockquote><p class="mono">Claire · maman de Léon</p></li>
+    </ul>
+  </section>
+
+  <!-- l'équipe -->
+  <section class="equipe" id="equipe">
+    <header class="equipe__head">
+      <p class="step rv"><b>04</b> L'équipe</p>
+      <h2 class="h2 rv" style="--i:1">Quatre fauteuils,<br><em>quatre spécialités</em></h2>
+    </header>
+    <ul class="fauteuils">
+      <li class="fauteuil rv">
+        <p class="fauteuil__n" aria-hidden="true">01</p>
+        <h3>Malik</h3>
+        <p class="mono">Fondateur · 14 ans de métier</p>
+        <p class="fauteuil__txt">Dégradés à blanc et nuques impeccables. Il a ouvert LAME en 2019 avec un seul fauteuil.</p>
+        <p class="jours" aria-label="Présent du mardi au samedi"><i class="off">L</i><i>M</i><i>M</i><i>J</i><i>V</i><i>S</i></p>
+        <a class="fauteuil__go" href="#reserver" data-pick-barbier="malik">Réserver avec Malik</a>
+      </li>
+      <li class="fauteuil rv" style="--i:1">
+        <p class="fauteuil__n" aria-hidden="true">02</p>
+        <h3>Jo</h3>
+        <p class="mono">Coiffeur · 9 ans de métier</p>
+        <p class="fauteuil__txt">Ciseaux, coupes longues et pompadours qui tiennent jusqu'au soir sans casque de laque.</p>
+        <p class="jours" aria-label="Présent du lundi au samedi, sauf le mercredi"><i>L</i><i>M</i><i class="off">M</i><i>J</i><i>V</i><i>S</i></p>
+        <a class="fauteuil__go" href="#reserver" data-pick-barbier="jo">Réserver avec Jo</a>
+      </li>
+      <li class="fauteuil rv" style="--i:2">
+        <p class="fauteuil__n" aria-hidden="true">03</p>
+        <h3>Inès</h3>
+        <p class="mono">Barbière · 7 ans de métier</p>
+        <p class="fauteuil__txt">Coupe-chou, serviette chaude, contours au millimètre. Les barbes pleines passent par elle.</p>
+        <p class="jours" aria-label="Présente du mardi au samedi"><i class="off">L</i><i>M</i><i>M</i><i>J</i><i>V</i><i>S</i></p>
+        <a class="fauteuil__go" href="#reserver" data-pick-barbier="ines">Réserver avec Inès</a>
+      </li>
+      <li class="fauteuil rv" style="--i:3">
+        <p class="fauteuil__n" aria-hidden="true">04</p>
+        <h3>Théo</h3>
+        <p class="mono">Coiffeur · 4 ans de métier</p>
+        <p class="fauteuil__txt">Tontes, crops et premières coupes des enfants. Patient, même un samedi à 17 h.</p>
+        <p class="jours" aria-label="Présent du lundi au samedi, sauf le jeudi"><i>L</i><i>M</i><i>M</i><i class="off">J</i><i>V</i><i>S</i></p>
+        <a class="fauteuil__go" href="#reserver" data-pick-barbier="theo">Réserver avec Théo</a>
+      </li>
+    </ul>
+  </section>
+
+  <i class="stripes stripes--thick" aria-hidden="true"></i>
+
+  <!-- réserver : prestation → barbier → créneau -->
+  <section class="resa" id="reserver">
+    <header class="resa__head">
+      <div>
+        <p class="step rv"><b>05</b> Réserver</p>
+        <h2 class="h2 rv" style="--i:1">Ton fauteuil,<br><em>en trois temps</em></h2>
+      </div>
+      <p class="text rv" style="--i:2">Les créneaux d'aujourd'hui et du prochain jour ouvert, en direct. Tu règles au salon, après la coupe. Un doute ? <button class="link" type="button" data-chat-open>Demande à Sam</button>.</p>
+    </header>
+    <form class="board rv" style="--i:2" novalidate data-resa data-demo="Démonstration : aucun rendez-vous n’a été envoyé.">
+      <fieldset class="col">
+        <legend><b>1</b> La prestation</legend>
+        <p class="col__label mono">Coupe</p>
+        <label class="pick"><input type="radio" name="coupe" value="degrade" data-name="Dégradé" data-min="30" data-price="26" checked><span>Dégradé</span><em>30 min · 26 €</em></label>
+        <label class="pick"><input type="radio" name="coupe" value="crop" data-name="Crop texturé" data-min="35" data-price="28"><span>Crop texturé</span><em>35 min · 28 €</em></label>
+        <label class="pick"><input type="radio" name="coupe" value="pompadour" data-name="Pompadour" data-min="40" data-price="32"><span>Pompadour</span><em>40 min · 32 €</em></label>
+        <label class="pick"><input type="radio" name="coupe" value="tonte" data-name="Tonte" data-min="15" data-price="14"><span>Tonte</span><em>15 min · 14 €</em></label>
+        <label class="pick"><input type="radio" name="coupe" value="gamin" data-name="Coupe gamin" data-min="20" data-price="16"><span>Coupe gamin</span><em>20 min · 16 €</em></label>
+        <label class="pick pick--none"><input type="radio" name="coupe" value="aucune" data-name="" data-min="0" data-price="0"><span>Pas de coupe</span><em>—</em></label>
+        <p class="col__label mono">Barbe</p>
+        <label class="pick pick--none"><input type="radio" name="barbe" value="aucune" data-name="" data-min="0" data-price="0" checked><span>Pas de barbe</span><em>—</em></label>
+        <label class="pick"><input type="radio" name="barbe" value="trois" data-name="Barbe de trois jours" data-min="10" data-price="10"><span>Trois jours</span><em>10 min · 10 €</em></label>
+        <label class="pick"><input type="radio" name="barbe" value="pleine" data-name="Barbe pleine" data-min="20" data-price="18"><span>Barbe pleine</span><em>20 min · 18 €</em></label>
+        <label class="pick"><input type="radio" name="barbe" value="rasage" data-name="Rasage à l'ancienne" data-min="25" data-price="22"><span>Rasage à l'ancienne</span><em>25 min · 22 €</em></label>
+      </fieldset>
+
+      <fieldset class="col">
+        <legend><b>2</b> Le barbier</legend>
+        <label class="pick pick--tall"><input type="radio" name="barbier" value="auto" data-name="Premier disponible" checked><span>Premier disponible</span><em>le plus de créneaux</em></label>
+        <label class="pick pick--tall"><input type="radio" name="barbier" value="malik" data-name="Malik"><span>Malik</span><em>dégradés · fauteuil 01</em></label>
+        <label class="pick pick--tall"><input type="radio" name="barbier" value="jo" data-name="Jo"><span>Jo</span><em>ciseaux · fauteuil 02</em></label>
+        <label class="pick pick--tall"><input type="radio" name="barbier" value="ines" data-name="Inès"><span>Inès</span><em>barbe · fauteuil 03</em></label>
+        <label class="pick pick--tall"><input type="radio" name="barbier" value="theo" data-name="Théo"><span>Théo</span><em>tontes, enfants · fauteuil 04</em></label>
+      </fieldset>
+
+      <fieldset class="col col--slots">
+        <legend><b>3</b> Le créneau</legend>
+        <div class="days" data-days></div>
+        <p class="slots__note mono" data-slots-note aria-live="polite">Les créneaux s'affichent ici.</p>
+        <div class="slots" data-slots></div>
+        <p class="slots__key mono" aria-hidden="true"><i></i> libre <i class="full"></i> complet ou passé</p>
+      </fieldset>
+
+      <aside class="recap" aria-label="Récapitulatif du rendez-vous">
+        <p class="recap__head mono"><span>Récapitulatif</span><span>LAME · Carmes</span></p>
+        <dl class="recap__lines" data-recap-lines aria-live="polite"></dl>
+        <dl class="recap__when">
+          <div><dt class="mono">Avec</dt><dd data-recap-who>Premier disponible</dd></div>
+          <div><dt class="mono">Quand</dt><dd data-recap-when>Choisis un créneau</dd></div>
+        </dl>
+        <p class="recap__total"><b data-recap-total>26 €</b><span class="mono" data-recap-time>30 min</span></p>
+        <div class="recap__fields">
+          <label>Prénom<input type="text" name="prenom" autocomplete="given-name" required></label>
+          <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" required></label>
+        </div>
+        <button class="btn btn--red" type="submit">Valider le rendez-vous</button>
+        <p class="recap__error" data-error role="alert"></p>
+        <p class="recap__done" data-done role="status"></p>
+        <i class="recap__stamp" aria-hidden="true">C'est noté</i>
+      </aside>
+    </form>
+  </section>
+
+  <!-- venir -->
+  <section class="venir" id="venir">
+    <figure class="venir__photo" data-in>
+      <img src="media/photo-1.webp" alt="Le salon : quatre fauteuils en cuir brun, miroirs ronds cerclés de laiton, mur de carreaux vert bouteille et sol en damier" loading="lazy" width="1168" height="880">
+      <figcaption class="mono">Le salon, un mardi à l'ouverture</figcaption>
+    </figure>
+    <div class="venir__text">
+      <p class="step rv"><b>06</b> Venir</p>
+      <h2 class="h2 rv" style="--i:1">8, rue des<br><em>Rémouleurs</em></h2>
+      <p class="venir__status mono rv" style="--i:2" data-open-status>Lundi → samedi · 9 h 30 – 19 h 30</p>
+      <dl class="infos rv" style="--i:3">
+        <div><dt class="mono">Horaires</dt><dd>Du lundi au samedi, 9 h 30 – 19 h 30, sans coupure le midi. Fermé le dimanche.</dd></div>
+        <div><dt class="mono">Sans rendez-vous</dt><dd>Tous les matins jusqu'à midi, un fauteuil tourne sans réservation : premier arrivé, premier assis.</dd></div>
+        <div><dt class="mono">Paiement</dt><dd>Carte bancaire, sans contact, espèces. Pas de chèque. Tu règles sur place, après la coupe.</dd></div>
+        <div><dt class="mono">Se garer</dt><dd>Parking souterrain des Carmes à deux minutes à pied. Arceaux à vélo devant la vitrine.</dd></div>
+        <div><dt class="mono">Métro</dt><dd>Ligne B, station Carmes, à trois minutes.</dd></div>
+        <div><dt class="mono">Téléphone</dt><dd>05 00 00 00 00</dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">LAME</p>
+  <div class="foot__row">
+    <p>© <span data-year>2026</span> LAME — barbier-coiffeur, 8, rue des Rémouleurs, 31000 Toulouse.</p>
+    <p>Site de démonstration, formule Premium — entreprise fictive ; photos et vidéos générées par IA. Adresse, prix, équipe et avis sont inventés.</p>
+    <p><a href="../../eco/demos/barbier/">Voir la version Éco de ce métier</a></p>
+  </div>
+</footer>
+
+<a class="tag" href="../../">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Sam",
+  "role": "À l'accueil de LAME",
+  "launch": "Demander à Sam",
+  "greeting": "Salut, moi c'est Sam, à l'accueil. Prix, horaires, créneau, parking : pose ta question.",
+  "chips": ["Les prix", "Sans rendez-vous ?", "Les horaires", "Où se garer ?"],
+  "fallback": "Celle-là, je préfère la laisser à l'équipe : 05 00 00 00 00, du lundi au samedi. Sinon je peux te renseigner sur les prix, les durées, les horaires, le paiement ou le stationnement.",
+  "intents": [
+    { "keys": ["prix", "tarif", "combien", "coute", "cher", "euro"], "answer": "Coupe de 14 € (tonte) à 32 € (pompadour) ; le dégradé est à 26 €. Barbe de 10 à 22 €. Coupe et barbe le même jour : 4 € de moins. Shampoing et coiffage compris.", "link": { "label": "Voir les tarifs", "href": "#carte" }, "chips": ["Combien de temps ?", "Réserver"] },
+    { "keys": ["sans rendez", "sans rdv", "sans reserv", "passer", "attente", "attendre", "file"], "answer": "Oui : tous les matins, de 9 h 30 à midi, un fauteuil tourne sans réservation. Premier arrivé, premier assis — compte une douzaine de minutes d'attente en semaine, plus le samedi. L'après-midi, mieux vaut réserver.", "link": { "label": "Voir les créneaux", "href": "#reserver" }, "chips": ["Les horaires", "Les prix"] },
+    { "keys": ["duree", "temps", "long", "minutes", "rapide", "pause"], "answer": "Tonte : 15 min. Dégradé : 30 min. Crop : 35 min. Pompadour : 40 min. Ajoute 10 à 25 min pour la barbe. On ne prend pas de retard : à l'heure dans le fauteuil, à l'heure dehors.", "chips": ["Réserver", "Les prix"] },
+    { "keys": ["enfant", "gamin", "fils", "petit", "garcon", "ado"], "answer": "Oui, dès 4 ans. Coupe gamin jusqu'à 12 ans : 16 €, vingt minutes, aux ciseaux si la tondeuse fait peur. C'est le plus souvent Théo ; le mercredi et le samedi matin sont les moments les plus calmes.", "link": { "label": "Réserver avec Théo", "href": "#reserver" } },
+    { "keys": ["barbe", "rasage", "raser", "coupe-chou", "coupe chou", "moustache", "contour"], "answer": "Trois formules : entretien trois jours (10 €, 10 min), barbe pleine taillée aux ciseaux avec contours à la lame (18 €, 20 min), rasage à l'ancienne avec serviette chaude et coupe-chou (22 €, 25 min). Inès est la spécialiste.", "link": { "label": "Essayer sur le buste", "href": "#essayer" }, "chips": ["Les prix", "Réserver"] },
+    { "keys": ["paiement", "payer", "carte", "cb", "espece", "liquide", "cheque", "sans contact", "regler"], "answer": "Carte bancaire, sans contact et espèces. Pas de chèque. Tu règles au salon, après la coupe : rien à payer en ligne.", "chips": ["Les prix", "Les horaires"] },
+    { "keys": ["horaire", "ouvert", "ferme", "heure", "dimanche", "lundi", "samedi", "midi"], "answer": "Du lundi au samedi, 9 h 30 – 19 h 30, sans coupure le midi. Fermé le dimanche. Dernier créneau à 19 h pour une tonte ou une barbe.", "chips": ["Sans rendez-vous ?", "Réserver"] },
+    { "keys": ["garer", "parking", "voiture", "stationn", "velo", "metro", "bus", "acces", "adresse", "ou etes", "trouver", "venir"], "answer": "8, rue des Rémouleurs, aux Carmes. Le parking souterrain des Carmes est à deux minutes à pied ; arceaux à vélo devant la vitrine ; métro ligne B, station Carmes, à trois minutes.", "link": { "label": "Infos pratiques", "href": "#venir" } },
+    { "keys": ["reserv", "rendez-vous", "rendez vous", "rdv", "creneau", "dispo", "aujourd", "demain"], "answer": "Trois temps : la prestation, le barbier, le créneau. Tu vois en direct les créneaux d'aujourd'hui et du prochain jour ouvert ; « Premier disponible » t'en donne le plus.", "link": { "label": "Prendre un créneau", "href": "#reserver" }, "chips": ["Les prix", "Combien de temps ?"] },
+    { "keys": ["retard", "annul", "empech", "decal", "report"], "answer": "Un empêchement ? Appelle le 05 00 00 00 00, même une heure avant : on redonne le créneau à quelqu'un. Dix minutes de retard, on te garde le fauteuil ; au-delà, on fait passer le suivant.", "chips": ["Les horaires"] },
+    { "keys": ["quelle coupe", "hesit", "conseil", "idee", "degrade", "crop", "pompadour", "tondu", "essayer"], "answer": "Tu hésites ? Essaie les quatre coupes et les trois barbes sur le buste : tu le fais tourner, tu regardes la nuque, et tu réserves ce que tu vois. Sinon, dis juste « comme d'habitude, mais propre » à ton barbier.", "link": { "label": "Essayer une coupe", "href": "#essayer" } },
+    { "keys": ["bonjour", "salut", "hello", "coucou", "bonsoir"], "answer": "Salut ! Qu'est-ce que je peux faire pour toi ?", "chips": ["Les prix", "Sans rendez-vous ?", "Les horaires"] },
+    { "keys": ["merci", "super", "parfait", "top", "nickel"], "answer": "Avec plaisir. À bientôt dans le fauteuil !" }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="buste.js"></script>
+<script type="module" src="lame.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>

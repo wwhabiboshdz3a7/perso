@@ -234,7 +234,7 @@ if (suivi) {
     const stateBox = el('div', 'sv__state');
     const big = el('b', '', String(file.step + 1).padStart(2, '0'));
     big.append(el('small', '', ' / 06'));
-    stateBox.append(el('span', 'lbl', id), big, el('span', 'lbl', STEPS[file.step] + (done ? '' : ' en cours')));
+    stateBox.append(el('span', 'lbl', id), big, el('span', 'lbl', file.action ? 'En attente de votre accord' : STEPS[file.step] + (done ? '' : ' en cours')));
     const meta = el('dl', 'sv__meta');
     for (const [label, value] of [['Véhicule', file.car], ['Intervention', file.job], ['Technicien · montant', `${file.tech} · ${file.total}`]]) {
       const cell = el('div');

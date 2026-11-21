@@ -63,17 +63,6 @@ const byId = Object.fromEntries(PARTS.map((part) => [part.id, part]));
 // ---------- état partagé entre la fiche et la scène ----------
 const state = { target: 0, selected: null, touched: false, wake() {} };
 
-if (root) {
-  setupPanel();
-  const canvas = root.querySelector('[data-xp-canvas]');
-  try {
-    start3d(canvas);
-  } catch (error) {
-    console.info('[atelier 31] 3D indisponible, image de secours affichée.', error);
-    root.classList.add('no-3d');
-  }
-}
-
 // ---------- la fiche : liste des pièces, étapes, curseur ----------
 function setupPanel() {
   const fiche = root.querySelector('[data-fiche]');
@@ -156,23 +145,24 @@ function start3d(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 0.98;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 60);
   scene.environment = studioEnvironment(renderer, {
-    ambient: '#30333a',
+    ambient: '#24272b',
     panels: [
-      { size: [10, 10], color: '#ffffff', intensity: 3.2, position: [0, 9, 2] },
-      { size: [4, 7], color: '#fff4e6', intensity: 6, position: [-7, 2.5, 4] },
-      { size: [2, 8], color: '#dfe8ff', intensity: 5, position: [7, 2, -2] },
-      { size: [10, 1.2], color: '#ffffff', intensity: 3, position: [0, -1, 8] },
+      { size: [10, 10], color: '#ffffff', intensity: 2.2, position: [0, 9, 2] },
+      { size: [4, 7], color: '#fff4e6', intensity: 4.2, position: [-7, 2.5, 4] },
+      { size: [2, 8], color: '#dfe8ff', intensity: 3.6, position: [7, 2, -2] },
+      { size: [14, 9], color: '#ffffff', intensity: 1.5, position: [0, 3, 11] },
+      { size: [10, 1.2], color: '#ffffff', intensity: 2, position: [0, -1.5, 8] },
     ],
   });
-  scene.environmentIntensity = 1.0;
-  const key = new THREE.DirectionalLight('#ffffff', 2.4);
+  scene.environmentIntensity = 0.85;
+  const key = new THREE.DirectionalLight('#ffffff', 1.7);
   key.position.set(3, 6, 6);
-  const rim = new THREE.DirectionalLight('#ffd9c2', 1.6);
+  const rim = new THREE.DirectionalLight('#ffd9c2', 1.1);
   rim.position.set(-6, 3, -4);
   scene.add(key, rim);
 
@@ -208,7 +198,7 @@ function start3d(canvas) {
   };
 
   // ---------- rotation, sélection ----------
-  let yaw = -0.62, yawHome = -0.62, pitch = 0.2, dragging = false, moved = false, lastX = 0, lastY = 0, downX = 0, downY = 0, grabbed = false;
+  let yaw = -0.46, yawHome = -0.46, pitch = 0.24, dragging = false, moved = false, lastX = 0, lastY = 0, downX = 0, downY = 0, grabbed = false;
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   function partAt(event) {
@@ -276,7 +266,7 @@ function start3d(canvas) {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    yawHome = camera.aspect < 1.05 ? -1.02 : -0.62;
+    yawHome = camera.aspect < 1.05 ? -0.72 : -0.46;
     if (!grabbed) yaw = yawHome;
     wake();
   }
@@ -308,7 +298,8 @@ function start3d(canvas) {
 
     t = reduced ? goal : Math.abs(goal - t) < 0.0005 ? goal : lerp(t, goal, 1 - Math.exp(-3.4 * dt));
     const s1 = step(0, 0.5, t), s2 = step(0.5, 1, t);
-    const o = { nuts: 1.75 * s1 + 0.55 * s2, wheel: 1.1 * s1 + 0.4 * s2, disc: 0.6 * s2, pads: 0.28 * s2, lift: 0.5 * s2, hub: -0.5 * s2 };
+    const k = camera.aspect < 1.05 ? 0.74 : 1; // écran étroit : pièces moins écartées, pour rester lisibles
+    const o = { nuts: (1.9 * s1 + 1.3 * s2) * k, wheel: (1.2 * s1 + 0.9 * s2) * k, disc: 0.85 * s2 * k, pads: 0.3 * s2, lift: 0.55 * s2, hub: -0.7 * s2 * k };
     parts.ecrous.group.position.y = o.nuts;
     for (const nut of parts.ecrous.nuts) nut.rotation.y = s1 * TAU * 3;
     parts.roue.group.position.y = o.wheel;
@@ -456,7 +447,7 @@ function buildWheel() {
   mesh(part, lathe(profile.map(([r, y]) => [r, y + YW]), 128), rubber);
 
   // voile de la jante : un disque percé de fenêtres, puis galbé vers l'extérieur
-  const alloy = part.mat(new THREE.MeshStandardMaterial({ color: '#3d4046', roughness: 0.3, metalness: 1 }));
+  const alloy = part.mat(new THREE.MeshStandardMaterial({ color: '#8f949b', roughness: 0.3, metalness: 1 }));
   const face = new THREE.Shape();
   face.absarc(0, 0, 0.67, 0, TAU, false);
   const HALF = 0.022, n = 9;
@@ -492,7 +483,7 @@ function buildWheel() {
 
   // jante : le tonneau, avec ses deux rebords
   const barrel = [[0.664, 0.25], [0.7, 0.276], [0.734, 0.298], [0.744, 0.286], [0.722, 0.262], [0.7, 0.245], [0.675, 0.2], [0.66, 0.08], [0.645, -0.04], [0.655, -0.18], [0.69, -0.245], [0.722, -0.262], [0.744, -0.286], [0.734, -0.3], [0.704, -0.29]];
-  const barrelMaterial = part.mat(new THREE.MeshStandardMaterial({ color: '#34373c', roughness: 0.38, metalness: 1, side: THREE.DoubleSide }));
+  const barrelMaterial = part.mat(new THREE.MeshStandardMaterial({ color: '#6c7077', roughness: 0.4, metalness: 1, side: THREE.DoubleSide }));
   mesh(part, lathe(barrel.map(([r, y]) => [r, y + YW]), 96), barrelMaterial);
 
   // cache-moyeu
@@ -728,4 +719,16 @@ function buildHub() {
   mesh(part, lathe(ribs, 48), boot);
   part.anchor.position.set(0, -0.015, 0.2);
   return part;
+}
+
+// ---------- démarrage (après les constantes de géométrie) ----------
+if (root) {
+  setupPanel();
+  const canvas = root.querySelector('[data-xp-canvas]');
+  try {
+    start3d(canvas);
+  } catch (error) {
+    console.info('[atelier 31] 3D indisponible, image de secours affichée.', error);
+    root.classList.add('no-3d');
+  }
 }

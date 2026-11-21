@@ -31,7 +31,7 @@
     <p class="hero__meta mono">
       <span>Programme neuf · Toulouse, Port Saint-Sauveur</span>
       <span>43° 35′ 52″ N — 1° 27′ 14″ E</span>
-      <span>Planche 01 / 08</span>
+      <span>Planche 01 / 09</span>
     </p>
     <h1 class="hero__title"><span class="l"><span>Les</span> <span>Terrasses</span></span> <span class="l"><span>du</span> <span class="accent">Canal</span></span></h1>
     <div class="hero__side">
@@ -295,9 +295,11 @@
         </div>
         <fieldset class="field seg">
           <legend class="mono">Durée du prêt</legend>
-          <label><input type="radio" name="duree" value="15"><span>15 ans</span></label>
-          <label><input type="radio" name="duree" value="20"><span>20 ans</span></label>
-          <label><input type="radio" name="duree" value="25" checked><span>25 ans</span></label>
+          <div class="seg__row">
+            <label><input type="radio" name="duree" value="15"><span>15 ans</span></label>
+            <label><input type="radio" name="duree" value="20"><span>20 ans</span></label>
+            <label><input type="radio" name="duree" value="25" checked><span>25 ans</span></label>
+          </div>
         </fieldset>
         <div class="field">
           <label class="mono" for="sim-taux">Taux d’intérêt annuel <output data-out="taux">3,35 %</output></label>
@@ -360,8 +362,10 @@
         <label>Créneau<select name="creneau"><option>10 h – 11 h</option><option>11 h – 12 h</option><option>14 h – 15 h</option><option>15 h 30 – 16 h 30</option><option>17 h – 18 h</option><option>18 h – 19 h</option></select></label>
         <fieldset class="form__wide seg seg--light">
           <legend>Format du rendez-vous</legend>
-          <label><input type="radio" name="format" value="sur place" checked><span>À l’espace de vente</span></label>
-          <label><input type="radio" name="format" value="visio"><span>En visio</span></label>
+          <div class="seg__row">
+            <label><input type="radio" name="format" value="sur place" checked><span>À l’espace de vente</span></label>
+            <label><input type="radio" name="format" value="visio"><span>En visio</span></label>
+          </div>
         </fieldset>
         <label class="form__wide">Lot qui vous intéresse<input type="text" name="projet" data-rdv-lot readonly></label>
         <label class="check form__wide"><input type="checkbox" name="accord" required><span>J’accepte d’être rappelé(e) au sujet de ce programme.</span></label>
