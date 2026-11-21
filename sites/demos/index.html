@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Démos — deux formules, tous les métiers</title>
+<meta name="description" content="Le catalogue de démos : la formule Éco, des sites vitrines complets pour 23 métiers, et la formule Premium, les mêmes métiers avec film au défilement, module 3D et assistant.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cpath d='M8 9h7a7 7 0 0 1 0 14H8z' fill='%23c6f432'/%3E%3Ccircle cx='23' cy='21' r='3' fill='%23c6f432'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/catalogue.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="top__brand" href="#haut"><span class="dot"></span>Démos<em>Toulouse</em></a>
+  <nav class="top__nav" aria-label="Sections">
+    <a href="#formules">Formules</a>
+    <a href="#premium">Premium <sup data-count-premium></sup></a>
+    <a href="#eco">Éco <sup data-count-eco></sup></a>
+    <a href="#comparer">Comparer</a>
+  </nav>
+</header>
+
+<main id="haut">
+  <section class="hero">
+    <p class="mono hero__kicker">Catalogue de démonstration · sites complets, testables</p>
+    <h1 class="hero__title">Deux formules.<br><span class="lime">Tous</span> les métiers.</h1>
+    <p class="hero__lede">Chaque démo est un vrai site : on y réserve, on y calcule un devis, on y compose sa pizza. Choisissez le niveau, ouvrez la démo de votre métier, imaginez la vôtre.</p>
+    <div class="reel" aria-hidden="true">
+      <div class="reel__track" data-reel></div>
+    </div>
+  </section>
+
+  <!-- les deux formules -->
+  <section class="plans" id="formules">
+    <article class="plan">
+      <p class="mono plan__tag">Formule 01</p>
+      <h2 class="plan__name">Éco</h2>
+      <p class="plan__pitch">Un site vitrine net, rapide, à l'image du métier — avec la fonction qui fait gagner du temps : réservation, devis, commande.</p>
+      <ul class="plan__list">
+        <li>Identité sur mesure : couleurs, typographie, ton</li>
+        <li>Une fonction métier qui marche vraiment</li>
+        <li>Mobile, référencement local, formulaires</li>
+        <li>Hébergement sans abonnement</li>
+      </ul>
+      <a class="btn" href="#eco"><span data-count-eco></span> démos Éco ↓</a>
+    </article>
+    <article class="plan plan--premium">
+      <p class="mono plan__tag">Formule 02</p>
+      <h2 class="plan__name">Premium</h2>
+      <p class="plan__pitch">Le même métier, raconté comme une marque : un film qui avance au défilement, un objet en 3D que l'on manipule, un assistant qui répond.</p>
+      <ul class="plan__list">
+        <li>Tout ce que contient la formule Éco</li>
+        <li>Film tourné pour vous, piloté par le défilement</li>
+        <li>Module 3D interactif : configurer, choisir, comprendre</li>
+        <li>Assistant conversationnel aux couleurs de la maison</li>
+      </ul>
+      <a class="btn btn--lime" href="#premium"><span data-count-premium></span> démos Premium ↓</a>
+    </article>
+  </section>
+
+  <!-- grille Premium -->
+  <section class="block" id="premium">
+    <header class="block__head">
+      <p class="mono">Formule 02 — Premium</p>
+      <h2 class="block__title">Le métier,<br>mis en scène</h2>
+      <p class="block__lede">Survolez une carte pour voir le film. Chaque démo contient un module 3D différent, pensé pour le métier.</p>
+    </header>
+    <div class="premium" data-premium></div>
+  </section>
+
+  <!-- comparaison -->
+  <section class="block block--light" id="comparer">
+    <header class="block__head">
+      <p class="mono">Éco ou Premium ?</p>
+      <h2 class="block__title">Ce qui change</h2>
+    </header>
+    <div class="table-wrap">
+      <table class="compare">
+        <thead><tr><th scope="col">Dans le site</th><th scope="col">Éco</th><th scope="col">Premium</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Design sur mesure, adapté au mobile</th><td>Oui</td><td>Oui</td></tr>
+          <tr><th scope="row">Fonction métier (réservation, devis, commande…)</th><td>Oui</td><td>Oui</td></tr>
+          <tr><th scope="row">Photos</th><td>Banque d'images ou les vôtres</td><td>Réalisées sur mesure</td></tr>
+          <tr><th scope="row">Film piloté par le défilement</th><td>—</td><td>Oui</td></tr>
+          <tr><th scope="row">Module 3D interactif</th><td>—</td><td>Oui</td></tr>
+          <tr><th scope="row">Assistant conversationnel</th><td>—</td><td>Oui</td></tr>
+          <tr><th scope="row">Hébergement sans abonnement</th><td>Oui</td><td>Oui</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pairs" data-pairs></div>
+  </section>
+
+  <!-- grille Éco -->
+  <section class="block" id="eco">
+    <header class="block__head">
+      <p class="mono">Formule 01 — Éco</p>
+      <h2 class="block__title"><span data-count-eco></span> métiers,<br>prêts à ouvrir</h2>
+      <p class="block__lede">Chaque site a sa fonction métier, testable dans le navigateur. Filtrez par secteur ou cherchez un métier.</p>
+    </header>
+    <div class="tools">
+      <div class="filters" data-filters role="group" aria-label="Filtrer par secteur"></div>
+      <label class="search"><span class="sr-only">Rechercher un métier</span><input type="search" data-search placeholder="Rechercher : dentiste, garage…" autocomplete="off"></label>
+    </div>
+    <p class="mono count" data-shown aria-live="polite"></p>
+    <div class="eco" data-eco></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">Démos</p>
+  <p class="mono foot__note">Toutes les entreprises présentées sont fictives : aucune réservation, commande ou paiement n'est réel. Les photos et vidéos de la formule Premium et les photos d'ouverture de la formule Éco ont été générées par IA.</p>
+</footer>
+
+<script type="module" src="assets/catalogue.js"></script>
+</body>
+</html>

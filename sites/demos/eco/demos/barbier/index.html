@@ -142,7 +142,7 @@ footer.site button{text-decoration:underline;color:var(--muted)}
 </div></header>
 
 <section class="hero" id="top">
-  <div class="ph"><img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1800&q=70" alt="Barbier au travail, rasage au coupe-chou" fetchpriority="high"></div>
+  <div class="ph"><img src="hero.webp" alt="Barbier au travail, rasage au coupe-chou" fetchpriority="high"></div>
   <div class="container">
     <p class="eyebrow" data-reveal>Saint-Michel · Toulouse · depuis 2012</p>
     <h1 data-reveal>Coupe.<br><span>Barbe.</span><br>Rasage.</h1>
@@ -339,5 +339,6 @@ footer.site button{text-decoration:underline;color:var(--muted)}
   $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="${i === dow ? 'today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 1 ? 'Fermé' : i === 6 ? '10:00 – 19:00' : '10:00 – 19:30'}</span></div>`).join('');
 })();
 </script>
+<a data-premium-link href="../../../premium/barbier/" style="position:fixed;z-index:60;right:14px;bottom:calc(env(safe-area-inset-bottom) + 122px);display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:#c6f432;color:#0a0a0b;font:700 13px/1 system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,.28)">Ce métier en formule Premium&nbsp;→</a>
 </body>
 </html>

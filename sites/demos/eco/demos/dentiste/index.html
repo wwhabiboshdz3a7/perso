@@ -168,7 +168,7 @@ footer.site button{text-decoration:underline}
     <div class="trust" data-reveal><span><i>✓</i>Conventionné secteur 1</span><span><i>💳</i>Tiers payant</span><span><i>♿</i>Accès PMR</span><span><i>🧒</i>Pédodontie</span></div>
   </div>
   <div class="hero-img" data-reveal="right">
-    <div class="ph"><img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1000&q=70" alt="Salle de soins du cabinet dentaire" fetchpriority="high"></div>
+    <div class="ph"><img src="hero.webp" alt="Salle de soins du cabinet dentaire" fetchpriority="high"></div>
     <div class="float"><i>📅</i><div><b>Prochain créneau</b><span id="nextSlot">calcul…</span></div></div>
   </div>
 </div></section>
@@ -365,5 +365,6 @@ footer.site button{text-decoration:underline}
   $('#hours').innerHTML = [1, 2, 3, 4, 5, 6, 0].map((i) => `<div class="row${i === dow ? ' today' : ''}"><span>${names[i]}</span><span>${i === 0 || i === 6 ? 'Fermé' : '8:30 – 12:30 · 14:00 – 19:00'}</span></div>`).join('');
 })();
 </script>
+<a data-premium-link href="../../../premium/dentiste/" style="position:fixed;z-index:60;right:14px;bottom:calc(env(safe-area-inset-bottom) + 122px);display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:#c6f432;color:#0a0a0b;font:700 13px/1 system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,.28)">Ce métier en formule Premium&nbsp;→</a>
 </body>
 </html>

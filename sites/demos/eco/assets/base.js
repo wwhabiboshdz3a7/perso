@@ -121,7 +121,7 @@
   function initDemoBadge() {
     if ($('.demo-badge') || location.pathname.split('/').filter(Boolean).length < 2) return;
     const a = document.createElement('a');
-    a.className = 'demo-badge'; a.href = '../../'; a.innerHTML = 'Démo <span>— entreprise fictive · retour aux démos</span>';
+    a.className = 'demo-badge'; a.href = '../../../#eco'; a.innerHTML = 'Démo Éco <span>— entreprise fictive · retour au catalogue</span>';
     document.body.appendChild(a);
   }
   function initHeaderScroll() {
