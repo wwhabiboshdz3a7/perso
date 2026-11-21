@@ -123,7 +123,7 @@ function setupPanel() {
   }
 
   function select(id, fromScene = false) {
-    state.selected = id && id !== state.selected ? id : id === state.selected && fromScene ? id : id === state.selected ? null : id;
+    state.selected = id === state.selected && !fromScene ? null : id; // un second appui dans la liste désélectionne
     for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.part === state.selected));
     const part = byId[state.selected];
     // une pièce cachée par la roue : on ouvre l'ensemble pour la montrer
