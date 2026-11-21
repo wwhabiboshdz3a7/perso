@@ -259,9 +259,9 @@ async function init() {
   // ---------- plans de caméra, un par chapitre ----------
   stage.setShots([
     { target: [0, 1.45, 0], radius: 8.7, azimuth: HERO_AZIMUTH, elevation: 13, fov: 30, shift: [0.3, 0], portrait: { shift: [0, 0.5], radius: 11.6, target: [0, 1.3, 0] } },
-    { target: [0, 0.8, 0], radius: 5.8, azimuth: CLOSE_AZIMUTH, elevation: 6, fov: 30, shift: [-0.48, -0.06], portrait: { shift: [0, 0.48], radius: 8.4 } },
+    { target: [0, 0.8, 0], radius: 6.4, azimuth: CLOSE_AZIMUTH, elevation: 6, fov: 30, shift: [-0.52, -0.02], portrait: { shift: [0, 0.48], radius: 8.4 } },
     { target: [0, 2.25, 0], radius: 13.6, azimuth: 10, elevation: 6, fov: 30, shift: [0.29, 0], portrait: { shift: [0, 0.36], radius: 14.5, fov: 38 } },
-    { target: [0, 1.1, 0], radius: 6, azimuth: PLUNGE_AZIMUTH, elevation: 79, fov: 30, shift: [-0.37, 0], portrait: { shift: [0, 0.48], radius: 11 } },
+    { target: [0, 1.1, 0], radius: 7.4, azimuth: PLUNGE_AZIMUTH, elevation: 79, fov: 30, shift: [-0.46, 0], portrait: { shift: [0, 0.48], radius: 11 } },
     { target: [0, 1.1, 0], radius: 8.8, azimuth: 24, elevation: 21, fov: 30, shift: [0, -0.36], portrait: { shift: [0, 0.34], radius: 10.4 } },
   ]);
 
