@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quai pour Mac</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d5c63'/%3E%3Cpath d='M9 8h14v4H9zM12 12h8v7h-8zM6 23c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --surface: #fffdf8;
+    --ink: #17232b;
+    --muted: #5d6a72;
+    --line: #dcd6c8;
+    --accent: #0d5c63;
+    --accent-ink: #ffffff;
+    --accent-soft: #e2efee;
+    --signal: #b4500f;
+    --signal-soft: #fbeee3;
+    --ok: #1f7a4d;
+    --radius: 14px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f171c;
+      --surface: #16212a;
+      --ink: #e9eef0;
+      --muted: #94a3ab;
+      --line: #2a3943;
+      --accent: #4fc1c4;
+      --accent-ink: #062427;
+      --accent-soft: #173238;
+      --signal: #ffab7a;
+      --signal-soft: #33231a;
+      --ok: #5fd39a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px 80px; }
+  a { color: var(--accent); }
+  code { font-family: var(--mono); font-size: .92em; overflow-wrap: anywhere; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 22px 0 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
+  .brand svg { width: 30px; height: 30px; flex: none; }
+  .brand small { font-weight: 500; color: var(--muted); font-size: 13px; letter-spacing: 0; }
+  .who { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .who b { color: var(--ink); overflow-wrap: anywhere; }
+
+  button, .btn {
+    font: inherit; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    padding: 8px 14px; border-radius: 10px; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 40px;
+  }
+  button:hover, .btn:hover { border-color: var(--accent); }
+  button:focus-visible, .btn:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.primary:hover { filter: brightness(1.08); }
+  button.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+  button.quiet:hover { color: var(--ink); border-color: var(--line); }
+  button.danger:hover { color: var(--signal); border-color: var(--signal); }
+  button:disabled { opacity: .55; cursor: default; }
+  button:disabled:hover { border-color: var(--line); filter: none; }
+
+  input[type=text], input[type=password] {
+    font: inherit; width: 100%;
+    padding: 9px 12px; min-height: 42px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); color: var(--ink);
+  }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .hint { font-size: 13px; color: var(--muted); margin: 0; }
+  .hint.warn { color: var(--signal); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  #loading { color: var(--muted); text-align: center; padding: 60px 0; }
+
+  /* Réglages */
+  #settings { max-width: 560px; margin: 4vh auto 26px; }
+  #settings h1 { font-size: 22px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  #settings .lead { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  #settings form { display: grid; gap: 14px; }
+  #settings .hint + .actions, #account .actions { margin-top: 4px; }
+  #account p { margin: 0 0 14px; font-size: 15px; overflow-wrap: anywhere; }
+  .problem {
+    background: var(--signal-soft); color: var(--signal); border-radius: 10px;
+    padding: 10px 12px; font-size: 14px; margin: 0 0 16px;
+  }
+
+  /* Avertissements (GitHub Pages, workflow) */
+  .alert { border-color: var(--signal); margin-bottom: 14px; display: grid; gap: 10px; }
+  .alert h2 { margin: 0; font-size: 16px; }
+  .alert p { margin: 0; font-size: 14px; }
+
+  /* Zone de dépôt */
+  .drop {
+    border: 2px dashed var(--line); border-radius: var(--radius);
+    background: var(--surface);
+    padding: 34px 20px; text-align: center;
+    transition: border-color .15s, background .15s;
+  }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop h1 { margin: 10px 0 4px; font-size: 20px; letter-spacing: -0.01em; }
+  .drop p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+  .drop .icon { width: 44px; height: 44px; color: var(--accent); }
+  .drop .choices { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .target-note { font-size: 14px; margin: 14px 0 0 !important; }
+
+  .pending { display: grid; gap: 14px; }
+  .pending .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .pending .row > div { flex: 1 1 220px; }
+
+  /* Étapes de la publication */
+  .progress-title { margin: 0 0 14px; font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+  .steps { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 12px; }
+  .steps li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; color: var(--muted); }
+  .steps .mark {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line);
+    display: grid; place-items: center; font-size: 12px; font-weight: 700; line-height: 1;
+  }
+  .steps .label { font-weight: 600; display: block; }
+  .steps .detail { font-size: 13px; display: block; min-height: 0; }
+  .steps li.active { color: var(--ink); }
+  .steps li.active .mark { border-color: var(--accent-soft); border-top-color: var(--accent); color: transparent; animation: spin .9s linear infinite; }
+  .steps li.done { color: var(--ink); }
+  .steps li.done .mark { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+  .steps li.error { color: var(--ink); }
+  .steps li.error .mark { background: var(--signal); border-color: var(--signal); color: var(--surface); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .steps li.active .mark { animation: none; border-color: var(--accent); }
+    .bar > i, .drop { transition: none; }
+  }
+  .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  #progress .hint { margin-top: 10px; }
+  .failure { margin-top: 16px; display: grid; gap: 12px; }
+  .failure p { margin: 0; }
+  .failure .why { background: var(--signal-soft); color: var(--signal); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+
+  .done { display: grid; gap: 10px; }
+  .done strong { color: var(--ok); }
+  .linkrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .link {
+    font-family: var(--mono); font-size: 14px; color: var(--accent);
+    overflow-wrap: anywhere; text-decoration: none; flex: 1 1 200px; min-width: 0;
+  }
+  .link:hover { text-decoration: underline; }
+
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin: 34px 0 12px; }
+  .section-head h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin: 0; font-weight: 700;
+  }
+  .projects { display: grid; gap: 12px; }
+  .project .name { font-weight: 700; font-size: 17px; margin: 0; overflow-wrap: anywhere; }
+  .project .meta { font-size: 13px; color: var(--muted); margin: 2px 0 10px; }
+  .project .actions { margin-top: 14px; }
+  .project .hint { margin-top: 8px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent);
+    text-transform: uppercase; vertical-align: 2px; margin-left: 6px;
+  }
+  .empty { text-align: center; color: var(--muted); padding: 30px 20px; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--ink); color: var(--bg);
+    padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    width: max-content; max-width: calc(100vw - 32px); box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  }
+  #toast.error { background: #a6400a; color: #fff; }
+
+  @media (max-width: 560px) {
+    .brand small { display: none; }
+    .card { padding: 16px; }
+    .drop { padding: 26px 14px; }
+    .pending .row > button, .drop .choices button { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M9 8h14v4H9zM12 12h8v7h-8zM6 23c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Quai <small>· tes sites en ligne avec GitHub</small></span>
+    </div>
+    <div class="who" id="who" hidden>
+      <span>connecté en tant que <b id="who-login"></b></span>
+      <button class="quiet" id="open-settings" type="button" aria-expanded="false" aria-controls="settings">Réglages</button>
+    </div>
+  </header>
+
+  <p id="loading" role="status">Chargement…</p>
+
+  <!-- Réglages : connexion à GitHub -->
+  <section id="settings" class="card" aria-labelledby="settings-title" hidden>
+    <h1 id="settings-title" tabindex="-1">Connecter Quai à GitHub</h1>
+    <p class="problem" id="settings-problem" role="alert" hidden></p>
+
+    <div id="account" hidden>
+      <p>Connecté en tant que <b id="account-login"></b>. Tes projets sont rangés dans le dépôt
+        <a id="account-repo" target="_blank" rel="noopener"></a> et publiés sur
+        <a id="account-site" target="_blank" rel="noopener"></a>.</p>
+      <div class="actions">
+        <button class="danger" id="disconnect" type="button">Se déconnecter</button>
+        <button class="quiet" id="close-settings" type="button">Fermer</button>
+      </div>
+    </div>
+
+    <form id="connect-form" novalidate>
+      <p class="lead" style="margin:0">Quai envoie tes sites dans un dépôt GitHub, qui les met en ligne gratuitement. Il lui faut l'adresse du dépôt et un jeton d'accès.</p>
+      <div>
+        <label for="repo">Dépôt GitHub</label>
+        <input id="repo" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="proprietaire/depot" required>
+      </div>
+      <div>
+        <label for="token">Jeton d'accès GitHub</label>
+        <input id="token" type="password" autocomplete="off" spellcheck="false" aria-describedby="token-help">
+      </div>
+      <p class="hint" id="token-help">Crée un jeton « classic » avec les portées <code>repo</code> et <code>workflow</code> (ou un jeton fin avec Contents, Actions, Pages et Workflows en lecture/écriture sur ce dépôt) sur <a href="https://github.com/settings/tokens" id="tokens-link" target="_blank" rel="noopener">github.com/settings/tokens</a>, puis colle-le ici. <span id="storage-note"></span></p>
+      <div class="actions">
+        <button class="primary" type="submit" id="connect">Se connecter</button>
+        <button type="button" id="use-gh" hidden>Utiliser ma connexion GitHub existante</button>
+      </div>
+    </form>
+  </section>
+
+  <main id="app" hidden>
+    <div id="alerts"></div>
+
+    <!-- Étape 1 : déposer -->
+    <section id="drop" class="drop" aria-labelledby="drop-title">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      <h1 id="drop-title">Dépose un site ici</h1>
+      <p>Un dossier ou un fichier .zip contenant ton site. Tu obtiens un lien public une à deux minutes plus tard.</p>
+      <div class="choices">
+        <button class="primary" id="pick-zip" type="button">Choisir un .zip</button>
+        <button id="pick-folder" type="button">Choisir un dossier</button>
+      </div>
+      <p class="target-note" id="target-note" hidden>
+        <span id="target-text"></span>
+        <button class="quiet" id="target-cancel" type="button">Annuler</button>
+      </p>
+      <input id="input-folder" type="file" webkitdirectory multiple hidden>
+      <input id="input-zip" type="file" accept=".zip,application/zip" hidden>
+    </section>
+
+    <!-- Étape 2 : nommer -->
+    <section id="pending" class="card pending" aria-label="Nom du projet" hidden>
+      <div class="row">
+        <div>
+          <label for="name">Nom du projet (il apparaît dans le lien)</label>
+          <input id="name" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="63" aria-describedby="name-hint link-preview">
+        </div>
+        <button class="primary" id="deploy" type="button">Mettre en ligne</button>
+        <button class="quiet" id="cancel" type="button">Annuler</button>
+      </div>
+      <p class="hint" id="summary"></p>
+      <p class="hint" id="link-preview"></p>
+      <p class="hint" id="name-hint" aria-live="polite"></p>
+      <p class="hint warn" id="index-hint" hidden>Pas de fichier index.html à la racine de ce dossier : sans lui, GitHub ne mettra pas le projet en ligne.</p>
+    </section>
+
+    <!-- Étape 3 : publication -->
+    <section id="progress" class="card" aria-labelledby="progress-title" hidden>
+      <p class="progress-title" id="progress-title" tabindex="-1"></p>
+      <p class="sr" id="progress-status" role="status"></p>
+      <ol class="steps" id="steps"></ol>
+      <div class="bar" id="progress-bar" role="progressbar" aria-label="Avancement de la publication" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
+      <p class="hint" id="progress-note" hidden></p>
+      <div id="progress-warnings"></div>
+      <div class="failure" id="failure" hidden>
+        <p class="why" id="failure-text" role="alert"></p>
+        <p class="hint" id="failure-link" hidden>Le lien du projet, à réessayer plus tard : <a id="failure-url" target="_blank" rel="noopener"></a></p>
+        <div class="actions">
+          <button class="primary" id="failure-retry" type="button">Recommencer</button>
+          <button id="failure-settings" type="button" hidden>Ouvrir les réglages</button>
+          <a class="btn" id="failure-run" target="_blank" rel="noopener" hidden>Voir le détail sur GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Étape 4 : lien -->
+    <section id="done" class="card done" aria-label="Projet en ligne" hidden>
+      <div><strong id="done-title">En ligne.</strong> <span id="done-text"></span></div>
+      <div class="linkrow">
+        <a class="link" id="done-link" target="_blank" rel="noopener"></a>
+        <button class="primary" id="done-copy" type="button">Copier le lien</button>
+        <a class="btn" id="done-open" target="_blank" rel="noopener">Ouvrir</a>
+        <button class="quiet" id="done-close" type="button">Fermer</button>
+      </div>
+      <div id="done-warnings"></div>
+    </section>
+
+    <div class="section-head">
+      <h2 id="projects-title">Mes projets</h2>
+      <button class="quiet" id="refresh" type="button">Actualiser</button>
+    </div>
+    <div id="projects" class="projects" aria-labelledby="projects-title"></div>
+  </main>
+</div>
+<div id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const IGNORED = new Set(['.git', '.github', 'node_modules', '__MACOSX', '.DS_Store', 'Thumbs.db']);
+  const NAME_RE = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+  const STEPS = [
+    { id: 'read', label: 'Lecture du projet' },
+    { id: 'upload', label: 'Envoi des fichiers vers GitHub' },
+    { id: 'publish', label: 'Publication par GitHub' },
+    { id: 'online', label: 'Mise en ligne' },
+  ];
+
+  let state = null;         // réponse de /api/state
+  let projects = [];
+  let branches = [];        // noms déjà utilisés dans le dépôt
+  let pending = null;       // { kind: 'zip', file } ou { kind: 'files', files: [{ path, file }] }
+  let target = null;        // nom du projet à mettre à jour
+  let settingsOpen = false;
+  let pagesFailure = null;  // { message, settingsUrl } après un échec d'activation
+  let busy = false;         // une publication est affichée
+
+  // ---------- petits utilitaires ----------
+
+  function h(tag, attrs, ...children) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs || {})) {
+      if (key === 'class') el.className = value;
+      else if (key.startsWith('on')) el.addEventListener(key.slice(2), value);
+      else if (value !== null && value !== undefined && value !== false) el.setAttribute(key, value);
+    }
+    for (const child of children.flat()) {
+      if (child === null || child === undefined || child === false) continue;
+      el.append(child.nodeType ? child : document.createTextNode(String(child)));
+    }
+    return el;
+  }
+
+  let toastTimer;
+  function toast(message, isError) {
+    const el = $('toast');
+    el.textContent = message;
+    el.className = isError ? 'error' : '';
+    el.setAttribute('role', isError ? 'alert' : 'status');
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, isError ? 8000 : 2500);
+  }
+
+  function formatBytes(n) {
+    const fmt = (v) => v.toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    if (n < 1024) return n + ' o';
+    if (n < 1024 * 1024) return fmt(n / 1024) + ' Ko';
+    return fmt(n / 1024 / 1024) + ' Mo';
+  }
+  const formatDate = (ms) =>
+    new Date(ms).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+  const plural = (n, word) => `${n.toLocaleString('fr-FR')} ${word}${n > 1 ? 's' : ''}`;
+
+  function slugify(text) {
+    return String(text)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 63)
+      .replace(/-+$/, '');
+  }
+
+  function randomName() {
+    const a = ['joli', 'vif', 'calme', 'brave', 'doux', 'grand', 'petit', 'rapide', 'clair', 'fier'];
+    const b = ['renard', 'hibou', 'phare', 'nuage', 'galet', 'lynx', 'canal', 'voilier', 'heron', 'cedre'];
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    return `${pick(a)}-${pick(b)}-${Math.floor(100 + Math.random() * 900)}`;
+  }
+
+  async function copy(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Lien copié.');
+    } catch {
+      window.prompt('Copie ce lien :', text);
+    }
+  }
+
+  // Toutes les requêtes portent l'en-tête X-Quai : le serveur refuse celles qui ne l'ont pas.
+  async function api(path, options = {}) {
+    const headers = { 'X-Quai': '1', ...(options.headers || {}) };
+    if (typeof options.body === 'string') headers['Content-Type'] = 'application/json';
+    let response;
+    try {
+      response = await fetch('/api/' + path, { ...options, headers });
+    } catch {
+      throw new Error("Quai ne répond plus. Relance l'application Quai, puis recharge cette page.");
+    }
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(data.error || `Erreur ${response.status}`);
+      error.status = response.status;
+      error.data = data;
+      throw error;
+    }
+    return data;
+  }
+
+  // ---------- réglages ----------
+
+  function render() {
+    $('loading').hidden = true;
+    const connected = state.connected;
+    $('who').hidden = !connected;
+    $('app').hidden = !connected;
+    if (connected) $('who-login').textContent = state.login;
+    if (!connected) settingsOpen = false;
+
+    const showSettings = !connected || settingsOpen;
+    $('settings').hidden = !showSettings;
+    $('open-settings').setAttribute('aria-expanded', String(settingsOpen));
+    $('settings-title').textContent = connected ? 'Réglages' : 'Connecter Quai à GitHub';
+    $('account').hidden = !connected;
+    $('connect-form').hidden = connected;
+    $('settings-problem').hidden = !state.problem;
+    $('settings-problem').textContent = state.problem || '';
+    if (connected) {
+      $('account-login').textContent = state.login;
+      $('account-repo').textContent = state.repo;
+      $('account-repo').href = state.repoUrl;
+      $('account-site').textContent = state.siteUrl.replace(/^https?:\/\//, '');
+      $('account-site').href = state.siteUrl;
+    } else {
+      if (!$('repo').value) $('repo').value = state.repo || '';
+      $('use-gh').hidden = !state.ghAvailable;
+      $('tokens-link').href = state.tokensUrl;
+      $('storage-note').textContent = state.storage === 'trousseau'
+        ? 'Il est rangé dans le Trousseau de ton Mac et ne quitte jamais cet ordinateur, sauf pour parler à GitHub.'
+        : "Il est enregistré dans un fichier lisible par toi seul (~/.quai/config.json) et n'est jamais renvoyé à cette page.";
+    }
+    renderAlerts();
+  }
+
+  async function loadState() {
+    state = await api('state');
+    render();
+  }
+
+  async function connect(body) {
+    const buttons = [$('connect'), $('use-gh')];
+    buttons.forEach((b) => { b.disabled = true; });
+    $('connect').textContent = 'Vérification…';
+    try {
+      state = await api('connect', { method: 'POST', body: JSON.stringify(body) });
+      $('token').value = '';
+      $('toast').hidden = true;
+      pagesFailure = null;
+      render();
+      await refreshProjects().catch(() => {});
+      $('pick-zip').focus();
+    } catch (err) {
+      $('settings-problem').textContent = err.message;
+      $('settings-problem').hidden = false;
+    }
+    buttons.forEach((b) => { b.disabled = false; });
+    $('connect').textContent = 'Se connecter';
+  }
+
+  $('connect-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const repo = $('repo').value.trim();
+    const token = $('token').value.trim();
+    if (!repo) { $('repo').focus(); return toast('Indique le dépôt GitHub (proprietaire/depot).', true); }
+    if (!token) { $('token').focus(); return toast("Colle ton jeton d'accès GitHub.", true); }
+    connect({ repo, token });
+  });
+  $('use-gh').addEventListener('click', () => {
+    const repo = $('repo').value.trim();
+    if (!repo) { $('repo').focus(); return toast('Indique le dépôt GitHub (proprietaire/depot).', true); }
+    connect({ repo, useGh: true });
+  });
+
+  function toggleSettings(open) {
+    settingsOpen = open;
+    render();
+    if (open) $('settings-title').focus();
+    else $('open-settings').focus();
+  }
+  $('open-settings').addEventListener('click', () => toggleSettings(!settingsOpen));
+  $('close-settings').addEventListener('click', () => toggleSettings(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && settingsOpen) toggleSettings(false);
+  });
+
+  $('disconnect').addEventListener('click', async () => {
+    if (!window.confirm('Se déconnecter de GitHub ? Le jeton enregistré sur cet ordinateur sera effacé. Tes projets restent en ligne.')) return;
+    try {
+      state = await api('disconnect', { method: 'POST' });
+      projects = [];
+      branches = [];
+      render();
+      $('repo').focus();
+    } catch (err) { toast(err.message, true); }
+  });
+
+  // ---------- avertissements : workflow absent, GitHub Pages à activer ----------
+
+  const blocked = () =>
+    Boolean(state && state.connected && (state.checks.workflow === false || ['absent', 'legacy'].includes(state.checks.pages)));
+
+  function renderAlerts() {
+    const box = $('alerts');
+    box.replaceChildren();
+    if (!state.connected) return;
+    const { checks } = state;
+    const recheck = () => h('button', { type: 'button', onclick: (e) => recheckState(e.currentTarget) }, 'Revérifier');
+
+    if (checks.workflow === false) {
+      box.append(h('section', { class: 'card alert', 'aria-label': 'Publication impossible' },
+        h('h2', null, 'Publication impossible pour l’instant'),
+        h('p', null, 'Le dépôt ', h('b', null, state.repo), ' ne contient pas le fichier ', h('code', null, checks.workflowPath),
+          ` sur sa branche ${state.defaultBranch}. C’est lui qui met les projets en ligne : ajoute-le au dépôt, puis clique sur « Revérifier ».`),
+        h('div', { class: 'actions' }, recheck())
+      ));
+    }
+    if (checks.pages === 'absent' || checks.pages === 'legacy') {
+      box.append(h('section', { class: 'card alert', 'aria-label': 'GitHub Pages' },
+        h('h2', null, 'GitHub Pages n’est pas encore activé'),
+        h('p', null, 'C’est le service de GitHub qui héberge tes sites. Il s’active une seule fois, en un clic.'),
+        pagesFailure ? h('p', { class: 'hint warn', role: 'alert' }, pagesFailure.message) : null,
+        pagesFailure ? h('p', null, 'À la main : ouvre ',
+          h('a', { href: pagesFailure.settingsUrl, target: '_blank', rel: 'noopener' }, 'Settings → Pages'),
+          ', choisis ', h('b', null, 'Source : GitHub Actions'), ', puis reviens ici et clique sur « Revérifier ».') : null,
+        h('div', { class: 'actions' },
+          h('button', { class: 'primary', type: 'button', id: 'enable-pages', onclick: (e) => enablePages(e.currentTarget) }, 'Activer GitHub Pages'),
+          pagesFailure ? recheck() : null)
+      ));
+    } else if (checks.pages === 'unknown') {
+      box.append(h('p', { class: 'hint', style: 'margin:0 0 14px' },
+        'Quai n’a pas pu vérifier que GitHub Pages est activé (le jeton n’a pas accès à ce réglage). Si tes liens ne s’ouvrent pas, ouvre ',
+        h('a', { href: checks.pagesSettingsUrl, target: '_blank', rel: 'noopener' }, 'Settings → Pages'),
+        ' et choisis « Source : GitHub Actions ».'));
+    }
+    for (const id of ['pick-zip', 'pick-folder']) $(id).disabled = blocked();
+  }
+
+  async function enablePages(button) {
+    button.disabled = true;
+    button.textContent = 'Activation…';
+    try {
+      state = await api('pages/enable', { method: 'POST' });
+      pagesFailure = null;
+      toast('GitHub Pages est activé.');
+    } catch (err) {
+      if (err.status === 401) return loadState().catch(() => {});
+      pagesFailure = {
+        message: err.message,
+        settingsUrl: (err.data && err.data.settingsUrl) || state.checks.pagesSettingsUrl,
+      };
+    }
+    render();
+  }
+
+  async function recheckState(button) {
+    button.disabled = true;
+    button.textContent = 'Vérification…';
+    try {
+      await loadState();
+      if (!blocked()) { pagesFailure = null; render(); toast('Tout est prêt.'); }
+    } catch (err) {
+      toast(err.message, true);
+      render();
+    }
+  }
+
+  // ---------- liste des projets ----------
+
+  async function refreshProjects() {
+    if (!state || !state.connected) return;
+    const data = await api('projects');
+    projects = data.projects;
+    branches = data.branches;
+    renderProjects();
+    if (!$('pending').hidden) updateNameHint();
+  }
+
+  function renderProjects() {
+    const box = $('projects');
+    box.replaceChildren();
+    if (!projects.length) {
+      box.append(h('div', { class: 'card empty' }, "Aucun projet pour l'instant. Dépose ton premier site ci-dessus."));
+      return;
+    }
+    for (const project of projects) box.append(projectCard(project));
+  }
+
+  function projectCard(project) {
+    const facts = [];
+    if (project.updatedAt) facts.push(`Mis à jour le ${formatDate(project.updatedAt)}`);
+    if (project.files !== null) facts.push(plural(project.files, 'fichier'));
+    if (project.bytes !== null) facts.push(formatBytes(project.bytes));
+    if (!project.online) facts.push('La mise en ligne est en cours : le lien fonctionnera dans une à deux minutes.');
+    if (project.online && !project.managed && project.origin) facts.push(`Publié hors de Quai (${project.origin})`);
+
+    return h('article', { class: 'card project', 'aria-label': `Projet ${project.name}` },
+      h('p', { class: 'name' }, project.name, project.online ? null : h('span', { class: 'tag' }, 'bientôt en ligne')),
+      h('p', { class: 'meta' }, facts.join(' · ')),
+      h('div', { class: 'linkrow' },
+        h('a', { class: 'link', href: project.url, target: '_blank', rel: 'noopener' }, project.url),
+        h('button', { type: 'button', onclick: () => copy(project.url), 'aria-label': `Copier le lien de ${project.name}` }, 'Copier le lien')
+      ),
+      project.notes.map((note) => h('p', { class: 'hint warn' }, note)),
+      project.managed
+        ? h('div', { class: 'actions' },
+            h('button', { type: 'button', onclick: () => setTarget(project.name), 'aria-label': `Nouvelle version de ${project.name}` }, 'Nouvelle version'),
+            h('button', { type: 'button', class: 'quiet danger', onclick: (e) => removeProject(project.name, e.currentTarget), 'aria-label': `Supprimer ${project.name}` }, 'Supprimer'))
+        : null
+    );
+  }
+
+  async function removeProject(name, button) {
+    if (!window.confirm(`Supprimer « ${name} » ? Son lien ne fonctionnera plus et ses fichiers seront retirés de GitHub.`)) return;
+    button.disabled = true;
+    try {
+      const result = await api(`projects/${name}`, { method: 'DELETE' });
+      if (target === name) setTarget(null);
+      toast(result.republishing
+        ? 'Projet supprimé. Son lien cessera de fonctionner dans une à deux minutes.'
+        : 'Projet supprimé. Son lien cessera de fonctionner dans une dizaine de minutes.');
+    } catch (err) {
+      toast(err.message, true);
+      if (err.status === 401) loadState().catch(() => {});
+    }
+    await refreshProjects().catch(() => {});
+    $('refresh').focus();
+  }
+
+  $('refresh').addEventListener('click', async () => {
+    try {
+      await refreshProjects();
+      toast('Liste à jour.');
+    } catch (err) {
+      toast(err.message, true);
+      if (err.status === 401) loadState().catch(() => {});
+    }
+  });
+
+  // ---------- étapes du dépôt ----------
+
+  function show(step) {
+    for (const id of ['drop', 'pending', 'progress', 'done']) $(id).hidden = id !== step;
+    busy = step === 'progress';
+  }
+
+  function setTarget(name) {
+    target = name;
+    $('drop-title').textContent = name ? `Dépose la nouvelle version de « ${name} »` : 'Dépose un site ici';
+    $('target-note').hidden = !name;
+    $('target-text').textContent = name ? 'Le lien reste le même.' : '';
+    if (name) {
+      pending = null;
+      show('drop');
+      $('drop').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      $('pick-zip').focus({ preventScroll: true });
+    }
+  }
+  $('target-cancel').addEventListener('click', () => { setTarget(null); $('pick-zip').focus(); });
+
+  const keep = (path) => !path.split('/').some((segment) => IGNORED.has(segment));
+
+  function commonRoot(files) {
+    const first = files[0].path.split('/');
+    if (first.length < 2) return '';
+    return files.every((f) => f.path.startsWith(first[0] + '/')) ? first[0] : '';
+  }
+
+  function stage(next, suggestion) {
+    const { limits } = state;
+    const mb = (bytes) => Math.round(bytes / 1024 / 1024);
+    if (next.kind === 'files') {
+      next.files = next.files.filter((f) => keep(f.path));
+      if (!next.files.length) return toast('Ce dossier ne contient aucun fichier à publier.', true);
+      if (next.files.length > limits.files) {
+        return toast(`Trop de fichiers (${plural(next.files.length, 'fichier')}). Limite : ${limits.files.toLocaleString('fr-FR')}.`, true);
+      }
+      const big = next.files.find((f) => f.file.size > limits.fileBytes);
+      if (big) return toast(`Le fichier « ${big.path} » dépasse ${mb(limits.fileBytes)} Mo, la taille maximale d'un fichier sur GitHub.`, true);
+    }
+    const bytes = next.kind === 'zip' ? next.file.size : next.files.reduce((sum, f) => sum + f.file.size, 0);
+    if (bytes > limits.totalBytes) {
+      return toast(`Projet trop volumineux (${formatBytes(bytes)}). Limite : ${mb(limits.totalBytes)} Mo.`, true);
+    }
+    pending = next;
+    $('name').value = target || slugify(suggestion) || randomName();
+    $('name').disabled = Boolean(target);
+    $('summary').textContent = next.kind === 'zip'
+      ? `Archive ${next.file.name} · ${formatBytes(bytes)}`
+      : `Dossier ${suggestion || ''} · ${plural(next.files.length, 'fichier')} · ${formatBytes(bytes)}`.replace('  ', ' ');
+    let missingIndex = false;
+    if (next.kind === 'files') {
+      const root = commonRoot(next.files);
+      missingIndex = !next.files.some((f) => f.path === (root ? root + '/index.html' : 'index.html'));
+    }
+    $('index-hint').hidden = !missingIndex;
+    updateNameHint();
+    show('pending');
+    if (target) $('deploy').focus();
+    else $('name').select();
+  }
+
+  function updateNameHint() {
+    const name = $('name').value;
+    const hint = $('name-hint');
+    const reserved = name === 'main' || name === 'gh-pages' || name === state.defaultBranch;
+    const foreign = projects.some((p) => p.name === name && !p.managed);
+    let problem = '';
+    if (!NAME_RE.test(name)) problem = 'Lettres minuscules, chiffres et tirets uniquement, sans tiret au début ni à la fin.';
+    else if (reserved) problem = `« ${name} » est un nom réservé : choisis-en un autre.`;
+    else if (foreign) problem = `« ${name} » est déjà pris par un projet publié hors de Quai : choisis un autre nom.`;
+
+    hint.className = problem ? 'hint warn' : 'hint';
+    $('deploy').disabled = Boolean(problem);
+    $('link-preview').textContent = problem ? '' : `Lien : ${state.siteUrl}${name}/`;
+    if (problem) {
+      hint.textContent = problem;
+      $('deploy').textContent = 'Mettre en ligne';
+      return;
+    }
+    const exists = branches.includes(name) || projects.some((p) => p.name === name);
+    hint.textContent = exists
+      ? `« ${name} » existe déjà : ce sera une nouvelle version, le lien ne change pas.`
+      : '';
+    $('deploy').textContent = exists ? 'Publier la nouvelle version' : 'Mettre en ligne';
+  }
+  $('name').addEventListener('input', () => {
+    const el = $('name');
+    const cleaned = el.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    if (cleaned !== el.value) el.value = cleaned;
+    updateNameHint();
+  });
+  $('name').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !$('deploy').disabled) $('deploy').click();
+  });
+
+  $('cancel').addEventListener('click', () => { pending = null; show('drop'); $('pick-zip').focus(); });
+  $('done-close').addEventListener('click', () => { show('drop'); $('pick-zip').focus(); });
+  $('failure-retry').addEventListener('click', () => { show('drop'); $('pick-zip').focus(); });
+  $('failure-settings').addEventListener('click', () => { show('drop'); loadState().catch(() => {}); });
+
+  // ---------- publication : envoi au serveur local, puis suivi de la tâche ----------
+
+  async function sendFiles(id, files, onProgress) {
+    const queue = files.slice();
+    let sent = 0;
+    let failure = null;
+    async function worker() {
+      while (queue.length && !failure) {
+        const item = queue.shift();
+        try {
+          await api(`uploads/${id}/files?path=${encodeURIComponent(item.path)}`, {
+            method: 'PUT',
+            body: item.file,
+            headers: { 'Content-Type': 'application/octet-stream' },
+          });
+        } catch (err) {
+          failure = err;
+          return;
+        }
+        sent += 1;
+        onProgress(sent);
+      }
+    }
+    await Promise.all(Array.from({ length: 4 }, worker));
+    if (failure) throw failure;
+  }
+
+  $('deploy').addEventListener('click', async () => {
+    const name = $('name').value;
+    if (!pending || $('deploy').disabled) return;
+    const item = pending;
+    pending = null;
+    const local = { name, state: 'running', step: 'read', files: 0, warnings: [], detail: 'Préparation…' };
+    show('progress');
+    renderJob(local);
+    $('progress-title').focus();
+    try {
+      const { id } = await api('uploads', { method: 'POST', body: JSON.stringify({ name }) });
+      try {
+        if (item.kind === 'zip') {
+          await api(`uploads/${id}/zip`, { method: 'PUT', body: item.file, headers: { 'Content-Type': 'application/zip' } });
+        } else {
+          await sendFiles(id, item.files, (sent) => {
+            renderJob({ ...local, detail: `${sent.toLocaleString('fr-FR')} / ${plural(item.files.length, 'fichier')}` });
+          });
+        }
+        const { job } = await api(`uploads/${id}/publish`, { method: 'POST' });
+        setTarget(null);
+        follow(job, 0);
+      } catch (err) {
+        api(`uploads/${id}`, { method: 'DELETE' }).catch(() => {});
+        throw err;
+      }
+    } catch (err) {
+      renderJob({ ...local, detail: '', state: 'error', error: { step: 'read', message: err.message, reconnect: err.status === 401 } });
+      if (err.status === 409 || err.status === 401) loadState().catch(() => {});
+    }
+  });
+
+  function follow(job, failures) {
+    renderJob(job);
+    if (job.state !== 'running') {
+      refreshProjects().catch(() => {});
+      return;
+    }
+    setTimeout(async () => {
+      let next = job;
+      try {
+        next = (await api(`jobs/${job.id}`)).job;
+        failures = 0;
+      } catch (err) {
+        failures += 1;
+        if (failures >= 5) {
+          return renderJob({ ...job, state: 'error', error: { step: job.step, message: err.message } });
+        }
+      }
+      follow(next, failures);
+    }, 800);
+  }
+
+  const RUN_STATUS = {
+    queued: 'en file d’attente chez GitHub…',
+    in_progress: 'GitHub assemble le site…',
+    completed: 'terminée',
+  };
+
+  function stepDetail(job, id, status) {
+    if (status === 'todo') return '';
+    const count = (n) => n.toLocaleString('fr-FR');
+    if (id === 'read') {
+      if (job.detail) return job.detail;
+      if (!job.files) return status === 'active' ? 'lecture des fichiers…' : '';
+      const ignored = job.ignored ? ` · ${plural(job.ignored, 'fichier')} inutile${job.ignored > 1 ? 's' : ''} écarté${job.ignored > 1 ? 's' : ''}` : '';
+      return `${plural(job.files, 'fichier')} · ${formatBytes(job.bytes)}${ignored}`;
+    }
+    if (id === 'upload') {
+      const reused = job.reused ? ` (dont ${count(job.reused)} déjà chez GitHub)` : '';
+      return `${count(job.sent)} / ${plural(job.files, 'fichier')}${reused}`;
+    }
+    if (id === 'publish') {
+      if (status === 'done') return 'terminée';
+      return job.run ? RUN_STATUS[job.run.status] || '' : 'lancement…';
+    }
+    if (status === 'active') return 'GitHub met le site en ligne, encore quelques secondes…';
+    return status === 'done' ? 'le lien répond' : '';
+  }
+
+  let announced = '';
+  function renderJob(job) {
+    const current = STEPS.findIndex((s) => s.id === job.step);
+    const running = job.state === 'running';
+    $('progress-title').textContent = running
+      ? `Publication de « ${job.name} »…`
+      : job.state === 'done' ? `« ${job.name} » est en ligne` : `La publication de « ${job.name} » a échoué`;
+
+    const list = $('steps');
+    list.replaceChildren();
+    STEPS.forEach((step, index) => {
+      let status = 'todo';
+      if (job.state === 'done' || index < current) status = 'done';
+      else if (index === current) status = running ? 'active' : 'error';
+      const mark = status === 'done' ? '✓' : status === 'error' ? '!' : String(index + 1);
+      const spoken = { done: 'terminé', active: 'en cours', error: 'échec', todo: 'à venir' }[status];
+      list.append(h('li', { class: status, 'aria-current': status === 'active' ? 'step' : null },
+        h('span', { class: 'mark', 'aria-hidden': 'true' }, mark),
+        h('span', null,
+          h('span', { class: 'label' }, step.label, h('span', { class: 'sr' }, ` (${spoken})`)),
+          h('span', { class: 'detail' }, stepDetail(job, step.id, status)))
+      ));
+    });
+
+    // Avancement global : lecture 5 %, envoi jusqu'à 65 %, publication 85 %, mise en ligne 100 %.
+    let ratio = [0.03, 0.05, 0.7, 0.88][Math.max(0, current)];
+    if (job.step === 'upload' && job.files) ratio = 0.05 + 0.6 * (job.sent / job.files);
+    if (job.step === 'publish' && job.run && job.run.status === 'in_progress') ratio = 0.78;
+    if (job.state === 'done') ratio = 1;
+    const percent = Math.round(ratio * 100);
+    $('bar').style.width = percent + '%';
+    $('progress-bar').setAttribute('aria-valuenow', String(percent));
+    $('progress-bar').hidden = !running;
+
+    $('progress-note').hidden = !job.note;
+    $('progress-note').textContent = job.note || '';
+    $('progress-warnings').replaceChildren(...(job.warnings || []).map((w) => h('p', { class: 'hint warn' }, w)));
+
+    // Annonce vocale : une phrase par changement d'étape, pas à chaque fichier.
+    const spokenKey = `${job.id || ''}:${job.step}:${job.state}`;
+    if (running && spokenKey !== announced) {
+      announced = spokenKey;
+      $('progress-status').textContent = `Étape ${current + 1} sur ${STEPS.length} : ${STEPS[current].label}.`;
+    }
+
+    const failed = job.state === 'error';
+    $('failure').hidden = !failed;
+    if (failed) {
+      const step = STEPS.find((s) => s.id === job.error.step) || STEPS[0];
+      $('failure-text').textContent = `Échec à l'étape « ${step.label} » : ${job.error.message}`;
+      const linkUseful = Boolean(job.error.late && job.url);
+      $('failure-link').hidden = !linkUseful;
+      if (linkUseful) { $('failure-url').textContent = job.url; $('failure-url').href = job.url; }
+      $('failure-settings').hidden = !job.error.reconnect;
+      $('failure-run').hidden = !job.error.runUrl;
+      if (job.error.runUrl) $('failure-run').href = job.error.runUrl;
+      if (!$('progress').hidden) $('failure-retry').focus();
+    }
+    if (job.state === 'done') showDone(job);
+  }
+
+  function showDone(job) {
+    $('done-title').textContent = job.newVersion ? 'Nouvelle version en ligne.' : 'En ligne.';
+    $('done-text').textContent = `${job.name} · ${plural(job.files, 'fichier')} · ${formatBytes(job.bytes)}`;
+    $('done-link').textContent = job.url;
+    $('done-link').href = job.url;
+    $('done-open').href = job.url;
+    $('done-copy').onclick = () => copy(job.url);
+    $('done-warnings').replaceChildren(...(job.warnings || []).map((w) => h('p', { class: 'hint warn' }, w)));
+    show('done');
+    $('done-copy').focus();
+  }
+
+  // ---------- sélection et glisser-déposer ----------
+
+  const isZip = (file) => /\.zip$/i.test(file.name);
+
+  $('pick-folder').addEventListener('click', () => $('input-folder').click());
+  $('pick-zip').addEventListener('click', () => $('input-zip').click());
+
+  $('input-folder').addEventListener('change', (event) => {
+    const files = [...event.target.files].map((file) => ({ path: file.webkitRelativePath || file.name, file }));
+    event.target.value = '';
+    if (files.length) stage({ kind: 'files', files }, commonRoot(files));
+  });
+  $('input-zip').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!isZip(file)) return toast('Ce fichier n’est pas un .zip.', true);
+    stage({ kind: 'zip', file }, file.name.replace(/\.zip$/i, ''));
+  });
+
+  function readEntry(entry, prefix, out) {
+    if (entry.isFile) {
+      return new Promise((resolve, reject) => entry.file((file) => {
+        out.push({ path: prefix + entry.name, file });
+        resolve();
+      }, reject));
+    }
+    if (!entry.isDirectory || IGNORED.has(entry.name)) return Promise.resolve();
+    const reader = entry.createReader();
+    const readBatch = () => new Promise((resolve, reject) => reader.readEntries(resolve, reject));
+    return (async () => {
+      for (;;) {
+        const batch = await readBatch();
+        if (!batch.length) break;
+        for (const child of batch) await readEntry(child, prefix + entry.name + '/', out);
+      }
+    })();
+  }
+
+  async function handleDrop(dataTransfer) {
+    // Les entrées doivent être lues tout de suite : elles ne survivent pas à un await.
+    const entries = [...(dataTransfer.items || [])]
+      .map((item) => (item.webkitGetAsEntry ? item.webkitGetAsEntry() : null))
+      .filter(Boolean);
+    const plain = [...(dataTransfer.files || [])];
+
+    if (plain.length === 1 && isZip(plain[0]) && !(entries[0] && entries[0].isDirectory)) {
+      return stage({ kind: 'zip', file: plain[0] }, plain[0].name.replace(/\.zip$/i, ''));
+    }
+    let files = [];
+    if (entries.length) {
+      for (const entry of entries) await readEntry(entry, '', files);
+    } else {
+      files = plain.map((file) => ({ path: file.name, file }));
+    }
+    if (!files.length) return toast('Rien à publier dans ce que tu as déposé.', true);
+    stage({ kind: 'files', files }, commonRoot(files));
+  }
+
+  let depth = 0;
+  const hasFiles = (event) => [...(event.dataTransfer?.types || [])].includes('Files');
+  const canDrop = () => Boolean(state && state.connected) && !busy && !blocked();
+  window.addEventListener('dragenter', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth += 1;
+    if (canDrop()) $('drop').classList.add('over');
+  });
+  window.addEventListener('dragover', (event) => { if (hasFiles(event)) event.preventDefault(); });
+  window.addEventListener('dragleave', () => {
+    depth = Math.max(0, depth - 1);
+    if (!depth) $('drop').classList.remove('over');
+  });
+  window.addEventListener('drop', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth = 0;
+    $('drop').classList.remove('over');
+    if (!state || !state.connected || busy) return;
+    if (blocked()) return toast('La publication n’est pas encore possible : regarde le message en haut de la page.', true);
+    handleDrop(event.dataTransfer).catch((err) => toast(err.message || 'Lecture du dossier impossible.', true));
+  });
+
+  // ---------- démarrage ----------
+
+  (async () => {
+    try {
+      await loadState();
+    } catch (err) {
+      $('loading').textContent = err.message;
+      return;
+    }
+    if (!state.connected) return $('repo').value ? $('token').focus() : $('repo').focus();
+    refreshProjects().catch((err) => toast(err.message, true));
+    if (state.activeJob) {
+      // Une publication était en cours avant le rechargement de la page : on reprend son suivi.
+      try {
+        const { job } = await api(`jobs/${state.activeJob}`);
+        show('progress');
+        follow(job, 0);
+      } catch { /* terminée entre-temps */ }
+    }
+  })();
+})();
+</script>
+</body>
+</html>
