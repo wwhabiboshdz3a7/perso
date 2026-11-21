@@ -88,7 +88,7 @@ em { font-style: italic; }
   .cover__media::before { background: linear-gradient(to top, rgba(35, 28, 23, 0.6), transparent 34%); }
   .cover__title--light { display: none; }
   .cover__caption { left: var(--pad); bottom: 16px; right: var(--pad); }
-  .cover__sticker { right: 14px; top: -34px; width: 124px; height: 124px; }
+  .cover__sticker { right: 14px; top: 14px; width: 118px; height: 118px; }
   .cover__sticker b { font-size: 40px; }
   .cover__sticker .mono { font-size: 8.5px; }
   .cover__foot { order: 4; padding: 22px 0 30px; }
@@ -194,7 +194,7 @@ figcaption b { color: var(--ink); margin-right: 10px; }
 @media (max-width: 1080px) {
   .maison__head .d2, .maison__intro, .maison__stage, .fiche { grid-column: 1 / -1; }
   .maison__intro { padding-top: 16px; }
-  .maison__stage { margin-right: calc(-1 * var(--pad)); height: clamp(380px, 62vh, 640px); }
+  .maison__stage { margin-right: calc(-1 * var(--pad)); height: clamp(360px, min(96vw, 66vh), 640px); }
   .maison__mood { right: var(--pad); }
   .fiche { margin-top: 26px; box-shadow: 6px 6px 0 var(--pool); }
 }
@@ -396,7 +396,7 @@ figcaption b { color: var(--ink); margin-right: 10px; }
 
 /* pied de page */
 .foot { padding: clamp(36px, 5vw, 70px) var(--pad) 104px; background: var(--ink); color: var(--plaster); overflow: hidden; }
-.foot__big { font: 400 clamp(64px, 18.6vw, 340px) / 0.8 var(--serif); letter-spacing: -0.03em; white-space: nowrap; margin-left: -0.03em; }
+.foot__big { font: 400 clamp(48px, 15.4vw, 300px) / 0.8 var(--serif); letter-spacing: -0.03em; white-space: nowrap; margin-left: -0.03em; }
 .foot__big em { color: var(--pool-light); }
 .foot__row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; margin-top: 30px; padding-top: 14px; border-top: 1px solid rgba(239, 230, 218, 0.3); }
 .foot__row span:nth-child(2) { max-width: 48em; opacity: 0.8; }

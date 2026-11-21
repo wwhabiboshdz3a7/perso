@@ -280,7 +280,7 @@ em { font-style: normal; }
 .recap__when { padding: 8px 0; border-top: 1px solid rgba(239, 231, 214, 0.3); border-bottom: 1px solid rgba(239, 231, 214, 0.3); }
 .recap__when dt { opacity: 0.7; flex: none; }
 .recap__when dd { text-align: right; font-size: 14px; font-weight: 600; line-height: 1.35; }
-.recap__total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.recap__total { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .recap__total b { font: 400 clamp(64px, 5.8vw, 92px) / 0.85 var(--display); font-variant-numeric: tabular-nums; padding-top: 6px; }
 .recap__fields { display: grid; gap: 10px; }
 .recap__fields label { display: grid; gap: 6px; font: 500 11px/1 var(--mono-font); letter-spacing: 0.1em; text-transform: uppercase; }
@@ -291,7 +291,7 @@ em { font-style: normal; }
 .recap__error { color: #ffb0a1; font-size: 13.5px; font-weight: 600; line-height: 1.4; }
 .recap__error:empty, .recap__done:empty { display: none; }
 .recap__done { font-size: 13.5px; line-height: 1.5; padding: 10px 12px; background: var(--paper); color: var(--ink); }
-.recap__stamp { position: absolute; right: 12px; top: 118px; padding: 6px 14px 2px; background: var(--red); color: #fff; outline: 3px solid #fff; outline-offset: -7px; font: 400 40px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; font-style: normal; rotate: -9deg; opacity: 0; scale: 1.6; pointer-events: none; }
+.recap__stamp { position: absolute; right: 4px; top: 2px; padding: 6px 14px 2px; background: var(--red); color: #fff; outline: 3px solid #fff; outline-offset: -7px; font: 400 34px/1 var(--display); letter-spacing: 0.05em; text-transform: uppercase; font-style: normal; rotate: -8deg; opacity: 0; scale: 1.6; pointer-events: none; }
 .board.is-done .recap__stamp { opacity: 1; scale: 1; transition: opacity 0.15s, scale 0.3s cubic-bezier(0.2, 1.6, 0.4, 1); }
 
 /* ---------- venir ---------- */
@@ -380,5 +380,4 @@ em { font-style: normal; }
   .carte__photo img { aspect-ratio: 4 / 3; }
   .venir__photo img { aspect-ratio: 1; }
   .shot__title { font-size: clamp(64px, 21vw, 120px); }
-  .recap__stamp { top: 104px; }
 }
