@@ -8,6 +8,7 @@ Projets web personnels. Chaque branche est un site autonome, publiable tel quel 
 | `demos-toulouse` | Démos de sites pour commerces toulousains (restaurant, coiffeur, garage, etc.), chacune avec sa fonctionnalité métier (réservation, prise de RDV, devis…). |
 | `academy` | Plateforme de formation au code (C, Python, HTML/CSS, JS, C++, cyber, IA) et à la vidéo IA, du débutant à l'avancé, avec éditeur intégré. |
 | `nexora-v2` | Refonte complète du site de l'agence NEXORA. |
+| `sites/ecrin` (dossier) | **Écrin** : galerie de démos de sites premium en WebGL/3D (pizzeria, horlogerie, parfumerie, pâtisserie, champagne, torréfacteur). En ligne : https://ecrin-demos-3d.netlify.app |
 
 ## Publier sur Netlify
 
