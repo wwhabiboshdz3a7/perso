@@ -89,11 +89,11 @@ h3 { font: 700 18px/1.2 var(--text); }
 }
 
 /* ---------- ouverture ---------- */
-.hero { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto auto 1fr; padding: calc(var(--bar) + 12px) var(--pad) clamp(34px, 4.6vw, 66px); }
+.hero { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto auto 1fr; padding: calc(var(--bar) + 12px) var(--pad) clamp(34px, 5.6vw, 84px); }
 .hero__meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--ink); }
 .hero__meta span { padding: 9px 12px 9px 0; }
 .hero__meta span + span { padding-left: 12px; border-left: 1px solid var(--rule); }
-.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 18vw, 380px); line-height: 0.8; margin: 0.23em 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
+.hero__title { display: flex; align-items: baseline; font-size: clamp(50px, 18vw, 380px); line-height: 0.8; margin: 0.275em 0 clamp(14px, 2vw, 34px) -0.045em; white-space: nowrap; }
 .hero__title i { width: 0.17em; height: 0.17em; margin-left: 0.05em; border-radius: 50%; background: var(--signal); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px); padding-top: clamp(18px, 2vw, 28px); border-top: 1px solid var(--ink); background: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 12px) 0 0 / 100% 7px no-repeat; }
 .hero__text { display: flex; flex-direction: column; gap: clamp(18px, 2.2vw, 28px); }
@@ -108,7 +108,10 @@ h3 { font: 700 18px/1.2 var(--text); }
 .nums dd { margin-top: 8px; font: 500 11px/1.35 var(--mono-font); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .hero__fig { display: grid; grid-template-rows: 1fr auto; min-height: 240px; background: #111 url("media/mouvement.webp") center / cover; }
 .hero__fig video { min-height: 0; aspect-ratio: 16 / 9; }
-@media (min-width: 901px) { .hero__fig video { aspect-ratio: auto; height: clamp(230px, calc(100svh - 34vw - 250px), 600px); } }
+@media (min-width: 901px) {
+  .hero__fig { align-self: start; }
+  .hero__fig video { aspect-ratio: auto; height: clamp(230px, calc(100svh - 19.4vw - 294px), 620px); }
+}
 .pastille { position: absolute; top: 12px; left: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--ink); color: var(--paper); font: 600 11px/1 var(--mono-font); letter-spacing: 0.08em; text-transform: uppercase; }
 @media (prefers-reduced-motion: no-preference) {
   .hero__title span { animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
