@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurèle — Horloger-bijoutier à Toulouse : montres maison et réparation au comptoir</title>
+<meta name="description" content="Aurèle, horloger-bijoutier indépendant à Toulouse : la montre AU-01 à configurer en 3D, et un atelier de réparation au comptoir. Démonstration de site Premium — entreprise fictive.">
+<meta name="theme-color" content="#f2f1ec">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0b0b'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23f2f1ec' stroke-width='2'/%3E%3Cpath d='M16 9v7l5 3' fill='none' stroke='%23f2f1ec' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23ff4f00'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="montre.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="bar__brand" href="#accueil" aria-label="Aurèle, retour en haut de page">Aurèle</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#film"><i>01</i>Le calibre</a>
+    <a href="#configurer"><i>02</i>Configurer</a>
+    <a href="#fiche"><i>03</i>Fiche technique</a>
+    <a href="#reparer"><i>04</i>Réparer</a>
+    <a href="#venir"><i>05</i>Venir</a>
+  </nav>
+  <p class="bar__clock" aria-hidden="true"><span class="dot"></span><span data-clock>--:--:--</span></p>
+  <a class="btn btn--signal bar__cta" href="#essayage">Essayer</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : composition typographique, le calibre en marche dans un cadre coté -->
+  <section class="hero">
+    <div class="hero__meta mono">
+      <span>Notice N° AU-01 · éd. 2026</span>
+      <span>Horloger-bijoutier indépendant</span>
+      <span>43,600° N · 1,443° E — Toulouse</span>
+      <span>Séries de 50 pièces</span>
+    </div>
+    <h1 class="hero__title"><span>Aurèle</span><i aria-hidden="true"></i></h1>
+    <div class="hero__grid">
+      <div class="hero__text">
+        <p class="hero__lede">Des montres dessinées à Toulouse et assemblées dans notre atelier des Pyrénées, cinquante à la fois. Et un établi ouvert au comptoir, pour remettre les vôtres en marche.</p>
+        <div class="hero__cta">
+          <a class="btn btn--signal" href="#configurer">Configurer l’AU-01</a>
+          <a class="btn btn--line" href="#reparer">Faire réparer une montre</a>
+        </div>
+        <dl class="nums">
+          <div><dt>39<small>mm</small></dt><dd>Boîtier acier</dd></div>
+          <div><dt>72<small>h</small></dt><dd>Réserve de marche</dd></div>
+          <div><dt>10<small>bar</small></dt><dd>Étanchéité</dd></div>
+        </dl>
+      </div>
+      <figure class="fig hero__fig">
+        <video data-loop muted loop playsinline preload="metadata" poster="media/mouvement.webp" aria-label="Le calibre AU-01 filmé en macro : le balancier oscille, les roues tournent">
+          <source src="media/mouvement.mp4" type="video/mp4">
+        </video>
+        <span class="pastille"><span class="dot"></span>En marche · 4 Hz</span>
+        <figcaption class="mono"><b>Fig. 1</b> Calibre AU-01, côté ponts. Grossissement × 12.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="band marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Calibre AU-01</span><i></i><span>28 800 alternances / heure</span><i></i><span>72 h de réserve</span><i></i><span>Étanche 10 bar</span><i></i><span>Réparation au comptoir</span><i></i><span>Diagnostic gratuit</span><i></i>
+      <span>Calibre AU-01</span><i></i><span>28 800 alternances / heure</span><i></i><span>72 h de réserve</span><i></i><span>Étanche 10 bar</span><i></i><span>Réparation au comptoir</span><i></i><span>Diagnostic gratuit</span><i></i>
+    </div>
+  </div>
+
+  <!-- le film : un seul plan long, trois relevés qui se succèdent -->
+  <section class="film" id="film" data-film data-length="2.4" aria-label="Le calibre AU-01 en marche">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <div class="film__scale" aria-hidden="true"><span>0</span><i></i><span>72 h</span></div>
+      <article class="film__shot" data-src="media/mouvement" data-frames="41" data-label="Calibre AU-01">
+        <div class="shot__main">
+          <p class="step"><b>01</b>Le calibre</p>
+          <h2 class="shot__title">Le calibre<br>AU-01 <em>en marche</em></h2>
+        </div>
+        <ol class="notes" data-notes>
+          <li class="is-on"><p class="mono">Relevé 1/3 · balancier</p><b>4<small>Hz</small></b><span>Le balancier bat 28 800 fois par heure. C’est lui que vous entendez en approchant la montre de l’oreille.</span></li>
+          <li><p class="mono">Relevé 2/3 · pivots</p><b>28<small>rubis</small></b><span>Chaque axe tourne dans une pierre synthétique : presque pas de frottement, presque pas d’usure. Les vis sont bleuies à la flamme, une par une.</span></li>
+          <li><p class="mono">Relevé 3/3 · barillet</p><b>72<small>h</small></b><span>Posée le vendredi soir, elle est encore à l’heure le lundi matin : le ressort emmagasine trois jours de marche.</span></li>
+        </ol>
+      </article>
+    </div>
+  </section>
+
+  <!-- le configurateur : la montre en 3D, trois réglages, un prix -->
+  <section class="cfg" id="configurer" data-config>
+    <header class="head">
+      <p class="step rv"><b>02</b>Configurateur</p>
+      <h2 class="h2 rv" style="--i:1">Composez<br>votre AU-01</h2>
+      <p class="head__text rv" style="--i:2">Trois boîtiers, quatre cadrans, trois bracelets : trente-six montres possibles. Faites-la tourner, ouvrez-la pour voir ce qu’elle a dans le ventre, puis venez l’essayer.</p>
+    </header>
+    <div class="cfg__grid">
+      <div class="fig cfg__stage">
+        <canvas class="cfg__canvas" data-watch tabindex="0" aria-label="Montre AU-01 en trois dimensions, à l’heure. Flèches gauche et droite pour la faire tourner, haut et bas pour l’incliner."></canvas>
+        <img class="cfg__fallback" src="media/etabli.webp" alt="Le calibre AU-01 posé sur l’établi, entre une loupe et des brucelles" loading="lazy" width="1800" height="1018">
+        <p class="cfg__cap mono"><b>Fig. 2</b> AU-01, vue <span data-view>assemblée</span> · à l’heure</p>
+        <p class="cfg__hint mono" aria-hidden="true">↔ Glissez pour la faire tourner</p>
+        <ol class="cfg__labels mono" data-labels aria-hidden="true"></ol>
+        <button class="btn cfg__open" type="button" data-open aria-pressed="false"><span data-open-label>Ouvrir la montre</span></button>
+      </div>
+
+      <form class="cfg__panel" data-config-form aria-label="Configuration de la montre">
+        <fieldset class="opt rv">
+          <legend><b>A</b>Boîtier <small>39 mm</small></legend>
+          <div class="chips chips--3">
+            <label class="chip"><input type="radio" name="boitier" value="acier" data-code="AC" data-price="0" data-label="Acier 316L brossé" checked><i style="--sw:linear-gradient(135deg,#f4f5f7,#9a9da3)"></i><span>Acier</span><em>inclus</em></label>
+            <label class="chip"><input type="radio" name="boitier" value="rose" data-code="OR" data-price="340" data-label="Acier traité or rose 5N"><i style="--sw:linear-gradient(135deg,#fbe0cc,#c98a66)"></i><span>Or rose</span><em>+ 340 €</em></label>
+            <label class="chip"><input type="radio" name="boitier" value="dlc" data-code="DLC" data-price="260" data-label="Acier noir DLC"><i style="--sw:linear-gradient(135deg,#55575c,#0c0c0e)"></i><span>Noir DLC</span><em>+ 260 €</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt rv" style="--i:1">
+          <legend><b>B</b>Cadran <small>soleillé</small></legend>
+          <div class="chips chips--4">
+            <label class="chip"><input type="radio" name="cadran" value="bleu" data-code="BN" data-price="0" data-label="Bleu nuit soleillé" checked><i style="--sw:radial-gradient(circle at 35% 30%,#3b5fa8,#122447)"></i><span>Bleu nuit</span><em>inclus</em></label>
+            <label class="chip"><input type="radio" name="cadran" value="argent" data-code="AG" data-price="0" data-label="Argent soleillé"><i style="--sw:radial-gradient(circle at 35% 30%,#ffffff,#b4b7bd)"></i><span>Argent</span><em>inclus</em></label>
+            <label class="chip"><input type="radio" name="cadran" value="vert" data-code="VS" data-price="90" data-label="Vert sapin soleillé"><i style="--sw:radial-gradient(circle at 35% 30%,#2f7a56,#0d2a1d)"></i><span>Vert sapin</span><em>+ 90 €</em></label>
+            <label class="chip"><input type="radio" name="cadran" value="noir" data-code="NR" data-price="0" data-label="Noir soleillé"><i style="--sw:radial-gradient(circle at 35% 30%,#4a4c52,#0a0a0c)"></i><span>Noir</span><em>inclus</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt rv" style="--i:2">
+          <legend><b>C</b>Bracelet <small>entre-cornes 20 mm</small></legend>
+          <div class="chips chips--3">
+            <label class="chip"><input type="radio" name="bracelet" value="noir" data-code="CN" data-price="0" data-label="Cuir noir, couture ivoire" checked><i style="--sw:linear-gradient(135deg,#3a3a3c,#0c0c0d)"></i><span>Cuir noir</span><em>inclus</em></label>
+            <label class="chip"><input type="radio" name="bracelet" value="cognac" data-code="CC" data-price="0" data-label="Cuir cognac, couture ivoire"><i style="--sw:linear-gradient(135deg,#c07a3e,#6e3a17)"></i><span>Cuir cognac</span><em>inclus</em></label>
+            <label class="chip"><input type="radio" name="bracelet" value="acier" data-code="MA" data-price="320" data-label="Acier trois mailles, assorti au boîtier"><i style="--sw:repeating-linear-gradient(0deg,#eceef0 0 4px,#8e9197 4px 6px)"></i><span>Acier</span><em>+ 320 €</em></label>
+          </div>
+        </fieldset>
+        <div class="sum rv" style="--i:3">
+          <div class="sum__left">
+            <p class="mono">Réf. <span data-ref>AU01-AC-BN-CN</span></p>
+            <p class="sum__price" aria-live="polite"><span data-price-out>2 480 €</span></p>
+            <p class="sum__recap" data-recap>Acier 316L brossé · bleu nuit soleillé · cuir noir, couture ivoire</p>
+          </div>
+          <a class="btn btn--signal" href="#essayage">Demander un essayage</a>
+        </div>
+        <p class="sum__note mono rv" style="--i:4">Livraison sous 5 semaines · numérotée · garantie 5 ans</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- la fiche technique : cotes et caractéristiques -->
+  <section class="spec" id="fiche">
+    <header class="head">
+      <p class="step rv"><b>03</b>Fiche technique</p>
+      <h2 class="h2 rv" style="--i:1">Tout ce qui<br>se mesure</h2>
+      <p class="head__text rv" style="--i:2">Les cotes, la marche, l’étanchéité : tout est ici, vérifié pièce par pièce avant de quitter l’atelier. Le reste se juge au poignet.</p>
+    </header>
+
+    <dl class="bignums">
+      <div class="rv"><dt>39<small>mm</small></dt><dd><b>Ø</b>Diamètre du boîtier</dd></div>
+      <div class="rv" style="--i:1"><dt>11,2<small>mm</small></dt><dd><b>e</b>Épaisseur, glace comprise</dd></div>
+      <div class="rv" style="--i:2"><dt>−2/+6<small>s/j</small></dt><dd><b>Δ</b>Marche réglée en 5 positions</dd></div>
+      <div class="rv" style="--i:3"><dt>50<small>pièces</small></dt><dd><b>N</b>Par série, numérotées</dd></div>
+    </dl>
+
+    <div class="spec__grid">
+      <figure class="plan rv">
+        <svg viewBox="0 0 640 440" role="img" aria-labelledby="plan-titre">
+          <title id="plan-titre">Plan coté de l’AU-01 : diamètre 39 mm, 47 mm de corne à corne, entre-cornes 20 mm, épaisseur 11,2 mm</title>
+          <g class="plan__axis">
+            <path d="M62 225H358M210 52V398M470 225H570"/>
+          </g>
+          <g class="plan__ghost">
+            <path d="M150 84V58M270 84V58M150 366V392M270 366V392"/>
+          </g>
+          <g class="plan__line">
+            <rect x="134" y="84" width="16" height="64" rx="5"/><rect x="270" y="84" width="16" height="64" rx="5"/>
+            <rect x="134" y="302" width="16" height="64" rx="5"/><rect x="270" y="302" width="16" height="64" rx="5"/>
+            <rect x="324" y="213" width="20" height="24" rx="3"/>
+            <path d="M330 213v24M335 213v24M340 213v24" class="plan__thin"/>
+            <circle cx="210" cy="225" r="117" class="plan__fill"/>
+            <circle cx="210" cy="225" r="105"/>
+            <circle cx="210" cy="225" r="99" class="plan__thin"/>
+            <g class="plan__thin">
+              <path d="M206 143v18M214 143v18M251 154l-8 14M281 184l-14 8M292 225h-17M281 266l-14-8M251 296l-8-14M210 307v-17M169 296l8-14M139 266l14-8M128 225h17M139 184l14 8M169 154l8 14"/>
+            </g>
+            <path d="M210 225L168 199M210 225L277 186" class="plan__hand"/>
+            <!-- profil -->
+            <path d="M500 108h32a8 8 0 0 1 8 8v218a8 8 0 0 1-8 8h-32z" class="plan__fill"/>
+            <path d="M500 118Q478 225 500 332"/>
+            <path d="M540 132q9 4 9 14v158q0 10-9 14" />
+            <path d="M503 108l3-16q2-8 10-8h14q10 0 12 10l4 30M503 342l3 16q2 8 10 8h14q10 0 12-10l4-30" />
+            <circle cx="519" cy="225" r="11"/><circle cx="519" cy="225" r="4" class="plan__thin"/>
+          </g>
+          <g class="plan__dim">
+            <path d="M93 225V34M327 225V34M93 44H327"/>
+            <path d="M134 84H30M134 366H30M40 84V366"/>
+            <path d="M150 392V424M270 392V424M150 414H270"/>
+            <path d="M481 130V34M549 150V34M481 44H549"/>
+          </g>
+          <g class="plan__dots">
+            <circle cx="93" cy="44" r="3.5"/><circle cx="327" cy="44" r="3.5"/><circle cx="40" cy="84" r="3.5"/><circle cx="40" cy="366" r="3.5"/>
+            <circle cx="150" cy="414" r="3.5"/><circle cx="270" cy="414" r="3.5"/><circle cx="481" cy="44" r="3.5"/><circle cx="549" cy="44" r="3.5"/>
+            <circle cx="210" cy="225" r="5"/>
+          </g>
+          <g class="plan__text">
+            <text x="210" y="36" text-anchor="middle">Ø 39,0</text>
+            <text x="32" y="225" text-anchor="middle" transform="rotate(-90 32 225)">47,0</text>
+            <text x="210" y="432" text-anchor="middle">20,0</text>
+            <text x="515" y="36" text-anchor="middle">11,2</text>
+            <text x="592" y="229" text-anchor="start">mm</text>
+            <text x="470" y="400" text-anchor="start">Profil</text>
+            <text x="62" y="400" text-anchor="start">Face</text>
+          </g>
+        </svg>
+        <figcaption class="mono"><b>Fig. 3</b> Plan coté, échelle 2:1. Cotes en millimètres.</figcaption>
+      </figure>
+
+      <table class="table rv" style="--i:1">
+        <caption class="mono">Caractéristiques — AU-01, série 03</caption>
+        <tbody>
+          <tr><th scope="row">Référence</th><td><span data-ref>AU01-AC-BN-CN</span> <mark>votre configuration</mark></td></tr>
+          <tr><th scope="row">Boîtier</th><td><span data-part="boitier">Acier 316L brossé</span>, 39 mm</td></tr>
+          <tr><th scope="row">Cadran</th><td><span data-part="cadran">Bleu nuit soleillé</span>, index appliqués</td></tr>
+          <tr><th scope="row">Bracelet</th><td><span data-part="bracelet">Cuir noir, couture ivoire</span></td></tr>
+          <tr><th scope="row">Glace</th><td>Saphir bombé, antireflet intérieur</td></tr>
+          <tr><th scope="row">Fond</th><td>Saphir, vissé par 6 vis</td></tr>
+          <tr><th scope="row">Étanchéité</th><td>10 bar (100 m), couronne vissée</td></tr>
+          <tr><th scope="row">Mouvement</th><td>Calibre AU-01, automatique — ébauche suisse, ponts redessinés, décor et réglage à l’atelier</td></tr>
+          <tr><th scope="row">Fréquence</th><td>28 800 alternances / heure (4 Hz)</td></tr>
+          <tr><th scope="row">Réserve de marche</th><td>72 heures</td></tr>
+          <tr><th scope="row">Empierrage</th><td>28 rubis</td></tr>
+          <tr><th scope="row">Poids</th><td>68 g sur cuir · 142 g sur acier</td></tr>
+          <tr><th scope="row">Garantie</th><td>5 ans, première révision offerte</td></tr>
+          <tr class="table__total"><th scope="row">Prix TTC</th><td><span data-price-out>2 480 €</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- l'atelier de réparation : le geste, les tarifs, l'estimateur -->
+  <section class="fix" id="reparer">
+    <header class="head">
+      <p class="step rv"><b>04</b>Atelier de réparation</p>
+      <h2 class="h2 rv" style="--i:1">L’établi<br>est ouvert</h2>
+      <p class="head__text rv" style="--i:2">Pile, bracelet, glace : c’est fait pendant que vous attendez, sous vos yeux. Pour une révision, le diagnostic est gratuit et le prix annoncé avant de toucher à la montre. Toutes marques, y compris les montres de famille.</p>
+    </header>
+
+    <div class="fix__story">
+      <figure class="fig fix__photo rv">
+        <img src="media/mains.webp" alt="Deux mains gantées de doigtiers reposent un balancier sur un mouvement, à la brucelle, sous une lampe d’établi" loading="lazy" width="1300" height="1625">
+        <figcaption class="mono"><b>Fig. 4</b> Repose du balancier, après nettoyage.</figcaption>
+      </figure>
+      <div class="fix__side">
+        <ol class="steps">
+          <li class="rv"><b>1</b><h3>Diagnostic, devant vous</h3><p>On ouvre le fond, on mesure la marche et l’amplitude au chronocomparateur. Dix minutes, sans frais, sans rendez-vous.</p></li>
+          <li class="rv" style="--i:1"><b>2</b><h3>Un prix écrit</h3><p>Vous repartez avec un devis ferme. S’il faut une pièce introuvable, nous vous appelons avant de la faire refaire.</p></li>
+          <li class="rv" style="--i:2"><b>3</b><h3>Démontage complet</h3><p>Chaque pièce est nettoyée, contrôlée, huilée avec cinq lubrifiants différents, puis la montre est réglée sur six jours.</p></li>
+          <li class="rv" style="--i:3"><b>4</b><h3>Les pièces vous reviennent</h3><p>Tout ce qui a été remplacé vous est rendu dans un sachet, avec le relevé de marche avant / après.</p></li>
+        </ol>
+        <table class="table table--prices rv">
+          <caption class="mono">Tarifs au comptoir — TTC</caption>
+          <tbody>
+            <tr><th scope="row">Diagnostic</th><td>10 min</td><td>0 €</td></tr>
+            <tr><th scope="row">Pile, avec contrôle du joint</th><td>15 min</td><td>19 €</td></tr>
+            <tr><th scope="row">Mise à taille d’un bracelet</th><td>10 min</td><td>12 €</td></tr>
+            <tr><th scope="row">Test d’étanchéité 10 bar</th><td>10 min</td><td>25 €</td></tr>
+            <tr><th scope="row">Glace minérale / saphir</th><td>5 jours</td><td>65 € / 140 €</td></tr>
+            <tr><th scope="row">Révision complète</th><td>1 à 6 sem.</td><td>dès 95 €</td></tr>
+            <tr><th scope="row">Gravure du fond, 20 caractères</th><td>48 h</td><td>35 €</td></tr>
+            <tr><th scope="row">Bijouterie : mise à taille de bague</th><td>3 jours</td><td>dès 40 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <form class="est" data-est data-demo="Merci ! Ceci est une démonstration : aucun dépôt n’a été enregistré.">
+      <div class="est__in">
+        <p class="est__title"><span class="dot"></span>Estimer une intervention</p>
+        <fieldset class="opt">
+          <legend><b>1</b>Intervention</legend>
+          <div class="chips chips--4">
+            <label class="chip chip--plain"><input type="radio" name="intervention" value="pile"><span>Pile</span><em>19 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="intervention" value="revision" checked><span>Révision</span><em>dès 95 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="intervention" value="bracelet"><span>Bracelet</span><em>dès 12 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="intervention" value="glace"><span>Glace</span><em>dès 45 €</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt" data-for="pile revision">
+          <legend><b>2</b>Mouvement</legend>
+          <div class="chips chips--5">
+            <label class="chip chip--plain"><input type="radio" name="mouvement" value="quartz"><span>Quartz</span><em>à pile</em></label>
+            <label class="chip chip--plain"><input type="radio" name="mouvement" value="quartzchrono"><span>Chrono quartz</span><em>à pile</em></label>
+            <label class="chip chip--plain"><input type="radio" name="mouvement" value="manuel"><span>Mécanique</span><em>remontage manuel</em></label>
+            <label class="chip chip--plain"><input type="radio" name="mouvement" value="auto" checked><span>Automatique</span><em>à rotor</em></label>
+            <label class="chip chip--plain"><input type="radio" name="mouvement" value="chrono"><span>Chrono mécanique</span><em>à poussoirs</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt" data-for="bracelet" hidden disabled>
+          <legend><b>2</b>Bracelet</legend>
+          <div class="chips chips--3">
+            <label class="chip chip--plain"><input type="radio" name="detail-bracelet" value="taille" checked><span>Mise à taille</span><em>12 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="detail-bracelet" value="pompes"><span>Pompes ou maillon</span><em>18 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="detail-bracelet" value="cuir"><span>Cuir neuf sur mesure</span><em>89 €</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt" data-for="glace" hidden disabled>
+          <legend><b>2</b>Glace</legend>
+          <div class="chips chips--3">
+            <label class="chip chip--plain"><input type="radio" name="detail-glace" value="plexi"><span>Plexiglas</span><em>45 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="detail-glace" value="minerale" checked><span>Minérale</span><em>65 €</em></label>
+            <label class="chip chip--plain"><input type="radio" name="detail-glace" value="saphir"><span>Saphir</span><em>140 €</em></label>
+          </div>
+        </fieldset>
+        <fieldset class="opt">
+          <legend><b>3</b>Options</legend>
+          <div class="chips chips--3">
+            <label class="chip chip--plain chip--check"><input type="checkbox" name="etancheite" value="1"><span>Test d’étanchéité</span><em data-opt-note="etancheite">+ 25 €</em></label>
+            <label class="chip chip--plain chip--check"><input type="checkbox" name="ancienne" value="1"><span>Montre de plus de 30 ans</span><em data-opt-note="ancienne">+ 20 %</em></label>
+            <label class="chip chip--plain chip--check"><input type="checkbox" name="express" value="1"><span>Express</span><em data-opt-note="express">+ 60 €</em></label>
+          </div>
+        </fieldset>
+        <p class="est__warn" data-est-warn role="status" hidden></p>
+      </div>
+
+      <div class="est__out">
+        <p class="mono est__kind" data-est-kind>Estimation, confirmée après le diagnostic gratuit</p>
+        <p class="est__price" aria-live="polite"><span data-est-price>340 €</span></p>
+        <dl class="est__lines" data-est-lines></dl>
+        <dl class="est__facts">
+          <div><dt>Délai</dt><dd data-est-delay>4 semaines</dd></div>
+          <div><dt>Dépôt</dt><dd data-est-drop>—</dd></div>
+          <div><dt>Retour</dt><dd data-est-ready>—</dd></div>
+          <div><dt>Garantie</dt><dd data-est-warranty>24 mois</dd></div>
+        </dl>
+        <div class="est__form">
+          <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+          <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" pattern="[0-9 +().-]{10,}" title="Dix chiffres au moins" required></label>
+          <button class="btn btn--signal" type="submit">Annoncer mon dépôt</button>
+          <p class="form__done mono" data-done role="status"></p>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- preuves : chiffres et avis -->
+  <section class="proof" aria-label="Chiffres et avis">
+    <dl class="bignums bignums--dark">
+      <div class="rv"><dt>1 870</dt><dd>Montres remises en marche depuis 2017</dd></div>
+      <div class="rv" style="--i:1"><dt>4,9<small>/5</small></dt><dd>Note moyenne sur 214 avis</dd></div>
+      <div class="rv" style="--i:2"><dt>24<small>mois</small></dt><dd>De garantie sur chaque révision</dd></div>
+      <div class="rv" style="--i:3"><dt>0<small>€</small></dt><dd>Le diagnostic, sans rendez-vous</dd></div>
+    </dl>
+    <ul class="quotes">
+      <li class="rv"><p class="mono"><span class="stars" aria-label="5 sur 5">●●●●●</span> Révision · mars 2026</p><blockquote>« La montre de mon grand-père, arrêtée depuis vingt ans. Devis tenu à l’euro près, et les pièces remplacées rendues dans un sachet avec le relevé de marche. »</blockquote><p class="quotes__who">Hélène M., Toulouse</p></li>
+      <li class="rv" style="--i:1"><p class="mono"><span class="stars" aria-label="5 sur 5">●●●●●</span> AU-01 · janvier 2026</p><blockquote>« Je l’ai configurée sur le site puis je suis passé l’essayer. Le cadran vert est encore mieux en vrai. Livrée en cinq semaines, numéro 31 sur 50. »</blockquote><p class="quotes__who">Julien R., Blagnac</p></li>
+      <li class="rv" style="--i:2"><p class="mono"><span class="stars" aria-label="5 sur 5">●●●●●</span> Pile · septembre 2026</p><blockquote>« Pile changée en dix minutes, étanchéité testée devant moi. Dix-neuf euros annoncés, dix-neuf euros payés. »</blockquote><p class="quotes__who">Sophie D., Toulouse</p></li>
+    </ul>
+  </section>
+
+  <!-- le lieu, l'équipe, les infos pratiques -->
+  <section class="place" id="venir">
+    <header class="head">
+      <p class="step rv"><b>05</b>Deux adresses</p>
+      <h2 class="h2 rv" style="--i:1">Un comptoir,<br>un atelier</h2>
+      <p class="head__text rv" style="--i:2">Le comptoir est à Toulouse, à deux pas de la place Esquirol : on y répare, on y essaie. Les AU-01, elles, sont assemblées à 1 600 mètres d’altitude, dans l’air sec des Pyrénées, là où Camille a appris le métier.</p>
+    </header>
+    <div class="place__grid">
+      <figure class="fig place__photo rv">
+        <img src="media/atelier.webp" alt="L’atelier d’assemblage : une rangée d’établis en bois sous de grandes fenêtres donnant sur une forêt enneigée" loading="lazy" width="1300" height="1625">
+        <figcaption class="mono"><b>Fig. 5</b> L’atelier d’assemblage, Les Angles (66), un soir de février.</figcaption>
+      </figure>
+      <div class="place__side">
+        <ul class="team">
+          <li class="rv"><p class="mono">Horlogère · fondatrice</p><h3>Camille Aurèle</h3><p>Formée au lycée horloger de Morteau, sept ans au service après-vente d’une manufacture avant d’ouvrir le comptoir en 2017. C’est elle qui règle chaque AU-01.</p></li>
+          <li class="rv" style="--i:1"><p class="mono">Bijoutier · sertisseur</p><h3>Thomas Vidal</h3><p>Mises à taille, soudures, rhodiage, enfilage de perles : tout ce qui se porte et qui n’a pas d’aiguilles passe par son établi.</p></li>
+        </ul>
+        <figure class="fig place__wide rv">
+          <img src="media/etabli.webp" alt="Un mouvement de montre tenu dans un porte-mouvement en laiton, entre une loupe, des brucelles et des coupelles de vis bleuies" loading="lazy" width="1800" height="1018">
+          <figcaption class="mono"><b>Fig. 6</b> L’établi du comptoir. Chaque coupelle, une montre.</figcaption>
+        </figure>
+        <table class="table rv">
+          <caption class="mono">Infos pratiques</caption>
+          <tbody>
+            <tr><th scope="row">Comptoir</th><td>9, rue Peyrolières, 31000 Toulouse</td></tr>
+            <tr><th scope="row">Accès</th><td>Métro A — Esquirol, 3 min à pied · parking Esquirol</td></tr>
+            <tr><th scope="row">Horaires</th><td>Mardi au vendredi 10 h – 13 h, 14 h – 19 h · samedi 10 h – 18 h</td></tr>
+            <tr><th scope="row">Fermé</th><td>Dimanche et lundi</td></tr>
+            <tr><th scope="row">Téléphone</th><td><a href="tel:+33500000000">05 00 00 00 00</a></td></tr>
+            <tr><th scope="row">Atelier</th><td>Les Angles (66) — visite le premier samedi du mois, sur rendez-vous</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- la demande d'essayage, avec la configuration choisie -->
+  <section class="try" id="essayage">
+    <div class="try__left">
+      <p class="step rv"><b>06</b>Essayage</p>
+      <h2 class="h2 rv" style="--i:1">Passez-la<br>au poignet</h2>
+      <p class="try__text rv" style="--i:2">Trente minutes au comptoir, sans engagement. Nous préparons la montre dans votre configuration — ou la plus proche disponible — et nous mesurons votre poignet pour le bracelet.</p>
+      <div class="ticket rv" style="--i:3">
+        <p class="mono ticket__head"><span>Votre configuration</span><a href="#configurer">Modifier</a></p>
+        <p class="ticket__ref" data-ref>AU01-AC-BN-CN</p>
+        <dl>
+          <div><dt>Boîtier</dt><dd data-part="boitier">Acier 316L brossé</dd></div>
+          <div><dt>Cadran</dt><dd data-part="cadran">Bleu nuit soleillé</dd></div>
+          <div><dt>Bracelet</dt><dd data-part="bracelet">Cuir noir, couture ivoire</dd></div>
+          <div class="ticket__total"><dt>Prix TTC</dt><dd data-price-out>2 480 €</dd></div>
+        </dl>
+      </div>
+      <button class="btn btn--line rv" style="--i:4" type="button" data-chat-open>Une question ? Demander à l’atelier</button>
+    </div>
+    <form class="form rv" style="--i:2" data-try data-demo="Merci ! Ceci est une démonstration : aucune demande n’a été envoyée.">
+      <input type="hidden" name="reference" value="AU01-AC-BN-CN" data-ref-input>
+      <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+      <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" pattern="[0-9 +().-]{10,}" title="Dix chiffres au moins" required></label>
+      <label class="form__wide">E-mail <small>(facultatif)</small><input type="email" name="email" autocomplete="email"></label>
+      <label>Date<input type="date" name="date" data-open-days required></label>
+      <label>Créneau<select name="creneau"><option>10 h – 11 h</option><option>11 h – 12 h</option><option>14 h – 15 h</option><option>15 h – 16 h</option><option>16 h – 17 h</option><option>17 h – 18 h</option></select></label>
+      <label class="form__wide">Tour de poignet <small>(facultatif)</small><select name="poignet"><option value="">Je ne sais pas — nous le mesurerons</option><option>Moins de 16 cm</option><option>16 à 17 cm</option><option>17 à 18 cm</option><option>18 à 19 cm</option><option>Plus de 19 cm</option></select></label>
+      <p class="form__hint mono" data-date-hint>Comptoir ouvert du mardi au samedi.</p>
+      <button class="btn form__send" type="submit">Réserver l’essayage — <span data-ref>AU01-AC-BN-CN</span></button>
+      <p class="form__done mono" data-done role="status"></p>
+    </form>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">À l’heure<i></i></p>
+  <div class="foot__grid">
+    <div><p class="mono">Aurèle</p><p>Horloger-bijoutier indépendant<br>9, rue Peyrolières, 31000 Toulouse<br>05 00 00 00 00</p></div>
+    <div><p class="mono">Horaires</p><p>Mardi – vendredi : 10 h – 13 h, 14 h – 19 h<br>Samedi : 10 h – 18 h<br>Fermé dimanche et lundi</p></div>
+    <div><p class="mono">Sur cette page</p><p><a href="#configurer">Configurer l’AU-01</a><br><a href="#reparer">Estimer une réparation</a><br><a href="#essayage">Demander un essayage</a></p></div>
+    <div><p class="mono">À propos</p><p>Site de démonstration, formule Premium — entreprise fictive ; photos et vidéos générées par IA. Adresse, prix et avis sont inventés.<br><a href="../../">Voir le catalogue des démos</a></p></div>
+  </div>
+  <p class="foot__legal mono">© <span data-year>2026</span> Aurèle — entreprise fictive</p>
+</footer>
+
+<a class="tag" href="../../" title="Retour au catalogue des démos">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "L’atelier",
+  "role": "Aurèle — réponses de l’établi",
+  "launch": "Demander à l’atelier",
+  "greeting": "Bonjour, ici l’atelier Aurèle. Une montre à réparer, un essayage, une question sur l’AU-01 ? Je vous écoute.",
+  "chips": ["Faire réparer ma montre", "Les délais", "Essayer l’AU-01", "Les horaires"],
+  "fallback": "Je préfère ne pas vous répondre de travers : pour cette question, appelez le comptoir au 05 00 00 00 00. Je peux vous renseigner sur les réparations, les délais, la garantie, la gravure, l’essayage, l’étanchéité et les horaires.",
+  "intents": [
+    { "keys": ["repar", "revision", "devis", "casse", "panne", "arrete", "retarde", "avance", "entretien", "bracelet", "glace", "verre", "raye"], "answer": "Le diagnostic est gratuit et se fait devant vous, sans rendez-vous. Pour une première idée du prix et du délai, l’estimateur du site fait le calcul : une révision va de 95 € (quartz) à 620 € (chronographe mécanique).", "link": { "label": "Ouvrir l’estimateur", "href": "#reparer" }, "chips": ["Les délais", "La garantie"] },
+    { "keys": ["delai", "combien de temps", "quand", "duree", "attente", "semaine", "urgent", "express", "vite"], "answer": "Pile, mise à taille et test d’étanchéité : sur place, en dix à quinze minutes. Glace : cinq jours ouvrés. Révision : une semaine pour un quartz, quatre pour une automatique, six pour un chronographe mécanique. L’option express divise le délai par deux.", "link": { "label": "Calculer mon délai", "href": "#reparer" }, "chips": ["La garantie", "Les horaires"] },
+    { "keys": ["garantie", "garanti", "sav", "retour", "defaut"], "answer": "Chaque révision est garantie 24 mois, pièces et main-d’œuvre. Pile et glace : 12 mois. L’AU-01 est garantie 5 ans, et sa première révision est offerte.", "chips": ["Faire réparer ma montre", "Essayer l’AU-01"] },
+    { "keys": ["gravure", "graver", "grave", "initiale", "personnalis", "cadeau"], "answer": "Nous gravons le fond de boîte ou la masse oscillante : 35 € jusqu’à 20 caractères, prêt en 48 heures. Sur une AU-01 commandée, la gravure du numéro et de vos initiales est offerte.", "chips": ["Essayer l’AU-01", "Les horaires"] },
+    { "keys": ["essay", "rendez", "rdv", "poignet", "voir la montre", "porter"], "answer": "L’essayage dure une trentaine de minutes, au comptoir, sans engagement. Choisissez votre configuration, puis un créneau du mardi au samedi : la montre vous attendra.", "link": { "label": "Demander un essayage", "href": "#essayage" }, "chips": ["Le prix de l’AU-01", "Où êtes-vous ?"] },
+    { "keys": ["etanch", " eau", "piscine", "nager", "nage", "douche", "plong", "baign"], "answer": "L’AU-01 est étanche à 10 bar : baignade et nage sans souci, mais pas de plongée en bouteille. Pour toute montre, faites contrôler l’étanchéité tous les deux ans : 25 €, dix minutes, résultat imprimé.", "chips": ["Faire réparer ma montre", "La garantie"] },
+    { "keys": ["horaire", "ouvert", "ferme", "heure", "samedi", "dimanche", "lundi", "midi"], "answer": "Le comptoir est ouvert du mardi au vendredi de 10 h à 13 h et de 14 h à 19 h, le samedi de 10 h à 18 h. Fermé dimanche et lundi.", "chips": ["Où êtes-vous ?", "Essayer l’AU-01"] },
+    { "keys": ["adresse", "ou etes", "ou se trouve", "trouver", "metro", "parking", "venir", "acces", "situe"], "answer": "9, rue Peyrolières, à Toulouse. Métro A, station Esquirol, puis trois minutes à pied. Le parking Esquirol est le plus proche.", "link": { "label": "Voir les infos pratiques", "href": "#venir" }, "chips": ["Les horaires"] },
+    { "keys": ["pile", "batterie", "quartz"], "answer": "Un changement de pile coûte 19 €, contrôle du joint compris, et se fait en quinze minutes pendant que vous attendez. Ajoutez 25 € si vous voulez un test d’étanchéité à 10 bar.", "link": { "label": "Estimer", "href": "#reparer" }, "chips": ["Les horaires", "Où êtes-vous ?"] },
+    { "keys": ["prix", "tarif", "au-01", "au01", "configur", "montre", "or rose", "dlc", "acheter", "commande"], "answer": "L’AU-01 démarre à 2 480 € en acier sur cuir. Comptez + 340 € en or rose, + 260 € en noir DLC, + 90 € pour le cadran vert sapin et + 320 € pour le bracelet acier. Livraison sous cinq semaines.", "link": { "label": "Configurer la montre", "href": "#configurer" }, "chips": ["Essayer l’AU-01", "La garantie"] },
+    { "keys": ["paiement", "payer", "acompte", "plusieurs fois", "carte", "cheque"], "answer": "Pour une AU-01 : 30 % à la commande, le solde à la livraison, ou trois fois sans frais par carte. Les réparations se règlent au retrait de la montre.", "chips": ["Essayer l’AU-01"] },
+    { "keys": ["bijou", "bague", "collier", "perle", "alliance", "chaine"], "answer": "Thomas, notre bijoutier, s’occupe des mises à taille de bague (dès 40 €, trois jours), des soudures de chaîne et de l’enfilage de perles. Apportez le bijou : le devis est immédiat.", "chips": ["Les horaires", "Où êtes-vous ?"] },
+    { "keys": ["bonjour", "salut", "bonsoir", "hello", "coucou"], "answer": "Bonjour ! Que puis-je faire pour vous ?", "chips": ["Faire réparer ma montre", "Essayer l’AU-01", "Les horaires"] },
+    { "keys": ["merci", "parfait", "super", "top", "au revoir"], "answer": "Avec plaisir. À bientôt au comptoir !" }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="configurateur.js"></script>
+<script type="module" src="atelier.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>
