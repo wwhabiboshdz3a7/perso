@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier 31 — Garage indépendant toutes marques, Toulouse</title>
+<meta name="description" content="Atelier 31 : entretien, freinage et préparation toutes marques à Toulouse. Devis instantané, suivi de réparation en ligne. Démonstration de site Premium — entreprise fictive.">
+<meta name="theme-color" content="#101214">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101214'/%3E%3Cpath d='M4 28 20 4h8L12 28z' fill='%23ff5a1f'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="garage.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="bar__brand" href="#accueil"><span class="bar__mark" aria-hidden="true"></span>Atelier&nbsp;31</a>
+  <nav class="bar__nav" aria-label="Sections">
+    <a href="#film"><i>01</i>Méthode</a>
+    <a href="#eclate"><i>02</i>Vue éclatée</a>
+    <a href="#tarifs"><i>03</i>Tarifs</a>
+    <a href="#suivi"><i>04</i>Suivi</a>
+    <a href="#atelier"><i>05</i>Atelier</a>
+  </nav>
+  <a class="btn btn--sig bar__cta" href="#devis">Devis en 60&nbsp;s</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : la fiche technique du garage posée sur la vidéo de l'atelier -->
+  <section class="hero">
+    <video class="hero__video" data-loop muted loop playsinline preload="metadata" poster="media/orbite.webp">
+      <source src="media/orbite.mp4" type="video/mp4">
+    </video>
+    <div class="hero__meta lbl">
+      <span>Fiche A31 — garage indépendant, toutes marques</span>
+      <span class="hero__open" data-open>Lun.–ven. 7 h 30 – 18 h 30 · sam. 8 h – 12 h</span>
+    </div>
+    <h1 class="hero__title">
+      <span class="hero__word">Atelier</span>
+      <span class="hero__row"><span class="hero__num">31</span><span class="hero__hatch" aria-hidden="true"></span></span>
+    </h1>
+    <div class="hero__side">
+      <p class="hero__lede">Entretien, freinage, préparation. Devis ferme avant démontage, pièces montrées après, serrage au couple à chaque roue.</p>
+      <div class="hero__cta">
+        <a class="btn btn--sig" href="#devis">Chiffrer mon intervention</a>
+        <a class="btn btn--wire" href="#suivi">Suivre ma réparation</a>
+      </div>
+    </div>
+    <dl class="hero__specs">
+      <div><dt>Devis</dt><dd>Ferme, avant démontage</dd></div>
+      <div><dt>Garantie</dt><dd>24 mois, pièces et main-d'œuvre</dd></div>
+      <div><dt>Mobilité</dt><dd>6 véhicules de prêt</dd></div>
+      <div><dt>Adresse</dt><dd>31, rue des Carrossiers, Toulouse</dd></div>
+    </dl>
+  </section>
+
+  <div class="band marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Révision</span><i></i><span>Freinage</span><i></i><span>Distribution</span><i></i><span>Climatisation</span><i></i><span>Géométrie</span><i></i><span>Pneumatiques</span><i></i><span>Diagnostic</span><i></i><span>Préparation</span><i></i>
+      <span>Révision</span><i></i><span>Freinage</span><i></i><span>Distribution</span><i></i><span>Climatisation</span><i></i><span>Géométrie</span><i></i><span>Pneumatiques</span><i></i><span>Diagnostic</span><i></i><span>Préparation</span><i></i>
+    </div>
+  </div>
+
+  <!-- le film : deux plans que l'on fait avancer en défilant -->
+  <section class="film" id="film" data-film data-length="1.6" aria-label="La méthode de l'atelier en deux plans : diagnostic, puis intervention">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <div class="film__frame" aria-hidden="true"><span>A31 / CAM 02</span><span>● Enr.</span></div>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/orbite" data-frames="41" data-label="Diagnostic">
+        <div class="shot">
+          <div class="shot__main">
+            <p class="kick"><b>01</b>Diagnostic</p>
+            <h2 class="shot__title">Voir avant<br>de démonter</h2>
+            <p class="shot__text">Tour complet du véhicule, lecture des calculateurs, essai routier si besoin. Vous recevez les photos et un devis ferme&nbsp;: rien n'est démonté sans votre accord.</p>
+          </div>
+          <dl class="shot__data">
+            <div><dt>62</dt><dd>points de contrôle</dd></div>
+            <div><dt>45 min</dt><dd>sur le pont</dd></div>
+            <div><dt>59 €</dt><dd>déduits si vous nous confiez la réparation</dd></div>
+          </dl>
+        </div>
+      </article>
+      <article class="film__shot" data-src="media/frein" data-frames="41" data-label="Intervention">
+        <div class="shot">
+          <div class="shot__main">
+            <p class="kick"><b>02</b>Intervention</p>
+            <h2 class="shot__title">Serré au couple,<br>pas à l'oreille</h2>
+            <p class="shot__text">Disque rainuré, étrier, plaquettes&nbsp;: chaque pièce est posée propre, serrée à la clé dynamométrique, puis rodée sur route. Les anciennes vous attendent sur l'établi.</p>
+          </div>
+          <dl class="shot__data">
+            <div><dt>120 N·m</dt><dd>aux écrous de roue</dd></div>
+            <div><dt>24 mois</dt><dd>de garantie, pièces et main-d'œuvre</dd></div>
+            <div><dt>50 km</dt><dd>puis resserrage de contrôle offert</dd></div>
+          </dl>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- vue éclatée du train roulant, en 3D -->
+  <section class="xp" id="eclate" data-xp>
+    <header class="cart rv"><b>03</b><span>Vue éclatée</span><span>Train avant gauche · 6 pièces · éch. 1:4</span></header>
+    <div class="xp__head">
+      <h2 class="h2 rv" style="--i:1">Démontez-le<br>sans vous salir</h2>
+      <p class="lead rv" style="--i:2">C'est ce que nous avons sous les yeux quand votre voiture est sur le pont. Écartez les pièces, faites tourner l'ensemble, touchez celle qui vous intéresse&nbsp;: ce que nous y contrôlons, quand elle se remplace, ce qu'elle coûte.</p>
+    </div>
+    <div class="xp__body">
+      <div class="xp__stage rv" style="--i:2">
+        <div class="xp__view">
+          <canvas class="xp__canvas" data-xp-canvas tabindex="0" aria-label="Train roulant en trois dimensions : roue, disque, étrier, plaquettes et moyeu. Flèches gauche et droite pour faire tourner, haut et bas pour écarter ou rapprocher les pièces."></canvas>
+          <div class="xp__marks" data-xp-marks></div>
+          <p class="xp__hint lbl" aria-hidden="true">↔ faites tourner · touchez une pièce</p>
+          <img class="xp__fallback" src="media/frein.webp" alt="Disque de frein rainuré et étrier orange montés sur un moyeu" loading="lazy" width="1280" height="720">
+        </div>
+        <div class="xp__ctrl">
+          <div class="xp__steps" role="group" aria-label="Étapes du démontage">
+            <button type="button" data-xp-step="0" aria-pressed="true"><b>A</b>Roue montée</button>
+            <button type="button" data-xp-step="50" aria-pressed="false"><b>B</b>Dépose</button>
+            <button type="button" data-xp-step="100" aria-pressed="false"><b>C</b>Disque et plaquettes</button>
+          </div>
+          <label class="xp__range"><span class="lbl">Écartement <output data-xp-out>0 %</output></span>
+            <input type="range" min="0" max="100" step="1" value="0" data-xp-range>
+          </label>
+        </div>
+      </div>
+      <aside class="xp__panel rv" style="--i:3" aria-label="Fiche des pièces">
+        <ol class="xp__list">
+          <li><button type="button" data-part="roue" aria-pressed="false"><b>01</b>Jante et pneu</button></li>
+          <li><button type="button" data-part="ecrous" aria-pressed="false"><b>02</b>Écrous de roue</button></li>
+          <li><button type="button" data-part="disque" aria-pressed="false"><b>03</b>Disque ventilé</button></li>
+          <li><button type="button" data-part="etrier" aria-pressed="false"><b>04</b>Étrier</button></li>
+          <li><button type="button" data-part="plaquettes" aria-pressed="false"><b>05</b>Plaquettes</button></li>
+          <li><button type="button" data-part="moyeu" aria-pressed="false"><b>06</b>Moyeu et roulement</button></li>
+        </ol>
+        <article class="fiche" data-fiche aria-live="polite"></article>
+      </aside>
+    </div>
+  </section>
+
+  <!-- prestations et tarifs -->
+  <section class="tar" id="tarifs">
+    <header class="cart rv"><b>04</b><span>Prestations et tarifs</span><span>TTC · main-d'œuvre 78 € / h</span></header>
+    <div class="tar__grid">
+      <figure class="tar__media" data-in>
+        <video data-loop muted loop playsinline preload="none" poster="media/frein.webp" aria-label="Un technicien monte un disque et un étrier de frein"><source src="media/frein.mp4" type="video/mp4"></video>
+        <figcaption class="lbl"><span>Pont 2</span><span>Freinage avant</span></figcaption>
+      </figure>
+      <div class="tar__main">
+        <h2 class="h2 rv">Les prix<br>sont sur<br>la table</h2>
+        <p class="lead rv" style="--i:1">Tarifs «&nbsp;à partir de&nbsp;» pour une citadine, pièces de qualité équivalente à l'origine. Votre prix exact se calcule plus bas, en une minute.</p>
+        <ol class="tar__list">
+          <li class="rv"><span class="n">01</span><h3>Révision</h3><p>Vidange, filtres, 62 points de contrôle, remise à zéro</p><span class="t">1 h 30</span><b data-from="revision">185 €</b></li>
+          <li class="rv"><span class="n">02</span><h3>Freins avant</h3><p>Disques et plaquettes, nettoyage des étriers, rodage</p><span class="t">1 h 30</span><b data-from="freins-av">235 €</b></li>
+          <li class="rv"><span class="n">03</span><h3>Freins arrière</h3><p>Disques et plaquettes, contrôle du frein de parking</p><span class="t">1 h 15</span><b data-from="freins-ar">185 €</b></li>
+          <li class="rv"><span class="n">04</span><h3>Distribution</h3><p>Kit complet, pompe à eau, courroie d'accessoires</p><span class="t">4 h</span><b data-from="distribution">495 €</b></li>
+          <li class="rv"><span class="n">05</span><h3>Climatisation</h3><p>Recharge, contrôle d'étanchéité, traitement de l'habitacle</p><span class="t">45 min</span><b data-from="clim">95 €</b></li>
+          <li class="rv"><span class="n">06</span><h3>Pneus</h3><p>Le pneu fourni, monté, équilibré, valve neuve</p><span class="t">15 min</span><b data-from="pneus">90 €</b></li>
+          <li class="rv"><span class="n">07</span><h3>Diagnostic</h3><p>Lecture des calculateurs et compte rendu photo, déduit en cas de réparation</p><span class="t">45 min</span><b>59 €</b></li>
+          <li class="rv"><span class="n">08</span><h3>Géométrie</h3><p>Réglage des trains sur banc 3D, relevé avant / après</p><span class="t">1 h</span><b>89 €</b></li>
+        </ol>
+        <a class="btn btn--sig rv" href="#devis">Calculer mon prix</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- preuves : chiffres et avis -->
+  <section class="num" id="preuves" aria-label="L'atelier en chiffres et avis de clients">
+    <dl class="num__grid">
+      <div class="rv"><dt>4,9<small>/5</small></dt><dd>312 avis vérifiés</dd></div>
+      <div class="rv" style="--i:1"><dt>24<small>mois</small></dt><dd>de garantie, pièces et main-d'œuvre</dd></div>
+      <div class="rv" style="--i:2"><dt>48<small>h</small></dt><dd>délai moyen pour un rendez-vous</dd></div>
+      <div class="rv" style="--i:3"><dt>0</dt><dd>intervention sans votre accord écrit</dd></div>
+    </dl>
+    <ul class="num__quotes">
+      <li class="rv"><blockquote>«&nbsp;Devis reçu avec les photos des disques, une heure après avoir déposé la voiture. Facture au centime près.&nbsp;»</blockquote><p class="lbl">Claire D. — berline compacte, freins avant</p></li>
+      <li class="rv" style="--i:1"><blockquote>«&nbsp;Voyant moteur un vendredi à 17 h. Diagnostic le soir même, voiture réparée le lundi midi, véhicule de prêt entre-temps.&nbsp;»</blockquote><p class="lbl">Mehdi A. — SUV hybride, diagnostic</p></li>
+      <li class="rv" style="--i:2"><blockquote>«&nbsp;On m'a montré les anciennes plaquettes et expliqué pourquoi l'arrière pouvait attendre. Je n'avais jamais vu ça.&nbsp;»</blockquote><p class="lbl">Sophie L. — citadine, révision</p></li>
+    </ul>
+  </section>
+
+  <!-- devis instantané -->
+  <section class="dv" id="devis" data-devis>
+    <header class="cart rv"><b>05</b><span>Devis instantané</span><span>Fourchette indicative · devis ferme après contrôle</span></header>
+    <div class="dv__grid">
+      <div class="dv__config">
+        <h2 class="h2 rv">Votre prix,<br>en direct</h2>
+        <p class="lead rv" style="--i:1">Cochez, le calcul se fait sous vos yeux&nbsp;: main-d'œuvre au temps constructeur, pièces selon la catégorie du véhicule.</p>
+
+        <fieldset class="set rv">
+          <legend><b>A</b>Prestation <small>une ou plusieurs</small></legend>
+          <div class="opts opts--3">
+            <label class="opt"><input type="checkbox" name="presta" value="revision" checked><span class="opt__t">Révision</span><span class="opt__d">Vidange, filtres, contrôles</span></label>
+            <label class="opt"><input type="checkbox" name="presta" value="freins-av"><span class="opt__t">Freins avant</span><span class="opt__d">Disques et plaquettes</span></label>
+            <label class="opt"><input type="checkbox" name="presta" value="freins-ar"><span class="opt__t">Freins arrière</span><span class="opt__d">Disques et plaquettes</span></label>
+            <label class="opt"><input type="checkbox" name="presta" value="distribution"><span class="opt__t">Distribution</span><span class="opt__d">Kit et pompe à eau</span></label>
+            <label class="opt"><input type="checkbox" name="presta" value="clim"><span class="opt__t">Climatisation</span><span class="opt__d">Recharge et étanchéité</span></label>
+            <label class="opt"><input type="checkbox" name="presta" value="pneus"><span class="opt__t">Pneus</span><span class="opt__d">Fournis, montés, équilibrés</span></label>
+          </div>
+          <div class="tyres" data-tyres hidden>
+            <span class="lbl" id="tyres-label">Nombre de pneus</span>
+            <div class="seg" role="radiogroup" aria-labelledby="tyres-label">
+              <label><input type="radio" name="pneus-n" value="2" checked><span>2</span></label>
+              <label><input type="radio" name="pneus-n" value="4"><span>4</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="set rv">
+          <legend><b>B</b>Véhicule</legend>
+          <div class="opts opts--4">
+            <label class="opt"><input type="radio" name="cat" value="citadine"><span class="opt__t">Citadine</span><span class="opt__d">3,60 à 4,10 m</span></label>
+            <label class="opt"><input type="radio" name="cat" value="compacte" checked><span class="opt__t">Compacte, berline</span><span class="opt__d">4,10 à 4,80 m</span></label>
+            <label class="opt"><input type="radio" name="cat" value="suv"><span class="opt__t">SUV, monospace</span><span class="opt__d">Utilitaire léger compris</span></label>
+            <label class="opt"><input type="radio" name="cat" value="sport"><span class="opt__t">Sportive, premium</span><span class="opt__d">Plus de 250 ch</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="set rv">
+          <legend><b>C</b>Options</legend>
+          <div class="opts opts--2">
+            <label class="opt"><input type="checkbox" name="pret" value="1"><span class="opt__t">Véhicule de prêt</span><span class="opt__d">Offert dès 3 h d'intervention, sinon 19 €</span></label>
+            <label class="opt"><input type="checkbox" name="origine" value="1"><span class="opt__t">Pièces d'origine</span><span class="opt__d">Références constructeur, + 22 % sur les pièces</span></label>
+          </div>
+        </fieldset>
+      </div>
+
+      <aside class="ticket rv" style="--i:2" aria-label="Estimation">
+        <header class="ticket__head"><span class="lbl">Estimation</span><span class="lbl" data-q-ref>Compacte · 1 prestation</span></header>
+        <p class="ticket__price" data-q-price aria-live="polite" aria-atomic="true"><span data-q-min>210</span><i>–</i><span data-q-max>265</span><em>€ TTC</em></p>
+        <dl class="ticket__facts">
+          <div><dt>Durée</dt><dd data-q-time>1 h 30</dd></div>
+          <div><dt>Immobilisation</dt><dd data-q-stay>Sur place, au salon d'attente</dd></div>
+          <div><dt>Premier créneau</dt><dd data-q-slot>—</dd></div>
+        </dl>
+        <ul class="ticket__lines" data-q-lines></ul>
+        <form class="ticket__form" data-demo="Merci. Ceci est une démonstration : aucune demande n’a été envoyée." data-q-form>
+          <p class="lbl ticket__ask">Demander ce rendez-vous</p>
+          <label>Nom<input type="text" name="nom" autocomplete="name" required></label>
+          <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" required pattern="0[1-9]([ .]?[0-9]{2}){4}" title="Dix chiffres, par exemple 06 12 34 56 78"></label>
+          <label>Immatriculation<input type="text" name="immat" required pattern="[A-Za-z]{2}[\- ]?[0-9]{3}[\- ]?[A-Za-z]{2}" title="Format AB-123-CD" placeholder="AB-123-CD" autocapitalize="characters"></label>
+          <label>Date souhaitée<input type="date" name="date" required data-q-date></label>
+          <button class="btn btn--ink" type="submit" data-q-submit>Demander le rendez-vous</button>
+          <p class="ticket__done lbl" data-done role="status"></p>
+        </form>
+      </aside>
+    </div>
+  </section>
+
+  <!-- suivi de réparation -->
+  <section class="sv" id="suivi" data-suivi>
+    <header class="cart rv"><b>06</b><span>Suivi de réparation</span><span>Mis à jour par le technicien, à chaque étape</span></header>
+    <div class="sv__head">
+      <h2 class="h2 rv">Où en est<br>votre voiture&nbsp;?</h2>
+      <div class="sv__ask rv" style="--i:1">
+        <p class="lead">Le numéro de dossier figure sur votre ordre de réparation. Essayez avec un dossier d'exemple.</p>
+        <form class="sv__form" data-sv-form novalidate>
+          <label for="dossier" class="lbl">Numéro de dossier</label>
+          <div class="sv__field">
+            <input id="dossier" type="text" name="dossier" value="A31-2026-118" placeholder="A31-2026-118" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="dossier-msg">
+            <button class="btn btn--ink" type="submit">Suivre</button>
+          </div>
+          <p class="sv__msg lbl" id="dossier-msg" data-sv-msg role="status"></p>
+          <div class="sv__ex"><span class="lbl">Exemples</span>
+            <button type="button" data-sv-ex="A31-2026-118">A31-2026-118</button>
+            <button type="button" data-sv-ex="A31-2026-124">A31-2026-124</button>
+            <button type="button" data-sv-ex="A31-2026-097">A31-2026-097</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="sv__result rv" style="--i:2" data-sv-result aria-live="polite"></div>
+  </section>
+
+  <!-- l'atelier, l'équipe, les infos pratiques -->
+  <section class="lieu" id="atelier">
+    <header class="cart rv"><b>07</b><span>L'atelier</span><span>31, rue des Carrossiers · 31200 Toulouse</span></header>
+    <div class="lieu__grid">
+      <div class="lieu__media">
+        <figure class="fig fig--a" data-in><img src="media/photo-2.webp" alt="Une voiture levée sur un pont élévateur dans l'atelier, sol propre et outillage rangé" loading="lazy" width="1600" height="1067"><figcaption class="lbl"><span>Fig. 01</span><span>Pont 3, baie de géométrie</span></figcaption></figure>
+        <figure class="fig fig--b" data-in><img src="media/photo-1.webp" alt="L'accueil et le salon d'attente de l'atelier, avec vue sur les ponts" loading="lazy" width="1600" height="1067"><figcaption class="lbl"><span>Fig. 02</span><span>Accueil et salon d'attente</span></figcaption></figure>
+      </div>
+      <div class="lieu__text">
+        <h2 class="h2 rv">Entrez,<br>c'est propre</h2>
+        <p class="lead rv" style="--i:1">Six ponts, une baie de géométrie, un banc de diagnostic multimarque. La porte de l'atelier reste ouverte&nbsp;: vous pouvez voir votre voiture levée, et le technicien vous montre ce qu'il a trouvé.</p>
+        <ul class="team rv" style="--i:2">
+          <li><b>Karim B.</b><span>Chef d'atelier, 18 ans de métier, freinage et châssis</span></li>
+          <li><b>Élodie M.</b><span>Diagnostic électronique, hybrides et électriques</span></li>
+          <li><b>Thomas R.</b><span>Préparation, géométrie, journées circuit</span></li>
+        </ul>
+        <dl class="infos rv" style="--i:3">
+          <div><dt>Adresse</dt><dd>31, rue des Carrossiers, 31200 Toulouse<br>Parking clients, bus et métro à 300 m</dd></div>
+          <div><dt>Horaires</dt><dd>Lundi au vendredi · 7 h 30 – 18 h 30<br>Samedi · 8 h – 12 h<br>Dépôt des clés 24 h / 24, boîte sécurisée</dd></div>
+          <div><dt>Téléphone</dt><dd><a href="tel:+33500000000">05 00 00 00 00</a></dd></div>
+          <div><dt>Urgence</dt><dd>Remorquage partenaire, 7 j / 7 jusqu'à 22 h</dd></div>
+        </dl>
+        <div class="lieu__cta rv" style="--i:4">
+          <a class="btn btn--sig" href="#devis">Prendre rendez-vous</a>
+          <button class="btn btn--wire" type="button" data-chat-open>Poser une question à Max</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">Atelier 31</p>
+  <div class="foot__row">
+    <p>© <span data-year>2026</span> Atelier 31 — entreprise fictive.</p>
+    <p>Site de démonstration, formule Premium — entreprise fictive ; photos et vidéos générées par IA. Adresse, prix, avis et numéros de dossier sont inventés.</p>
+    <p><a href="../../eco/demos/garage/">Voir la version Éco de ce métier</a></p>
+  </div>
+</footer>
+
+<a class="tag" href="../../">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Max",
+  "role": "Conseiller atelier — Atelier 31",
+  "launch": "Demander à Max",
+  "greeting": "Bonjour, ici Max, conseiller à l'atelier. Une panne, un prix, un rendez-vous ? Dites-moi ce qui vous amène.",
+  "chips": ["C'est urgent", "Combien ça coûte ?", "Quels délais ?", "Véhicule de prêt"],
+  "fallback": "Je préfère ne pas vous répondre au hasard : appelez l'atelier au 05 00 00 00 00, un technicien vous répond du lundi au samedi. Je peux aussi vous renseigner sur les tarifs, les délais, le véhicule de prêt, la garantie ou les horaires.",
+  "intents": [
+    { "keys": ["urgent", "urgence", "panne", "voyant", "remorqu", "depann", "fume", "ne demarre", "bruit"], "answer": "Si un voyant rouge est allumé (huile, température, freins), arrêtez-vous dès que possible et ne redémarrez pas. Appelez le 05 00 00 00 00 : remorquage partenaire 7 j/7 jusqu'à 22 h, et diagnostic le jour même si le véhicule arrive avant 16 h.", "link": { "label": "Voir les infos pratiques", "href": "#atelier" }, "chips": ["Véhicule de prêt", "Les horaires"] },
+    { "keys": ["prix", "tarif", "combien", "cout", "coute", "devis", "cher"], "answer": "La main-d'œuvre est à 78 € TTC de l'heure. Quelques repères pour une citadine : révision dès 185 €, freins avant dès 235 €, distribution dès 495 €. Le calculateur vous donne la fourchette pour votre véhicule en une minute.", "link": { "label": "Calculer mon devis", "href": "#devis" }, "chips": ["Quels délais ?", "Garantie constructeur"] },
+    { "keys": ["delai", "quand", "rendez", "rdv", "dispo", "creneau", "attente", "rapide"], "answer": "Comptez 48 h en moyenne pour un rendez-vous. Une révision ou des freins se font dans la demi-journée ; une distribution demande la journée. Le calculateur affiche le premier créneau possible.", "link": { "label": "Voir le premier créneau", "href": "#devis" }, "chips": ["Véhicule de prêt", "Les horaires"] },
+    { "keys": ["suivi", "dossier", "avancement", "ou en est", "prete", "recuperer"], "answer": "Votre numéro de dossier (du type A31-2026-118) figure sur l'ordre de réparation. Saisissez-le dans le suivi : vous verrez l'étape en cours et le dernier message du technicien.", "link": { "label": "Suivre ma réparation", "href": "#suivi" } },
+    { "keys": ["pret", "courtoisie", "remplacement", "mobilite", "navette"], "answer": "Nous avons six véhicules de prêt. Ils sont offerts dès 3 heures d'intervention, sinon 19 € la journée, carburant à votre charge. Pensez à le demander à la réservation : ils partent vite.", "link": { "label": "Ajouter au devis", "href": "#devis" } },
+    { "keys": ["garantie", "constructeur", "concession", "carnet", "reseau"], "answer": "Oui, vous conservez la garantie constructeur. La réglementation européenne vous laisse libre de faire entretenir votre véhicule hors réseau, à condition de respecter le plan d'entretien : c'est ce que nous faisons, et nous tamponnons le carnet, papier ou numérique. Nos interventions sont en plus garanties 24 mois, pièces et main-d'œuvre.", "chips": ["Combien ça coûte ?", "Quels délais ?"] },
+    { "keys": ["horaire", "ouvert", "heure", "samedi", "dimanche", "fermeture", "cles"], "answer": "Du lundi au vendredi de 7 h 30 à 18 h 30, le samedi de 8 h à 12 h. En dehors de ces horaires, vous pouvez déposer vos clés dans la boîte sécurisée, 24 h/24.", "chips": ["Où êtes-vous ?", "Quels délais ?"] },
+    { "keys": ["adresse", "ou etes", "trouver", "venir", "acces", "parking", "metro", "bus"], "answer": "31, rue des Carrossiers, 31200 Toulouse. Parking clients devant l'atelier, bus et métro à 300 mètres.", "link": { "label": "Voir l'atelier", "href": "#atelier" } },
+    { "keys": ["marque", "electrique", "hybride", "diesel", "allemande", "japonaise", "modele", "utilitaire"], "answer": "Nous intervenons sur toutes les marques : thermique, hybride et électrique. Élodie est habilitée pour les véhicules haute tension. Seuls les poids lourds et les deux-roues ne passent pas chez nous.", "chips": ["Combien ça coûte ?", "Garantie constructeur"] },
+    { "keys": ["frein", "disque", "plaquette", "etrier", "pneu", "jante"], "answer": "Disques et plaquettes se changent par essieu. Les plaquettes se remplacent sous 3 mm de garniture, les disques quand ils atteignent la cote minimale gravée sur la tranche. La vue éclatée vous montre chaque pièce et son prix.", "link": { "label": "Ouvrir la vue éclatée", "href": "#eclate" } },
+    { "keys": ["paiement", "payer", "carte", "cheque", "fois", "facilite"], "answer": "Carte bancaire, virement ou espèces. Au-delà de 300 €, le paiement en trois fois sans frais est possible par carte.", "chips": ["Combien ça coûte ?"] },
+    { "keys": ["bonjour", "salut", "bonsoir", "hello"], "answer": "Bonjour ! Que puis-je faire pour vous ?", "chips": ["C'est urgent", "Combien ça coûte ?", "Quels délais ?"] },
+    { "keys": ["merci", "parfait", "super", "top", "au revoir"], "answer": "Avec plaisir. Bonne route, et à bientôt à l'atelier." }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="eclate.js"></script>
+<script type="module" src="atelier.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>

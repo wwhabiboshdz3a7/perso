@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les Terrasses du Canal — 42 appartements neufs au bord du canal du Midi, Toulouse</title>
+<meta name="description" content="Les Terrasses du Canal : 42 appartements du T2 au T5 avec terrasse, au bord du canal du Midi à Toulouse. Livraison 2028. Démonstration de site Premium — programme fictif.">
+<meta name="theme-color" content="#f3efe7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2317332a'/%3E%3Cpath d='M6 25h20v-5h-5v-5h-5v-5h-5v5H6z' fill='%23c8553d'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="immobilier.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="top">
+  <a class="top__brand" href="#accueil"><span class="top__mark" aria-hidden="true"></span><span>Les Terrasses du Canal</span></a>
+  <nav class="top__nav" aria-label="Sections">
+    <a href="#film">Visite</a>
+    <a href="#maquette">Maquette</a>
+    <a href="#programme">Appartements</a>
+    <a href="#quartier">Quartier</a>
+    <a href="#financer">Financer</a>
+  </nav>
+  <a class="btn btn--accent top__cta" href="#rendez-vous">Rendez-vous</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : le titre posé sur la grille, la vidéo cotée comme une élévation -->
+  <section class="hero">
+    <p class="hero__meta mono">
+      <span>Programme neuf · Toulouse, Port Saint-Sauveur</span>
+      <span>43° 35′ 52″ N — 1° 27′ 14″ E</span>
+      <span>Planche 01 / 09</span>
+    </p>
+    <h1 class="hero__title"><span class="l"><span>Les</span> <span>Terrasses</span></span> <span class="l"><span>du</span> <span class="accent">Canal</span></span></h1>
+    <div class="hero__side">
+      <p class="hero__lede">Quarante-deux appartements du T2 au T5, chacun avec sa terrasse plantée, sur le quai du canal du Midi. Parcourez la maquette, choisissez votre lot, calculez votre mensualité.</p>
+      <div class="hero__cta">
+        <a class="btn" href="#maquette">Choisir un lot</a>
+        <a class="btn btn--line" href="#financer">Simuler un financement</a>
+      </div>
+    </div>
+    <div class="hero__frame">
+      <p class="cote mono" aria-hidden="true"><span>Façade sur le canal — 30,00 m</span></p>
+      <div class="hero__view">
+        <video class="hero__video" data-loop muted loop playsinline preload="metadata" poster="media/aerien.webp" aria-label="Vue aérienne du programme au bord du canal">
+          <source src="media/aerien.mp4" type="video/mp4">
+        </video>
+        <p class="cote cote--v mono" aria-hidden="true"><span>R+5 — 18,60 m</span></p>
+        <dl class="cartouche">
+          <div><dt class="mono">Logements</dt><dd>42</dd></div>
+          <div><dt class="mono">Typologies</dt><dd>T2 → T5</dd></div>
+          <div><dt class="mono">Livraison</dt><dd>T4 2028</dd></div>
+          <div><dt class="mono">À partir de</dt><dd>259 000 €</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <div class="band marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>42 appartements</span><i>+</i><span>T2 au T5</span><i>+</i><span>Terrasses de 9 à 96 m²</span><i>+</i><span>Canal du Midi</span><i>+</i><span>Brique de Toulouse</span><i>+</i><span>Livraison 2028</span><i>+</i><span>Frais de notaire réduits</span><i>+</i>
+      <span>42 appartements</span><i>+</i><span>T2 au T5</span><i>+</i><span>Terrasses de 9 à 96 m²</span><i>+</i><span>Canal du Midi</span><i>+</i><span>Brique de Toulouse</span><i>+</i><span>Livraison 2028</span><i>+</i><span>Frais de notaire réduits</span><i>+</i>
+    </div>
+  </div>
+
+  <!-- le film : arriver par le quai, puis entrer dans un séjour -->
+  <section class="film" id="film" data-film data-length="1.8" aria-label="Visite en deux plans : l'arrivée par le canal, puis un séjour ouvert sur sa terrasse">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/aerien" data-frames="41" data-label="Arriver">
+        <div class="shot__main">
+          <p class="idx idx--film mono"><b>01</b> Arriver</p>
+          <h2 class="shot__title">Au bout du quai,<br>la brique rose</h2>
+          <p class="shot__text">Vous longez le canal sous les platanes, à pied ou à vélo. Au 12, quai des Bateliers : six niveaux de brique toulousaine, et une terrasse plantée devant chaque séjour.</p>
+        </div>
+        <dl class="shot__data">
+          <div><dt>9 min</dt><dd class="mono">à pied du métro<br>François-Verdier</dd></div>
+          <div><dt>30 m</dt><dd class="mono">de façade<br>sur le canal</dd></div>
+          <div><dt>0</dt><dd class="mono">voiture en<br>cœur d’îlot</dd></div>
+        </dl>
+      </article>
+      <article class="film__shot" data-src="media/salon" data-frames="41" data-label="Habiter">
+        <div class="shot__main">
+          <p class="idx idx--film mono"><b>02</b> Habiter</p>
+          <h2 class="shot__title">Le séjour<br>finit dehors</h2>
+          <p class="shot__text">Une baie coulissante de 3,20 m, un seuil plat : la terrasse prolonge la pièce de vie. Parquet de chêne, 2,60 m sous plafond, et le soleil du sud-ouest jusqu’au dîner.</p>
+        </div>
+        <dl class="shot__data">
+          <div><dt>3,20 m</dt><dd class="mono">de baie<br>coulissante</dd></div>
+          <div><dt>2,60 m</dt><dd class="mono">de hauteur<br>sous plafond</dd></div>
+          <div><dt>9 → 96 m²</dt><dd class="mono">de terrasse<br>par logement</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- la maquette : chaque lot est un bloc que l'on peut choisir -->
+  <section class="sheet maq" id="maquette">
+    <header class="head">
+      <p class="idx mono"><span><b>03</b> Maquette interactive</span><span>Bâtiment A · côté canal · éch. 1:200</span></p>
+      <h2 class="h2 rv">Tournez l’immeuble.<br>Choisissez <em>votre lot.</em></h2>
+      <p class="lede rv" style="--i:1">Chaque bloc est un appartement. Touchez-le pour afficher sa fiche, filtrez par nombre de pièces ou par budget, passez au soir pour voir les séjours s’allumer. Treize des quarante-deux lots sont ici ; le bâtiment B, côté jardin, se découvre à l’espace de vente.</p>
+    </header>
+
+    <div class="maq__bar" role="group" aria-label="Filtrer les lots">
+      <fieldset class="chips">
+        <legend class="mono">Pièces</legend>
+        <label><input type="radio" name="rooms" value="0" checked><span>Tous</span></label>
+        <label><input type="radio" name="rooms" value="2"><span>T2</span></label>
+        <label><input type="radio" name="rooms" value="3"><span>T3</span></label>
+        <label><input type="radio" name="rooms" value="4"><span>T4</span></label>
+        <label><input type="radio" name="rooms" value="5"><span>T5</span></label>
+      </fieldset>
+      <label class="range">
+        <span class="mono">Budget maximum <output data-budget-out>900 000 €</output></span>
+        <input type="range" name="budget" min="250000" max="900000" step="10000" value="900000">
+      </label>
+      <label class="check"><input type="checkbox" name="free"><span>Disponibles seulement</span></label>
+      <p class="maq__count mono" data-count role="status">13 lots sur 13</p>
+    </div>
+
+    <div class="maq__body">
+      <div class="maq__stage" data-stage>
+        <canvas class="maq__canvas" data-maquette tabindex="0" aria-label="Maquette en trois dimensions du bâtiment A. Flèches gauche et droite : faire tourner l’immeuble. Flèches haut et bas : passer d’un lot au suivant. La liste complète des lots figure dans le tableau qui suit."></canvas>
+        <img class="maq__fallback" src="media/aerien.webp" alt="Le bâtiment A vu depuis le canal : façade en brique rose et terrasses plantées" loading="lazy">
+        <p class="maq__note mono" aria-hidden="true">Maquette · bât. A · RDC + 5</p>
+        <button class="maq__mode" type="button" role="switch" aria-checked="false" aria-label="Éclairage du soir" data-night><span>Jour</span><span>Soir</span></button>
+        <p class="maq__hint mono" aria-hidden="true">↔ Glissez pour tourner · touchez un lot</p>
+        <div class="maq__pin mono" data-pin aria-hidden="true" hidden></div>
+        <div class="maq__tip mono" data-tip aria-hidden="true" hidden></div>
+      </div>
+      <aside class="fiche" data-fiche aria-live="polite" aria-label="Fiche du lot"></aside>
+    </div>
+
+    <ul class="legend mono" aria-label="Légende des statuts">
+      <li><i class="sw sw--dispo"></i>Disponible</li>
+      <li><i class="sw sw--option"></i>Optionné</li>
+      <li><i class="sw sw--vendu"></i>Vendu</li>
+      <li><i class="sw sw--sel"></i>Lot sélectionné</li>
+      <li><i class="sw sw--off"></i>Hors de vos critères</li>
+    </ul>
+
+    <div class="lots">
+      <table>
+        <caption class="mono">Grille des lots — bâtiment A · prix TTC, TVA 20 %, hors frais de notaire</caption>
+        <thead>
+          <tr>
+            <th scope="col">Lot</th>
+            <th scope="col">Type</th>
+            <th scope="col" class="num">Surface</th>
+            <th scope="col" class="num c-ext">Extérieur</th>
+            <th scope="col" class="c-floor">Étage</th>
+            <th scope="col" class="c-aspect">Orientation</th>
+            <th scope="col" class="num">Prix</th>
+            <th scope="col">Statut</th>
+          </tr>
+        </thead>
+        <tbody data-lots></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- les quatre typologies et leurs prix -->
+  <section class="sheet types" id="programme">
+    <header class="head">
+      <p class="idx mono"><span><b>04</b> Les appartements</span><span>Grille de prix · novembre 2026</span></p>
+      <h2 class="h2 rv">Quarante-deux adresses,<br>quatre <em>façons d’habiter.</em></h2>
+      <p class="lede rv" style="--i:1">Tous les logements sont traversants ou à double orientation. Une place de parking en sous-sol est comprise à partir du T3 ; elle est en option pour les T2.</p>
+    </header>
+    <ol class="types__list">
+      <li class="rv"><a href="#maquette" data-rooms="2">
+        <span class="types__t">T2</span>
+        <span class="types__what"><b>Deux pièces</b>44 à 48 m² · loggia ou terrasse de 9 à 22 m²</span>
+        <span class="types__left mono">4 disponibles sur 11</span>
+        <span class="types__price"><small class="mono">à partir de</small>259 000 €</span>
+        <span class="types__go mono">Voir sur la maquette →</span>
+      </a></li>
+      <li class="rv"><a href="#maquette" data-rooms="3">
+        <span class="types__t">T3</span>
+        <span class="types__what"><b>Trois pièces</b>63 à 69 m² · terrasse de 12 à 26 m² ou jardin</span>
+        <span class="types__left mono">6 disponibles sur 15</span>
+        <span class="types__price"><small class="mono">à partir de</small>379 000 €</span>
+        <span class="types__go mono">Voir sur la maquette →</span>
+      </a></li>
+      <li class="rv"><a href="#maquette" data-rooms="4">
+        <span class="types__t">T4</span>
+        <span class="types__what"><b>Quatre pièces</b>82 à 91 m² · terrasse de 14 à 31 m² ou jardin de 52 m²</span>
+        <span class="types__left mono">5 disponibles sur 12</span>
+        <span class="types__price"><small class="mono">à partir de</small>472 000 €</span>
+        <span class="types__go mono">Voir sur la maquette →</span>
+      </a></li>
+      <li class="rv"><a href="#maquette" data-rooms="5">
+        <span class="types__t">T5</span>
+        <span class="types__what"><b>Cinq pièces</b>108 à 124 m² · terrasse de 38 à 96 m², dont l’attique</span>
+        <span class="types__left mono">2 disponibles sur 4</span>
+        <span class="types__price"><small class="mono">à partir de</small>695 000 €</span>
+        <span class="types__go mono">Voir sur la maquette →</span>
+      </a></li>
+    </ol>
+  </section>
+
+  <!-- prestations -->
+  <section class="sheet presta" id="prestations">
+    <header class="head">
+      <p class="idx mono"><span><b>05</b> Prestations</span><span>Notice descriptive · extrait</span></p>
+      <h2 class="h2 rv">Ce qui est compris,<br><em>noir sur blanc.</em></h2>
+    </header>
+    <div class="presta__grid">
+      <figure class="plate plate--a" data-in>
+        <img src="media/photo-2.webp" alt="Cuisine ouverte sur le séjour, plan de travail clair et grande baie vitrée" loading="lazy" width="1600" height="1067">
+        <figcaption class="mono"><span>Fig. 1</span> Cuisine ouverte, livrée équipée à partir du T3</figcaption>
+      </figure>
+      <ol class="presta__list">
+        <li class="rv"><span class="mono">01</span><h3>Une terrasse par logement</h3><p>De 9 à 96 m², avec jardinières maçonnées, point d’eau et prise extérieure.</p></li>
+        <li class="rv"><span class="mono">02</span><h3>Baies de 3,20 m</h3><p>Coulissants aluminium à seuil plat, brise-soleil orientables motorisés.</p></li>
+        <li class="rv"><span class="mono">03</span><h3>Parquet de chêne</h3><p>Contrecollé dans les pièces de vie et les chambres, grès cérame 60 × 60 ailleurs.</p></li>
+        <li class="rv"><span class="mono">04</span><h3>Chaleur et fraîcheur</h3><p>Pompe à chaleur collective, plancher chauffant et rafraîchissant. Bâtiment RE 2020, seuil 2025.</p></li>
+        <li class="rv"><span class="mono">05</span><h3>Stationnement</h3><p>46 places en sous-sol, toutes pré-équipées pour la recharge, et un local de 70 vélos de plain-pied.</p></li>
+        <li class="rv"><span class="mono">06</span><h3>Toit-terrasse partagé</h3><p>280 m² sur le bâtiment B : potager en bacs, grande table, vue sur les toits et le canal.</p></li>
+      </ol>
+      <figure class="plate plate--b" data-in>
+        <img src="media/photo-1.webp" alt="Toit-terrasse partagé : bacs de potager, pergola et vue sur les toits de Toulouse" loading="lazy" width="1600" height="1067">
+        <figcaption class="mono"><span>Fig. 2</span> Le toit-terrasse partagé et son potager</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- le quartier, mesuré en minutes -->
+  <section class="sheet around" id="quartier">
+    <header class="head">
+      <p class="idx mono"><span><b>06</b> Le quartier</span><span>12, quai des Bateliers · 31400 Toulouse</span></p>
+      <h2 class="h2 rv">Le centre à vélo,<br><em>le canal à pied.</em></h2>
+      <p class="lede rv" style="--i:1">Port Saint-Sauveur : les péniches, la piste cyclable du canal au pied de l’immeuble, et le marché du dimanche à deux rues.</p>
+    </header>
+    <ul class="dist">
+      <li class="rv" style="--w:3"><span class="dist__what">Piste cyclable du canal</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">1 min <small class="mono">à pied</small></span></li>
+      <li class="rv" style="--w:12"><span class="dist__what">École maternelle et élémentaire</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">4 min <small class="mono">à pied</small></span></li>
+      <li class="rv" style="--w:24"><span class="dist__what">Marché du dimanche</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">8 min <small class="mono">à pied</small></span></li>
+      <li class="rv" style="--w:27"><span class="dist__what">Métro François-Verdier, ligne B</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">9 min <small class="mono">à pied</small></span></li>
+      <li class="rv" style="--w:21"><span class="dist__what">Gare Matabiau</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">7 min <small class="mono">à vélo</small></span></li>
+      <li class="rv" style="--w:30"><span class="dist__what">Place du Capitole</span><span class="dist__bar" aria-hidden="true"></span><span class="dist__val">10 min <small class="mono">à vélo</small></span></li>
+    </ul>
+  </section>
+
+  <!-- calendrier, promoteur, avis -->
+  <section class="sheet trust" id="promoteur">
+    <header class="head">
+      <p class="idx mono"><span><b>07</b> Calendrier et garanties</span><span>Maître d’ouvrage · Horizon Sud</span></p>
+      <h2 class="h2 rv">Livré fin 2028.<br><em>C’est écrit au contrat.</em></h2>
+      <p class="lede rv" style="--i:1">Horizon Sud construit à Toulouse depuis 2006. Vous achetez en VEFA : garantie financière d’achèvement, parfait achèvement, biennale et décennale.</p>
+    </header>
+    <ol class="steps">
+      <li class="is-done rv"><span class="mono">Mars 2026</span><b>Permis purgé</b></li>
+      <li class="is-done rv" style="--i:1"><span class="mono">Sept. 2026</span><b>Lancement commercial</b></li>
+      <li class="is-now rv" style="--i:2"><span class="mono">Aujourd’hui</span><b>Choix des lots</b></li>
+      <li class="rv" style="--i:3"><span class="mono">Janv. 2027</span><b>Début du chantier</b></li>
+      <li class="rv" style="--i:4"><span class="mono">Déc. 2027</span><b>Hors d’eau</b></li>
+      <li class="rv" style="--i:5"><span class="mono">4ᵉ trim. 2028</span><b>Remise des clés</b></li>
+    </ol>
+    <dl class="figures">
+      <div class="rv"><dt>19</dt><dd class="mono">résidences livrées<br>depuis 2006</dd></div>
+      <div class="rv" style="--i:1"><dt>1 180</dt><dd class="mono">logements remis<br>à leurs acquéreurs</dd></div>
+      <div class="rv" style="--i:2"><dt>97 %</dt><dd class="mono">livrés au trimestre<br>annoncé</dd></div>
+      <div class="rv" style="--i:3"><dt>60 %</dt><dd class="mono">du programme<br>déjà réservé</dd></div>
+    </dl>
+    <ul class="quotes">
+      <li class="rv"><blockquote>« Nous avons choisi sur plan en 2022. À la remise des clés, la terrasse faisait exactement la surface promise, au demi-mètre carré près. »</blockquote><p class="mono">Claire et Mathieu R. — T4, résidence Le Patio des Minimes</p></li>
+      <li class="rv" style="--i:1"><blockquote>« Trois visites de chantier, des appels de fonds expliqués à chaque étape. Pour un premier achat, on ne s’est jamais sentis perdus. »</blockquote><p class="mono">Inès B. — T2, résidence Côté Garonne</p></li>
+      <li class="rv" style="--i:2"><blockquote>« Deux réserves à la livraison, levées en trois semaines. Le conseiller répond encore au téléphone deux ans après. »</blockquote><p class="mono">Jean-Marc D. — T3, résidence Les Jardins de Lardenne</p></li>
+    </ul>
+  </section>
+
+  <!-- le simulateur de financement -->
+  <section class="sim" id="financer">
+    <header class="head head--dark">
+      <p class="idx mono"><span><b>08</b> Financement</span><span>Simulation indicative · sans engagement</span></p>
+      <h2 class="h2 rv">Combien par mois ?<br><em>Faites le calcul.</em></h2>
+      <p class="lede rv" style="--i:1">Le lot choisi sur la maquette est déjà là. Réglez votre apport, la durée et le taux : la mensualité se recalcule, frais de notaire réduits du neuf compris.</p>
+    </header>
+    <div class="sim__grid">
+      <form class="sim__form" data-sim novalidate>
+        <div class="field">
+          <label class="mono" for="sim-lot">Lot</label>
+          <select id="sim-lot" name="lot"></select>
+        </div>
+        <div class="field">
+          <label class="mono" for="sim-apport">Apport personnel</label>
+          <div class="field__row">
+            <input type="range" id="sim-apport" min="0" max="600000" step="1000" value="55000">
+            <span class="field__num"><input type="number" id="sim-apport-n" min="0" step="1000" value="55000" inputmode="numeric" aria-label="Apport personnel, en euros"><span aria-hidden="true">€</span></span>
+          </div>
+        </div>
+        <fieldset class="field seg">
+          <legend class="mono">Durée du prêt</legend>
+          <div class="seg__row">
+            <label><input type="radio" name="duree" value="15"><span>15 ans</span></label>
+            <label><input type="radio" name="duree" value="20"><span>20 ans</span></label>
+            <label><input type="radio" name="duree" value="25" checked><span>25 ans</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label class="mono" for="sim-taux">Taux d’intérêt annuel <output data-out="taux">3,35 %</output></label>
+          <input type="range" id="sim-taux" min="2" max="5.5" step="0.05" value="3.35">
+        </div>
+        <label class="check check--dark"><input type="checkbox" id="sim-park"><span>Ajouter une place de parking en sous-sol (+ 18 000 €)</span></label>
+        <p class="sim__note mono">Assurance emprunteur comptée à 0,30 % du capital par an. Frais de notaire estimés à 2,5 % dans le neuf, contre 7,5 % environ dans l’ancien.</p>
+      </form>
+
+      <div class="sim__result">
+        <p class="mono">Mensualité estimée, assurance comprise</p>
+        <p class="sim__big" aria-live="polite" aria-atomic="true"><span data-out="mois">—</span><small> € / mois</small></p>
+        <p class="sim__sub">dont <span data-out="assurance">—</span> d’assurance · pendant <span data-out="duree">25 ans</span></p>
+        <div class="sim__bar" data-bar role="img" aria-label="Répartition du coût total">
+          <span data-seg="apport"></span><span data-seg="capital"></span><span data-seg="cout"></span>
+        </div>
+        <ul class="sim__key mono" aria-hidden="true">
+          <li><i class="k k--apport"></i>Apport</li><li><i class="k k--capital"></i>Capital emprunté</li><li><i class="k k--cout"></i>Intérêts et assurance</li>
+        </ul>
+        <dl class="sim__lines">
+          <div><dt>Prix <span data-out="lot-nom"></span></dt><dd data-out="prix">—</dd></div>
+          <div><dt>Frais de notaire réduits <small data-out="eco"></small></dt><dd data-out="frais">—</dd></div>
+          <div class="is-total"><dt>Budget total</dt><dd data-out="budget">—</dd></div>
+          <div><dt>Votre apport <small data-out="apport-pct"></small></dt><dd data-out="apport">—</dd></div>
+          <div><dt>Montant emprunté</dt><dd data-out="emprunt">—</dd></div>
+          <div><dt>Coût du crédit, assurance comprise</dt><dd data-out="cout">—</dd></div>
+          <div><dt>Revenus nets conseillés <small>à 35 % d’endettement</small></dt><dd data-out="revenus">—</dd></div>
+        </dl>
+        <p class="sim__msg" data-sim-msg role="status"></p>
+        <a class="btn btn--accent" href="#rendez-vous">Valider ce projet avec un conseiller</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- rendez-vous à l'espace de vente -->
+  <section class="sheet rdv" id="rendez-vous">
+    <header class="head">
+      <p class="idx mono"><span><b>09</b> Rendez-vous</span><span>Espace de vente · sur le quai</span></p>
+      <h2 class="h2 rv">Venez voir la maquette,<br><em>la vraie.</em></h2>
+    </header>
+    <div class="rdv__grid">
+      <div class="rdv__info">
+        <dl class="infos rv">
+          <div><dt class="mono">Adresse</dt><dd>Espace de vente, 12, quai des Bateliers<br>31400 Toulouse</dd></div>
+          <div><dt class="mono">Horaires</dt><dd>Du mardi au samedi, 10 h – 13 h et 14 h – 19 h</dd></div>
+          <div><dt class="mono">Téléphone</dt><dd>05 00 00 00 00</dd></div>
+          <div><dt class="mono">Sur place</dt><dd>Maquette au 1:100, plans de chaque lot, échantillons de brique, de parquet et de façades de cuisine</dd></div>
+        </dl>
+        <div class="recap rv" style="--i:1">
+          <p class="mono">Votre projet, tel que simulé</p>
+          <p class="recap__text" data-recap>Aucun lot sélectionné pour l’instant.</p>
+        </div>
+        <button class="btn btn--line rv" style="--i:2" type="button" data-chat-open>Poser une question à Léa</button>
+      </div>
+      <form class="form rv" style="--i:1" data-rdv data-demo="Merci. Ceci est une démonstration : aucune demande n’a été envoyée.">
+        <label>Nom et prénom<input type="text" name="nom" autocomplete="name" required></label>
+        <label>Téléphone<input type="tel" name="tel" autocomplete="tel" required pattern="[0-9 +.]{10,}" title="Dix chiffres, par exemple 06 00 00 00 00"></label>
+        <label class="form__wide">E-mail<input type="email" name="email" autocomplete="email" required></label>
+        <label>Date souhaitée<input type="date" name="date" required></label>
+        <label>Créneau<select name="creneau"><option>10 h – 11 h</option><option>11 h – 12 h</option><option>14 h – 15 h</option><option>15 h 30 – 16 h 30</option><option>17 h – 18 h</option><option>18 h – 19 h</option></select></label>
+        <fieldset class="form__wide seg seg--light">
+          <legend>Format du rendez-vous</legend>
+          <div class="seg__row">
+            <label><input type="radio" name="format" value="sur place" checked><span>À l’espace de vente</span></label>
+            <label><input type="radio" name="format" value="visio"><span>En visio</span></label>
+          </div>
+        </fieldset>
+        <label class="form__wide">Lot qui vous intéresse<input type="text" name="projet" data-rdv-lot readonly></label>
+        <label class="check form__wide"><input type="checkbox" name="accord" required><span>J’accepte d’être rappelé(e) au sujet de ce programme.</span></label>
+        <button class="btn btn--accent form__wide" type="submit">Demander ce rendez-vous</button>
+        <p class="form__done form__wide" data-done role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <dl class="foot__cart">
+    <div class="foot__name"><dt class="mono">Projet</dt><dd>Les Terrasses du Canal</dd></div>
+    <div><dt class="mono">Maître d’ouvrage</dt><dd>Horizon Sud — promoteur fictif</dd></div>
+    <div><dt class="mono">Adresse</dt><dd>12, quai des Bateliers, Toulouse</dd></div>
+    <div><dt class="mono">Phase</dt><dd>Commercialisation</dd></div>
+    <div><dt class="mono">Date</dt><dd>© <span data-year>2026</span></dd></div>
+    <div><dt class="mono">Planche</dt><dd>09 / 09</dd></div>
+  </dl>
+  <div class="foot__row">
+    <p>Site de démonstration, formule Premium — entreprise fictive ; photos et vidéos générées par IA. Programme, adresse, prix, disponibilités et avis sont inventés ; le simulateur est indicatif.</p>
+    <p class="foot__links"><a href="../../eco/demos/immobilier/">Voir la version Éco de ce métier</a><a href="../../">Toutes les démos</a></p>
+  </div>
+</footer>
+
+<a class="tag" href="../../">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Léa",
+  "role": "Conseillère du programme · Horizon Sud",
+  "launch": "Demander à Léa",
+  "greeting": "Bonjour, je suis Léa, conseillère des Terrasses du Canal. Prix, livraison, financement, visite : que souhaitez-vous savoir ?",
+  "chips": ["Les prix", "Date de livraison", "Ai-je droit au PTZ ?", "Prendre rendez-vous"],
+  "fallback": "Je préfère ne pas vous répondre à peu près. Un conseiller vous le précisera au 05 00 00 00 00, du mardi au samedi. Je peux en revanche vous renseigner sur les prix, la livraison, le PTZ, les frais de notaire, le parking, le quartier ou les visites.",
+  "intents": [
+    { "keys": ["prix", "combien", "tarif", "cout", "coute", "budget", "cher"], "answer": "Les T2 démarrent à 259 000 €, les T3 à 379 000 €, les T4 à 472 000 € et les T5 à 695 000 €. Chaque lot de la maquette affiche son prix exact, sa surface et sa terrasse.", "link": { "label": "Ouvrir la maquette", "href": "#maquette" }, "chips": ["Frais de notaire", "Simuler une mensualité"] },
+    { "keys": ["livraison", "livre", "quand", "date", "chantier", "travaux", "calendrier", "cles", "2028"], "answer": "Le chantier démarre en janvier 2027, le bâtiment sera hors d’eau fin 2027 et les clés sont remises au 4ᵉ trimestre 2028. La date figure dans l’acte de vente, avec des pénalités si elle est dépassée.", "link": { "label": "Voir le calendrier", "href": "#promoteur" }, "chips": ["Comment se passe la réservation ?", "Les prix"] },
+    { "keys": ["ptz", "pret a taux zero", "taux zero", "primo", "aide", "premier achat"], "answer": "Le prêt à taux zéro peut financer une partie d’un achat neuf en résidence principale, sous conditions de ressources, si vous n’avez pas été propriétaire de votre résidence principale depuis deux ans. Son montant dépend de vos revenus et de la taille du foyer : un conseiller le calcule avec vous en rendez-vous, avis d’imposition à l’appui.", "link": { "label": "Prendre rendez-vous", "href": "#rendez-vous" }, "chips": ["Simuler une mensualité", "Frais de notaire"] },
+    { "keys": ["notaire", "frais", "acte"], "answer": "Dans le neuf, les frais de notaire sont réduits : comptez environ 2,5 % du prix, contre 7 à 8 % dans l’ancien. Sur un T3 à 379 000 €, cela représente environ 9 500 € au lieu de 28 000 €. Le simulateur les intègre automatiquement.", "link": { "label": "Ouvrir le simulateur", "href": "#financer" }, "chips": ["Ai-je droit au PTZ ?", "Les prix"] },
+    { "keys": ["simul", "mensualite", "credit", "pret", "emprunt", "apport", "taux", "financ", "banque"], "answer": "Le simulateur calcule votre mensualité à partir du lot choisi, de votre apport, de la durée et du taux, assurance et frais de notaire compris. C’est une estimation : le plan de financement définitif se construit avec votre banque ou notre courtier partenaire.", "link": { "label": "Ouvrir le simulateur", "href": "#financer" }, "chips": ["Ai-je droit au PTZ ?", "Prendre rendez-vous"] },
+    { "keys": ["parking", "garage", "stationnement", "voiture", "velo", "recharge", "borne", "cave"], "answer": "Le sous-sol compte 46 places, toutes pré-équipées pour une borne de recharge. Une place est comprise à partir du T3, deux pour les T5 ; pour un T2, elle est en option à 18 000 €. Un local de 70 vélos est accessible de plain-pied depuis le quai.", "chips": ["Les prix", "Le quartier"] },
+    { "keys": ["visite", "visiter", "rendez", "rdv", "rencontrer", "espace de vente", "horaire", "ouvert", "voir"], "answer": "L’espace de vente se trouve sur place, 12, quai des Bateliers, du mardi au samedi de 10 h à 13 h et de 14 h à 19 h. Vous y verrez la maquette au 1:100, les plans de chaque lot et les matériaux. Comptez une heure ; la visio est possible.", "link": { "label": "Choisir un créneau", "href": "#rendez-vous" }, "chips": ["Comment se passe la réservation ?", "Le quartier"] },
+    { "keys": ["quartier", "metro", "transport", "ecole", "commerce", "marche", "gare", "centre", "canal", "ou est", "adresse", "situe"], "answer": "Nous sommes au Port Saint-Sauveur, sur le canal du Midi. Métro François-Verdier à 9 minutes à pied, gare Matabiau à 7 minutes à vélo, Capitole à 10 minutes par la piste du canal. École à 4 minutes, marché le dimanche à 8 minutes.", "link": { "label": "Voir le quartier", "href": "#quartier" }, "chips": ["Prendre rendez-vous", "Le parking"] },
+    { "keys": ["reserv", "option", "bloquer", "depot", "garantie", "retract", "contrat", "vefa", "appel de fonds", "etapes"], "answer": "Une option gratuite bloque un lot pendant 7 jours. Vous signez ensuite un contrat de réservation, avec un dépôt de garantie de 2 % placé sous séquestre et dix jours de rétractation. Le prix se règle ensuite par appels de fonds, au fil de l’avancement du chantier.", "link": { "label": "Prendre rendez-vous", "href": "#rendez-vous" }, "chips": ["Date de livraison", "Simuler une mensualité"] },
+    { "keys": ["dispo", "reste", "libre", "t2", "t3", "t4", "t5", "pieces", "chambre", "terrasse", "surface", "etage", "attique", "jardin"], "answer": "Il reste 17 appartements sur 42 : 4 T2, 6 T3, 5 T4 et 2 T5, dont l’attique et sa terrasse de 96 m². Sur la maquette, filtrez par nombre de pièces et par budget : les lots qui ne correspondent pas s’estompent.", "link": { "label": "Filtrer sur la maquette", "href": "#maquette" }, "chips": ["Les prix", "Prendre rendez-vous"] },
+    { "keys": ["bonjour", "bonsoir", "salut", "hello", "coucou"], "answer": "Bonjour ! Dites-moi ce que vous cherchez : un nombre de pièces, un budget, une date d’emménagement ?", "chips": ["Les prix", "Ce qu’il reste", "Date de livraison"] },
+    { "keys": ["merci", "parfait", "super", "au revoir", "bonne journee"], "answer": "Avec plaisir. Si vous passez sur le quai, la porte de l’espace de vente est ouverte du mardi au samedi." }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="programme.js"></script>
+<script type="module" src="maquette.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+</body>
+</html>

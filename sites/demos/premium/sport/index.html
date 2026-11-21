@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FORGE — Salle de force et de conditionnement, Toulouse</title>
+<meta name="description" content="FORGE : haltérophilie, kettlebell et cours en petit groupe (8 personnes maximum) à Toulouse. Démonstration de site Premium — entreprise fictive.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23c6f432'/%3E%3Cpath d='M4 16h24M8 9v14M24 9v14M12 12v8M20 12v8' stroke='%230a0a0a' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/premium/premium.css">
+<link rel="stylesheet" href="sport.css">
+<script type="importmap">{"imports":{"three":"../../assets/vendor/three/build/three.module.min.js","three/addons/":"../../assets/vendor/three/addons/"}}</script>
+</head>
+<body>
+
+<header class="top">
+  <a class="top__brand" href="#accueil" aria-label="FORGE, retour en haut">Forge</a>
+  <nav class="top__nav" aria-label="Sections">
+    <a href="#film">Le swing</a>
+    <a href="#barre">Calculateur</a>
+    <a href="#planning">Planning</a>
+    <a href="#abonnements">Abonnements</a>
+    <a href="#lieu">La salle</a>
+  </nav>
+  <p class="top__status mono" data-open-status><i aria-hidden="true"></i><span>Lun.–ven. 6 h – 22 h</span></p>
+  <a class="btn btn--acid" href="#essai">Séance d'essai</a>
+</header>
+
+<main id="accueil">
+  <!-- ouverture : l'affiche. Colonne de titre à gauche, vidéo en biseau à droite, bandeau de chiffres en bas. -->
+  <section class="hero">
+    <div class="hero__media">
+      <video class="hero__video" data-loop muted loop playsinline preload="metadata" poster="media/kettlebell.webp">
+        <source src="media/kettlebell.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero__body">
+      <p class="hero__kicker mono"><span>Salle de force &amp; conditionnement</span><span>Toulouse · Les Minimes</span></p>
+      <h1 class="hero__title"><span>Soulève.</span><span>Répète.</span><span><b>Progresse.</b></span></h1>
+      <p class="hero__lede">Des barres, des kettlebells, huit personnes par cours et un coach qui regarde chaque répétition. Pas de machines guidées, pas d'abonnement qu'on oublie.</p>
+      <div class="hero__cta">
+        <a class="btn btn--acid" href="#essai">Réserver ma séance d'essai</a>
+        <a class="btn btn--line" href="#barre">Calculer ma barre ↓</a>
+      </div>
+    </div>
+    <a class="sticker" href="#essai"><span>1<sup>re</sup> séance</span><b>offerte</b></a>
+    <dl class="hero__stats">
+      <div><dt><span data-count="8">8</span></dt><dd>personnes max.<br>par cours</dd></div>
+      <div><dt><span data-count="14">14</span></dt><dd>plateformes<br>d'haltérophilie</dd></div>
+      <div><dt><span data-count="23">23</span></dt><dd>cours coachés<br>par semaine</dd></div>
+      <div><dt>6<small>h</small>–22<small>h</small></dt><dd>en semaine,<br>ouvert 7 j / 7</dd></div>
+    </dl>
+  </section>
+
+  <div class="bands" aria-hidden="true">
+    <div class="band band--acid marquee">
+      <div class="marquee__track">
+        <span>Haltérophilie</span><i>✕</i><span>Kettlebell</span><i>✕</i><span>Petit groupe</span><i>✕</i><span>8 max par cours</span><i>✕</i><span>Magnésie fournie</span><i>✕</i>
+        <span>Haltérophilie</span><i>✕</i><span>Kettlebell</span><i>✕</i><span>Petit groupe</span><i>✕</i><span>8 max par cours</span><i>✕</i><span>Magnésie fournie</span><i>✕</i>
+      </div>
+    </div>
+    <div class="band band--line marquee">
+      <div class="marquee__track">
+        <span>Pas de machines guidées</span><i>/</i><span>Des barres</span><i>/</i><span>Pas de miroirs partout</span><i>/</i><span>Des coachs</span><i>/</i><span>Pas de frais d'inscription</span><i>/</i><span>Des progrès notés</span><i>/</i>
+        <span>Pas de machines guidées</span><i>/</i><span>Des barres</span><i>/</i><span>Pas de miroirs partout</span><i>/</i><span>Des coachs</span><i>/</i><span>Pas de frais d'inscription</span><i>/</i><span>Des progrès notés</span><i>/</i>
+      </div>
+    </div>
+  </div>
+
+  <!-- le film : un seul plan long, la légende se découpe en trois temps (voir sport.css) -->
+  <section class="film" id="film" data-film data-length="2.4" aria-label="Le swing de kettlebell, en trois temps">
+    <div class="film__sticky">
+      <canvas class="film__canvas"></canvas>
+      <p class="film__hud" aria-hidden="true"></p>
+      <article class="film__shot" data-src="media/kettlebell" data-frames="41" data-label="Le swing">
+        <h2 class="swing__head mono">Le swing <span>— le premier geste qu'on t'apprend ici</span></h2>
+        <div class="beat beat--1">
+          <p class="beat__num" aria-hidden="true">01</p>
+          <p class="label"><b>Temps 1</b> Le sommet</p>
+          <h3 class="beat__title">Zéro<br>kilo</h3>
+          <p class="beat__text">À hauteur de poitrine, la fonte ne pèse plus rien pendant une demi-seconde. Les bras sont des cordes : ils n'ont rien tiré. Gainage serré, on souffle.</p>
+          <p class="beat__data mono">Kettlebell 16 kg · bras 0 % · hanches 100 %</p>
+        </div>
+        <div class="beat beat--2">
+          <p class="beat__num" aria-hidden="true">02</p>
+          <p class="label"><b>Temps 2</b> La chute</p>
+          <h3 class="beat__title">Laisse<br>tomber</h3>
+          <p class="beat__text">On ne freine pas : on attend. La kettlebell redescend toute seule et le buste ne bouge qu'au dernier moment, quand les avant-bras touchent les hanches.</p>
+          <p class="beat__data mono">Regard à 2 m devant · épaules basses</p>
+        </div>
+        <div class="beat beat--3">
+          <p class="beat__num" aria-hidden="true">03</p>
+          <p class="label"><b>Temps 3</b> La charnière</p>
+          <h3 class="beat__title">Tends<br>l'arc</h3>
+          <p class="beat__text">Hanches loin derrière, dos plat, tibias presque verticaux. Ce n'est pas un squat, c'est un arc qu'on bande. La répétition suivante part d'ici — et seulement d'ici.</p>
+          <p class="beat__data mono">Série type : 10 × 10, 30 s de repos</p>
+        </div>
+        <ol class="swing__rail mono" aria-hidden="true"><li>Sommet</li><li>Chute</li><li>Charnière</li></ol>
+      </article>
+    </div>
+  </section>
+
+  <!-- les disciplines : aplat vert acide, colonnes bordées de noir -->
+  <section class="disc" id="disciplines">
+    <header class="disc__head">
+      <p class="label label--ink rv"><b>01</b> Ce qu'on fait ici</p>
+      <h2 class="h2 rv" style="--i:1">Trois disciplines.<br>La technique <em>d'abord.</em></h2>
+    </header>
+    <ol class="disc__grid">
+      <li class="rv">
+        <p class="disc__n" aria-hidden="true">01</p>
+        <h3>Haltérophilie</h3>
+        <p>Arraché, épaulé-jeté. On commence au bâton, puis à la barre technique de 10 kg. La charge monte quand le geste est propre, pas avant.</p>
+        <p class="mono">7 cours / semaine · 14 plateformes · barres de 15 et 20 kg</p>
+      </li>
+      <li class="rv" style="--i:1">
+        <p class="disc__n" aria-hidden="true">02</p>
+        <h3>Kettlebell</h3>
+        <p>Swing, relevé turc, épaulé, arraché. Une seule fonte et tout le corps travaille. Le meilleur point de départ : on y apprend à pousser avec les hanches.</p>
+        <p class="mono">6 cours / semaine · de 8 à 32 kg · 60 min</p>
+      </li>
+      <li class="rv" style="--i:2">
+        <p class="disc__n" aria-hidden="true">03</p>
+        <h3>Conditionnement</h3>
+        <p>Traîneau, corde, rameur, portés de charges. Quarante-cinq minutes en petit groupe : chacun à son intensité, tout le monde finit ensemble.</p>
+        <p class="mono">6 cours / semaine · 8 personnes max. · 45 min</p>
+      </li>
+      <li class="disc__start rv" style="--i:3">
+        <p class="disc__n" aria-hidden="true">00</p>
+        <h3>Tu débutes ?</h3>
+        <p>« Bases de la barre » : quatre séances pour apprendre le squat, le soulevé de terre et le développé, avec Théo. Inclus dans tous les abonnements.</p>
+        <a class="btn btn--acid" href="#planning" data-preset-level="debutant">Voir les cours débutants</a>
+      </li>
+    </ol>
+  </section>
+
+  <!-- le calculateur de barre : la scène 3D, puis les trois réglages -->
+  <section class="calc" id="barre" data-calc>
+    <header class="calc__head">
+      <div>
+        <p class="label rv"><b>02</b> Calculateur de barre</p>
+        <h2 class="h2 rv" style="--i:1">Charge<br><em>ta barre.</em></h2>
+      </div>
+      <p class="calc__intro rv" style="--i:2">Donne ton maximum sur une répétition, choisis ta séance : on calcule la charge de travail et les disques viennent se glisser sur les manchons, dans l'ordre où tu les monteras en salle.</p>
+    </header>
+
+    <div class="calc__stage">
+      <p class="calc__big" aria-hidden="true"><span data-load>100</span><small>kg</small></p>
+      <canvas class="calc__canvas" data-bar tabindex="0" aria-label="Barre olympique chargée, en trois dimensions. Fais-la tourner avec les flèches gauche et droite, incline la vue avec haut et bas."></canvas>
+      <img class="calc__fallback" src="media/photo-1.webp" alt="" loading="lazy">
+      <p class="calc__tag mono" aria-hidden="true">Par côté <b data-side-tag>40 kg</b></p>
+      <button class="calc__view mono" type="button" data-view aria-pressed="false">Zoom sur un côté</button>
+      <p class="calc__hint mono" aria-hidden="true">↻ glisse pour tourner autour de la barre</p>
+    </div>
+
+    <div class="calc__panel">
+      <fieldset class="cell rv">
+        <legend class="label"><b>A</b> Ton maximum (1RM)</legend>
+        <div class="rm">
+          <button type="button" class="rm__btn" data-rm-step="-5" aria-label="Retirer 5 kilos">−</button>
+          <label class="rm__field"><span class="sr-only">Maximum sur une répétition, en kilos</span><input type="number" inputmode="decimal" min="20" max="300" step="0.5" value="100" data-rm><span aria-hidden="true">kg</span></label>
+          <button type="button" class="rm__btn" data-rm-step="5" aria-label="Ajouter 5 kilos">+</button>
+        </div>
+        <p class="cell__help">Le plus lourd que tu soulèves une seule fois, proprement. Entre 20 et 300 kg.</p>
+        <details class="est">
+          <summary>Tu ne connais pas ton max ?</summary>
+          <div class="est__row">
+            <label>Charge (kg)<input type="number" inputmode="decimal" min="20" max="300" step="0.5" value="80" data-est-kg></label>
+            <label>Répétitions<input type="number" inputmode="numeric" min="1" max="12" step="1" value="6" data-est-reps></label>
+          </div>
+          <p class="est__out"><span data-est-out>Max estimé : 96 kg</span> <button type="button" class="link" data-est-use>Utiliser ce max</button></p>
+          <p class="cell__help">Formule d'Epley : charge × (1 + répétitions ÷ 30). Fiable jusqu'à 10–12 répétitions.</p>
+        </details>
+      </fieldset>
+
+      <fieldset class="cell rv" style="--i:1">
+        <legend class="label"><b>B</b> Ta séance</legend>
+        <div class="sessions">
+          <button type="button" data-session data-pct="40" data-sets="2" data-reps="10" aria-pressed="false"><b>40 %</b><span>Échauffement</span><em>2 × 10</em></button>
+          <button type="button" data-session data-pct="60" data-sets="3" data-reps="8" aria-pressed="false"><b>60 %</b><span>Technique</span><em>3 × 8</em></button>
+          <button type="button" data-session data-pct="70" data-sets="4" data-reps="6" aria-pressed="false"><b>70 %</b><span>Volume</span><em>4 × 6</em></button>
+          <button type="button" data-session data-pct="80" data-sets="5" data-reps="5" aria-pressed="true"><b>80 %</b><span>Force</span><em>5 × 5</em></button>
+          <button type="button" data-session data-pct="90" data-sets="3" data-reps="2" aria-pressed="false"><b>90 %</b><span>Lourd</span><em>3 × 2</em></button>
+          <button type="button" data-session data-pct="100" data-sets="1" data-reps="1" aria-pressed="false"><b>100 %</b><span>Test de max</span><em>1 × 1</em></button>
+        </div>
+        <label class="pct">
+          <span>Ou un pourcentage libre : <b data-pct-out>80 %</b></span>
+          <input type="range" min="30" max="100" step="2.5" value="80" data-pct>
+        </label>
+      </fieldset>
+
+      <div class="cell cell--out rv" style="--i:2">
+        <p class="label label--ink"><b>C</b> Sur la barre</p>
+        <p class="out__total"><span data-total>100</span> kg</p>
+        <p class="out__formula mono" data-formula>20 (barre) + 2 × 40 = 100 kg</p>
+        <p class="out__side"><b>Par côté</b> <span data-side>40 kg</span></p>
+        <ol class="plates" data-plates aria-label="Disques à monter de chaque côté, du manchon vers l'extérieur"></ol>
+        <p class="out__note" data-note></p>
+        <p class="out__volume mono" data-volume></p>
+        <p class="sr-only" aria-live="polite" data-spoken></p>
+      </div>
+    </div>
+
+    <div class="rule rv">
+      <p class="label"><b>!</b> La règle du calcul</p>
+      <p>Charge visée = ton max × le pourcentage. On retire les <b>20 kg de la barre</b>, on divise par deux, puis on arrondit <b>aux 2,5 kg inférieurs par côté</b> — c'est notre plus petit disque. La barre chargée tombe donc sur un multiple de 5 kg, jamais au-dessus de ta cible : mieux vaut 2,5 kg de moins et toutes les répétitions propres. Disques montés du plus lourd au plus léger ; les colliers à clip (200 g la paire) ne sont pas comptés.</p>
+      <ul class="legend mono" aria-label="Couleurs des disques">
+        <li style="--c:#d6202b">25 kg rouge</li>
+        <li style="--c:#1d5fd6">20 kg bleu</li>
+        <li style="--c:#f4c20d">15 kg jaune</li>
+        <li style="--c:#1c9a48">10 kg vert</li>
+        <li style="--c:#ecebe6">5 kg blanc</li>
+        <li style="--c:#2b2b2e">2,5 kg noir</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- le planning de la semaine -->
+  <section class="plan" id="planning" data-planning>
+    <header class="plan__head">
+      <div>
+        <p class="label label--ink rv"><b>03</b> Planning</p>
+        <h2 class="h2 rv" style="--i:1">La semaine,<br>heure par heure</h2>
+      </div>
+      <div class="filters rv" style="--i:2">
+        <div class="filter" role="group" aria-label="Discipline">
+          <span class="mono">Discipline</span>
+          <button type="button" data-filter="disc" data-value="" aria-pressed="true">Toutes</button>
+          <button type="button" data-filter="disc" data-value="haltero" aria-pressed="false">Haltérophilie</button>
+          <button type="button" data-filter="disc" data-value="kettlebell" aria-pressed="false">Kettlebell</button>
+          <button type="button" data-filter="disc" data-value="conditionnement" aria-pressed="false">Conditionnement</button>
+          <button type="button" data-filter="disc" data-value="bases" aria-pressed="false">Bases de la barre</button>
+        </div>
+        <div class="filter" role="group" aria-label="Niveau">
+          <span class="mono">Niveau</span>
+          <button type="button" data-filter="level" data-value="" aria-pressed="true">Tous</button>
+          <button type="button" data-filter="level" data-value="debutant" aria-pressed="false">Débutant</button>
+          <button type="button" data-filter="level" data-value="intermediaire" aria-pressed="false">Intermédiaire</button>
+          <button type="button" data-filter="level" data-value="confirme" aria-pressed="false">Confirmé</button>
+        </div>
+        <div class="filter" role="group" aria-label="Créneau">
+          <span class="mono">Créneau</span>
+          <button type="button" data-filter="slot" data-value="" aria-pressed="true">Toute la journée</button>
+          <button type="button" data-filter="slot" data-value="matin" aria-pressed="false">Matin</button>
+          <button type="button" data-filter="slot" data-value="midi" aria-pressed="false">Midi</button>
+          <button type="button" data-filter="slot" data-value="soir" aria-pressed="false">Soir</button>
+        </div>
+        <p class="filters__count mono" data-count-out aria-live="polite">23 cours cette semaine</p>
+      </div>
+    </header>
+
+    <div class="week" data-week tabindex="0" role="region" aria-label="Planning de la semaine, par jour"></div>
+    <p class="week__hint mono" aria-hidden="true">← glisse pour voir toute la semaine →</p>
+
+    <div class="ticket" data-ticket>
+      <div class="ticket__what">
+        <p class="label"><b>→</b> Ta réservation</p>
+        <p class="ticket__title" data-ticket-title>Choisis un cours</p>
+        <p class="ticket__meta mono" data-ticket-meta>Clique sur « Réserver » dans la grille : le cours vient s'inscrire ici.</p>
+      </div>
+      <form class="ticket__form" data-book novalidate hidden>
+        <label>Prénom<input type="text" name="prenom" autocomplete="given-name" required></label>
+        <label>E-mail<input type="email" name="email" autocomplete="email" required></label>
+        <button class="btn btn--acid" type="submit" data-book-submit>Confirmer ma place</button>
+        <p class="ticket__msg mono" data-book-msg role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- les abonnements -->
+  <section class="subs" id="abonnements" data-subs>
+    <header class="subs__head">
+      <div>
+        <p class="label rv"><b>04</b> Abonnements</p>
+        <h2 class="h2 rv" style="--i:1">Trois formules.<br><em>Zéro frais d'entrée.</em></h2>
+      </div>
+      <fieldset class="switch rv" style="--i:2">
+        <legend class="sr-only">Rythme de paiement</legend>
+        <label><input type="radio" name="rythme" value="mensuel" checked><span>Mensuel</span></label>
+        <label><input type="radio" name="rythme" value="annuel"><span>Annuel <small>2 mois offerts</small></span></label>
+      </fieldset>
+    </header>
+    <div class="subs__grid">
+      <article class="plan-card rv" data-plan="Plateau" data-monthly="48">
+        <p class="mono">Formule 1</p>
+        <h3>Plateau</h3>
+        <p class="price"><b data-price>48</b><span>€ / mois</span></p>
+        <p class="price__sub mono" data-price-sub>Sans engagement · préavis de 30 jours</p>
+        <ul>
+          <li>Accès libre aux plateformes et aux racks, 7 j / 7</li>
+          <li>Une séance de prise en main avec un coach</li>
+          <li>Magnésie, casier et douche compris</li>
+        </ul>
+        <a class="btn btn--line" href="#essai" data-choose="Plateau">Essayer d'abord</a>
+      </article>
+      <article class="plan-card plan-card--main rv" style="--i:1" data-plan="Collectif" data-monthly="72">
+        <p class="mono">Formule 2 · la plus choisie</p>
+        <h3>Collectif</h3>
+        <p class="price"><b data-price>72</b><span>€ / mois</span></p>
+        <p class="price__sub mono" data-price-sub>Sans engagement · préavis de 30 jours</p>
+        <ul>
+          <li>Tout « Plateau »</li>
+          <li>Cours en petit groupe illimités (8 personnes max.)</li>
+          <li>Le cycle « Bases de la barre » pour démarrer</li>
+          <li>Carnet de charges tenu par ton coach</li>
+        </ul>
+        <a class="btn btn--ink" href="#essai" data-choose="Collectif">Essayer d'abord</a>
+      </article>
+      <article class="plan-card rv" style="--i:2" data-plan="Coaché" data-monthly="108">
+        <p class="mono">Formule 3</p>
+        <h3>Coaché</h3>
+        <p class="price"><b data-price>108</b><span>€ / mois</span></p>
+        <p class="price__sub mono" data-price-sub>Sans engagement · préavis de 30 jours</p>
+        <ul>
+          <li>Tout « Collectif »</li>
+          <li>Deux séances individuelles par mois</li>
+          <li>Programme écrit pour toi, revu toutes les 6 semaines</li>
+          <li>Analyse vidéo de tes barres</li>
+        </ul>
+        <a class="btn btn--line" href="#essai" data-choose="Coaché">Essayer d'abord</a>
+      </article>
+    </div>
+    <dl class="extras mono rv">
+      <div><dt>Séance d'essai</dt><dd>offerte</dd></div>
+      <div><dt>Carnet de 10 cours</dt><dd>130 €</dd></div>
+      <div><dt>Coaching individuel</dt><dd>55 € la séance</dd></div>
+      <div><dt>Étudiants, − 26 ans</dt><dd>− 15 %</dd></div>
+    </dl>
+  </section>
+
+  <!-- la salle, les chiffres, les coachs -->
+  <section class="place" id="lieu">
+    <figure class="place__photo" data-in>
+      <img src="media/photo-1.webp" alt="La salle FORGE vide : racks noirs, disques de couleur rangés, plateformes en bois sous des néons verts" loading="lazy" width="1168" height="880">
+      <figcaption class="mono">La salle, 5 h 50 — dix minutes avant l'ouverture</figcaption>
+    </figure>
+    <div class="place__text">
+      <p class="label rv"><b>05</b> La salle</p>
+      <h2 class="h2 rv" style="--i:1">620 m² de fonte,<br><em>pas un tapis de course.</em></h2>
+      <p class="text rv" style="--i:2">Un ancien atelier de chaudronnerie aux Minimes, refait autour d'une idée simple : de la place pour soulever. Chaque plateforme a sa barre, ses disques et son bac à magnésie. Personne n'attend son tour.</p>
+      <dl class="figures rv" style="--i:3">
+        <div><dt><span data-count="2400">2 400</span><small>kg</small></dt><dd>de disques sur les râteliers</dd></div>
+        <div><dt><span data-count="312">312</span></dt><dd>membres, liste fermée à 340</dd></div>
+        <div><dt><span data-count="4.9" data-decimals="1">4,9</span><small>/5</small></dt><dd>sur 187 avis vérifiés</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="crew" id="equipe">
+    <div class="crew__list">
+      <p class="label rv"><b>06</b> Les coachs</p>
+      <h2 class="h2 h2--s rv" style="--i:1">Trois paires d'yeux<br>sur ta barre</h2>
+      <ol>
+        <li class="rv"><b>Inès Carrère</b><span>Haltérophilie</span><p>Onze ans de plateau, ancienne compétitrice régionale. Elle te fera travailler au bâton plus longtemps que tu ne le voudrais.</p></li>
+        <li class="rv" style="--i:1"><b>Malik Benaouda</b><span>Kettlebell · conditionnement</span><p>Il compte tes répétitions à voix haute et n'en valide aucune de travers. Ses cours de midi sont pleins dès le lundi.</p></li>
+        <li class="rv" style="--i:2"><b>Théo Lasserre</b><span>Bases de la barre · débutants</span><p>Préparateur physique diplômé. Sa spécialité : les gens qui pensent que « ce n'est pas pour eux ».</p></li>
+      </ol>
+    </div>
+    <figure class="crew__photo" data-in>
+      <img src="media/photo-2.webp" alt="Un cours en petit groupe vu de dos : six personnes tiennent une barre à bout de bras, dans un nuage de magnésie" loading="lazy" width="1168" height="880">
+      <figcaption class="mono">Haltérophilie, mardi 19 h 45</figcaption>
+    </figure>
+  </section>
+
+  <section class="voices" aria-label="Avis des membres">
+    <blockquote class="rv">
+      <p>Arrivée sans avoir jamais touché une barre. Six mois plus tard, je squatte mon poids de corps — et surtout je sais pourquoi je le fais.</p>
+      <footer class="mono">Camille R. · membre depuis 2025</footer>
+    </blockquote>
+    <blockquote class="rv" style="--i:1">
+      <p>Huit par cours, ça change tout. Inès a corrigé mon arraché en trois séances, après deux ans à tourner en rond tout seul.</p>
+      <footer class="mono">Julien M. · formule Collectif</footer>
+    </blockquote>
+    <blockquote class="rv" style="--i:2">
+      <p>J'ai 58 ans et un dos capricieux. On a commencé avec une kettlebell de 8 kg. Je n'ai plus mal, et j'en suis à 20.</p>
+      <footer class="mono">Bernard T. · kettlebell du mercredi</footer>
+    </blockquote>
+  </section>
+
+  <section class="infos" id="venir">
+    <h2 class="sr-only">Infos pratiques</h2>
+    <dl class="infos__grid">
+      <div class="rv"><dt class="mono">Adresse</dt><dd>12, allée de l'Enclume<br>31200 Toulouse</dd></div>
+      <div class="rv" style="--i:1"><dt class="mono">Horaires</dt><dd>Lun.–ven. 6 h – 22 h<br>Sam. 8 h – 18 h · Dim. 9 h – 13 h</dd></div>
+      <div class="rv" style="--i:2"><dt class="mono">Venir</dt><dd>Métro B, Canal du Midi : 6 min à pied<br>Arceaux vélo dans la cour, 8 places voiture</dd></div>
+      <div class="rv" style="--i:3"><dt class="mono">Sur place</dt><dd>6 douches, casiers à code<br>Magnésie et eau fraîche à volonté</dd></div>
+    </dl>
+  </section>
+
+  <!-- la séance d'essai -->
+  <section class="trial" id="essai">
+    <div class="trial__text">
+      <p class="label label--ink rv"><b>07</b> Séance d'essai</p>
+      <h2 class="h2 rv" style="--i:1">Viens<br>soulever<br>une fois.</h2>
+      <p class="text rv" style="--i:2">La première séance est offerte et sans engagement : quarante-cinq minutes avec un coach, à ton niveau. Tu repars en sachant faire un swing. Prévois une tenue de sport et des chaussures à semelle plate.</p>
+      <button class="btn btn--line rv" style="--i:3" type="button" data-chat-open>Une question ? Demande à Coach</button>
+    </div>
+    <form class="form rv" style="--i:2" data-demo="C'est noté ! Ceci est une démonstration : aucune demande n'a été envoyée.">
+      <label>Prénom<input type="text" name="prenom" autocomplete="given-name" required></label>
+      <label>Téléphone<input type="tel" name="tel" autocomplete="tel" required></label>
+      <label>Ce qui te tente<select name="discipline"><option>Kettlebell</option><option>Haltérophilie</option><option>Conditionnement</option><option>Bases de la barre</option><option>Je ne sais pas encore</option></select></label>
+      <label>Ton niveau<select name="niveau"><option>Jamais touché une barre</option><option>Je m'entraîne déjà un peu</option><option>Je m'entraîne régulièrement</option></select></label>
+      <label>Formule envisagée<select name="formule" data-formule><option>Je verrai après l'essai</option><option>Plateau</option><option>Collectif</option><option>Coaché</option></select></label>
+      <label>Plutôt<select name="creneau"><option>Le matin (6 h – 9 h)</option><option>Le midi (12 h – 14 h)</option><option>Le soir (17 h – 21 h)</option><option>Le week-end</option></select></label>
+      <button class="btn btn--ink" type="submit">Demander ma séance d'essai</button>
+      <p class="form__done mono" data-done role="status"></p>
+    </form>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__big" aria-hidden="true">Forge</p>
+  <div class="foot__row">
+    <p class="mono">© <span data-year>2026</span> FORGE — entreprise fictive · 12, allée de l'Enclume, 31200 Toulouse · 05 00 00 00 00</p>
+    <p>Site de démonstration, formule Premium — entreprise fictive ; photos et vidéos générées par IA. Adresse, prix, horaires et avis sont inventés.</p>
+    <p class="foot__links mono"><a href="../../eco/demos/salle-de-sport/">Voir la version Éco de ce métier</a><a href="../../">Toutes les démos</a></p>
+  </div>
+</footer>
+
+<a class="tag" href="../../">← Démos <b>Premium</b></a>
+
+<script type="application/json" id="chat">
+{
+  "name": "Coach",
+  "role": "Assistant de FORGE",
+  "launch": "Demander à Coach",
+  "greeting": "Salut ! Moi c'est Coach. Séance d'essai, horaires, tarifs, premiers pas ? Pose ta question, je réponds sans détour.",
+  "chips": ["Séance d'essai", "Je débute", "Les tarifs", "Les horaires"],
+  "fallback": "Celle-là, je préfère la laisser à l'équipe : passe à l'accueil ou appelle le 05 00 00 00 00. Je peux t'aider pour la séance d'essai, le planning, les tarifs, la résiliation, les vestiaires ou le coaching individuel.",
+  "intents": [
+    { "keys": ["essai", "essayer", "tester", "decouvr", "premiere seance", "gratuit", "offert"], "answer": "La première séance est offerte : 45 minutes avec un coach, à ton niveau, sans engagement. Tenue de sport, chaussures à semelle plate, et c'est tout. Laisse ton prénom et ton numéro, on te rappelle dans la journée pour caler le créneau.", "link": { "label": "Demander ma séance d'essai", "href": "#essai" }, "chips": ["Je débute", "Les horaires"] },
+    { "keys": ["debut", "jamais", "novice", "peur", "niveau", "pas sportif", "bases", "vieux", "surpoids", "senior"], "answer": "Tu es au bon endroit. La moitié de nos membres n'avaient jamais touché une barre en arrivant. On commence par « Bases de la barre » : quatre séances avec Théo, au bâton puis à vide. Personne ne te regarde, à part le coach — et c'est son métier.", "link": { "label": "Voir les cours débutants", "href": "#planning" }, "chips": ["Séance d'essai", "Les tarifs"] },
+    { "keys": ["horaire", "ouvert", "ouvre", "ferme", "heure", "dimanche", "samedi", "ferie"], "answer": "Du lundi au vendredi de 6 h à 22 h, le samedi de 8 h à 18 h, le dimanche de 9 h à 13 h. Jours fériés : horaires du dimanche. Les cours coachés sont dans le planning.", "link": { "label": "Voir le planning", "href": "#planning" }, "chips": ["Où êtes-vous ?", "Séance d'essai"] },
+    { "keys": ["tarif", "prix", "combien", "abonnement", "cout", "coute", "formule", "etudiant", "reduction", "carnet"], "answer": "Trois formules, sans frais d'inscription : Plateau à 48 € par mois (accès libre), Collectif à 72 € (cours illimités), Coaché à 108 € (avec 2 séances individuelles). En annuel, deux mois sont offerts. Étudiants et moins de 26 ans : − 15 %. Carnet de 10 cours : 130 €.", "link": { "label": "Comparer les formules", "href": "#abonnements" }, "chips": ["Résilier ?", "Coaching individuel"] },
+    { "keys": ["resili", "arret", "engagement", "annul", "suspend", "pause", "blessure", "demenag", "rembours"], "answer": "En mensuel, aucun engagement : tu résilies depuis ton espace membre ou à l'accueil, avec 30 jours de préavis. En annuel, tu es engagé 12 mois, mais on suspend l'abonnement jusqu'à 3 mois sur certificat médical, et on rembourse au prorata en cas de déménagement à plus de 30 km.", "chips": ["Les tarifs", "Séance d'essai"] },
+    { "keys": ["douche", "casier", "vestiaire", "serviette", "cadenas", "affaires", "magnesie"], "answer": "Six douches individuelles, deux vestiaires, des casiers à code : pas besoin de cadenas. Apporte ta serviette ; la magnésie et l'eau fraîche sont fournies. Le sèche-cheveux aussi, on y tient.", "chips": ["Les horaires", "Où êtes-vous ?"] },
+    { "keys": ["coaching", "individuel", "personnalise", "programme", "prive", "particulier", "suivi"], "answer": "Une séance individuelle coûte 55 € (480 € les dix). La formule Coaché, à 108 € par mois, en inclut deux, avec un programme écrit pour toi et une analyse vidéo de tes barres. Dis-nous ton objectif dans le formulaire, on te met avec le bon coach.", "link": { "label": "Voir la formule Coaché", "href": "#abonnements" }, "chips": ["Séance d'essai", "Les tarifs"] },
+    { "keys": ["planning", "cours", "creneau", "reserver", "reservation", "complet", "liste d attente", "kettlebell", "haltero", "conditionnement"], "answer": "23 cours par semaine, huit personnes maximum. Tu filtres par discipline, niveau et créneau, et tu réserves ta place directement dans le planning. Si c'est complet, inscris-toi en liste d'attente : une place sur trois se libère la veille.", "link": { "label": "Ouvrir le planning", "href": "#planning" }, "chips": ["Je débute", "Les tarifs"] },
+    { "keys": ["adresse", "ou etes", "ou est", "trouver", "metro", "parking", "velo", "venir", "acces", "quartier"], "answer": "12, allée de l'Enclume, aux Minimes. Métro B, station Canal du Midi, puis six minutes à pied. Arceaux vélo dans la cour et huit places de parking devant l'atelier.", "link": { "label": "Infos pratiques", "href": "#venir" }, "chips": ["Les horaires", "Séance d'essai"] },
+    { "keys": ["charge", "barre", "disque", "1rm", "max", "pourcentage", "calcul", "5x5", "combien mettre"], "answer": "Le calculateur fait ça pour toi : tu donnes ton max, tu choisis ta séance, et il charge la barre en 3D avec le détail par côté. On arrondit toujours aux 2,5 kg inférieurs par côté.", "link": { "label": "Calculer ma barre", "href": "#barre" }, "chips": ["Je débute", "Coaching individuel"] },
+    { "keys": ["mal de dos", "dos", "genou", "epaule", "douleur", "medecin", "sante", "enceinte", "grossesse", "operation"], "answer": "On adapte, mais on ne joue pas au médecin : avec une douleur ou une reprise après blessure, demande d'abord un feu vert médical, puis dis-le au coach dès l'essai. Il ajustera les charges et les amplitudes. Beaucoup de nos membres sont venus pour un dos fragile.", "link": { "label": "Demander ma séance d'essai", "href": "#essai" } },
+    { "keys": ["bonjour", "salut", "bonsoir", "hello", "coucou"], "answer": "Salut ! Qu'est-ce que je peux faire pour toi ?", "chips": ["Séance d'essai", "Je débute", "Les tarifs"] },
+    { "keys": ["merci", "super", "parfait", "top", "genial", "cool"], "answer": "Avec plaisir. À bientôt sur le plateau !" }
+  ]
+}
+</script>
+
+<script type="module" src="../../assets/premium/film.js"></script>
+<script type="module" src="barre.js"></script>
+<script type="module" src="../../assets/premium/chat.js"></script>
+<script type="module" src="../../assets/premium/ui.js"></script>
+<script type="module" src="parcours.js"></script>
+</body>
+</html>
